@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id   String   @id @default(uuid())
+  login     String   @unique
+  password  String
+  user_type UserType @default(USER)
+  farms     Farm[]
+}
+
+model Farm {
+  farm_id   String  @id @default(uuid())
+  farm_name String
+  city      String
+  lng       Float
+  lat       Float
+  gateway   String
+  users      User[]
+  pivots    Pivot[]
+}
+
+model Pivot {
+  pivot_id    String   @id @default(uuid())
+  pivot_name  String
+  lng         Float
+  lat         Float
+  start_angle Int
+  end_angle   Int
+  radius      Float
+  farm_id     String
+  updatedAt DateTime @updatedAt
+  farm        Farm     @relation(fields: [farm_id], references: [farm_id])
+  cycles      Cycle[]
+  intents     Intent[]
+  radio       Radio?
+}
+
+model Cycle {
+  cycle_id        String          @id @default(uuid())
+  is_running      Boolean
+  pivot_id        String
+  updatedAt DateTime @updatedAt
+  pivot           Pivot           @relation(fields: [pivot_id], references: [pivot_id])
+  cycle_states    CycleState[]
+  cycle_variables CycleVariable[]
+}
+
+model Intent {
+  intent_id      String           @id @default(uuid())
+  power          PowerState
+  water          Intent_water
+  direction      Intent_direction
+  percentimenter Int
+  start_angle    Int
+  end_angle      Int
+  date_on        DateTime
+  date_off       DateTime
+  pivot_id       String
+  updatedAt DateTime @updatedAt
+  pivot          Pivot            @relation(fields: [pivot_id], references: [pivot_id])
+}
+
+model Radio {
+  radio_id Int    @id
+  rssi     Int
+  rank     Int
+  father   String
+  pivot_id String @unique
+  updatedAt DateTime @updatedAt
+  Pivot    Pivot  @relation(fields: [pivot_id], references: [pivot_id])
+}
+
+model CycleState {
+  cycle_state_id String          @id @default(uuid())
+  water          WaterState
+  direction      DirectionState
+  connection     ConnectionState
+  start_angle    Int
+  end_angle      Int
+  cycle_id       String
+  updatedAt DateTime @updatedAt
+  cycle          Cycle           @relation(fields: [cycle_id], references: [cycle_id])
+}
+
+model CycleVariable {
+  cycle_variable String @id @default(uuid())
+  angle          Int
+  percentimeter  Int
+  pressure       Int
+  cycle_id       String
+  updatedAt DateTime @updatedAt
+  cycle          Cycle  @relation(fields: [cycle_id], references: [cycle_id])
+}
+
+enum UserType {
+  SUDO
+  USER
+  MANAGER
+  ADMIN
+}
+
+enum PowerState {
+  NULL
+  ON
+  OFF
+}
+
+enum WaterState {
+  NULL
+  DRY
+  WET
+}
+
+enum DirectionState {
+  NULL
+  CLOCKWISE
+  ANTI_CLOCKWISE
+}
+
+enum ConnectionState {
+  ONLINE
+  OFFLINE
+}
+
+enum Intent_water {
+  NULL
+  DRY
+  WET
+}
+
+enum Intent_direction {
+  NULL
+  CLOCKWISE
+  ANTI_CLOCKWISE
+}
