@@ -1,6 +1,7 @@
-import { Prisma, PrismaClient, User } from '@prisma/client';
+import { Prisma, PrismaClient, User, UserType } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import {DuplicateUniqueError} from '../types/errors';
 
 const db = new PrismaClient();
 
@@ -10,7 +11,7 @@ type Cookie = {
   token: string;
 };
 
-export const loginController = async (
+export const signInController = async (
   login: User['login'],
   password: User['password']
 ): Promise<Cookie | null> => {
@@ -53,8 +54,7 @@ export const registerController = async (
   const oldUser = await db.user.findUnique({ where: { login } });
 
   if (oldUser) {
-    console.error(`User with login ${login} already exists!`);
-    return null;
+    throw new DuplicateUniqueError("login");
   }
 
   const newPass = await bcrypt.hash(password, 10);
