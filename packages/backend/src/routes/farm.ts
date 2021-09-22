@@ -1,8 +1,10 @@
 import express from 'express';
-import verifyUser from '../middlewares/user';
+import authMiddleware from '../middlewares/auth';
+import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
   createFarmController,
-  readAllFarmController
+  readAllFarmController,
+  addUserToFarmController
 } from '../controllers/farm';
 
 const router = express.Router();
@@ -26,18 +28,54 @@ router.post('/create', async (req, res, next) => {
   }
 });
 
-router.post('/update');
+router.get(
+  '/readAll',
+  authMiddleware(['USER']),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const user = req.user;
 
-router.get('/readAll', verifyUser, async (req: Request & {user: }, res, next) => {
-  const user = req.user;
+      try {
+        const farms = await readAllFarmController(user.user_id);
 
-  try {
-    const farms = await readAllFarmController(user.user_id);
+        return res.send(farms);
+      } catch (err) {
+        next(err);
+      }
+    }
+  )
+);
 
-    return res.send(farms);
-  } catch (err) {
-    next(err);
-  }
-});
+router.put(
+  '/addUser/:target_farm_id',
+  authMiddleware(['ADMIN']),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const user = req.user;
+      const { target_farm_id } = req.params;
+      const { target_user_id } = req.body;
+
+      try {
+        const farms = await addUserToFarmController(
+          user.user_id,
+          target_user_id,
+          target_farm_id
+        );
+
+        return res.send(farms);
+      } catch (err) {
+        next(err);
+      }
+    }
+  )
+);
 
 export default router;

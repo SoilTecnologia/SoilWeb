@@ -1,7 +1,8 @@
 import { Prisma, PrismaClient, User, Farm } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import user from '../middlewares/user';
+import user from '../middlewares/auth';
+import { isAdminOf } from '../utils/admin';
 
 const db = new PrismaClient();
 
@@ -89,12 +90,43 @@ export const updateFarmController = async (
   return newFarm;
 };
 
-export const deleteFarm = async (
+export const deleteFarmController = async (
   farm_id: Farm['farm_id']
 ): Promise<boolean> => {
   const hasDeleted = await db.farm.delete({ where: { farm_id } });
 
   if (hasDeleted) return true;
+
+  return false;
+};
+
+export const addUserToFarmController = async (
+  user_id: User['user_id'],
+  target_user_id: User['user_id'],
+  target_farm_id: Farm['farm_id']
+): Promise<boolean> => {
+  const user = await db.user.findUnique({ where: { user_id } });
+  const targetUser = await db.user.findUnique({
+    where: { user_id: target_user_id }
+  });
+  const targetFarm = await db.farm.findUnique({
+    where: { farm_id: target_farm_id },
+    include: { users: true }
+  });
+
+  if (user && targetFarm && targetUser) {
+    //if (isAdminOf(user, targetFarm)) {
+    await db.farm.update({
+      where: { farm_id: target_farm_id },
+      data: {
+        users: {
+          connect: [user]
+        }
+      }
+    });
+
+    return true;
+  }
 
   return false;
 };
