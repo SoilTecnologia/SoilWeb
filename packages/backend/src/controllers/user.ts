@@ -39,6 +39,7 @@ export const signInController = async (
 
     return response;
   } else {
+    console.log("AQQQ")
     console.log(user);
     if (user) console.log(await bcrypt.compare(password, user.password));
   }
@@ -46,7 +47,7 @@ export const signInController = async (
   return null;
 };
 
-export const registerController = async (
+export const signUpController = async (
   login: User['login'],
   password: User['password'],
   user_type: User['user_type']

@@ -27,9 +27,7 @@ const authMiddleware = (
     const token = req.headers.authorization;
     if (!token) return res.status(401).send('No token provided');
 
-    const decode = <TokenInfo>(
-      jwt.verify(token, process.env.TOKEN_SECRET as jwt.Secret)
-    );
+    const decode = <TokenInfo>jwt.verify(token, process.env.TOKEN_SECRET as jwt.Secret);
 
     if (!isType(decode.user_type, target_types))
       return res.status(401).send('Failed to authenticate token.');

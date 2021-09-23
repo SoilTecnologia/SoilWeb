@@ -9,3 +9,7 @@ export function isType(user_type: string, target_types: (keyof typeof UserType)[
 	}
 	return false;
 }
+
+export function isTypeOfFarm(user_type: string, target_types: (keyof typeof UserType)[], target_farm_id: string) {
+	
+}

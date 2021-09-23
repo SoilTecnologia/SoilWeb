@@ -20,11 +20,14 @@ function error(
   res: express.Response,
   next: express.NextFunction
 ) {
-  console.error(err.stack);
+  if (err.name == 'TokenExpiredError') {
+    res.status(401).send('Token expired!');
+  } else {
+    console.error(err.stack);
 
-  res.status(500);
-  res.send('Internal Server Error');
-
+    res.status(500);
+    res.send('Internal Server Error');
+  }
   next();
 }
 

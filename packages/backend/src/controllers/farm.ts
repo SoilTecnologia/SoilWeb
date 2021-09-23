@@ -1,8 +1,8 @@
-import { Prisma, PrismaClient, User, Farm } from '@prisma/client';
+import { Prisma, PrismaClient, User, UserType, Farm } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import user from '../middlewares/auth';
-import { isAdminOf } from '../utils/admin';
+import { isUserTypeOf } from '../utils/farm';
 
 const db = new PrismaClient();
 
@@ -12,7 +12,6 @@ export const createFarmController = async (
   lng: Farm['lng'],
   lat: Farm['lat'],
   gateway: Farm['gateway'],
-  user_ids?: User['user_id'][]
 ): Promise<Farm | null> => {
   let farmUsers: User[] = [];
 
@@ -25,41 +24,24 @@ export const createFarmController = async (
       gateway
     }
   });
-
-  if (user_ids) {
-    user_ids.forEach(async (user_id) => {
-      const user = await db.user.findFirst({ where: { user_id } });
-      if (user) {
-        farmUsers.push(user);
-      }
-    });
-  }
-
-  await db.farm.update({
-    where: { farm_id: newFarm.farm_id },
-    data: {
-      users: {
-        connect: farmUsers
-      }
-    }
-  });
-
   return newFarm;
 };
 
 export const readAllFarmController = async (
   user_id: User['user_id']
 ): Promise<Pick<Farm, 'farm_id' | 'farm_name' | 'city'>[] | null> => {
-  const farms = await db.farm.findMany({
+  const farms = await db.farmUser.findMany({
     where: {
-      users: {
-        some: { user_id }
-      }
+      user_id: user_id
     },
     select: {
-      farm_id: true,
-      farm_name: true,
-      city: true
+      farm: {
+        select: {
+          farm_id: true,
+          farm_name: true,
+          city: true
+        }
+      }
     }
   });
 
@@ -115,17 +97,32 @@ export const addUserToFarmController = async (
   });
 
   if (user && targetFarm && targetUser) {
-    //if (isAdminOf(user, targetFarm)) {
-    await db.farm.update({
-      where: { farm_id: target_farm_id },
-      data: {
-        users: {
-          connect: [user]
-        }
+    if (targetUser.user_type == 'ADMIN') {
+      if (isUserTypeOf(user, targetFarm, ['SUDO'])) {
+        await db.farm.update({
+          where: { farm_id: target_farm_id },
+          data: {
+            users: {
+              connect: [user]
+            }
+          }
+        });
+        return true;
       }
-    });
+    } else {
+      if (isUserTypeOf(user, targetFarm, ['SUDO','ADMIN'])) {
+        await db.farm.update({
+          where: { farm_id: target_farm_id },
+          data: {
+            users: {
+              connect: [user]
+            }
+          }
+        });
+      }
 
-    return true;
+      return true;
+    }
   }
 
   return false;

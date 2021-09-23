@@ -1,5 +1,5 @@
 import express from 'express';
-import { signInController, registerController } from '../controllers/user';
+import { signInController, signUpController } from '../controllers/user';
 
 const router = express.Router();
 
@@ -7,7 +7,7 @@ router.post('/signup', async (req, res, next) => {
   const { login, password, user_type } = req.body;
 
   try {
-    const cookieInfo = await registerController(login, password, user_type);
+    const cookieInfo = await signUpController(login, password, user_type);
 
     res.send(cookieInfo);
   } catch (err) {

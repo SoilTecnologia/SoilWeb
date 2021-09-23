@@ -78,4 +78,32 @@ router.put(
   )
 );
 
+router.put(
+  '/addAdmin/:target_farm_id',
+  authMiddleware(['SUDO']),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const user = req.user;
+      const { target_farm_id } = req.params;
+      const { target_user_id } = req.body;
+
+      try {
+        const farms = await addUserToFarmController(
+          user.user_id,
+          target_user_id,
+          target_farm_id
+        );
+
+        return res.send(farms);
+      } catch (err) {
+        next(err);
+      }
+    }
+  )
+);
+
 export default router;

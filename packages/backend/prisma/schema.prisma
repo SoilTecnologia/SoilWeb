@@ -12,7 +12,7 @@ model User {
   login     String   @unique
   password  String
   user_type UserType @default(USER)
-  farms     Farm[]
+  farms FarmUser[]
 }
 
 model Farm {
@@ -22,8 +22,16 @@ model Farm {
   lng       Float
   lat       Float
   gateway   String
-  users      User[]
   pivots    Pivot[]
+  users FarmUser[]
+}
+
+model FarmUser {
+  farm_user_id String @id @default(uuid())
+  farm Farm @relation(fields: [farm_id], references: [farm_id])
+  farm_id String
+  user User @relation(fields: [user_id], references: [user_id])
+  user_id String
 }
 
 model Pivot {
