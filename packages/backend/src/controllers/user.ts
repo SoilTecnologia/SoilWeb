@@ -1,20 +1,21 @@
 import { Prisma, PrismaClient, User, UserType } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import {DuplicateUniqueError} from '../types/errors';
+import { DuplicateUniqueError, InvalidCredentials, InvalidRequestBody } from '../types/errors';
 
 const db = new PrismaClient();
 
-type Cookie = {
+type Response = {
   user_type: User['user_type'];
   user_id: User['user_id'];
   token: string;
+  user: User;
 };
 
 export const signInController = async (
   login: User['login'],
   password: User['password']
-): Promise<Cookie | null> => {
+): Promise<Response | null> => {
   const user = await db.user.findUnique({ where: { login } });
 
   if (user && (await bcrypt.compare(password, user.password))) {
@@ -34,60 +35,60 @@ export const signInController = async (
     const response = {
       user_id,
       user_type,
-      token
+      token,
+      user
     };
 
     return response;
   } else {
-    console.log("AQQQ")
-    console.log(user);
-    if (user) console.log(await bcrypt.compare(password, user.password));
+    throw new InvalidCredentials();
   }
-
-  return null;
 };
 
 export const signUpController = async (
   login: User['login'],
   password: User['password'],
   user_type: User['user_type']
-): Promise<Cookie | null> => {
-  const oldUser = await db.user.findUnique({ where: { login } });
+): Promise<Response | null> => {
+  if (login && password) {
+    const oldUser = await db.user.findUnique({ where: { login } });
 
-  if (oldUser) {
-    throw new DuplicateUniqueError("login");
+    const newPass = await bcrypt.hash(password, 10);
+
+    if (oldUser) throw new DuplicateUniqueError('login');
+
+    const user = await db.user.create({
+      data: {
+        login,
+        password: newPass,
+        user_type
+      }
+    });
+
+    const { user_id } = user;
+
+    const token = jwt.sign(
+      {
+        user_id: user_id,
+        user_type: user_type
+      },
+      process.env.TOKEN_SECRET as jwt.Secret,
+      {
+        expiresIn: '2h'
+      }
+    );
+
+    const response = {
+      user_id,
+      user_type,
+      token,
+      user
+    };
+
+    return response;
+  } else {
+    throw new InvalidRequestBody();
   }
-
-  const newPass = await bcrypt.hash(password, 10);
-
-  const user = await db.user.create({
-    data: {
-      login,
-      password: newPass,
-      user_type
-    }
-  });
-
-  const { user_id } = user;
-
-  const token = jwt.sign(
-    {
-      user_id: user_id,
-      user_type: user_type
-    },
-    process.env.TOKEN_SECRET as jwt.Secret,
-    {
-      expiresIn: '2h'
-    }
-  );
-
-  const response = {
-    user_id,
-    user_type,
-    token
-  };
-
-  return response;
 };
 
 export const updateUserController = async (

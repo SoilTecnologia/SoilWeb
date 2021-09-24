@@ -2,6 +2,7 @@ import express from 'express';
 import userRoute from './user';
 import farmRoute from './farm';
 import pivotRoute from './pivot';
+import { DuplicateUniqueError, InvalidCredentials } from '../types/errors';
 
 const router = express.Router();
 
@@ -15,19 +16,17 @@ const router = express.Router();
 */
 
 function error(
-  err: Error,
+  err: unknown,
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
 ) {
-  if (err.name == 'TokenExpiredError') {
-    res.status(401).send('Token expired!');
-  } else {
-    console.error(err.stack);
-
-    res.status(500);
-    res.send('Internal Server Error');
-  }
+  if(err instanceof DuplicateUniqueError)
+    res.status(400).send(err.message);
+  else if(err instanceof InvalidCredentials)
+    res.status(400).send(err.message);
+  else
+    res.status(500).send('Internal Server Error')
   next();
 }
 

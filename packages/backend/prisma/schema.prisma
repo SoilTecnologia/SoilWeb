@@ -28,6 +28,7 @@ model Farm {
 
 model FarmUser {
   farm_user_id String @id @default(uuid())
+  farm_user_type FarmUserType
   farm Farm @relation(fields: [farm_id], references: [farm_id])
   farm_id String
   user User @relation(fields: [user_id], references: [user_id])
@@ -110,6 +111,10 @@ model CycleVariable {
 enum UserType {
   SUDO
   USER
+}
+
+enum FarmUserType {
+  WORKER
   MANAGER
   ADMIN
 }
