@@ -2,7 +2,7 @@ import express from 'express';
 import userRoute from './user';
 import farmRoute from './farm';
 import pivotRoute from './pivot';
-import { DuplicateUniqueError, InvalidCredentials } from '../types/errors';
+import { DuplicateUniqueError, InvalidCredentials, ServerError } from '../types/errors';
 
 const router = express.Router();
 
@@ -21,9 +21,7 @@ function error(
   res: express.Response,
   next: express.NextFunction
 ) {
-  if(err instanceof DuplicateUniqueError)
-    res.status(400).send(err.message);
-  else if(err instanceof InvalidCredentials)
+  if(err instanceof ServerError)
     res.status(400).send(err.message);
   else
     res.status(500).send('Internal Server Error')

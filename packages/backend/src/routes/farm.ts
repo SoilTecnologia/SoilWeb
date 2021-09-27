@@ -4,12 +4,14 @@ import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
   createFarmController,
   readAllFarmController,
-  // addUserToFarmController
 } from '../controllers/farm';
+import {
+  addUserToFarmController
+} from '../controllers/farm_user'
 
 const router = express.Router();
 
-router.post('/create', async (req, res, next) => {
+router.post('/create',authMiddleware(["SUDO"]), async (req, res, next) => {
   const { user_ids, farm_name, city, lng, lat, gateway } = req.body;
 
   try {
@@ -49,33 +51,34 @@ router.get(
   )
 );
 
-// router.put(
-//   '/addUser/:target_farm_id',
-//   authMiddleware(['ADMIN']),
-//   authHandler(
-//     async (
-//       req: IUserAuthInfoRequest,
-//       res: express.Response,
-//       next: express.NextFunction
-//     ) => {
-//       const user = req.user;
-//       const { target_farm_id } = req.params;
-//       const { target_user_id } = req.body;
+router.put(
+  '/addUser/:target_farm_id',
+  authMiddleware(['USER', 'SUDO']), 
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const user = req.user;
+      const { target_farm_id } = req.params;
+      const { target_user_id, farm_user_type } = req.body;
 
-//       try {
-//         const farms = await addUserToFarmController(
-//           user.user_id,
-//           target_user_id,
-//           target_farm_id
-//         );
+      try {
+        const farms = await addUserToFarmController(
+          user.user_id,
+          target_user_id,
+          target_farm_id,
+          farm_user_type
+        );
 
-//         return res.send(farms);
-//       } catch (err) {
-//         next(err);
-//       }
-//     }
-//   )
-// );
+        return res.send(farms);
+      } catch (err) {
+        next(err);
+      }
+    }
+  )
+);
 
 // router.put(
 //   '/addAdmin/:target_farm_id',
