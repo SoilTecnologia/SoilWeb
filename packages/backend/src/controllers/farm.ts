@@ -4,16 +4,15 @@ import bcrypt from 'bcrypt';
 import user from '../middlewares/auth';
 import { isUserTypeOf } from '../utils/farm';
 
-const db = new PrismaClient();
+import db from '../database';
 
 export const createFarmController = async (
   farm_name: Farm['farm_name'],
   city: Farm['city'],
   lng: Farm['lng'],
   lat: Farm['lat'],
-  gateway: Farm['gateway'],
+  gateway: Farm['gateway']
 ): Promise<Farm | null> => {
-  let farmUsers: User[] = [];
 
   const newFarm = await db.farm.create({
     data: {
@@ -54,7 +53,6 @@ export const updateFarmController = async (
   city?: Farm['city'],
   lng?: Farm['lng'],
   lat?: Farm['lat'],
-  gateway?: Farm['gateway']
 ): Promise<Farm> => {
   const newFarm = await db.farm.update({
     data: {
@@ -62,7 +60,6 @@ export const updateFarmController = async (
       city,
       lng,
       lat,
-      gateway
     },
     where: {
       farm_id

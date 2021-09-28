@@ -3,7 +3,7 @@ import express from 'express';
 import { isType } from '../utils/types';
 import { IUserAuthInfoRequest } from '../types/express';
 import { wrap } from 'module';
-import { UserType } from '@prisma/client';
+import { UserType, FarmUserType } from '@prisma/client';
 import { Request } from 'express';
 
 interface TokenInfo {
@@ -13,7 +13,7 @@ interface TokenInfo {
 
 // Esse middleware retorna uma
 const authMiddleware = (
-  target_types: (keyof typeof UserType)[]
+  user_types: (keyof typeof UserType)[],
 ): ((
   req: express.Request,
   res: express.Response,
@@ -29,7 +29,7 @@ const authMiddleware = (
 
     const decode = <TokenInfo>jwt.verify(token, process.env.TOKEN_SECRET as jwt.Secret);
 
-    if (!isType(decode.user_type, target_types))
+    if (!isType(decode.user_type, user_types))
       return res.status(401).send('Failed to authenticate token.');
 
     let wrappedRequest = <IUserAuthInfoRequest>req;

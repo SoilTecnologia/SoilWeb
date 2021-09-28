@@ -8,31 +8,39 @@ datasource db {
 }
 
 model User {
-  user_id   String   @id @default(uuid())
-  login     String   @unique
+  user_id   String     @id @default(uuid())
+  login     String     @unique
   password  String
-  user_type UserType @default(USER)
-  farms FarmUser[]
+  user_type UserType   @default(USER)
+  farms     FarmUser[]
 }
 
 model Farm {
-  farm_id   String  @id @default(uuid())
+  farm_id   String     @id @default(uuid())
   farm_name String
   city      String
   lng       Float
   lat       Float
-  gateway   String
-  pivots    Pivot[]
-  users FarmUser[]
+  gateway String
+  nodes     Node[]
+  users     FarmUser[]
 }
 
 model FarmUser {
-  farm_user_id String @id @default(uuid())
+  farm_user_id   String       @id @default(uuid())
   farm_user_type FarmUserType
-  farm Farm @relation(fields: [farm_id], references: [farm_id])
+  farm           Farm         @relation(fields: [farm_id], references: [farm_id])
+  farm_id        String
+  user           User         @relation(fields: [user_id], references: [user_id])
+  user_id        String
+}
+
+model Node {
+  node_id     Int  @id 
+  pivots      Pivot[]
+  isGPRS  Boolean
+  Farm        Farm   @relation(fields: [farm_id], references: [farm_id])
   farm_id String
-  user User @relation(fields: [user_id], references: [user_id])
-  user_id String
 }
 
 model Pivot {
@@ -43,9 +51,9 @@ model Pivot {
   start_angle Int
   end_angle   Int
   radius      Float
-  farm_id     String
-  updatedAt DateTime @updatedAt
-  farm        Farm     @relation(fields: [farm_id], references: [farm_id])
+  node_id     Int
+  updatedAt   DateTime @updatedAt
+  node        Node     @relation(fields: [node_id], references: [node_id])
   cycles      Cycle[]
   intents     Intent[]
   radio       Radio?
@@ -55,7 +63,7 @@ model Cycle {
   cycle_id        String          @id @default(uuid())
   is_running      Boolean
   pivot_id        String
-  updatedAt DateTime @updatedAt
+  updatedAt       DateTime        @updatedAt
   pivot           Pivot           @relation(fields: [pivot_id], references: [pivot_id])
   cycle_states    CycleState[]
   cycle_variables CycleVariable[]
@@ -72,18 +80,18 @@ model Intent {
   date_on        DateTime
   date_off       DateTime
   pivot_id       String
-  updatedAt DateTime @updatedAt
+  updatedAt      DateTime         @updatedAt
   pivot          Pivot            @relation(fields: [pivot_id], references: [pivot_id])
 }
 
 model Radio {
-  radio_id Int    @id
-  rssi     Int
-  rank     Int
-  father   String
-  pivot_id String @unique
+  radio_id  Int      @id
+  rssi      Int
+  rank      Int
+  father    String
+  pivot_id  String   @unique
   updatedAt DateTime @updatedAt
-  Pivot    Pivot  @relation(fields: [pivot_id], references: [pivot_id])
+  Pivot     Pivot    @relation(fields: [pivot_id], references: [pivot_id])
 }
 
 model CycleState {
@@ -94,18 +102,18 @@ model CycleState {
   start_angle    Int
   end_angle      Int
   cycle_id       String
-  updatedAt DateTime @updatedAt
+  updatedAt      DateTime        @updatedAt
   cycle          Cycle           @relation(fields: [cycle_id], references: [cycle_id])
 }
 
 model CycleVariable {
-  cycle_variable String @id @default(uuid())
+  cycle_variable String   @id @default(uuid())
   angle          Int
   percentimeter  Int
   pressure       Int
   cycle_id       String
-  updatedAt DateTime @updatedAt
-  cycle          Cycle  @relation(fields: [cycle_id], references: [cycle_id])
+  updatedAt      DateTime @updatedAt
+  cycle          Cycle    @relation(fields: [cycle_id], references: [cycle_id])
 }
 
 enum UserType {

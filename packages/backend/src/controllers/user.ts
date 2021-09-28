@@ -2,8 +2,8 @@ import { Prisma, PrismaClient, User, UserType } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { DuplicateUniqueError, InvalidCredentials, InvalidRequestBody } from '../types/errors';
+import db from '../database';
 
-const db = new PrismaClient();
 
 type Response = {
   user_type: User['user_type'];
@@ -17,6 +17,7 @@ export const signInController = async (
   password: User['password']
 ): Promise<Response | null> => {
   const user = await db.user.findUnique({ where: { login } });
+  console.log(user)
 
   if (user && (await bcrypt.compare(password, user.password))) {
     const { user_id, user_type } = user;

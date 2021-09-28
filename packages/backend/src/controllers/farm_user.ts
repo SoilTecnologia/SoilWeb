@@ -1,8 +1,8 @@
-import { identifier } from '@babel/types';
 import { PrismaClient, User, UserType, FarmUser, Farm } from '@prisma/client';
 import { DuplicateUniqueError } from '../types/errors';
+import db from '../database';
 
-const db = new PrismaClient();
+const prismaClient = new PrismaClient();
 
 /*
 Calling user: User which is calling the function
