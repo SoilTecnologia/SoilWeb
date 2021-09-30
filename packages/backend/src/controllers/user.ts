@@ -17,7 +17,6 @@ export const signInController = async (
   password: User['password']
 ): Promise<Response | null> => {
   const user = await db.user.findUnique({ where: { login } });
-  console.log(user)
 
   if (user && (await bcrypt.compare(password, user.password))) {
     const { user_id, user_type } = user;

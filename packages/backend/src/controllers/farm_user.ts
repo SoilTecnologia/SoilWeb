@@ -42,7 +42,6 @@ export const addUserToFarmController = async (
       calling_user?.user_type == 'SUDO' ||
       callingUserIsAdminOfTargetFarm.length > 0
     ) {
-      console.log("IS ADMIN!")
       if (isUserAlreadyInFarm && isUserAlreadyInFarm.length == 0) {
         await db.farmUser.create({
           data: {
@@ -56,9 +55,6 @@ export const addUserToFarmController = async (
       } else {
         throw new DuplicateUniqueError('target_user_id');
       }
-    } else {
-      console.log("NOT ADMIN")
-      console.log(target_farm)
     }
   }
 
