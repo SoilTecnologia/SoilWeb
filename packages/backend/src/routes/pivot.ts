@@ -1,6 +1,7 @@
 import { prisma } from '.prisma/client';
 import express from 'express';
-import {createPivotController, readOnePivotController, readAllPivotController, updatePivotController, readPivotsForMapController} from '../controllers/pivot';
+import { moveMessagePortToContext } from 'worker_threads';
+import {createPivotController, readOnePivotController, readAllPivotController, updatePivotController, deletePivotController} from '../controllers/pivot';
 
 const router = express.Router();
 
@@ -37,6 +38,18 @@ const router = express.Router();
     }
   });
 
+  router.delete('/:pivot_id', async(req, res, next) => {
+    const pivot_id = req.params.pivot_id;
+
+    try {
+      await deletePivotController(pivot_id);
+
+      res.send("done");
+    } catch(err) {
+      next(err);
+    }
+  })
+
   router.get('/readAll/:farm_id', async (req, res, next) => {
     const farm_id = req.params.farm_id;
 
@@ -49,28 +62,26 @@ const router = express.Router();
     }
   });
 
-  router.put('/update', async (req, res, next) => {
+  router.put('/update/:pivot_id', async (req, res, next) => {
+    const pivot_id = req.params.pivot_id;
     const {
-      pivot_id,
-      farm_id,
-      pivot_name,
-      lng,
-      lat,
-      start_angle,
-      end_angle,
-      radius
+      power,
+      water, 
+      direction,
+      connection,
+      curr_angle,
+      percentimeter
     } = req.body;
 
     try {
       const updatedPivot = await updatePivotController(
         pivot_id,
-        farm_id,
-        pivot_name,
-        lng,
-        lat,
-        start_angle,
-        end_angle,
-        radius
+        power,
+        water,
+        direction,
+        connection,
+        curr_angle,
+        percentimeter
       );
 
       res.send(updatedPivot);
@@ -79,6 +90,7 @@ const router = express.Router();
     }
   });
 
+  /*
   router.post('/listMap', async (req, res, next) => {
     const farm_id = req.body.farm_id;
 
@@ -90,5 +102,6 @@ const router = express.Router();
       next(err);
     }
   });
+  */
 
   export default router;

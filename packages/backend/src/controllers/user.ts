@@ -48,7 +48,7 @@ export const signInController = async (
 export const signUpController = async (
   login: User['login'],
   password: User['password'],
-  user_type: User['user_type']
+  user_type?: User['user_type']
 ): Promise<Response | null> => {
   if (login && password) {
     const oldUser = await db.user.findUnique({ where: { login } });
@@ -65,12 +65,11 @@ export const signUpController = async (
       }
     });
 
-    const { user_id } = user;
 
     const token = jwt.sign(
       {
-        user_id: user_id,
-        user_type: user_type
+        user_id: user.user_id,
+        user_type: user.user_type
       },
       process.env.TOKEN_SECRET as jwt.Secret,
       {
@@ -79,8 +78,8 @@ export const signUpController = async (
     );
 
     const response = {
-      user_id,
-      user_type,
+      user_id: user.user_id,
+      user_type: user.user_type,
       token,
       user
     };

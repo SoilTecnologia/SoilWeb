@@ -18,11 +18,17 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: ${(props) => props.theme.colors.primary};
+    background-color: ${(props) => props.theme.colors.secondary};
   };
 
-  p, h1, h2, h3, h4, h5, h6 {
+  p, h2, h3, h4, h5, h6 {
     font-family: 'Syncopate', serif;
     font-weight: 200;
+  };
+
+  h1 {
+    font-family: 'Montserrat';
+    font-weight: 500;
+    font-size: 42px;
   };
 `;

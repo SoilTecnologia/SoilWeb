@@ -4,14 +4,14 @@ import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
   createFarmController,
   readAllFarmController,
+  deleteFarmController
 } from '../controllers/farm';
-import {
-  addUserToFarmController
-} from '../controllers/farm_user'
+import { createNodeController } from '../controllers/node';
+import { addUserToFarmController } from '../controllers/farm_user';
 
 const router = express.Router();
 
-router.post('/create',authMiddleware(["SUDO"]), async (req, res, next) => {
+router.post('/create', authMiddleware(['SUDO']), async (req, res, next) => {
   const { user_ids, farm_name, city, lng, lat, gateway } = req.body;
 
   try {
@@ -20,7 +20,7 @@ router.post('/create',authMiddleware(["SUDO"]), async (req, res, next) => {
       city,
       lng,
       lat,
-      gateway,
+      gateway
     );
 
     res.send(newFarm);
@@ -53,7 +53,7 @@ router.get(
 
 router.put(
   '/addUser/:target_farm_id',
-  authMiddleware(['USER', 'SUDO']), 
+  authMiddleware(['USER', 'SUDO']),
   authHandler(
     async (
       req: IUserAuthInfoRequest,
@@ -63,7 +63,6 @@ router.put(
       const user = req.user;
       const { target_farm_id } = req.params;
       const { target_user_id, farm_user_type } = req.body;
-
 
       try {
         const farms = await addUserToFarmController(
@@ -80,6 +79,42 @@ router.put(
     }
   )
 );
+
+router.put(
+  '/addNode/:farm_id',
+  authMiddleware(['USER', 'SUDO']),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const user = req.user;
+      const { farm_id } = req.params;
+      const { node_id, isGPRS } = req.body;
+
+      try {
+        const newNode = await createNodeController(node_id, farm_id, isGPRS);
+
+        res.send(newNode);
+      } catch (err) {
+        next(err);
+      }
+    }
+  )
+);
+
+router.delete('/:farm_id', authMiddleware(['SUDO']), async (req, res, next) => {
+  const farm_id = req.params.farm_id;
+
+  try {
+    const deletedFarm = await deleteFarmController(farm_id);
+
+    res.send(deletedFarm);
+  } catch (err) {
+    next(err);
+  }
+});
 
 // router.put(
 //   '/addAdmin/:target_farm_id',

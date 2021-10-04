@@ -3,7 +3,6 @@ import Providers from 'next-auth/providers';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { session, signin, signIn } from 'next-auth/client';
 import axios from 'axios';
-import { redirect } from 'next/dist/server/api-utils';
 
 export default NextAuth({
   // Configure one or more authentication providers

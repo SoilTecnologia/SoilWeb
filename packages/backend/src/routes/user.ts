@@ -20,18 +20,6 @@ const router = express.Router();
     }
   });
 
-  router.post('/delete/:user_id', async (req, res, next) => {
-    const user_id = req.params.user_id;
-
-    try {
-      const response = await deleteUserController(user_id);
-
-      res.send(response);
-    } catch (err) {
-      next(err);
-    }
-  });
-
   router.post('/signin', async (req, res, next) => {
     const { login, password } = req.body;
 
@@ -39,6 +27,18 @@ const router = express.Router();
       const cookieInfo = await signInController(login, password);
 
       res.send(cookieInfo);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.delete('/:user_id', async (req, res, next) => {
+    const user_id = req.params.user_id;
+
+    try {
+      const response = await deleteUserController(user_id);
+
+      res.send(response);
     } catch (err) {
       next(err);
     }

@@ -72,10 +72,10 @@ export const updateFarmController = async (
 export const deleteFarmController = async (
   farm_id: Farm['farm_id']
 ): Promise<boolean> => {
-  const hasDeleted = await db.farm.delete({ where: { farm_id } });
+  await db.node.deleteMany({where: {farm_id}})
+  await db.farmUser.deleteMany({where: {farm_id}})
+  await db.farm.delete({ where: { farm_id } });
 
-  if (hasDeleted) return true;
-
-  return false;
+  return true;
 };
 

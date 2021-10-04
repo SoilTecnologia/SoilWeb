@@ -15,7 +15,7 @@ export const addUserToFarmController = async (
   target_user_id: User['user_id'],
   target_farm_id: Farm['farm_id'],
   farm_user_type: FarmUser['farm_user_type']
-): Promise<boolean> => {
+): Promise<FarmUser | null> => {
   const calling_user = await db.user.findUnique({
     where: { user_id: calling_user_id }
   });
@@ -43,7 +43,7 @@ export const addUserToFarmController = async (
       callingUserIsAdminOfTargetFarm.length > 0
     ) {
       if (isUserAlreadyInFarm && isUserAlreadyInFarm.length == 0) {
-        await db.farmUser.create({
+        const newFarmUser = await db.farmUser.create({
           data: {
             farm_user_type: 'WORKER',
             farm: { connect: { farm_id: target_farm_id } },
@@ -51,12 +51,12 @@ export const addUserToFarmController = async (
           }
         });
 
-        return true;
+        return newFarmUser;
       } else {
         throw new DuplicateUniqueError('target_user_id');
       }
     }
   }
 
-  return false;
+  return null;
 };
