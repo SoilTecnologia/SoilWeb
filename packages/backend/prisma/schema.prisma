@@ -36,7 +36,8 @@ model FarmUser {
 }
 
 model Node {
-  node_id Int     @id
+  node_id String     @id @default(uuid())
+  node_name Int
   pivots  Pivot[]
   isGPRS  Boolean
   Farm    Farm    @relation(fields: [farm_id], references: [farm_id])
@@ -51,7 +52,7 @@ model Pivot {
   start_angle Int
   end_angle   Int
   radius      Float
-  node_id     Int
+  node_id     String
   updatedAt   DateTime @updatedAt
   node        Node     @relation(fields: [node_id], references: [node_id])
   cycles      Cycle[]
@@ -95,7 +96,6 @@ model Radio {
 
 model CycleState {
   cycle_state_id  String          @id @default(uuid())
-  power           PowerState
   water           WaterState
   direction       DirectionState
   connection      ConnectionState

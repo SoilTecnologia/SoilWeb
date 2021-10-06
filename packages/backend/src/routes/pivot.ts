@@ -5,26 +5,26 @@ import {createPivotController, readOnePivotController, readAllPivotController, u
 
 const router = express.Router();
 
-  router.post('/create', async (req, res, next) => {
-    const { node_id, pivot_name, lng, lat, start_angle, end_angle, radius } =
-      req.body;
+  // router.post('/create', async (req, res, next) => {
+  //   const { node_id, pivot_name, lng, lat, start_angle, end_angle, radius } =
+  //     req.body;
 
-    try {
-      const newPivot = await createPivotController(
-        node_id,
-        pivot_name,
-        lng,
-        lat,
-        start_angle,
-        end_angle,
-        radius
-      );
+  //   try {
+  //     const newPivot = await createPivotController(
+  //       node_id,
+  //       pivot_name,
+  //       lng,
+  //       lat,
+  //       start_angle,
+  //       end_angle,
+  //       radius
+  //     );
 
-      res.send(newPivot);
-    } catch (err) {
-      next(err);
-    }
-  });
+  //     res.send(newPivot);
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // });
 
   router.get('/readOne/:pivot_id', async (req, res, next) => {
     const pivot_id = req.params.pivot_id;

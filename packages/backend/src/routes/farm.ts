@@ -91,10 +91,10 @@ router.put(
     ) => {
       const user = req.user;
       const { farm_id } = req.params;
-      const { node_id, isGPRS } = req.body;
+      const { node_name, isGPRS } = req.body;
 
       try {
-        const newNode = await createNodeController(node_id, farm_id, isGPRS);
+        const newNode = await createNodeController(node_name, farm_id, isGPRS);
 
         res.send(newNode);
       } catch (err) {

@@ -1,9 +1,17 @@
-import { Pivot, Farm, CycleState, CycleVariable } from '@prisma/client';
+import {
+  Pivot,
+  Farm,
+  Cycle,
+  CycleState,
+  CycleVariable,
+  PowerState
+} from '@prisma/client';
 import { Console } from 'console';
 import { connect } from 'http2';
 import db from '../database';
 
 export const createPivotController = async (
+  farm_id: Farm['farm_id'],
   node_id: Pivot['node_id'],
   pivot_name: Pivot['pivot_name'],
   lng: Pivot['lng'],
@@ -24,31 +32,30 @@ export const createPivotController = async (
     }
   });
 
-  console.log("PIVO CRIADO")
   return newPivo;
 };
 
 export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
-  const cycles = await db.cycle.findMany({where: {pivot_id}});
+  const cycles = await db.cycle.findMany({ where: { pivot_id } });
 
-  for(let cycle of cycles) { 
+  for (let cycle of cycles) {
     const cycle_id = cycle.cycle_id;
-    const cycleStates = await db.cycleState.findMany({where: {cycle_id}});
+    const cycleStates = await db.cycleState.findMany({ where: { cycle_id } });
 
-    for(let cycleState of cycleStates) {
+    for (let cycleState of cycleStates) {
       const cycle_state_id = cycleState.cycle_state_id;
 
-      await db.cycleVariable.deleteMany({where: {cycle_state_id}});
-      await db.cycleState.delete({where: {cycle_state_id}})
+      await db.cycleVariable.deleteMany({ where: { cycle_state_id } });
+      await db.cycleState.delete({ where: { cycle_state_id } });
     }
 
-    await db.cycle.delete({where: {cycle_id}});
-  };
+    await db.cycle.delete({ where: { cycle_id } });
+  }
 
-  await db.pivot.delete({where: {pivot_id}})
-  console.log("PIVO DELETEADO")
+  await db.pivot.delete({ where: { pivot_id } });
+  console.log('PIVO DELETEADO');
   return true;
-}
+};
 
 export const readOnePivotController = async (
   pivot_id: Pivot['pivot_id']
@@ -77,7 +84,7 @@ export const readAllPivotController = async (
 
 type FilteredCycleState = Pick<
   CycleState,
-  'power' | 'water' | 'direction' | 'connection'
+  'water' | 'direction' | 'connection'
 >;
 
 type FilteredCycleVariable = Pick<
@@ -90,7 +97,6 @@ const hasStateChanged = (
   newState: FilteredCycleState
 ): boolean => {
   return (
-    oldState.power != newState.power ||
     oldState.water != newState.water ||
     oldState.direction != newState.direction ||
     oldState.connection != newState.connection
@@ -110,175 +116,134 @@ const hasVariablesChanged = (
 
 export const updatePivotController = async (
   pivot_id: Pivot['pivot_id'],
-  power: CycleState['power'],
+  power: PowerState,
   water: CycleState['water'],
   direction: CycleState['direction'],
   connection: CycleState['connection'],
   curr_angle: CycleVariable['angle'],
   percentimeter: CycleVariable['percentimeter']
 ) => {
-  const lastCycle = await db.cycle.findFirst({ where: { pivot_id } });
+  const lastCycle = await db.cycle.findFirst({ where: { pivot_id, is_running: true }, orderBy: {updatedAt: "desc"} });
   const cycle_id = lastCycle?.cycle_id;
   let changes = [];
+  console.log()
 
-  if (power === 'ON' || power === 'NULL') {
+  if (power == 'ON' || power == 'NULL') {
     if (lastCycle && lastCycle.is_running) {
-      console.log('is running')
-      let lastCycleState = await db.cycleState.findFirst({
-        where: { cycle_id }
-      });
-      if (lastCycleState) {
-        console.log("last cycle state exists")
-        if (
-          hasStateChanged(lastCycleState, {
-            power,
-            water,
-            direction,
-            connection
-          })
-        ) {
-          console.log("state changed")
-          const result = await db.cycleState.update({
-            where: { cycle_state_id: lastCycleState.cycle_state_id },
-            data: { end_angle: curr_angle }
-          });
-
-          changes.push(result);
-
-          if (connection == 'ONLINE') {
-            lastCycleState = await db.cycleState.create({
-              data: {
-                power,
-                water,
-                direction,
-                connection,
-                start_angle: curr_angle,
-                end_angle: curr_angle,
-                cycle_id: lastCycle.cycle_id
-              }
-            });
-
-          changes.push(lastCycleState);
-          } else {
-            let tempLastCycleState = await db.cycleState.create({
-              data: {
-                power: 'NULL',
-                water: 'NULL',
-                direction: 'NULL',
-                connection: 'OFFLINE',
-                start_angle: lastCycleState.end_angle,
-                end_angle: lastCycleState.end_angle,
-                cycle_id: lastCycle.cycle_id
-              }
-            });
-
-            lastCycleState = tempLastCycleState;
-          changes.push(lastCycleState);
-          }
-        }
-
-        const lastCycleVariable = await db.cycleVariable.findFirst({
-          where: { cycle_state_id: lastCycleState.cycle_state_id }
-        });
-        if (
-          !lastCycleVariable ||
-          hasVariablesChanged(lastCycleVariable, {
-            angle: curr_angle,
-            percentimeter,
-            pressure: 0
-          })
-        ) {
-          console.log("VARIABLES CHANGED!!")
-          if (connection == 'ONLINE') {
-            console.log("cycle variable online created")
-      console.log(lastCycleState.cycle_state_id)
-            const newCycleVariable = await db.cycleVariable.create({
-              data: {
-                angle: curr_angle,
-                percentimeter,
-                pressure: 0,
-                cycle_state_id: lastCycleState.cycle_state_id
-              }
-            });
-
-            changes.push(newCycleVariable);
-          } else {
-            console.log("cycle variable offline created")
-            const result = await db.cycleVariable.create({
-              data: {
-                angle: lastCycleState.end_angle,
-                percentimeter: 0,
-                pressure: 0,
-                cycle_state_id: lastCycleState.cycle_id
-              }
-            });
-
-            changes.push(result);
-          }
-        }
-      }
-      //TODO Checar para on_off = 2 para setar is_running false
+      updateRunningCycle(cycle_id!, water, direction, connection, curr_angle, percentimeter);
     } else {
-      console.log("BATEU AQUI")
-      const newCycle = await db.cycle.create({ data: { pivot_id } });
-      changes.push(newCycle);
-      console.log("EAGUI")
-      const newCycleState = await db.cycleState.create({
-        data: {
-          power,
-          water,
-          direction,
-          connection,
-          start_angle: curr_angle,
-          end_angle: curr_angle,
-          cycle_id: newCycle.cycle_id,
-        }
-      });
-      changes.push(newCycleState);
-      console.log("EAQUI")
-      console.log(newCycleState.cycle_state_id)
-      console.log("percentimenter", percentimeter)
-      const newCycleVariable = await db.cycleVariable.create({
-        data: {
-          angle: curr_angle,
-          percentimeter,
-          pressure: 0,
-          cycle_state_id: newCycleState.cycle_state_id
-        }
-      });
-      changes.push(newCycleVariable);
+      if (power !== 'NULL') createNewCycle(pivot_id, water, direction, connection, curr_angle, percentimeter);
     }
-  } else {
+  } else if (power == 'OFF') {
     if (lastCycle && lastCycle.is_running) {
-      const result = await db.cycle.update({
-        where: { cycle_id: lastCycle.cycle_id },
-        data: { is_running: false }
-      });
-
-      changes.push(result);
-
-      const lastCycleState = await db.cycleState.findFirst({
-        where: { cycle_id: lastCycle.cycle_id }
-      });
-
-
-      const result2 = await db.cycleState.update({
-        where: {
-          cycle_state_id: lastCycleState?.cycle_state_id
-        },
-        data: {
-          connection,
-          direction,
-          end_angle: curr_angle,
-          power,
-          water
-        }
-      });
-
-      changes.push(result2);
+      closeCycle(cycle_id!, curr_angle);
     }
   }
-  return changes;
+
+  return true;
+};
+
+const closeCycle = async(cycle_id: Cycle['cycle_id'], curr_angle: CycleVariable['angle']) => {
+  const currentCycleState = await db.cycleState.findFirst({where: {cycle_id: cycle_id!}, orderBy: {updatedAt: 'desc'}})
+  await db.cycleState.update({
+    data: {
+      end_angle: curr_angle
+    },
+    where: {
+      cycle_state_id: currentCycleState?.cycle_state_id
+    }
+  })
+
+  await db.cycle.update({
+    where: {cycle_id},
+    data: {is_running: false}
+  })
+}
+
+const updateRunningCycle = async (cycle_id: Cycle['cycle_id'], water:CycleState['water'], direction: CycleState['direction'], connection:CycleState['connection'], curr_angle: CycleVariable['angle'], percentimeter: CycleVariable['percentimeter']) => {
+  const currentCycleState = await db.cycleState.findFirst({where: {cycle_id: cycle_id!}, orderBy: {updatedAt: 'desc'}})
+  const cycle_state_id = currentCycleState?.cycle_state_id;
+  const currentCycleVariable = await db.cycleVariable.findFirst({where: {cycle_state_id}, orderBy: {updatedAt: 'desc'}})
+
+  if(cycleVariablesChanged(currentCycleVariable!, {angle: curr_angle, percentimeter, pressure: 0})) {
+    updateCycleVariables(cycle_state_id!, curr_angle, percentimeter, 0);
+  }
+
+  if(cycleStateChanged(currentCycleState!, {water, direction, connection})) {
+    updateCycleState(cycle_id, cycle_state_id!, water, direction, connection, curr_angle);
+  }
+}
+
+type FilteredVariables = Pick<CycleVariable, 'angle' | 'percentimeter' | 'pressure'>;
+type FilteredState = Pick<CycleState, 'water' | 'direction' | 'connection'>;
+
+const cycleVariablesChanged = (oldVariables: CycleVariable, newVariables: FilteredVariables): boolean => {
+  const angleThreshold = 1;
+  const percentThreshold = 5;
+  const pressureThreshold = 5;
+
+  return((newVariables.angle <= oldVariables.angle-angleThreshold || newVariables.angle >= oldVariables.angle + angleThreshold) || (newVariables.percentimeter <= oldVariables.percentimeter-percentThreshold || newVariables.percentimeter >= oldVariables.percentimeter+percentThreshold) || (newVariables.pressure <= oldVariables.pressure-pressureThreshold || newVariables.percentimeter >= oldVariables.percentimeter+percentThreshold)) 
+}
+
+const cycleStateChanged = (oldState: CycleState, newState: FilteredState): boolean => {
+  return(oldState.water != newState.water || oldState.direction != newState.direction || oldState.connection != newState.connection) 
+}
+
+const updateCycleVariables = async (cycle_state_id: CycleState['cycle_state_id'], curr_angle: CycleVariable['angle'], percentimeter: CycleVariable['percentimeter'], pressure: CycleVariable['pressure']) => {
+  await db.cycleVariable.create({data: {
+    angle: curr_angle,
+    percentimeter,
+    pressure,
+    cycle_state_id
+  }})
+}
+
+const updateCycleState = async (cycle_id: Cycle['cycle_id'] , cycle_state_id: CycleState['cycle_state_id'], water: CycleState['water'], direction: CycleState['direction'], connection: CycleState['connection'], curr_angle: CycleVariable['angle']) => {
+  await db.cycleState.update({data: {
+    end_angle: curr_angle
+  }, where: {cycle_state_id}})
+
+  await db.cycleState.create({data: {
+    cycle_id,
+    water,
+    direction,
+    connection,
+    start_angle: curr_angle,
+    end_angle: curr_angle
+  }})
+}
+
+const createNewCycle = async (
+  pivot_id: Pivot['pivot_id'],
+  water: CycleState['water'],
+  direction: CycleState['direction'],
+  connection: CycleState['connection'],
+  curr_angle: CycleVariable['angle'],
+  percentimeter: CycleVariable['percentimeter']
+) => {
+  const newCycle = await db.cycle.create({
+    data: { pivot_id, is_running: true }
+  });
+  const newCycleState = await db.cycleState.create({
+    data: {
+      cycle_id: newCycle.cycle_id,
+      water,
+      direction,
+      connection,
+      start_angle: curr_angle,
+      end_angle: curr_angle
+    }
+  });
+  const newCycleVariable = await db.cycleVariable.create({
+    data: {
+      angle: curr_angle,
+      percentimeter,
+      pressure: 0,
+      cycle_state_id: newCycleState.cycle_state_id
+    }
+  })
+
+  return {cycle: newCycle, cycleState: newCycleState, cycleVariable: newCycleVariable};
 };
 
 /*
