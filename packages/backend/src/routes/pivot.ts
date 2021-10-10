@@ -90,6 +90,22 @@ const router = express.Router();
     }
   });
 
+router.put(
+  '/addRadio/:node_id',
+  async (req, res, next) => {
+    const node_id = req.params.node_id;
+    const {farm_id, pivot_name, lng, lat, start_angle, end_angle, radius} = req.body;
+
+    try {
+      const newRadio = await createRadioController(radio_name, pivot_id);
+
+      res.send(newPivot);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
   /*
   router.post('/listMap', async (req, res, next) => {
     const farm_id = req.body.farm_id;

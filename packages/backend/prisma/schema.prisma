@@ -85,7 +85,8 @@ model Intent {
 }
 
 model Radio {
-  radio_id  Int      @id
+  radio_id  String      @id @default(uuid())
+  radio_name Int
   rssi      Int
   rank      Int
   father    String
