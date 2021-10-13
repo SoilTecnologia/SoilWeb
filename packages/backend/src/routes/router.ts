@@ -2,7 +2,10 @@ import express from 'express';
 import userRoute from './user';
 import farmRoute from './farm';
 import pivotRoute from './pivot';
+import radioRoute from './radio';
 import nodeRoute from './node';
+import cycleRoute from './cycle';
+
 import {
   DuplicateUniqueError,
   InvalidCredentials,
@@ -28,6 +31,7 @@ function error(
   res: express.Response,
   next: express.NextFunction
 ) {
+  console.log(err)
   if (err instanceof ServerError) res.status(400).send(err.message);
   else if (err instanceof Error) res.status(500).send(err.message);
   else res.status(500).send('Internal Server Error');
@@ -38,6 +42,8 @@ router.use('/user', userRoute);
 router.use('/farm', farmRoute);
 router.use('/pivot', pivotRoute);
 router.use('/node', nodeRoute);
+router.use('/cycle', cycleRoute);
+router.use('/radio', radioRoute);
 router.use(error);
 
 export default router;

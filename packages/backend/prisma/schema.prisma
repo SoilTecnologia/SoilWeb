@@ -37,7 +37,7 @@ model FarmUser {
 
 model Node {
   node_id String     @id @default(uuid())
-  node_name Int
+  node_name String
   pivots  Pivot[]
   isGPRS  Boolean
   Farm    Farm    @relation(fields: [farm_id], references: [farm_id])
@@ -67,6 +67,7 @@ model Cycle {
   updatedAt    DateTime     @updatedAt
   pivot        Pivot        @relation(fields: [pivot_id], references: [pivot_id])
   cycle_states CycleState[]
+  cycle_variables CycleVariable[]
 }
 
 model Intent {
@@ -86,13 +87,13 @@ model Intent {
 
 model Radio {
   radio_id  String      @id @default(uuid())
-  radio_name Int
-  rssi      Int
-  rank      Int
-  father    String
-  pivot_id  String   @unique
+  radio_name String
+  rssi      Int @default(0)
+  rank      Int @default(0)
+  father    String @default("null")
   updatedAt DateTime @updatedAt
   Pivot     Pivot    @relation(fields: [pivot_id], references: [pivot_id])
+  pivot_id  String   
 }
 
 model CycleState {
@@ -114,8 +115,10 @@ model CycleVariable {
   percentimeter     Int
   pressure          Int
   cycle_state_id    String
+  cycle_id  String
   updatedAt         DateTime   @updatedAt
   cycle_state       CycleState @relation(fields: [cycle_state_id], references: [cycle_state_id])
+  cycle       Cycle @relation(fields: [cycle_id], references: [cycle_id])
 }
 
 enum UserType {
