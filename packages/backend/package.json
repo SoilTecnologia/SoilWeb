@@ -31,6 +31,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-sqs": "^3.36.1",
     "@next-auth/prisma-adapter": "^0.5.4",
     "@prisma/client": "^3.0.2",
     "bcrypt": "^5.0.1",

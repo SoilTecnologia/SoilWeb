@@ -88,12 +88,20 @@ model Intent {
 model Radio {
   radio_id  String      @id @default(uuid())
   radio_name String
+  updatedAt DateTime @updatedAt
+  Pivot     Pivot    @relation(fields: [pivot_id], references: [pivot_id])
+  pivot_id  String  
+  radio_variables RadioVariable[]
+}
+
+model RadioVariable {
+  radio_variable_id String @id @default(uuid())
   rssi      Int @default(0)
   rank      Int @default(0)
   father    String @default("null")
-  updatedAt DateTime @updatedAt
-  Pivot     Pivot    @relation(fields: [pivot_id], references: [pivot_id])
-  pivot_id  String   
+  updateAt DateTime @updatedAt
+  radio_id String
+  radio       Radio @relation(fields: [radio_id], references: [radio_id])
 }
 
 model CycleState {

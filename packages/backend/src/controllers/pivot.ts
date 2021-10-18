@@ -99,6 +99,7 @@ export const updatePivotController = async (
   let changes = [];
 
   if (connection == 'ONLINE') {
+    console.log("ONLINE!")
     if (power == 'ON') {
       if (lastCycle && lastCycle.is_running) {
         await updateRunningCycle(
