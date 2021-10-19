@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { updatePivotController } from '../controllers/pivot';
+import { readAllIntentController } from '../controllers/intent';
 import {
   Pivot,
   PowerState,
@@ -20,7 +21,27 @@ export function start() {
 }
 
 async function checkStatus() {
-  console.log('Calling to check status..');
+  console.log('Calling to check status and intents..');
+  const intents = await readAllIntentController(); 
+
+  let counter = 1;
+  for(let intent of intents) {
+    let string = "";
+    intent.direction=="CLOCKWISE" ? string = string.concat("3") : string = string.concat("4");
+    intent.water=="DRY" ? string = string.concat("5") : string = string.concat("6");
+    intent.power=="ON" ? string = string.concat("1") : string = string.concat("2");
+    string = string.concat(intent.percentimenter.toString()); 
+
+    for(let i=7; i>string.length;i--) string = string.concat("0");
+
+
+    console.log(string);
+    await axios.post(`http://192.168.100.105:3031/cmd?ID=${counter}&intencao=${string}`);
+
+    counter++;
+  }
+
+  console.log("Ja mandando aqui")
   const status = await axios.get('http://192.168.100.105:3031/status');
   processData(status.data);
 

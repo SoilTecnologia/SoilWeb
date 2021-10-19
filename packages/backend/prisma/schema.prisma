@@ -76,11 +76,7 @@ model Intent {
   water          Intent_water
   direction      Intent_direction
   percentimenter Int
-  start_angle    Int
-  end_angle      Int
-  date_on        DateTime
-  date_off       DateTime
-  pivot_id       String
+  pivot_id       String @unique 
   updatedAt      DateTime         @updatedAt
   pivot          Pivot            @relation(fields: [pivot_id], references: [pivot_id])
 }

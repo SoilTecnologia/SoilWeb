@@ -7,6 +7,7 @@ import {
   PowerState
 } from '@prisma/client';
 import db from '../database';
+import authMiddleware from '../middlewares/auth';
 
 export const createPivotController = async (
   farm_id: Farm['farm_id'],
@@ -95,6 +96,7 @@ export const updatePivotController = async (
     orderBy: { updatedAt: 'desc' }
   });
   const cycle_id = lastCycle?.cycle_id;
+  console.log(`Tentando atualizar cycle: connection:${connection}, water:${water}, direction:${direction}, curr_angle: ${curr_angle}`);
 
   let changes = [];
 
