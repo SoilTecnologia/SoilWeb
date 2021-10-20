@@ -24,10 +24,6 @@ router.put('/:pivot_id', async (req, res, next) => {
       water,
       direction,
       percentimenter,
-      start_angle,
-      end_angle,
-      date_on,
-      date_off
     );
 
     return res.send(newIntent);
