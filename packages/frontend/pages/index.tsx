@@ -1,21 +1,26 @@
-import React from 'react'
+import React from 'react';
 import withAuth from '../lib/withAuth';
 import { useSession } from 'next-auth/client';
-import {Header} from '../styles/common/Header';
-import { Card3D } from '../styles/common/Cards';
+import Header from '../components/Header';
 
 const index = () => {
-	const [session, loading] = useSession();
-	console.log(session, loading)
-	return (
-		<div>
-			<Header>
-				<h1>FAZENDAS</h1>
+  const [session, loading] = useSession();
+  console.log(session, loading);
+  return (
+    <div>
+      <Header>
+				<h4>FAZENDAS</h4>
 			</Header>
 
-			<Card3D>Oiue</Card3D>
-		</div>
-	)
-}
+      <div className="bg-primary font-sans rounded-md text-xl text-white flex p-8 m-16">
+        <div className="flex-col flex-grow">
+          <h4>Fazenda: Santa Rita</h4>
+          <h4>Cidade: Santa Rita do Sapucaí - MG</h4>
+        </div>
+        <button className="text-2xl">ENTRAR</button>
+      </div>
+    </div>
+  );
+};
 
 export default withAuth(index);
