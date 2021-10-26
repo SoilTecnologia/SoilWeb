@@ -31,7 +31,7 @@ router.post('/create', authMiddleware(['SUDO']), async (req, res, next) => {
 
 router.get(
   '/readAll',
-  authMiddleware(['USER']),
+  authMiddleware(['SUDO']),
   authHandler(
     async (
       req: IUserAuthInfoRequest,

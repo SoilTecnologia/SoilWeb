@@ -33,18 +33,16 @@ export const createPivotController = async (
 
   const newIntent = await db.intent.create({
     data: {
-      power: "NULL",
-      water: "NULL",
+      power: 'NULL',
+      water: 'NULL',
       percentimenter: 0,
-      direction: "NULL",
+      direction: 'NULL',
       pivot_id: newPivo.pivot_id
     }
-  })
+  });
 
   return newPivo;
 };
-
-
 
 export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
   const cycles = await db.cycle.findMany({ where: { pivot_id } });
@@ -82,12 +80,13 @@ export const readAllPivotController = async (
 ): Promise<Pivot[] | null> => {
   const nodes = await db.node.findMany({
     where: { farm_id },
-    select: { pivots: true }
+    select: {pivots: true}
   });
 
   let pivots: Pivot[] = [];
 
   nodes.forEach((node) => node.pivots.forEach((pivot) => pivots.push(pivot)));
+  pivots = pivots.sort((a, b) => a.pivot_name > b.pivot_name ? 1 : -1);
 
   return pivots;
 };
@@ -106,12 +105,14 @@ export const updatePivotController = async (
     orderBy: { updatedAt: 'desc' }
   });
   const cycle_id = lastCycle?.cycle_id;
-  console.log(`Tentando atualizar cycle: connection:${connection}, water:${water}, direction:${direction}, curr_angle: ${curr_angle}`);
+  console.log(
+    `Tentando atualizar cycle: connection:${connection}, water:${water}, direction:${direction}, curr_angle: ${curr_angle}`
+  );
 
   let changes = [];
 
   if (connection == 'ONLINE') {
-    console.log("ONLINE!")
+    console.log('ONLINE!');
     if (power == 'ON') {
       if (lastCycle && lastCycle.is_running) {
         await updateRunningCycle(

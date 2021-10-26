@@ -21,6 +21,14 @@ type FullCycle = {
   cycleStates: Array<CustomCycleState>;
 };
 
+export const readCycleController = async (pivot_id) => {
+  const cycle = await db.cycle.findFirst({
+    where: { pivot_id, is_running: true }
+  });
+
+  return cycle;
+};
+
 export const readAllCycleController = async (
   pivot_id: Pivot['pivot_id']
 ): Promise<FullCycle | null> => {

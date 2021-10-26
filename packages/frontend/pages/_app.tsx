@@ -1,11 +1,12 @@
-import 'tailwindcss/tailwind.css';
+import '../styles/global.css';
+import { createContext, useContext } from 'react';
 import type { AppProps } from 'next/app';
 import { Provider } from 'next-auth/client';
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <Provider session={session}>
-      <Component {...pageProps} />
+        <Component {...pageProps} />
     </Provider>
   );
 }
