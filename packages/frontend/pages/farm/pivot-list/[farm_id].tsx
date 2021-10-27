@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, SetStateAction } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Header from '../../../components/Header';
@@ -48,45 +48,65 @@ const PivotList: NextPage = () => {
 
 export default PivotList;
 
-const Pivot = ({ pivot }) => {
+type PivotData = {
+  pivot_id: string,
+  pivot_name: string
+}
+
+type CycleData = {
+  power: boolean;
+  direction?: 'NULL' | 'CLOCKWISE' | 'ANTICLOCKWISE';
+  water?: 'NULL' | 'DRY' | 'WET';
+  percentimeter?: number;
+  voltage?: number;
+  pressure?: number;
+};
+
+const Pivot = ({ pivot }: {pivot: PivotData}) => {
   const [inputValue, setInputValue] = useState('00000');
+  const [cycleData, setCycleData] = useState<CycleData>({power: false})
+
+  useEffect(() => {
+    const fetchData = async (pivot_id: string) => {
+      const response = await Axios.get(`http://localhost:3308/cycle/read/${pivot_id}`);
+      setCycleData(response.data);
+    }
+
+    fetchData(pivot.pivot_id);
+  }, [])
+
   const {
     pivot_id,
     pivot_name,
-    power,
-    direction,
-    water,
-    percentimeter,
-    voltage,
-    pressure
   } = pivot;
+
 
   return (
     <div className="flex min-w-min">
       <div className="bg-primary m-8 h-auto rounded-lg text-center p-4">
         <h4 className="bg-secondary rounded-lg p-4">Pivô {pivot_name}</h4>
-        <h2 className="text-white m-4">Ligado</h2>
+        <h2 className="text-white m-4">{cycleData.power ? "Ligado" : "Desligado"}</h2>
 
         <div className="grid grid-cols-3 text-white">
           <div>
             <p>Sentido:</p>
-            <p>{direction}</p>
+            <p>{cycleData.direction}</p>
           </div>
           <div>
             <p>Água:</p>
-            <p>{water}</p>
+            <p>{cycleData.water}</p>
           </div>
           <div>
             <p>Percentímetro:</p>
-            <div className="h-full">{percentimeter}</div>
+            <div className="h-full">{cycleData.percentimeter}</div>
           </div>
           <div>
             <p>Voltagem:</p>
-            <span>{voltage}</span>
+            <span>{cycleData.voltage}</span>
           </div>
           <div>
             <p>Pressão:</p>
-            <span>{pressure}</span>
+            <span>{cycleData.pressure}</span>
           </div>
           <div>
             <p>RSSI:</p>
@@ -115,7 +135,7 @@ const Pivot = ({ pivot }) => {
               if (err instanceof Error) {
                 alert(`Erro na requisição da intenção: ${err.message}`);
               } else {
-                alert("Erro desconhecido na requisição da intenção...");
+                alert('Erro desconhecido na requisição da intenção...');
               }
             }
           }}

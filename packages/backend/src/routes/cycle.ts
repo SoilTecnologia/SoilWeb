@@ -1,6 +1,6 @@
 import { prisma } from '.prisma/client';
 import express from 'express';
-import { readAllCycleController } from '../controllers/cycle';
+import { readAllCycleController, readCycleController } from '../controllers/cycle';
 
 const router = express.Router();
 
@@ -9,6 +9,18 @@ const router = express.Router();
 
     try {
       const cycle = await readAllCycleController(pivot_id);
+
+      res.send(cycle);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/read/:pivot_id', async (req, res, next) => {
+    const pivot_id = req.params.pivot_id;
+
+    try {
+      const cycle = await readCycleController(pivot_id);
 
       res.send(cycle);
     } catch (err) {

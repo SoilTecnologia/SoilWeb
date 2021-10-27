@@ -21,12 +21,47 @@ type FullCycle = {
   cycleStates: Array<CustomCycleState>;
 };
 
-export const readCycleController = async (pivot_id) => {
+type CycleData = {
+  power: boolean;
+  direction?: CycleState['direction'];
+  water?: CycleState['water'];
+  percentimeter?: CycleVariable['percentimeter'];
+  // voltage?: ;
+  pressure?: CycleVariable['pressure'];
+};
+
+export const readCycleController = async (
+  pivot_id: string
+): Promise<CycleData | null> => {
+  let pivotData: CycleData;
+
   const cycle = await db.cycle.findFirst({
     where: { pivot_id, is_running: true }
   });
 
-  return cycle;
+  if (cycle) {
+    const cycleState = await db.cycleState.findFirst({
+      where: { cycle_id: cycle.cycle_id },
+      orderBy: { updatedAt: 'desc' }
+    });
+    const cycleVariable = await db.cycleVariable.findFirst({
+      where: { cycle_id: cycle.cycle_id },
+      orderBy: { updatedAt: 'desc' }
+    });
+
+
+    return {
+      power: true,
+      direction: cycleState!.direction,
+      water: cycleState!.water,
+      percentimeter: cycleVariable!.percentimeter,
+      pressure: cycleVariable!.pressure
+    }
+  } else {
+    return {
+      power: false
+    };
+  }
 };
 
 export const readAllCycleController = async (

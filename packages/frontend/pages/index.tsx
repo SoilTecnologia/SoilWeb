@@ -12,7 +12,7 @@ const index = () => {
       const response = await Axios.get('http://localhost:3308/farm/readAll', {
         headers: {
           authorization:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjg1Mzc1NjktZmI5NC00NjVjLWIxMDItM2JlN2QyNWQ4MmE3IiwidXNlcl90eXBlIjoiU1VETyIsImlhdCI6MTYzNTI3MTQ1MiwiZXhwIjoxNjM1Mjc4NjUyfQ.V8ztVFZgPNy9oaaI1YLwzmYHrS3dUB74RwbYOjyBkZw'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjg1Mzc1NjktZmI5NC00NjVjLWIxMDItM2JlN2QyNWQ4MmE3IiwidXNlcl90eXBlIjoiU1VETyIsImlhdCI6MTYzNTM1NzM0NSwiZXhwIjoxNjM1MzY0NTQ1fQ.kFRZhTqNHRlJM9E1q12KCYGMHbgQZn-1rD7fH2qTQTA'
         }
       });
 
@@ -25,7 +25,7 @@ const index = () => {
         });
       }
 
-      setFarms(newFarms);
+      setFarms(newFarms as never);
       console.log('setada!');
     };
 
