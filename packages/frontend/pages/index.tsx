@@ -4,15 +4,14 @@ import Header from '../components/Header';
 import Axios from 'axios';
 import Link from 'next/link';
 
-const index = () => {
+const index = ({ token }: { token: string }) => {
   const [farms, setFarms] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await Axios.get('http://localhost:3308/farm/readAll', {
         headers: {
-          authorization:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjg1Mzc1NjktZmI5NC00NjVjLWIxMDItM2JlN2QyNWQ4MmE3IiwidXNlcl90eXBlIjoiU1VETyIsImlhdCI6MTYzNTM1NzM0NSwiZXhwIjoxNjM1MzY0NTQ1fQ.kFRZhTqNHRlJM9E1q12KCYGMHbgQZn-1rD7fH2qTQTA'
+          authorization: token
         }
       });
 
@@ -39,11 +38,7 @@ const index = () => {
       </Header>
 
       {farms.map(({ farm_id, farm_name, city }) => (
-        <Farm
-          farm_id={farm_id}
-          farm_name={farm_name}
-          city={city}
-        />
+        <Farm farm_id={farm_id} farm_name={farm_name} city={city} />
       ))}
     </div>
   );
@@ -54,7 +49,7 @@ export default withAuth(index);
 const Farm = ({
   farm_id,
   farm_name,
-  city,
+  city
 }: {
   farm_id: String;
   farm_name: String;

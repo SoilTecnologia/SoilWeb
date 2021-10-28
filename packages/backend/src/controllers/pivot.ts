@@ -31,15 +31,6 @@ export const createPivotController = async (
     }
   });
 
-  const newIntent = await db.intent.create({
-    data: {
-      power: 'NULL',
-      water: 'NULL',
-      percentimenter: 0,
-      direction: 'NULL',
-      pivot_id: newPivo.pivot_id
-    }
-  });
 
   return newPivo;
 };

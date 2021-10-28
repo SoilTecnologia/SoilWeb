@@ -1,4 +1,4 @@
-import { Pivot, Intent } from '@prisma/client';
+import { Radio, Intent } from '@prisma/client';
 import db from '../database';
 
 export const readAllIntentController = async() => {
@@ -8,7 +8,7 @@ export const readAllIntentController = async() => {
 }
 
 export const updateIntentController = async (
-  pivot_id: Pivot['pivot_id'],
+  radio_id: Radio['radio_id'],
   power: Intent['power'],
   water: Intent['water'],
   direction: Intent['direction'],
@@ -21,7 +21,7 @@ export const updateIntentController = async (
       direction,
       percentimenter,
     },
-    where: { pivot_id }
+    where: { radio_id }
   });
 
 	return response;

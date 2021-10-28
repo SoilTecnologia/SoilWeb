@@ -6,6 +6,7 @@ import radioRoute from './radio';
 import nodeRoute from './node';
 import cycleRoute from './cycle';
 import intentRoute from './intent';
+import raspberryRoute from './raspberry';
 
 import {
   DuplicateUniqueError,
@@ -46,6 +47,7 @@ router.use('/node', nodeRoute);
 router.use('/cycle', cycleRoute);
 router.use('/radio', radioRoute);
 router.use('/intent', intentRoute);
+router.use('/raspberry', raspberryRoute);
 router.use(error);
 
 export default router;

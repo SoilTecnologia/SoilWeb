@@ -1,16 +1,16 @@
 import NextAuth from 'next-auth';
-import Providers from 'next-auth/providers';
-import CredentialsProvider from 'next-auth/providers/credentials';
 import { session, signin, signIn } from 'next-auth/client';
 import axios from 'axios';
+import Providers from 'next-auth/providers';
 
 export default NextAuth({
   // Configure one or more authentication providers
   session: {
-    jwt: true
+    jwt: true,
+    maxAge: 60 * 60 * 3
   },
   providers: [
-    CredentialsProvider({
+    Providers.Credentials({
       // The credentials is used to generate a suitable form on the sign in page.
       // You can specify whatever fields you are expecting to be submitted.
       // e.g. domain, username, password, 2FA token, etc.
@@ -25,11 +25,10 @@ export default NextAuth({
         // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
         // You can also use the `req` object to obtain additional parameters
         // (i.e., the request IP address)
-        const opa = {
-          login: credentials.login,
+        const res = await axios.post('http://localhost:3308/user/signin', {
+          login: credentials.username,
           password: credentials.password
-        };
-        const res = await axios.post('http://localhost:3308/user/signin', opa);
+        });
 
         const user = res.data;
         // If no error and we have user data, return it
@@ -43,25 +42,25 @@ export default NextAuth({
   ],
   callbacks: {
     async redirect(url, baseUrl) {
-      return "/";
+      return '/';
     },
     async jwt(token, user, account, profile, isNewUser) {
-      if(user) {
+      if (user) {
         token.user_id = user.user_id;
         token.user_type = user.user_type;
         token.acessToken = user.token;
       }
-     return token;
+      return token;
     },
     async session(session, userOrToken) {
-      const {user_id, user_type} = userOrToken;
+      const { user_id, user_type } = userOrToken;
 
-      session.user = {user_id, user_type};
+      session.user = { user_id, user_type };
       session.token = userOrToken.acessToken;
       return session;
     }
   },
   pages: {
-    signIn: '/auth/signin',
+    signIn: '/auth/signin'
   }
 });

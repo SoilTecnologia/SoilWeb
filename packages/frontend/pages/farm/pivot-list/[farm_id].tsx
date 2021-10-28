@@ -2,6 +2,7 @@ import React, { useState, useEffect, SetStateAction } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Header from '../../../components/Header';
+import withAuth from '../../../lib/withAuth';
 import Axios from 'axios';
 
 const PivotList: NextPage = () => {
@@ -46,7 +47,7 @@ const PivotList: NextPage = () => {
   );
 };
 
-export default PivotList;
+export default withAuth(PivotList);
 
 type PivotData = {
   pivot_id: string,
@@ -127,9 +128,10 @@ const Pivot = ({ pivot }: {pivot: PivotData}) => {
           onSubmit={async (e) => {
             e.preventDefault();
             try {
-              const response = await Axios.post(
-                `http://192.168.100.105:3031/cmd?ID=${pivot_name}&intencao=${inputValue}`
-              );
+              // const response = await Axios.post(
+              //   `http://192.168.100.105:3031/cmd?ID=${pivot_name}&intencao=${inputValue}`
+              // );
+              const response = await Axios.post(`http://localhost:3308/raspberry/update/${pivot_name}/${inputValue}`);
               console.log(response.data);
             } catch (err) {
               if (err instanceof Error) {
