@@ -1,6 +1,7 @@
 import express from 'express';
 import { updateIntentController } from '../controllers/intent';
 import { start } from '../raspberry/index';
+import emitter from '../utils/eventBus';
 
 const router = express.Router();
 
@@ -23,9 +24,10 @@ router.put('/:pivot_id', async (req, res, next) => {
       power,
       water,
       direction,
-      percentimenter,
+      percentimenter
     );
 
+    emitter.emit("intent", newIntent);
     return res.send(newIntent);
   } catch (err) {
     next(err);

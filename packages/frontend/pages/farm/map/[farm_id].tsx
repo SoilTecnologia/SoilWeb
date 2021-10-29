@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Header from '../../../components/Header';
 import withAuth from '../../../lib/withAuth';
 import Axios from 'axios';
+import {FaClipboardList} from 'react-icons/fa'
 import {AiOutlineArrowLeft} from 'react-icons/ai';
-import {FaMapMarkedAlt} from 'react-icons/fa';
 
 const PivotList: NextPage = () => {
   const router = useRouter();
@@ -28,7 +28,7 @@ const PivotList: NextPage = () => {
   return (
     <div>
       <Header>
-        <h4>PIVÔS</h4>
+        <h4>MAPA</h4>
       </Header>
       <div className="flex justify-between">
         <Link href="/">
@@ -39,12 +39,12 @@ const PivotList: NextPage = () => {
           </a>
           </div>
         </Link>
-        <Link href={`/farm/map/${farm_id}`}>
+        <Link href={`/farm/pivot-list/${farm_id}`}>
           <div className="items-center inline-block cursor-pointer bg-primary m-8 p-4 w-44 rounded-lg font-sans text-white font-semibold">
             <a className="pr-8">
-              Mapa
+              Lista
             </a>
-            <FaMapMarkedAlt size="26" color="secondary" className="float-right"/>
+            <FaClipboardList size="26" color="secondary" className="float-right"/>
           </div>
         </Link>
       </div>

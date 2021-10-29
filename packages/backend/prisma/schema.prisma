@@ -63,6 +63,7 @@ model Cycle {
   cycle_id     String       @id @default(uuid())
   is_running   Boolean      @default(true)
   pivot_id     String
+  timestamp DateTime?
   updatedAt    DateTime     @updatedAt
   pivot        Pivot        @relation(fields: [pivot_id], references: [pivot_id])
   cycle_states CycleState[]
@@ -76,6 +77,7 @@ model Intent {
   direction      Intent_direction
   percentimenter Int
   radio_name       String 
+  timestamp DateTime?
   radio_id String @unique
   updatedAt      DateTime         @updatedAt
   radio          Radio            @relation(fields: [radio_id], references: [radio_id])
@@ -87,7 +89,7 @@ model Radio {
   updatedAt DateTime @updatedAt
   Pivot     Pivot    @relation(fields: [pivot_id], references: [pivot_id])
   pivot_id  String  
-  intents     Intent[]
+  intent     Intent?
   radio_variables RadioVariable[]
 }
 
@@ -96,6 +98,7 @@ model RadioVariable {
   rssi      Int @default(0)
   rank      Int @default(0)
   father    String @default("null")
+  timestamp DateTime?
   updateAt DateTime @updatedAt
   radio_id String
   radio       Radio @relation(fields: [radio_id], references: [radio_id])
@@ -106,6 +109,7 @@ model CycleState {
   water           WaterState
   direction       DirectionState
   connection      ConnectionState
+  timestamp DateTime?
   start_angle     Int
   end_angle       Int
   cycle_id        String
@@ -120,6 +124,7 @@ model CycleVariable {
   percentimeter     Int
   pressure          Int
   cycle_state_id    String
+  timestamp DateTime?
   cycle_id  String
   updatedAt         DateTime   @updatedAt
   cycle_state       CycleState @relation(fields: [cycle_state_id], references: [cycle_state_id])
