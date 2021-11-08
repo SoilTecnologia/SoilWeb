@@ -1,7 +1,13 @@
-import { Intent } from '@prisma/client';
+import {
+  DirectionState,
+  Intent,
+  WaterState,
+  PowerState,
+  ConnectionState
+} from '@prisma/client';
 import Axios from 'axios';
-import internal from 'stream';
 import { readAllIntentController } from '../controllers/intent';
+import { updatePivotController } from '../controllers/pivot';
 import emitter from '../utils/eventBus';
 
 type IntentData = {
@@ -36,7 +42,9 @@ export const start = async () => {
       counter = activePool.length - 1;
       while (counter >= 0) {
         if (activePool[counter].intent.intent_id == intent.intent_id) {
-          activePool = activePool.filter((value) => value != activePool[counter]);
+          activePool = activePool.filter(
+            (value) => value != activePool[counter]
+          );
           activePool.push({ intent, timestamp: new Date() });
           break;
         }
@@ -65,16 +73,30 @@ const loadIntents = async () => {
 };
 
 const checkPool = async () => {
-  console.log('Check Pool: ', "IDLE: ", idlePool.length, " ACTIVE: ", activePool.length);
+  console.log(
+    'Check Pool: ',
+    'IDLE: ',
+    idlePool.length,
+    ' ACTIVE: ',
+    activePool.length
+  );
   ready = false;
   for (let activeIntent of activePool) {
-    console.log("[ACTIVE] Sending data to pivot", activeIntent.intent.radio_name);
+    console.log(
+      '[ACTIVE] Sending data to pivot',
+      activeIntent.intent.radio_name
+    );
     const response = await sendData(activeIntent);
     if (response.status == 200) {
       activePool = activePool.filter((value) => value != activeIntent);
 
       activeIntent.timestamp = new Date();
       idlePool.push(activeIntent);
+      processResponse(
+        activeIntent.intent.radio_name,
+        activeIntent.intent,
+        response.data
+      );
     }
   }
 
@@ -83,9 +105,14 @@ const checkPool = async () => {
       new Date().getTime() - new Date(idleIntent.timestamp).getTime() >=
       20000
     ) {
-      console.log("[IDLE] Sending data to pivot", idleIntent.intent.radio_name);
+      console.log('[IDLE] Sending data to pivot', idleIntent.intent.radio_name);
       const response = await sendData(idleIntent);
       idleIntent.timestamp = new Date();
+      processResponse(
+        idleIntent.intent.radio_name,
+        idleIntent.intent,
+        response.data
+      );
     }
   }
 
@@ -93,9 +120,121 @@ const checkPool = async () => {
 };
 
 const sendData = async (intent: IntentData) => {
-  const response = await Axios.get(
-    `http://localhost:3308/pivot/readAll/e5abc5ae-7467-497c-a00d-417186dfe860`
+  let intentString: string = intentToString(intent);
+  console.log(intentString);
+
+  const response = await Axios.post(
+    `http://localhost:3308/test/${intentString}`
   );
 
   return response;
+};
+
+type RaspberryResponse = {
+  connection: ConnectionState;
+  direction: DirectionState;
+  water: WaterState;
+  power: PowerState;
+  percentimeter: number;
+  angle: number;
+  timestamp: number;
+};
+
+const processResponse = async (
+  radio_name: Intent['radio_name'],
+  intent: Intent,
+  response: string
+) => {
+  const raspberryResponse: RaspberryResponse = stringToStatus(response);
+  await updatePivotController(
+    radio_name,
+    raspberryResponse.connection,
+    raspberryResponse.power,
+    raspberryResponse.water,
+    raspberryResponse.direction,
+    raspberryResponse.angle,
+    raspberryResponse.percentimeter
+  );
+};
+
+const stringToStatus = (responseString: string) => {
+  console.log(responseString);
+  let [_, direction, water, power, percentimeter, angle, timestamp] =
+    /(\d{1})-(\d{1})-(\d{1})-(\d{2})-(\d{3})-(\d+)/.exec(responseString) || ["", "", "", "", 0, 0, 0];
+
+    console.log(direction, water)
+
+  let response: RaspberryResponse = {
+    connection: 'ONLINE',
+    direction: 'NULL',
+    water: 'NULL',
+    power: 'NULL',
+    percentimeter: 0,
+    angle: 0,
+    timestamp: 0
+  };
+
+  if (direction == '3') {
+    response.direction = 'CLOCKWISE';
+  } else if (direction == '4') {
+    response.direction = 'ANTI_CLOCKWISE';
+  }
+
+  if (water == '5') {
+    response.water = 'DRY';
+  } else if (water == '6') {
+    response.water = 'WET';
+  }
+
+  if (power == '1') {
+    response.power = 'ON';
+  } else if (direction == '2') {
+    response.power = 'OFF';
+  }
+
+  response.percentimeter = Number(percentimeter);
+  response.angle = Number(angle);
+  response.timestamp = Number(timestamp);
+
+  return response;
+};
+
+const intentToString = ({ intent }: { intent: Intent }): string => {
+  let intentString = '';
+
+  if (intent.direction == 'CLOCKWISE') {
+    intentString = intentString.concat('3');
+  } else if (intent.direction == 'ANTI_CLOCKWISE') {
+    intentString = intentString.concat('4');
+  } else {
+    return '00000';
+  }
+
+  if (intent.water == 'DRY') {
+    intentString = intentString.concat('5');
+  } else if (intent.water == 'WET') {
+    intentString = intentString.concat('6');
+  } else {
+    return '00000';
+  }
+
+  if (intent.power == 'ON') {
+    intentString = intentString.concat('1');
+  } else if (intent.power == 'OFF') {
+    intentString = intentString.concat('2');
+  } else {
+    return '00000';
+  }
+
+  // Adds the percentimeter to the end
+  // padStart adds 0's if the percentimeter string < 3, ie: 10 turns into 010
+  if (intent.percentimeter == 100) {
+    intentString = intentString.concat('99');
+  } else {
+    intentString = intentString.concat(
+      intent.percentimeter.toString().padStart(2, '0')
+    );
+  }
+
+  return intentString;
 };

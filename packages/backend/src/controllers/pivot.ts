@@ -1,6 +1,7 @@
 import {
   Farm,
   Pivot,
+  Radio,
   Cycle,
   CycleState,
   CycleVariable,
@@ -30,7 +31,6 @@ export const createPivotController = async (
       radius
     }
   });
-
 
   return newPivo;
 };
@@ -71,19 +71,19 @@ export const readAllPivotController = async (
 ): Promise<Pivot[] | null> => {
   const nodes = await db.node.findMany({
     where: { farm_id },
-    select: {pivots: true}
+    select: { pivots: true }
   });
 
   let pivots: Pivot[] = [];
 
   nodes.forEach((node) => node.pivots.forEach((pivot) => pivots.push(pivot)));
-  pivots = pivots.sort((a, b) => a.pivot_name > b.pivot_name ? 1 : -1);
+  pivots = pivots.sort((a, b) => (a.pivot_name > b.pivot_name ? 1 : -1));
 
   return pivots;
 };
 
 export const updatePivotController = async (
-  pivot_id: Pivot['pivot_id'],
+  radio_name: Radio['radio_name'],
   connection: CycleState['connection'],
   power?: PowerState,
   water?: CycleState['water'],
@@ -91,6 +91,9 @@ export const updatePivotController = async (
   curr_angle?: CycleVariable['angle'],
   percentimeter?: CycleVariable['percentimeter']
 ) => {
+  const radio = await db.radio.findFirst({ where: { radio_name } });
+  const pivot_id = radio!.pivot_id;
+
   const lastCycle = await db.cycle.findFirst({
     where: { pivot_id, is_running: true },
     orderBy: { updatedAt: 'desc' }
@@ -264,7 +267,8 @@ const updateCycleVariables = async (
           percentimeter: percentimeter!,
           pressure: pressure!,
           cycle_state_id: cycle_state_id,
-          cycle_id
+          cycle_id,
+          timestamp: new Date(Date.now())
         }
       });
     }
@@ -303,7 +307,8 @@ const updateCycleState = async (
           direction: direction!,
           connection,
           start_angle: curr_angle!,
-          end_angle: curr_angle!
+          end_angle: curr_angle!,
+          timestamp: new Date(Date.now())
         }
       });
 
@@ -332,7 +337,8 @@ const updateCycleState = async (
             direction: 'NULL',
             connection,
             start_angle: lastCycleVariable.angle,
-            end_angle: lastCycleVariable.angle
+            end_angle: lastCycleVariable.angle,
+            timestamp: new Date(Date.now())
           }
         });
 
@@ -352,8 +358,10 @@ const createNewCycle = async (
   curr_angle: CycleVariable['angle'],
   percentimeter: CycleVariable['percentimeter']
 ) => {
+  console.log('TRYINFGGG');
+  console.log(pivot_id);
   const newCycle = await db.cycle.create({
-    data: { pivot_id, is_running: true }
+    data: { pivot_id, is_running: true, timestamp: new Date(Date.now()) }
   });
   const newCycleState = await db.cycleState.create({
     data: {
@@ -362,7 +370,8 @@ const createNewCycle = async (
       direction,
       connection,
       start_angle: curr_angle,
-      end_angle: curr_angle
+      end_angle: curr_angle,
+      timestamp: new Date(Date.now())
     }
   });
 
@@ -372,7 +381,8 @@ const createNewCycle = async (
       percentimeter,
       pressure: 0,
       cycle_state_id: newCycleState.cycle_state_id,
-      cycle_id: newCycle.cycle_id
+      cycle_id: newCycle.cycle_id,
+      timestamp: new Date(Date.now())
     }
   });
 

@@ -34,6 +34,7 @@
     "@aws-sdk/client-sqs": "^3.36.1",
     "@next-auth/prisma-adapter": "^0.5.4",
     "@prisma/client": "^3.0.2",
+    "aws-iot-device-sdk-v2": "^1.6.3",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",

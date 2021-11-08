@@ -12,14 +12,14 @@ export const updateIntentController = async (
   power: Intent['power'],
   water: Intent['water'],
   direction: Intent['direction'],
-  percentimenter: Intent['percentimenter'],
+  percentimeter: Intent['percentimeter'],
 ): Promise<Intent> => {
   const response = await db.intent.update({
     data: {
       power,
       water,
       direction,
-      percentimenter,
+      percentimeter,
     },
     where: { radio_id }
   });

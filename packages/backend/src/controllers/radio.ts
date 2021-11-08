@@ -16,10 +16,12 @@ export const createRadioController = async (
     data: {
       power: 'NULL',
       water: 'NULL',
-      percentimenter: 0,
+      percentimeter: 0,
       direction: 'NULL',
       radio_id: newRadio.radio_id,
-      radio_name: newRadio.radio_name
+      radio_name: newRadio.radio_name,
+          timestamp: new Date(Date.now())
+
     }
   });
 
