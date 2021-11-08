@@ -5,14 +5,13 @@ import http from 'http';
 import router from './routes/router';
 import * as raspberry from './raspberry';
 import EventEmitter from 'events';
-import {send} from './aws-iot/index';
+import IoTDevice from './aws-iot/index';
 
 const PORT = 3308;
 const app = express();
 const eventEmitter = new EventEmitter();
 
 eventEmitter.on('intent', () => {
-
   console.log('INTENT event received!');
 });
 
@@ -24,4 +23,6 @@ app.listen(PORT, () => {
 });
 
 // raspberry.start();
-send();
+
+const iotDevice = new IoTDevice('Cloud', 1, 'teste-0');
+iotDevice.start();
