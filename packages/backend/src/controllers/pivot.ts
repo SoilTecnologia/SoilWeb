@@ -5,6 +5,7 @@ import {
   Cycle,
   CycleState,
   CycleVariable,
+  Node,
   PowerState
 } from '@prisma/client';
 import db from '../database';
@@ -83,16 +84,22 @@ export const readAllPivotController = async (
 };
 
 export const updatePivotController = async (
-  radio_name: Radio['radio_name'],
+  pivot_name: Pivot['pivot_name'],
   connection: CycleState['connection'],
+  node_id?: Node['node_id'],
   power?: PowerState,
   water?: CycleState['water'],
   direction?: CycleState['direction'],
   curr_angle?: CycleVariable['angle'],
   percentimeter?: CycleVariable['percentimeter']
 ) => {
-  const radio = await db.radio.findFirst({ where: { radio_name } });
-  const pivot_id = radio!.pivot_id;
+  let pivot;
+  if (node_id) {
+    pivot = await db.pivot.findFirst({ where: { node_id, pivot_name } });
+  }
+
+  pivot = await db.pivot.findFirst({ where: { pivot_name } });
+  const { pivot_id } = pivot!;
 
   const lastCycle = await db.cycle.findFirst({
     where: { pivot_id, is_running: true },

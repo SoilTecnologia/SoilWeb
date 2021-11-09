@@ -3,7 +3,8 @@ import {
   Intent,
   WaterState,
   PowerState,
-  ConnectionState
+  ConnectionState,
+  Pivot
 } from '@prisma/client';
 import Axios from 'axios';
 import { readAllIntentController } from '../controllers/intent';
@@ -141,14 +142,15 @@ type RaspberryResponse = {
 };
 
 const processResponse = async (
-  radio_name: Intent['radio_name'],
+  pivot_name: Pivot['pivot_name'],
   intent: Intent,
   response: string
 ) => {
   const raspberryResponse: RaspberryResponse = stringToStatus(response);
   await updatePivotController(
-    radio_name,
+    pivot_name,
     raspberryResponse.connection,
+    undefined,
     raspberryResponse.power,
     raspberryResponse.water,
     raspberryResponse.direction,
