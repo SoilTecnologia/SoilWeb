@@ -6,9 +6,13 @@ import {
   ConnectionState,
   Pivot
 } from '@prisma/client';
-import Axios from 'axios';
+import { Readable } from 'stream';
+import {FormDataEncoder} from 'form-data-encoder';
+import {FormData} from 'formdata-node';
+import Axios, { AxiosResponse } from 'axios';
 import { readAllIntentController } from '../controllers/intent';
 import { updatePivotController } from '../controllers/pivot';
+import { updateRadioController } from '../controllers/radio';
 import emitter from '../utils/eventBus';
 
 const TIMEOUT = 5000;
@@ -88,7 +92,6 @@ type RaspberryResponse = {
 };
 
 const stringToStatus = (responseString: string) => {
-  console.log(responseString);
   let [_, direction, water, power, percentimeter, angle, timestamp] =
     /(\d{1})-(\d{1})-(\d{1})-(\d{2})-(\d{3})-(\d+)/.exec(responseString) || [
       '',
@@ -100,7 +103,6 @@ const stringToStatus = (responseString: string) => {
       0
     ];
 
-  console.log(direction, water);
 
   let response: RaspberryResponse = {
     connection: 'ONLINE',
@@ -180,27 +182,28 @@ const intentToString = ({ intent }: { intent: Intent }): string => {
 const processResponse = async (
   pivot_name: Pivot['pivot_name'],
   intent: Intent,
-  response: string
+  response: any
 ) => {
-  const raspberryResponse: RaspberryResponse = stringToStatus(response);
-  await updatePivotController(
-    pivot_name,
-    raspberryResponse.connection,
-    undefined,
-    raspberryResponse.power,
-    raspberryResponse.water,
-    raspberryResponse.direction,
-    raspberryResponse.angle,
-    raspberryResponse.percentimeter
-  );
+   console.log(response)
+  updateRadioController(pivot_name, response.payload[3])
 };
 
 const sendData = async (intent: IntentData) => {
   let intentString: string = intentToString(intent);
-  console.log(intentString);
+  console.log(intent.intent.radio_name);
+
+  let bodyFormData = new FormData();
+
+  bodyFormData.set("ID", intent.intent.radio_name);
+  bodyFormData.set("CMD", "213");
+  bodyFormData.set("intencao", "000");
+  const encoder = new FormDataEncoder(bodyFormData);
 
   const response = await Axios({
-    url: `http://localhost:3308/test/${intentString}`,
+    method: "POST",
+    url: `http://192.168.100.100:3031/comands`,
+    headers: encoder.headers,
+    data: Readable.from(encoder),
     timeout: TIMEOUT
   });
 
@@ -247,7 +250,7 @@ const checkPool = async () => {
   for (let idleIntent of idlePool) {
     if (
       new Date().getTime() - new Date(idleIntent.timestamp).getTime() >=
-      20000
+      8000
     ) {
       console.log('[IDLE] Sending data to pivot', idleIntent.intent.radio_name);
 

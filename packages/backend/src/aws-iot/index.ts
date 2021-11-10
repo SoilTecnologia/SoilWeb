@@ -85,15 +85,17 @@ class IoTDevice {
     retain: boolean
   ) {
     const decoder = new TextDecoder('utf8');
+    console.log(this);
+    // console.log(payload)
 
-    if (this.type == 'Cloud') {
-      const json: PivotToCloudMessage = JSON.parse(decoder.decode(payload));
-      const{type, pivot_name, node_id, power, direction, water, angle, percentimeter, connection, timestamp} = json;
+    // if (this.type == 'Cloud') {
+    //   const json: PivotToCloudMessage = JSON.parse(decoder.decode(payload));
+    //   const{type, pivot_name, node_id, power, direction, water, angle, percentimeter, connection, timestamp} = json;
 
-      if(type == "status") {
-      // updatePivotController(pivot_name, "ONLINE", node_id, power, water, direction, angle, percentimeter);
-      }
-    }
+    //   if(type == "status") {
+    //   // updatePivotController(pivot_name, "ONLINE", node_id, power, water, direction, angle, percentimeter);
+    //   }
+    // }
     console.log(
       `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
     );

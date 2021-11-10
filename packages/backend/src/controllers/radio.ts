@@ -1,4 +1,4 @@
-import { Radio } from '@prisma/client';
+import { Radio, RadioVariable } from '@prisma/client';
 import db from '../database';
 
 export const createRadioController = async (
@@ -37,6 +37,25 @@ export const readRadioController = async (
 
   return radio;
 };
+
+export const updateRadioController = async (
+  radio_name: Radio['radio_name'],
+  rssi: number
+): Promise<RadioVariable | null> => {
+  const radio = await db.radio.findFirst({where: {radio_name}});
+
+  const newRadioVariables = await db.radioVariable.create({
+    data: {
+      radio_id: radio!.radio_id,
+      rank: 0,
+      rssi,
+      timestamp: new Date(),
+      father: "father",
+    }
+  })
+
+  return newRadioVariables;
+}
 
 export const deleteRadioController = async (radio_id: Radio['radio_id']) => {
   const deletedRadio = await db.radio.delete({
