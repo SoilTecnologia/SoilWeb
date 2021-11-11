@@ -41,6 +41,7 @@ export const readRadioController = async (
 export const updateRadioController = async (
   radio_name: Radio['radio_name'],
   rssi: number,
+  father: number,
   payload: string,
   response_time: number
 ): Promise<RadioVariable | null> => {
@@ -55,7 +56,7 @@ export const updateRadioController = async (
       response_time,
       radio_name,
       timestamp: new Date(),
-      father: "father",
+      father: father.toString(),
     }
   })
 

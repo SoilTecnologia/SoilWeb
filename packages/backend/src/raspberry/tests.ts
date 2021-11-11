@@ -77,7 +77,7 @@ export const start = async () => {
   // Dentro da checkPool existe uma flag ready para ver se ja posso checar o proximo
   setInterval(() => {
     if (ready) checkPool();
-  }, 200);
+  }, 2000);
 };
 
 const loadIntents = async () => {
@@ -195,8 +195,13 @@ const processResponse = async (
   response: any,
   response_time: number
 ) => {
-  console.log(response);
-  await updateRadioController(pivot_name, response.payload[3],JSON.stringify(response), response_time);
+  await updateRadioController(
+    pivot_name,
+    response.payload[3],
+    response.payload[0],
+    JSON.stringify(response),
+    response_time
+  );
   await updatePivotController(
     pivot_name,
     'ONLINE',
@@ -211,7 +216,6 @@ const processResponse = async (
 
 const sendData = async (intent: IntentData) => {
   let intentString: string = intentToString(intent);
-  console.log(intent.intent.radio_name);
 
   let bodyFormData = new FormData();
 
@@ -236,85 +240,128 @@ const sendData = async (intent: IntentData) => {
 };
 
 const checkPool = async () => {
-  if(fatherCounter < fatherUpdate) { 
-  console.log(
-    'Check Pool: ',
-    'IDLE: ',
-    idlePool.length,
-    ' ACTIVE: ',
-    activePool.length
-  );
   ready = false;
-  for (let activeIntent of activePool) {
-    console.log(
-      '[ACTIVE] Sending data to pivot',
-      activeIntent.intent.radio_name
-    );
+  if (fatherCounter < fatherUpdate) {
+    // console.log(
+    //   'Check Pool: ',
+    //   'IDLE: ',
+    //   idlePool.length,
+    //   ' ACTIVE: ',
+    //   activePool.length
+    // );
+    for (let activeIntent of activePool) {
+      console.log(
+        '[ACTIVE]\tSending data to pivot',
+        activeIntent.intent.radio_name
+      );
 
-    try {
-      const result = await sendData(activeIntent);
-      const { response, response_time } = result;
-      if (response.status == 200) {
+      try {
+        const result = await sendData(activeIntent);
+        const { response, response_time } = result;
+        if (
+          response.status == 200 &&
+          response.data.id == activeIntent.intent.radio_name
+        ) {
+          activePool = activePool.filter((value) => value != activeIntent);
+
+          activeIntent.timestamp = new Date();
+          activeIntent.attempts = 0;
+          idlePool.push(activeIntent);
+          processResponse(
+            activeIntent.intent.radio_name,
+            activeIntent.intent,
+            response.data,
+            response_time
+          );
+        } else {
+          console.log(
+            `[ERROR]\tResposta de outro id: -> ${activeIntent.intent.radio_name} | -> ${response.data.id}`
+          );
+          activeIntent.attempts++;
+
+          if (activeIntent.attempts >= 5) {
+            await updatePivotController(
+              activeIntent.intent.radio_name,
+              'OFFLINE'
+            );
+            activeIntent.attempts = 0;
+          }
+        }
+      } catch (err) {
+        console.log('[TIMEOUT]\ton', activeIntent.intent.radio_name);
+        activeIntent.attempts++;
+
         activePool = activePool.filter((value) => value != activeIntent);
 
         activeIntent.timestamp = new Date();
-        activeIntent.attempts = 0;
         idlePool.push(activeIntent);
-        processResponse(
-          activeIntent.intent.radio_name,
-          activeIntent.intent,
-          response.data,
-          response_time
-        );
-      }
-    } catch (err) {
-      console.log('TIMEOUT on', activeIntent.intent.radio_name);
-      activeIntent.attempts++;
-      activePool = activePool.filter((value) => value != activeIntent);
 
-      activeIntent.timestamp = new Date();
-      idlePool.push(activeIntent);
-
-      if (activeIntent.attempts >= 5) {
-        await updatePivotController(activeIntent.intent.radio_name, 'OFFLINE');
-        activeIntent.attempts = 0;
-      }
-    }
-  }
-
-  for (let idleIntent of idlePool) {
-    if (
-      new Date().getTime() - new Date(idleIntent.timestamp).getTime() >=
-      8000
-    ) {
-      console.log('[IDLE] Sending data to pivot', idleIntent.intent.radio_name);
-
-      try {
-        const result = await sendData(idleIntent);
-        const { response, response_time } = result;
-        idleIntent.timestamp = new Date();
-        idleIntent.attempts = 0;
-        processResponse(
-          idleIntent.intent.radio_name,
-          idleIntent.intent,
-          response.data,
-          response_time
-        );
-      } catch (err) {
-        idleIntent.attempts++;
-        console.log('TIMEOUT on', idleIntent.intent.radio_name);
-
-        if (idleIntent.attempts >= 5) {
-          await updatePivotController(idleIntent.intent.radio_name, 'OFFLINE');
-          idleIntent.attempts = 0;
+        if (activeIntent.attempts >= 5) {
+          await updatePivotController(
+            activeIntent.intent.radio_name,
+            'OFFLINE'
+          );
+          activeIntent.attempts = 0;
         }
       }
     }
-  }
 
+    for (let idleIntent of idlePool) {
+      if (
+        new Date().getTime() - new Date(idleIntent.timestamp).getTime() >=
+        8000
+      ) {
+        console.log(
+          '[IDLE]\tSending data to pivot',
+          idleIntent.intent.radio_name
+        );
+
+        try {
+          const result = await sendData(idleIntent);
+          const { response, response_time } = result;
+          if (
+            response.status == 200 &&
+            response.data.id == idleIntent.intent.radio_name
+          ) {
+            idleIntent.timestamp = new Date();
+            idleIntent.attempts = 0;
+            processResponse(
+              idleIntent.intent.radio_name,
+              idleIntent.intent,
+              response.data,
+              response_time
+            );
+          } else {
+            console.log(
+              `[ERROR]\tResposta de outro id: -> ${idleIntent.intent.radio_name} | -> ${response.data.id}`
+            );
+            idleIntent.attempts++;
+
+            if (idleIntent.attempts >= 5) {
+              await updatePivotController(
+                idleIntent.intent.radio_name,
+                'OFFLINE'
+              );
+              idleIntent.attempts = 0;
+            }
+          }
+        } catch (err) {
+          idleIntent.attempts++;
+          console.log('[TIMEOUT]\ton', idleIntent.intent.radio_name);
+
+          if (idleIntent.attempts >= 5) {
+            await updatePivotController(
+              idleIntent.intent.radio_name,
+              'OFFLINE'
+            );
+            idleIntent.attempts = 0;
+          }
+        }
+      }
+    }
   } else {
-
+    fatherCounter = 0;
   }
   fatherCounter++;
-  ready = true
+  ready = true;
 };

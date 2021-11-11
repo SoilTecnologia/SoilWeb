@@ -94,7 +94,6 @@ export const updatePivotController = async (
   percentimeter?: CycleVariable['percentimeter']
 ) => {
   let pivot;
-  console.log(pivot_name)
   if (node_id) {
     pivot = await db.pivot.findFirst({ where: { node_id, pivot_name } });
   }
@@ -107,18 +106,18 @@ export const updatePivotController = async (
     orderBy: { updatedAt: 'desc' }
   });
   const cycle_id = lastCycle?.cycle_id;
-  console.log(
-    `Tentando atualizar cycle: power: ${power}, connection:${connection}, water:${water}, direction:${direction}, curr_angle: ${curr_angle}`
-  );
+  // console.log(
+  //   `Tentando atualizar cycle: power: ${power}, connection:${connection}, water:${water}, direction:${direction}, curr_angle: ${curr_angle}`
+  // );
 
   let changes = [];
 
   if (connection == 'ONLINE') {
-    console.log('ONLINE!');
+    // console.log('ONLINE!');
     if (power === 'ON') {
-      console.log("POWER ON")
+      // console.log("POWER ON")
       if (lastCycle && lastCycle.is_running) {
-        console.log(lastCycle)
+        // console.log(lastCycle)
         await updateRunningCycle(
           cycle_id!,
           connection,
@@ -128,7 +127,7 @@ export const updatePivotController = async (
           percentimeter
         );
       } else {
-        console.log("SEM LAST CYCLE")
+        // console.log("SEM LAST CYCLE")
         await createNewCycle(
           pivot_id,
           connection,
@@ -144,9 +143,9 @@ export const updatePivotController = async (
       }
     }
   } else {
-    console.log('OFFLINE!');
+    // console.log('OFFLINE!');
     if (lastCycle && lastCycle.is_running) {
-      console.log('updateRunningCycle soh com connection!');
+      // console.log('updateRunningCycle soh com connection!');
       await updateRunningCycle(cycle_id!, connection);
     }
   }
@@ -207,7 +206,7 @@ const updateRunningCycle = async (
       0
     );
   } else {
-    console.log('ATUALIZANDFO SOH CYCLE STATE');
+    // console.log('ATUALIZANDFO SOH CYCLE STATE');
     await updateCycleState(cycle_id, connection);
   }
 };
@@ -263,7 +262,7 @@ const updateCycleVariables = async (
     orderBy: { updatedAt: 'desc' }
   });
 
-  console.log(connection, curr_angle, currentCycleVariable?.cycle_state_id);
+  // console.log(connection, curr_angle, currentCycleVariable?.cycle_state_id);
   if (connection == 'ONLINE') {
     if (
       cycleVariablesChanged(currentCycleVariable!, {
@@ -284,7 +283,7 @@ const updateCycleVariables = async (
       });
     }
   }
-  console.log('TERMINEI CYCLE VARIABLES');
+  // console.log('TERMINEI CYCLE VARIABLES');
 };
 
 const updateCycleState = async (
@@ -333,7 +332,7 @@ const updateCycleState = async (
         where: { cycle_state_id },
         orderBy: { updatedAt: 'desc' }
       });
-      console.log(lastCycleVariable?.angle);
+      // console.log(lastCycleVariable?.angle);
       if (lastCycleVariable) {
         await db.cycleState.update({
           data: {
@@ -369,8 +368,8 @@ const createNewCycle = async (
   curr_angle: CycleVariable['angle'],
   percentimeter: CycleVariable['percentimeter']
 ) => {
-  console.log('TRYINFGGG');
-  console.log(pivot_id);
+  // console.log('TRYINFGGG');
+  // console.log(pivot_id);
   const newCycle = await db.cycle.create({
     data: { pivot_id, is_running: true, timestamp: new Date(Date.now()) }
   });
