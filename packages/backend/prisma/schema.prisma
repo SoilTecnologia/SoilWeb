@@ -98,9 +98,12 @@ model RadioVariable {
   rssi      Int @default(0)
   rank      Int @default(0)
   father    String @default("null")
+  payload String @default("oi")
   timestamp DateTime
   updateAt DateTime @updatedAt
-  radio_id String
+  radio_id String 
+  radio_name String
+  response_time Float
   radio       Radio @relation(fields: [radio_id], references: [radio_id])
 }
 

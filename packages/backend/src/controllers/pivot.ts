@@ -94,6 +94,7 @@ export const updatePivotController = async (
   percentimeter?: CycleVariable['percentimeter']
 ) => {
   let pivot;
+  console.log(pivot_name)
   if (node_id) {
     pivot = await db.pivot.findFirst({ where: { node_id, pivot_name } });
   }
@@ -107,15 +108,17 @@ export const updatePivotController = async (
   });
   const cycle_id = lastCycle?.cycle_id;
   console.log(
-    `Tentando atualizar cycle: connection:${connection}, water:${water}, direction:${direction}, curr_angle: ${curr_angle}`
+    `Tentando atualizar cycle: power: ${power}, connection:${connection}, water:${water}, direction:${direction}, curr_angle: ${curr_angle}`
   );
 
   let changes = [];
 
   if (connection == 'ONLINE') {
     console.log('ONLINE!');
-    if (power == 'ON') {
+    if (power === 'ON') {
+      console.log("POWER ON")
       if (lastCycle && lastCycle.is_running) {
+        console.log(lastCycle)
         await updateRunningCycle(
           cycle_id!,
           connection,
@@ -125,6 +128,7 @@ export const updatePivotController = async (
           percentimeter
         );
       } else {
+        console.log("SEM LAST CYCLE")
         await createNewCycle(
           pivot_id,
           connection,
@@ -240,9 +244,9 @@ const cycleStateChanged = (
   newState: FilteredState
 ): boolean => {
   return (
+    oldState.connection != newState.connection ||
     oldState.water != newState.water ||
-    oldState.direction != newState.direction ||
-    oldState.connection != newState.connection
+    oldState.direction != newState.direction
   );
 };
 

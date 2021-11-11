@@ -69,13 +69,14 @@ router.get('/readAll/:farm_id', async (req, res, next) => {
 
 router.put('/update/:pivot_id', async (req, res, next) => {
   const pivot_id = req.params.pivot_id;
-  const { power, water, direction, connection, curr_angle, percentimeter } =
+  const { pivot_name, power, water, direction, connection, curr_angle, percentimeter } =
     req.body;
 
   try {
     const updatedPivot = await updatePivotController(
-      pivot_id,
+      pivot_name,
       connection,
+      undefined,
       power,
       water,
       direction,
