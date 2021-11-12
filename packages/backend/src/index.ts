@@ -22,11 +22,11 @@ eventEmitter.on('intent', () => {
   console.log('INTENT event received!');
 });
 
-raspberry.start();
+// raspberry.start();
 
-// const iotDevice = new IoTDevice('Cloud', 1);
-// iotDevice.start();
+const iotDevice = new IoTDevice('Cloud', 1);
+iotDevice.start();
 
-// setInterval(() => {
-//   iotDevice.publish({msg: "teste"}, "teste-0");
-// }, 1000)
+setInterval(() => {
+  iotDevice.publish({msg: "pirulitin"}, "cloud");
+}, 1000)

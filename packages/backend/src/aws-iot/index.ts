@@ -1,7 +1,9 @@
 import { EnumNumberMember } from '@babel/types';
 import { mqtt, iot } from 'aws-iot-device-sdk-v2';
+import { decode } from 'punycode';
 import { TextDecoder } from 'util';
 import { updatePivotController } from '../controllers/pivot';
+import { StatusStringToPrisma, StringStatusData } from '../utils/conversions';
 
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 class IoTDevice {
@@ -77,15 +79,14 @@ class IoTDevice {
     }
   }
 
-  async processMessage(
+  processMessage = async (
     topic: string,
     payload: ArrayBuffer,
     dup: boolean,
     qos: mqtt.QoS,
     retain: boolean
-  ) {
+  ) => {
     const decoder = new TextDecoder('utf8');
-    console.log(this);
     // console.log(payload)
 
     // if (this.type == 'Cloud') {
@@ -96,23 +97,29 @@ class IoTDevice {
     //   // updatePivotController(pivot_name, "ONLINE", node_id, power, water, direction, angle, percentimeter);
     //   }
     // }
-    console.log(
-      `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
-    );
+
+    // console.log(
+    //   `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
+    // );
+    console.log(JSON.parse(decoder.decode(payload)))
+
+    if(this.type == "Cloud") {
+      const ESPPayload: ESPToCloudMessage = JSON.parse(decoder.decode(payload as any));
+      const {type, node_id, pivot_name, esp_payload} = ESPPayload;
+      const {power, connection, water, direction, angle, percentimeter, timestamp} = StatusStringToPrisma(esp_payload)
+
+      await updatePivotController(pivot_name, connection, node_id, power, water, direction, angle, percentimeter, /*timestamp*/)
+    } else if(this.type == "Raspberry") {
+
+    }
   }
 }
 
-type PivotToCloudMessage = {
+type ESPToCloudMessage = {
   type: 'status';
   node_id: string;
   pivot_name: string;
-  power: 1 | 2;
-  direction: 3 | 4;
-  water: 5 | 6;
-  percentimeter: number;
-  angle: number;
-  timestamp: number;
-  connection: 1 | 0;
+  esp_payload: StringStatusData;
 };
 
 export default IoTDevice;
