@@ -4,20 +4,22 @@ module.exports = {
   development: {
     client: 'mysql2',
     connection: {
-      host: '127.0.0.1',
+      database: 'newsoildb',
       user: 'soil',
       password: 'password',
-      database: 'newsoildb'
+      host: 'localhost',
+      port: 3306
     }
   },
 
   production: {
     client: 'mysql2',
     connection: {
-      host: '127.0.0.1',
+      database: 'newsoildb',
       user: 'soil',
       password: 'password',
-      database: 'newsoildb'
+      host: 'localhost',
+      port: 3306
     }
   }
 };

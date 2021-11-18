@@ -19,7 +19,7 @@ export async function up(knex: Knex): Promise<void> {
     .createTable('farm_users', (table) => {
       table.uuid('farm_user_id').primary();
       table.uuid('user_id').references('user_id').inTable('users').index();
-      table.uuid('farm_id').references('farm_id').inTable('farm').index();
+      table.uuid('farm_id').references('farm_id').inTable('farms').index();
     });
 }
 
