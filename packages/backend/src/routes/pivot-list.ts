@@ -91,6 +91,7 @@ router.get('/readAll/:farm_id', async (req, res, next) => {
           } else {
             partialPivot.power = 'OFF';
           }
+          response.pivots.push(partialPivot);
         }
       }
     }
