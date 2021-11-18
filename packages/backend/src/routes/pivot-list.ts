@@ -5,64 +5,96 @@ import {
   CycleState,
   Radio,
   CycleVariable,
-  RadioVariable
+  RadioVariable,
+  PowerState,
+  Farm
 } from '@prisma/client';
 import { readAllPivotController } from '../controllers/pivot';
 import { readCycleController } from '../controllers/cycle';
+import db from '../database';
 
 const router = express.Router();
 
-type PivotListPartialResponse = {
+type PartialPivot = {
   pivot_id: Pivot['pivot_id'];
   pivot_name: Pivot['pivot_name'];
-  power: Cycle['is_running'];
-  direction: CycleState['direction'];
+  power: PowerState;
   water: CycleState['water'];
+  direction: CycleState['direction'];
   percentimeter: CycleVariable['percentimeter'];
-  // voltage: CycleVariable['voltage'];
-  pressure: CycleVariable['pressure'];
   rssi: RadioVariable['rssi'];
-  rank: RadioVariable['rank'];
+  connection: CycleState['connection'];
+  timestamp: CycleState['timestamp'];
 };
 
-type PivotListResponse = Array<PivotListPartialResponse>;
+type PivotListResponse = {
+  farm_name: Farm['farm_name'];
+  pivots: Array<PartialPivot>;
+};
 
 router.get('/readAll/:farm_id', async (req, res, next) => {
   const farm_id = req.params.farm_id;
-  const response: PivotListResponse = [];
+  let response: PivotListResponse = { farm_name: '', pivots: [] };
 
   try {
-    const pivots = await readAllPivotController(farm_id);
+    const farm = await db.farm.findFirst({
+      where: { farm_id },
+      select: { farm_name: true, nodes: true }
+    });
+    if (farm) {
+      response.farm_name = farm.farm_name;
 
-    if (pivots) {
-      for (let pivot of pivots) {
-        let partialResponse: PivotListPartialResponse = {
-          power: false,
-          direction: 'NULL',
-          percentimeter: 0,
-          pivot_id: '',
-          pivot_name: '',
-          pressure: 0,
-          rank: 0,
-          rssi: 0,
-          water: 'NULL'
-        };
+      for (let node of farm.nodes) {
+        const pivots = await db.pivot.findMany({
+          where: { node_id: node.node_id }
+        });
 
-        const { pivot_id, pivot_name } = pivot;
+        for (let pivot of pivots) {
+          let partialPivot: PartialPivot = {} as PartialPivot;
+          partialPivot.pivot_name = pivot.pivot_name;
+          partialPivot.pivot_id = pivot.pivot_id;
 
-        const cycle = await readCycleController(pivot_id);
+          const cycle = await db.cycle.findFirst({
+            where: { pivot_id: pivot.pivot_id },
+            orderBy: { timestamp: 'desc' }
+          });
 
-        if (cycle) {
-					const cycleState = readCycleState();
-					const cycleVariable = readCycleVariable();
+          if (cycle && cycle.is_running) {
+            partialPivot.power = 'ON';
 
-          const { cycle_id } = cycle;
-          partialResponse.power = cycle.is_running;
+            const cycleState = await db.cycleState.findFirst({
+              where: { cycle_id: cycle.cycle_id },
+              orderBy: { timestamp: 'desc' }
+            });
+
+            const cycleVariable = await db.cycleVariable.findFirst({
+              where: { cycle_id: cycle.cycle_id },
+              orderBy: { timestamp: 'desc' }
+            });
+
+            // const RadioVariable = await db.radioVariable.findFirst({
+            //   where: { radio_id: pivot.radio.radio_id },
+            //   orderBy: { timestamp: 'desc' }
+            // });
+
+            if (cycleState && cycleVariable) {
+              if (cycleState.connection == 'ONLINE') {
+                partialPivot.water = cycleState.water;
+                partialPivot.direction = cycleState.direction;
+                partialPivot.percentimeter = cycleVariable.percentimeter;
+                partialPivot.rssi = 0;
+                partialPivot.timestamp = cycleState.timestamp;
+                partialPivot.connection = cycleState.connection;
+              } else {
+                partialPivot.connection = "OFFLINE";
+              }
+            }
+          }
         }
       }
     }
 
-    res.send(cycle);
+    res.send(response);
   } catch (err) {
     next(err);
   }
