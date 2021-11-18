@@ -19,12 +19,12 @@ type PartialPivot = {
   pivot_id: Pivot['pivot_id'];
   pivot_name: Pivot['pivot_name'];
   power: PowerState;
-  water: CycleState['water'];
-  direction: CycleState['direction'];
-  percentimeter: CycleVariable['percentimeter'];
-  rssi: RadioVariable['rssi'];
+  water?: CycleState['water'];
+  direction?: CycleState['direction'];
+  percentimeter?: CycleVariable['percentimeter'];
+  rssi?: RadioVariable['rssi'];
   connection: CycleState['connection'];
-  timestamp: CycleState['timestamp'];
+  timestamp?: CycleState['timestamp'];
 };
 
 type PivotListResponse = {
@@ -60,8 +60,6 @@ router.get('/readAll/:farm_id', async (req, res, next) => {
           });
 
           if (cycle && cycle.is_running) {
-            partialPivot.power = 'ON';
-
             const cycleState = await db.cycleState.findFirst({
               where: { cycle_id: cycle.cycle_id },
               orderBy: { timestamp: 'desc' }
@@ -79,6 +77,7 @@ router.get('/readAll/:farm_id', async (req, res, next) => {
 
             if (cycleState && cycleVariable) {
               if (cycleState.connection == 'ONLINE') {
+                partialPivot.power = 'ON';
                 partialPivot.water = cycleState.water;
                 partialPivot.direction = cycleState.direction;
                 partialPivot.percentimeter = cycleVariable.percentimeter;
@@ -86,9 +85,11 @@ router.get('/readAll/:farm_id', async (req, res, next) => {
                 partialPivot.timestamp = cycleState.timestamp;
                 partialPivot.connection = cycleState.connection;
               } else {
-                partialPivot.connection = "OFFLINE";
+                partialPivot.connection = 'OFFLINE';
               }
             }
+          } else {
+            partialPivot.power = 'OFF';
           }
         }
       }

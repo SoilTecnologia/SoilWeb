@@ -4,7 +4,8 @@ import farmRoute from './farm';
 import pivotRoute from './pivot';
 import radioRoute from './radio';
 import nodeRoute from './node';
-import cycleRoute from './cycle';
+import cycleRoute from './cycle'
+import pivotList from './pivot-list'
 import intentRoute from './intent';
 // import raspberryRoute from './raspberry';
 import testRoute from './test';
@@ -48,6 +49,7 @@ router.use('/node', nodeRoute);
 router.use('/cycle', cycleRoute);
 router.use('/radio', radioRoute);
 router.use('/intent', intentRoute);
+router.use('/pivot-list', pivotList);
 // router.use('/raspberry', raspberryRoute);
 router.use('/test', testRoute);
 router.use(error);
