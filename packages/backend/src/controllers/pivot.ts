@@ -12,8 +12,8 @@ import db from '../database';
 import authMiddleware from '../middlewares/auth';
 
 export const createPivotController = async (
-  farm_id: Farm['farm_id'],
   node_id: Pivot['node_id'],
+  pivot_id: Pivot['pivot_id'],
   pivot_name: Pivot['pivot_name'],
   lng: Pivot['lng'],
   lat: Pivot['lat'],
@@ -24,6 +24,7 @@ export const createPivotController = async (
   const newPivo = await db.pivot.create({
     data: {
       node_id,
+      pivot_id,
       pivot_name,
       lng,
       lat,
@@ -84,23 +85,14 @@ export const readAllPivotController = async (
 };
 
 export const updatePivotController = async (
-  pivot_name: Pivot['pivot_name'],
+  pivot_id: Pivot['pivot_id'],
   connection: CycleState['connection'],
-  node_id?: Node['node_id'],
   power?: PowerState,
   water?: CycleState['water'],
   direction?: CycleState['direction'],
   curr_angle?: CycleVariable['angle'],
   percentimeter?: CycleVariable['percentimeter']
 ) => {
-  let pivot;
-  if (node_id) {
-    pivot = await db.pivot.findFirst({ where: { node_id, pivot_name } });
-  }
-
-  pivot = await db.pivot.findFirst({ where: { pivot_name } });
-  const { pivot_id } = pivot!;
-
   const lastCycle = await db.cycle.findFirst({
     where: { pivot_id, is_running: true },
     orderBy: { updatedAt: 'desc' }

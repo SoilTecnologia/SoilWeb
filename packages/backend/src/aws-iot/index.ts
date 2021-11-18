@@ -2,8 +2,9 @@ import { EnumNumberMember } from '@babel/types';
 import { mqtt, iot } from 'aws-iot-device-sdk-v2';
 import { decode } from 'punycode';
 import { TextDecoder } from 'util';
+import { updateIntentController } from '../controllers/intent';
 import { updatePivotController } from '../controllers/pivot';
-import { StatusStringToPrisma, StringStatusData } from '../utils/conversions';
+import { StatusStringToPrisma, IntentStringToPrisma, StringStatusData, StringIntentData } from '../utils/conversions';
 
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 class IoTDevice {
@@ -104,22 +105,32 @@ class IoTDevice {
     console.log(JSON.parse(decoder.decode(payload)))
 
     if(this.type == "Cloud") {
-      const ESPPayload: ESPToCloudMessage = JSON.parse(decoder.decode(payload as any));
-      const {type, node_id, pivot_name, esp_payload} = ESPPayload;
-      const {power, connection, water, direction, angle, percentimeter, timestamp} = StatusStringToPrisma(esp_payload)
+      const EdgePayload: EdgeToCloudPayload = JSON.parse(decoder.decode(payload as any));
+      const {type, pivot_id, edge_payload} = EdgePayload;
 
-      await updatePivotController(pivot_name, connection, node_id, power, water, direction, angle, percentimeter, /*timestamp*/)
+      const {power, connection, water, direction, angle, percentimeter, timestamp} = StatusStringToPrisma(edge_payload)
+
+      await updatePivotController(pivot_id, connection, power, water, direction, angle, percentimeter, /*timestamp*/)
     } else if(this.type == "Raspberry") {
+      const CloudPayload: CloudToRaspMessage = JSON.parse(decoder.decode(payload as any));
+      const {type, pivot_id, cloud_payload} = CloudPayload;
+      const {power, water, direction, percentimeter} = IntentStringToPrisma(cloud_payload);
 
+      await updateIntentController(pivot_id, power, water, direction, percentimeter);
     }
   }
 }
 
-type ESPToCloudMessage = {
-  type: 'status';
-  node_id: string;
-  pivot_name: string;
-  esp_payload: StringStatusData;
-};
+type EdgeToCloudPayload = {
+  type: "esp" | "rasp";
+  pivot_id: string;
+  edge_payload: StringStatusData;
+}
+
+type CloudToRaspMessage = {
+  type: "intent";
+  pivot_id: string;
+  cloud_payload: StringIntentData;
+}
 
 export default IoTDevice;
