@@ -22,6 +22,7 @@ type PartialPivot = {
   timestamp?: CycleState['timestamp'];
   lng: Pivot['lng'];
   lat: Pivot['lat'];
+  radius: Pivot['radius'];
   pivot_start_angle: number;
   pivot_end_angle: number;
   cycle_start_angle: number;
@@ -64,6 +65,7 @@ router.get('/readAll/:farm_id', async (req, res, next) => {
           partialPivot.pivot_id = pivot.pivot_id;
           partialPivot.lng = pivot.lng;
           partialPivot.lat = pivot.lat;
+          partialPivot.radius = pivot.radius;
           partialPivot.pivot_start_angle = pivot.start_angle;
           partialPivot.pivot_end_angle = pivot.end_angle;
 
