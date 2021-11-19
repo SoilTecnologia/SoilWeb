@@ -77,8 +77,7 @@ router.get('/:pivot_id', async (req, res, next) => {
       response.lat = pivot.lat;
 
       const cycle = await db.cycle.findFirst({ where: { pivot_id } });
-      if (cycle) {
-        if (cycle.is_running) {
+      if (cycle && cycle.is_running) {
           // Pega o primeiro estado daquele ciclo para ver onde ele começoiu
           const startCycleState = await db.cycleState.findFirst({
             where: { cycle_id: cycle.cycle_id },
@@ -115,7 +114,6 @@ router.get('/:pivot_id', async (req, res, next) => {
         } else {
           response.power = 'OFF';
         }
-      }
     }
 
     return res.send(response);
