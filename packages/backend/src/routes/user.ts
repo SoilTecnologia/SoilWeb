@@ -33,6 +33,9 @@ router.post('/signin', async (req, res, next) => {
   }
 });
 
+// Retorna 200 se o usuaŕio existir no banco 
+// e 401 se não existir
+
 router.get('/auth/:user_id', async (req, res, next) => {
   const { user_id } = req.params;
 

@@ -57,6 +57,7 @@ model Pivot {
   node        Node     @relation(fields: [node_id], references: [node_id])
   cycles      Cycle[]
   radio       Radio?
+  intent Intent?
 }
 
 model Cycle {
@@ -76,11 +77,10 @@ model Intent {
   water          Intent_water
   direction      Intent_direction
   percentimeter Int
-  radio_name       String 
   timestamp DateTime
-  radio_id String @unique
+  pivot_id String
   updatedAt      DateTime         @updatedAt
-  radio          Radio            @relation(fields: [radio_id], references: [radio_id])
+  pivot          Pivot            @relation(fields: [pivot_id], references: [pivot_id])
 }
 
 model Radio {
@@ -89,7 +89,6 @@ model Radio {
   updatedAt DateTime @updatedAt
   Pivot     Pivot    @relation(fields: [pivot_id], references: [pivot_id])
   pivot_id  String  
-  intent     Intent?
   radio_variables RadioVariable[]
 }
 

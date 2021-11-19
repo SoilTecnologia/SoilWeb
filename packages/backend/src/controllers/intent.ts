@@ -8,7 +8,7 @@ export const readAllIntentController = async() => {
 }
 
 export const updateIntentController = async (
-  radio_id: Radio['radio_id'],
+  pivot_id: Radio['pivot_id'],
   power: Intent['power'],
   water: Intent['water'],
   direction: Intent['direction'],
@@ -21,7 +21,7 @@ export const updateIntentController = async (
       direction,
       percentimeter,
     },
-    where: { radio_id }
+    where: { pivot_id }
   });
 
 	return response;
