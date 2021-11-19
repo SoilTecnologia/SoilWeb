@@ -1,8 +1,8 @@
-const knexConfig = require('./knexfile'); 
+const knexConfig = require("../knexfile");
 
 import express from 'express';
 import Knex from 'knex';
-import {Model} from 'objection';
+import { Model } from 'objection';
 import cors from 'cors';
 import { Server } from 'socket.io';
 import router from './routes/router';
@@ -10,6 +10,7 @@ import * as raspberry from './raspberry/tests';
 import EventEmitter from 'events';
 import IoTDevice from './aws-iot/index';
 import User from './models/user';
+import Farm from './models/farm';
 
 const knex = Knex(knexConfig.development);
 Model.knex(knex);
@@ -29,12 +30,24 @@ eventEmitter.on('intent', () => {
   console.log('INTENT event received!');
 });
 
-User.query().insert({
-  login: 'marcos',
-  password: '1234',
-  user_type: 'SUDO',
-})
 
+(async () => {
+  await Farm.query().insertGraph({
+    farm_name: "Santa Rita",
+    city: "Santa rita",
+    gateway: "192.168.0.1",
+    lat: "12.12",
+    lng: "12.12",
+    users: [
+      {
+        login: "admin",
+        password: "admin",
+        user_type: "SUDO"
+      }
+    ] 
+  });
+})();
+console.log("Calling")
 
 // raspberry.start();
 

@@ -10,7 +10,7 @@ class Farm extends Model {
 	lat: number;
 	gateway: string;
 
-	users: User[];
+	users?: User[];
 
 	static tableName = "farms";
 
