@@ -34,17 +34,6 @@ eventEmitter.on('intent', () => {
 (async () => {
   await Farm.query().insertGraph({
     farm_name: "Santa Rita",
-    city: "Santa rita",
-    gateway: "192.168.0.1",
-    lat: "12.12",
-    lng: "12.12",
-    users: [
-      {
-        login: "admin",
-        password: "admin",
-        user_type: "SUDO"
-      }
-    ] 
   });
 })();
 console.log("Calling")

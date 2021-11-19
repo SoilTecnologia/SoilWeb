@@ -1,6 +1,7 @@
 import { Model } from 'objection';
 import Node from './node';
 import User from './user';
+import { PowerState } from '@prisma/client';
 
 class Farm extends Model {
 	farm_id: string;
