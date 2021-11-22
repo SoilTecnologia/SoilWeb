@@ -5,7 +5,7 @@ import {
   readCycleController
 } from '../controllers/cycle';
 
-import { Cycle, WaterState, DirectionState, PowerState } from '@prisma/client';
+import { Cycle, WaterState, DirectionState, PowerState, ConnectionState } from '@prisma/client';
 import db from '../database';
 
 const router = express.Router();
@@ -39,6 +39,7 @@ type CycleStateData = {
   power: PowerState;
   water: WaterState;
   direction: DirectionState;
+  connection: ConnectionState;
 };
 
 type PercentData = {
@@ -93,7 +94,8 @@ router.get('/readAll/:pivot_id', async (req, res, next) => {
           date: cycleState.timestamp,
           power: 'ON',
           water: cycleState.water,
-          direction: cycleState.direction
+          direction: cycleState.direction,
+          connection: cycleState.connection
         });
       }
 
@@ -111,7 +113,8 @@ router.get('/readAll/:pivot_id', async (req, res, next) => {
           date: cycle.cycle_states[cycle.cycle_states.length - 1].timestamp,
           power: 'OFF',
           water: cycle.cycle_states[cycle.cycle_states.length - 1].water,
-          direction: cycle.cycle_states[cycle.cycle_states.length - 1].direction
+          direction: cycle.cycle_states[cycle.cycle_states.length - 1].direction,
+          connection: cycle.cycle_states[cycle.cycle_states.length - 1].connection
         });
       }
 
