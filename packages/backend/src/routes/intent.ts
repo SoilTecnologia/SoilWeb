@@ -46,7 +46,7 @@ router.put('/:pivot_id', async (req, res, next) => {
   }
 });
 
-type IntentPageResponse = {
+type StatusPageResponse = {
   pivot_name: string;
   power: PowerState;
   water?: CycleState['water'];
@@ -66,7 +66,7 @@ type IntentPageResponse = {
 router.get('/:pivot_id', async (req, res, next) => {
   const { pivot_id } = req.params;
   try {
-    let response: IntentPageResponse = {} as IntentPageResponse;
+    let response: StatusPageResponse = {} as StatusPageResponse;
 
     const pivot = await db.pivot.findFirst({ where: { pivot_id } });
     if (pivot) {
