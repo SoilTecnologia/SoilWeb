@@ -18,10 +18,8 @@ export const createRadioController = async (
       water: 'NULL',
       percentimeter: 0,
       direction: 'NULL',
-      radio_id: newRadio.radio_id,
-      radio_name: newRadio.radio_name,
-          timestamp: new Date(Date.now())
-
+      pivot_id: newRadio.pivot_id,
+      timestamp: new Date(Date.now())
     }
   });
 
@@ -32,8 +30,8 @@ export const readRadioController = async (
   radio_name: Radio['radio_name']
 ): Promise<Radio | null> => {
   const radio = await db.radio.findFirst({
-    where: {radio_name}
-  })
+    where: { radio_name }
+  });
 
   return radio;
 };
@@ -45,7 +43,7 @@ export const updateRadioController = async (
   payload: string,
   response_time: number
 ): Promise<RadioVariable | null> => {
-  const radio = await db.radio.findFirst({where: {radio_name}});
+  const radio = await db.radio.findFirst({ where: { radio_name } });
 
   const newRadioVariables = await db.radioVariable.create({
     data: {
@@ -56,12 +54,12 @@ export const updateRadioController = async (
       response_time,
       radio_name,
       timestamp: new Date(),
-      father: father.toString(),
+      father: father.toString()
     }
-  })
+  });
 
   return newRadioVariables;
-}
+};
 
 export const deleteRadioController = async (radio_id: Radio['radio_id']) => {
   const deletedRadio = await db.radio.delete({

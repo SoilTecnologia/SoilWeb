@@ -24,9 +24,9 @@ eventEmitter.on('intent', () => {
 
 // raspberry.start();
 
-const iotDevice = new IoTDevice('Cloud', 1);
-iotDevice.start();
+// const iotDevice = new IoTDevice('Cloud', 1);
+// iotDevice.start();
 
-setInterval(() => {
-  iotDevice.publish({msg: "pirulitin"}, "cloud");
-}, 1000)
+// setInterval(() => {
+//   iotDevice.publish({msg: "pirulitin"}, "cloud");
+// }, 1000)
