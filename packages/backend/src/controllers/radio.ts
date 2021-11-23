@@ -19,7 +19,8 @@ export const createRadioController = async (
       percentimeter: 0,
       direction: 'NULL',
       pivot_id: newRadio.pivot_id,
-      timestamp: new Date(Date.now())
+      timestamp: new Date(Date.now()),
+      pivot_name: radio_name
     }
   });
 
