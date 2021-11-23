@@ -79,6 +79,7 @@ model Intent {
   percentimeter Int
   timestamp DateTime
   pivot_id String
+  pivot_name String
   updatedAt      DateTime         @updatedAt
   pivot          Pivot            @relation(fields: [pivot_id], references: [pivot_id])
 }

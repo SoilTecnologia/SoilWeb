@@ -76,7 +76,6 @@ router.put('/update/:pivot_id', async (req, res, next) => {
     const updatedPivot = await updatePivotController(
       pivot_name,
       connection,
-      undefined,
       power,
       water,
       direction,

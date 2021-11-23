@@ -22,7 +22,7 @@ eventEmitter.on('intent', () => {
   console.log('INTENT event received!');
 });
 
-// raspberry.start();
+raspberry.start();
 
 // const iotDevice = new IoTDevice('Cloud', 1);
 // iotDevice.start();

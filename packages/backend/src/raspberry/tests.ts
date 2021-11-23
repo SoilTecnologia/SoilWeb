@@ -205,7 +205,6 @@ const processResponse = async (
   await updatePivotController(
     pivot_name,
     'ONLINE',
-    undefined,
     'ON',
     'DRY',
     'CLOCKWISE',
@@ -219,7 +218,7 @@ const sendData = async (intent: IntentData) => {
 
   let bodyFormData = new FormData();
 
-  bodyFormData.set('ID', intent.intent.radio_name);
+  bodyFormData.set('ID', intent.intent.pivot_name);
   bodyFormData.set('CMD', '213');
   bodyFormData.set('intencao', '000');
   const encoder = new FormDataEncoder(bodyFormData);
@@ -252,7 +251,7 @@ const checkPool = async () => {
     for (let activeIntent of activePool) {
       console.log(
         '[ACTIVE]\tSending data to pivot',
-        activeIntent.intent.radio_name
+        activeIntent.intent.pivot_name
       );
 
       try {
@@ -260,7 +259,7 @@ const checkPool = async () => {
         const { response, response_time } = result;
         if (
           response.status == 200 &&
-          response.data.id == activeIntent.intent.radio_name
+          response.data.id == activeIntent.intent.pivot_name
         ) {
           activePool = activePool.filter((value) => value != activeIntent);
 
@@ -268,27 +267,27 @@ const checkPool = async () => {
           activeIntent.attempts = 0;
           idlePool.push(activeIntent);
           processResponse(
-            activeIntent.intent.radio_name,
+            activeIntent.intent.pivot_name,
             activeIntent.intent,
             response.data,
             response_time
           );
         } else {
           console.log(
-            `[ERROR]\tResposta de outro id: -> ${activeIntent.intent.radio_name} | -> ${response.data.id}`
+            `[ERROR]\tResposta de outro id: -> ${activeIntent.intent.pivot_name} | -> ${response.data.id}`
           );
           activeIntent.attempts++;
 
           if (activeIntent.attempts >= 5) {
             await updatePivotController(
-              activeIntent.intent.radio_name,
+              activeIntent.intent.pivot_name,
               'OFFLINE'
             );
             activeIntent.attempts = 0;
           }
         }
       } catch (err) {
-        console.log('[TIMEOUT]\ton', activeIntent.intent.radio_name);
+        console.log('[TIMEOUT]\ton', activeIntent.intent.pivot_name);
         activeIntent.attempts++;
 
         activePool = activePool.filter((value) => value != activeIntent);
@@ -298,7 +297,7 @@ const checkPool = async () => {
 
         if (activeIntent.attempts >= 5) {
           await updatePivotController(
-            activeIntent.intent.radio_name,
+            activeIntent.intent.pivot_name,
             'OFFLINE'
           );
           activeIntent.attempts = 0;
@@ -313,7 +312,7 @@ const checkPool = async () => {
       ) {
         console.log(
           '[IDLE]\tSending data to pivot',
-          idleIntent.intent.radio_name
+          idleIntent.intent.pivot_name
         );
 
         try {
@@ -321,25 +320,25 @@ const checkPool = async () => {
           const { response, response_time } = result;
           if (
             response.status == 200 &&
-            response.data.id == idleIntent.intent.radio_name
+            response.data.id == idleIntent.intent.pivot_name
           ) {
             idleIntent.timestamp = new Date();
             idleIntent.attempts = 0;
             processResponse(
-              idleIntent.intent.radio_name,
+              idleIntent.intent.pivot_name,
               idleIntent.intent,
               response.data,
               response_time
             );
           } else {
             console.log(
-              `[ERROR]\tResposta de outro id: -> ${idleIntent.intent.radio_name} | -> ${response.data.id}`
+              `[ERROR]\tResposta de outro id: -> ${idleIntent.intent.pivot_name} | -> ${response.data.id}`
             );
             idleIntent.attempts++;
 
             if (idleIntent.attempts >= 5) {
               await updatePivotController(
-                idleIntent.intent.radio_name,
+                idleIntent.intent.pivot_name,
                 'OFFLINE'
               );
               idleIntent.attempts = 0;
@@ -347,11 +346,11 @@ const checkPool = async () => {
           }
         } catch (err) {
           idleIntent.attempts++;
-          console.log('[TIMEOUT]\ton', idleIntent.intent.radio_name);
+          console.log('[TIMEOUT]\ton', idleIntent.intent.pivot_name);
 
           if (idleIntent.attempts >= 5) {
             await updatePivotController(
-              idleIntent.intent.radio_name,
+              idleIntent.intent.pivot_name,
               'OFFLINE'
             );
             idleIntent.attempts = 0;

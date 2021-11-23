@@ -86,7 +86,7 @@ export const readAllPivotController = async (
 export const updatePivotController = async (
   pivot_name: Pivot['pivot_name'],
   connection: CycleState['connection'],
-  node_id?: Node['node_id'],
+  // node_id?: Node['node_id'],
   power?: PowerState,
   water?: CycleState['water'],
   direction?: CycleState['direction'],
@@ -94,9 +94,9 @@ export const updatePivotController = async (
   percentimeter?: CycleVariable['percentimeter']
 ) => {
   let pivot;
-  if (node_id) {
-    pivot = await db.pivot.findFirst({ where: { node_id, pivot_name } });
-  }
+  // if (node_id) {
+  //   pivot = await db.pivot.findFirst({ where: { node_id, pivot_name } });
+  // }
 
   pivot = await db.pivot.findFirst({ where: { pivot_name } });
   const { pivot_id } = pivot!;
