@@ -1,33 +1,43 @@
-import Pivot from '../models/pivot';
+import Pivot, {PivotUpdate} from '../models/pivot';
+import State from '../models/state';
 
 import knex from '../database';
 
 export const createPivotController = async (
-	pivot_id: Pivot['pivot_id'],
-	node_id: Pivot['node_id'],
-	pivot_name: Pivot['pivot_name'],
-	pivot_lng: Pivot['pivot_lng'],
-	pivot_lat: Pivot['pivot_lat'],
-	pivot_start_angle: Pivot['pivot_start_angle'],
-	pivot_end_angle: Pivot['pivot_end_angle'],
-	pivot_radius: Pivot['pivot_radius'],
-	radio_id: Pivot['radio_id']
+  pivot_id: Pivot['pivot_id'],
+  node_id: Pivot['node_id'],
+  pivot_name: Pivot['pivot_name'],
+  pivot_lng: Pivot['pivot_lng'],
+  pivot_lat: Pivot['pivot_lat'],
+  pivot_start_angle: Pivot['pivot_start_angle'],
+  pivot_end_angle: Pivot['pivot_end_angle'],
+  pivot_radius: Pivot['pivot_radius'],
+  radio_id: Pivot['radio_id']
 ) => {
-
-	const newPivot = await knex<Pivot>('pivots').insert({
-		pivot_id,
-		node_id,
-		pivot_name,
-		pivot_lng,
-		pivot_lat,
-		pivot_start_angle,
-		pivot_end_angle,
-		pivot_radius,
-		last_communication: new Date(),
-		radio_id
-	});
+  const newPivot = await knex<Pivot>('pivots').insert({
+    pivot_id,
+    node_id,
+    pivot_name,
+    pivot_lng,
+    pivot_lat,
+    pivot_start_angle,
+    pivot_end_angle,
+    pivot_radius,
+    last_communication: new Date(),
+    radio_id
+  });
 
   return newPivot;
+};
+
+export const updatePivotController = async (update: PivotUpdate) => {
+	const {pivot_id, connection, power, water, direction, angle, percentimeter, timestamp} = update;
+
+	const pivot = await knex<Pivot>('pivots').update({last_communication: timestamp}).where({pivot_id});
+	const state = await knex<State>('states').insert({pivot_id, power, water, direction, connection, timestamp});
+	// TODO CREATE STATE_VARIABLE
+
+  return null;
 };
 
 // export const readAllFarmController = async (
