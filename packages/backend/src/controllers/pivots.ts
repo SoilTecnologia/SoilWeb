@@ -1,30 +1,34 @@
-import user from '../middlewares/auth';
-import { isUserTypeOf } from '../utils/farm';
-import Farm from '../models/farm';
+import Pivot from '../models/pivot';
 
 import knex from '../database';
 
-export const createFarmController = async (
-	farm_id: Farm['farm_id'],
-	user_id: Farm['user_id'],
-  farm_name: Farm['farm_name'],
-  farm_city: Farm['farm_city'],
-  farm_lng: Farm['farm_lng'],
-  farm_lat: Farm['farm_lat'],
+export const createPivotController = async (
+	pivot_id: Pivot['pivot_id'],
+	node_id: Pivot['node_id'],
+	pivot_name: Pivot['pivot_name'],
+	pivot_lng: Pivot['pivot_lng'],
+	pivot_lat: Pivot['pivot_lat'],
+	pivot_start_angle: Pivot['pivot_start_angle'],
+	pivot_end_angle: Pivot['pivot_end_angle'],
+	pivot_radius: Pivot['pivot_radius'],
+	radio_id: Pivot['radio_id']
 ) => {
 
-	const newFarm = await knex<Farm>('farms').insert({
-		farm_id,
-		user_id,
-		farm_name,
-		farm_city,
-		farm_lng,
-		farm_lat,
+	const newPivot = await knex<Pivot>('pivots').insert({
+		pivot_id,
+		node_id,
+		pivot_name,
+		pivot_lng,
+		pivot_lat,
+		pivot_start_angle,
+		pivot_end_angle,
+		pivot_radius,
+		last_communication: new Date(),
+		radio_id
 	});
 
-  return newFarm;
+  return newPivot;
 };
-
 
 // export const readAllFarmController = async (
 //   user_id: User['user_id']

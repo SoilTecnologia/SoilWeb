@@ -6,7 +6,6 @@ import * as raspberry from './raspberry/tests';
 import EventEmitter from 'events';
 import IoTDevice from './aws-iot/index';
 
-
 const PORT = 3308;
 const app = express();
 const eventEmitter = new EventEmitter();

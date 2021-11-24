@@ -41,10 +41,10 @@ function error(
   next();
 }
 
-router.use('/user', userRoute);
-router.use('/farm', farmRoute);
+router.use('/users', userRoute);
+router.use('/farms', farmRoute);
 // router.use('/pivot', pivotRoute);
-// router.use('/node', nodeRoute);
+router.use('/nodes', nodeRoute);
 // router.use('/cycle', cycleRoute);
 // router.use('/radio', radioRoute);
 // router.use('/intent', intentRoute);

@@ -7,7 +7,7 @@ import {
   InvalidRequestBody
 } from '../types/errors';
 
-import User from '../models/users';
+import User from '../models/user';
 
 type Response = {
   user_type: User['user_type'];

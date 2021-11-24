@@ -1,30 +1,63 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
-import {
-  createFarmController,
-} from '../controllers/farms';
-// import { createNodeController } from '../controllers/node';
-// import { addUserToFarmController } from '../controllers/farm_user';
+import { createFarmController } from '../controllers/farms';
+import { createNodeController } from '../controllers/nodes';
 
 const router = express.Router();
 
-router.post('/create', authMiddleware(['SUDO']), async (req, res, next) => {
-  const { farm_name, farm_city, farm_lng, farm_lat } = req.body;
+router.post(
+  '/create',
+  authMiddleware(['SUDO']),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const user = req.user;
+      const { farm_id, farm_name, farm_city, farm_lng, farm_lat } = req.body;
 
-  try {
-    const newFarm = await createFarmController(
-      farm_name,
-      farm_city,
-      farm_lng,
-      farm_lat,
-    );
+      try {
+        const newFarm = await createFarmController(
+          farm_id,
+          user.user_id,
+          farm_name,
+          farm_city,
+          farm_lng,
+          farm_lat
+        );
 
-    res.send(newFarm);
-  } catch (err) {
-    next(err);
-  }
-});
+        res.send(newFarm);
+      } catch (err) {
+        next(err);
+      }
+    }
+  )
+);
+
+router.put(
+  '/addNode/:farm_id',
+  authMiddleware(['USER', 'SUDO']),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { farm_id } = req.params;
+      const { node_id, gateway } = req.body;
+
+      try {
+        const newNode = await createNodeController(node_id, farm_id, gateway);
+
+        res.send(newNode);
+      } catch (err) {
+        next(err);
+      }
+    }
+  )
+);
 
 // router.get(
 //   '/readAll',
@@ -70,30 +103,6 @@ router.post('/create', authMiddleware(['SUDO']), async (req, res, next) => {
 //         );
 
 //         return res.send(farms);
-//       } catch (err) {
-//         next(err);
-//       }
-//     }
-//   )
-// );
-
-// router.put(
-//   '/addNode/:farm_id',
-//   authMiddleware(['USER', 'SUDO']),
-//   authHandler(
-//     async (
-//       req: IUserAuthInfoRequest,
-//       res: express.Response,
-//       next: express.NextFunction
-//     ) => {
-//       const user = req.user;
-//       const { farm_id } = req.params;
-//       const { node_name, isGPRS } = req.body;
-
-//       try {
-//         const newNode = await createNodeController(node_name, farm_id, isGPRS);
-
-//         res.send(newNode);
 //       } catch (err) {
 //         next(err);
 //       }
