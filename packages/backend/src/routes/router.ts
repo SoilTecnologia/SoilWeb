@@ -42,7 +42,7 @@ function error(
 }
 
 router.use('/user', userRoute);
-// router.use('/farm', farmRoute);
+router.use('/farm', farmRoute);
 // router.use('/pivot', pivotRoute);
 // router.use('/node', nodeRoute);
 // router.use('/cycle', cycleRoute);
