@@ -1,10 +1,6 @@
 import express from 'express';
-import {
-  signInController,
-  signUpController,
-  deleteUserController
-} from '../controllers/user';
 import { DuplicateUniqueError } from '../types/errors';
+import { signUpController, signInController } from '../controllers/users';
 
 const router = express.Router();
 
@@ -12,6 +8,7 @@ const router = express.Router();
     const { login, password, user_type } = req.body;
 
     try {
+
       const cookieInfo = await signUpController(login, password, user_type);
 
       res.send(cookieInfo);
@@ -32,16 +29,16 @@ const router = express.Router();
     }
   });
 
-  router.delete('/:user_id', async (req, res, next) => {
-    const user_id = req.params.user_id;
+  // router.delete('/:user_id', async (req, res, next) => {
+  //   const user_id = req.params.user_id;
 
-    try {
-      const response = await deleteUserController(user_id);
+  //   try {
+  //     const response = await deleteUserController(user_id);
 
-      res.send(response);
-    } catch (err) {
-      next(err);
-    }
-  });
+  //     res.send(response);
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // });
 
   export default router;

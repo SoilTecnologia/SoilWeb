@@ -42,14 +42,14 @@ function error(
 }
 
 router.use('/user', userRoute);
-router.use('/farm', farmRoute);
-router.use('/pivot', pivotRoute);
-router.use('/node', nodeRoute);
-router.use('/cycle', cycleRoute);
-router.use('/radio', radioRoute);
-router.use('/intent', intentRoute);
-// router.use('/raspberry', raspberryRoute);
-router.use('/test', testRoute);
+// router.use('/farm', farmRoute);
+// router.use('/pivot', pivotRoute);
+// router.use('/node', nodeRoute);
+// router.use('/cycle', cycleRoute);
+// router.use('/radio', radioRoute);
+// router.use('/intent', intentRoute);
+// // router.use('/raspberry', raspberryRoute);
+// router.use('/test', testRoute);
 router.use(error);
 
 export default router;

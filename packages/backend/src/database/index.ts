@@ -1,7 +1,9 @@
-import {PrismaClient} from '@prisma/client';
+const knexConfig = require('../../knexfile');
 
-const db = new PrismaClient();
+import Knex from 'knex';
 
-export default  db;
+const knex = Knex(knexConfig.development);
+
+export default knex;
 
 /* Since this code uses ES6 Modules, the database connection client (db) will be created only once, no matter how many files imports this */

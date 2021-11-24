@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
       table.uuid('user_id').primary().defaultTo(knex.raw('(UUID())'));
       table.string('login', 255).unique().notNullable();
       table.string('password', 255).notNullable();
-      table.string('user_type').notNullable();
+      table.enum('user_type', ['SUDO', 'USER']).defaultTo("USER");
     })
     .createTable('farms', (table) => {
       table.uuid('farm_id').primary().defaultTo(knex.raw('(UUID())'));
