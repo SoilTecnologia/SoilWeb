@@ -4,7 +4,7 @@ module.exports = {
   development: {
     client: 'mysql2',
     connection: {
-      database: 'newsoildb',
+      database: 'newnewsoildb',
       user: 'soil',
       password: 'password',
       host: 'localhost',
@@ -15,7 +15,7 @@ module.exports = {
   production: {
     client: 'mysql2',
     connection: {
-      database: 'newsoildb',
+      database: 'newnewsoildb',
       user: 'soil',
       password: 'password',
       host: 'localhost',
