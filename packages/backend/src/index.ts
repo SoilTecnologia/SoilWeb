@@ -32,7 +32,7 @@ httpServer.listen(PORT, () => {
   console.info(`Server Listening on PORT ${PORT}`);
 });
 
-// raspberry.start();
+raspberry.start();
 
 const iotDevice = new IoTDevice('Raspberry', 1);
 iotDevice.start();

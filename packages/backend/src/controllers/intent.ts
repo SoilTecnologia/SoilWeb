@@ -17,6 +17,10 @@ export const updateIntentController = async (
 ): Promise<Intent> => {
   let response: Intent;
 
+  const intent = await db.intent.findFirst({
+    where: { pivot_id }
+  });
+
     response = await db.intent.update({
       data: {
         power,
@@ -24,7 +28,7 @@ export const updateIntentController = async (
         direction,
         percentimeter
       },
-      where: { pivot_id }
+      where: { intent_id: intent!.intent_id }
     });
 
   emitter.emit('intent', response);
