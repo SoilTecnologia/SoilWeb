@@ -33,8 +33,10 @@ export const createPivotController = async (
 export const updatePivotController = async (update: PivotUpdate) => {
 	const {pivot_id, connection, power, water, direction, angle, percentimeter, timestamp} = update;
 
-	const pivot = await knex<Pivot>('pivots').update({last_communication: timestamp}).where({pivot_id});
-	const state = await knex<State>('states').insert({pivot_id, power, water, direction, connection, timestamp});
+  await knex.transaction(async (trx) => {
+    await knex<Pivot>('pivots').transacting(trx).update({last_communication: timestamp}).where({pivot_id});
+    await knex<State>('states').transacting(trx).insert({pivot_id, power, water, direction, connection, timestamp});
+  })
 	// TODO CREATE STATE_VARIABLE
 
   return null;
