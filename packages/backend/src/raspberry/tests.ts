@@ -10,7 +10,10 @@ import { Readable } from 'stream';
 import { FormDataEncoder } from 'form-data-encoder';
 import { FormData } from 'formdata-node';
 import Axios, { AxiosResponse } from 'axios';
-import { readAllIntentController, updateIntentController } from '../controllers/intent';
+import {
+  readAllIntentController,
+  updateIntentController
+} from '../controllers/intent';
 import { updatePivotController } from '../controllers/pivot';
 import { updateRadioController } from '../controllers/radio';
 import emitter from '../utils/eventBus';
@@ -37,14 +40,21 @@ export const start = async () => {
     ready = false;
     let counter = idlePool.length - 1;
     let found = false;
+    let state = 0;
+
+    try {
     while (counter >= 0) {
       if (idlePool[counter].intent.intent_id == intent.intent_id) {
         found = true;
+
+        state = 0;
         activePool.push({
           intent,
           timestamp: new Date(),
           attempts: idlePool[counter].attempts
         });
+
+        state = 1;
         idlePool = idlePool.filter((value) => value != idlePool[counter]);
 
         break;
@@ -69,6 +79,10 @@ export const start = async () => {
       }
       counter--;
     }
+  } catch(err) {
+    console.log("Erro durante mudança")
+    console.log(err)
+  }
 
     ready = true;
   });
@@ -137,7 +151,7 @@ const stringToStatus = (statusPayload: []) => {
 
   if (power == '1') {
     response.power = 'ON';
-  } else if (direction == '2') {
+  } else if (power == '2') {
     response.power = 'OFF';
   }
 
@@ -189,27 +203,41 @@ const processResponse = async (
 ) => {
   console.log('[OK] on ', intent.pivot_name);
   const newStatus = stringToStatus(response.payload);
-  // console.log(newStatus)
-  // console.log(intent)
+  // console.log(newStatus);
+  // console.log(intent);
 
-  if(newStatus.power == intent.power && newStatus.water == intent.water && newStatus.direction == intent.direction){
-  await updatePivotController(
-    intent.pivot_id,
-    'ONLINE',
-    newStatus.power,
-    newStatus.water,
-    newStatus.direction,
-    0,
-    newStatus.percentimeter, 
-  );
-  
-  await updateIntentController(
-    intent.pivot_id,
-    "NULL",
-    "NULL",
-    "NULL",
-    0
-  );
+  if (newStatus.power != 'OFF') {
+    if (
+      newStatus.power == intent.power &&
+      newStatus.water == intent.water &&
+      newStatus.direction == intent.direction
+    ) {
+      await updatePivotController(
+        intent.pivot_id,
+        'ONLINE',
+        newStatus.power,
+        newStatus.water,
+        newStatus.direction,
+        0,
+        newStatus.percentimeter
+      );
+
+      await updateIntentController(intent.pivot_id, 'NULL', 'NULL', 'NULL', 0);
+    }
+  } else {
+    if (newStatus.power == intent.power) {
+      await updatePivotController(
+        intent.pivot_id,
+        'ONLINE',
+        newStatus.power,
+        'NULL',
+        'NULL',
+        0,
+        0
+      );
+
+      await updateIntentController(intent.pivot_id, 'NULL', 'NULL', 'NULL', 0);
+    }
   }
 };
 
@@ -241,8 +269,8 @@ const sendData = async (intent: IntentData) => {
 
 const checkPool = async () => {
   ready = false;
-  console.log("[ACTIVES]: ", activePool.length);
-  console.log("[IDLES]: ", idlePool.length);
+  console.log('[ACTIVES]: ', activePool.length);
+  console.log('[IDLES]: ', idlePool.length);
   if (fatherCounter < fatherUpdate) {
     // console.log(
     //   'Check Pool: ',
@@ -269,11 +297,7 @@ const checkPool = async () => {
           activeIntent.timestamp = new Date();
           activeIntent.attempts = 0;
           idlePool.push(activeIntent);
-          processResponse(
-            activeIntent.intent,
-            response.data,
-            response_time
-          );
+          processResponse(activeIntent.intent, response.data, response_time);
         } else {
           console.log(
             `[ERROR]\tResposta de outro id: -> ${activeIntent.intent.pivot_name} | -> ${response.data.id}`
@@ -326,11 +350,7 @@ const checkPool = async () => {
           ) {
             idleIntent.timestamp = new Date();
             idleIntent.attempts = 0;
-            processResponse(
-              idleIntent.intent,
-              response.data,
-              response_time
-            );
+            processResponse(idleIntent.intent, response.data, response_time);
           } else {
             console.log(
               `[ERROR]\tResposta de outro id: -> ${idleIntent.intent.pivot_name} | -> ${response.data.id}`

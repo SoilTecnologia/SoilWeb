@@ -4,6 +4,7 @@ import { decode } from 'punycode';
 import { TextDecoder } from 'util';
 import { updatePivotController } from '../controllers/pivot';
 import { StatusStringToPrisma, StringStatusData } from '../utils/conversions';
+import emitter from '../utils/eventBus';
 
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 class IoTDevice {
@@ -60,6 +61,12 @@ class IoTDevice {
       console.log(err);
     }
 
+    if (this.type == 'Cloud') {
+      emitter.on('intent', (intent) => {
+        this.publish(intent, 'marcos-0-0');
+      });
+    }
+
     console.log('subscribed!');
   }
 
@@ -101,26 +108,29 @@ class IoTDevice {
     // console.log(
     //   `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
     // );
-    console.log("RECEBIDOOOO")
-    console.log(JSON.parse(decoder.decode(payload)))
+    console.log('RECEBIDOOOO');
+    console.log(JSON.parse(decoder.decode(payload)));
 
-    if(this.type == "Cloud") {
+    if (this.type == 'Cloud') {
       // const ESPPayload: ESPToCloudMessage = JSON.parse(decoder.decode(payload as any));
       // const {type, node_id, pivot_name, esp_payload} = ESPPayload;
       // const {power, connection, water, direction, angle, percentimeter, timestamp} = StatusStringToPrisma(esp_payload)
-
       // await updatePivotController(pivot_name, connection, node_id, power, water, direction, angle, percentimeter, /*timestamp*/)
-    } else if(this.type == "Raspberry") {
-
+    } else if (this.type == 'Raspberry') {
+      //   const ESPPayload = JSON.parse(decoder.decode(payload as any));
+      //   const {type, node_id, pivot_name, esp_payload} = ESPPayload;
+      //   const {power, connection, water, direction, angle, percentimeter, timestamp} = StatusStringToPrisma(esp_payload)
+      //   await updatePivotController(pivot_name, connection, node_id, power, water, direction, angle, percentimeter, /*timestamp*/)
+      // }
     }
-  }
+  };
 }
 
-type ESPToCloudMessage = {
-  type: 'status';
-  node_id: string;
-  pivot_name: string;
-  esp_payload: StringStatusData;
-};
+// type ESPToCloudMessage = {
+//   type: 'status';
+//   node_id: string;
+//   pivot_name: string;
+//   esp_payload: StringStatusData;
+// };
 
 export default IoTDevice;
