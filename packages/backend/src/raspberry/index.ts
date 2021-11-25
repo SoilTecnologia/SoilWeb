@@ -186,7 +186,6 @@ const processResponse = async (
   await updatePivotController(
     pivot_name,
     raspberryResponse.connection,
-    undefined,
     raspberryResponse.power,
     raspberryResponse.water,
     raspberryResponse.direction,
@@ -219,7 +218,7 @@ const checkPool = async () => {
   for (let activeIntent of activePool) {
     console.log(
       '[ACTIVE] Sending data to pivot',
-      activeIntent.intent.radio_name
+      activeIntent.intent.pivot_name
     );
 
     try {
@@ -230,13 +229,13 @@ const checkPool = async () => {
         activeIntent.timestamp = new Date();
         idlePool.push(activeIntent);
         processResponse(
-          activeIntent.intent.radio_name,
+          activeIntent.intent.pivot_name,
           activeIntent.intent,
           response.data
         );
       }
     } catch (err) {
-        console.log('TIMEOUT on', activeIntent.intent.radio_name);
+        console.log('TIMEOUT on', activeIntent.intent.pivot_name);
         activePool = activePool.filter((value) => value != activeIntent);
 
         activeIntent.timestamp = new Date();
@@ -249,18 +248,18 @@ const checkPool = async () => {
       new Date().getTime() - new Date(idleIntent.timestamp).getTime() >=
       20000
     ) {
-      console.log('[IDLE] Sending data to pivot', idleIntent.intent.radio_name);
+      console.log('[IDLE] Sending data to pivot', idleIntent.intent.pivot_name);
 
       try {
         const response = await sendData(idleIntent);
         idleIntent.timestamp = new Date();
         processResponse(
-          idleIntent.intent.radio_name,
+          idleIntent.intent.pivot_name,
           idleIntent.intent,
           response.data
         );
       } catch (err) {
-        console.log('TIMEOUT on', idleIntent.intent.radio_name);
+        console.log('TIMEOUT on', idleIntent.intent.pivot_name);
       }
     }
   }

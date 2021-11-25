@@ -10,7 +10,7 @@ import { Readable } from 'stream';
 import { FormDataEncoder } from 'form-data-encoder';
 import { FormData } from 'formdata-node';
 import Axios, { AxiosResponse } from 'axios';
-import { readAllIntentController } from '../controllers/intent';
+import { readAllIntentController, updateIntentController } from '../controllers/intent';
 import { updatePivotController } from '../controllers/pivot';
 import { updateRadioController } from '../controllers/radio';
 import emitter from '../utils/eventBus';
@@ -40,12 +40,12 @@ export const start = async () => {
     while (counter >= 0) {
       if (idlePool[counter].intent.intent_id == intent.intent_id) {
         found = true;
-        idlePool = idlePool.filter((value) => value != idlePool[counter]);
         activePool.push({
           intent,
           timestamp: new Date(),
           attempts: idlePool[counter].attempts
         });
+        idlePool = idlePool.filter((value) => value != idlePool[counter]);
 
         break;
       }
@@ -84,11 +84,7 @@ const loadIntents = async () => {
   const allIntents = await readAllIntentController();
 
   for (let intent of allIntents) {
-    if (intent.power == 'NULL') {
-      idlePool.push({ intent, timestamp: new Date(), attempts: 0 });
-    } else {
-      activePool.push({ intent, timestamp: new Date(), attempts: 0 });
-    }
+    idlePool.push({ intent, timestamp: new Date(), attempts: 0 });
   }
 };
 
@@ -102,9 +98,10 @@ type RaspberryResponse = {
   timestamp: number;
 };
 
-const stringToStatus = (responseString: string) => {
+const stringToStatus = (statusPayload: []) => {
+  const responseString = String.fromCharCode(...statusPayload);
   let [_, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d{2})-(\d{3})-(\d+)/.exec(responseString) || [
+    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(responseString) || [
       '',
       '',
       '',
@@ -123,6 +120,8 @@ const stringToStatus = (responseString: string) => {
     angle: 0,
     timestamp: 0
   };
+
+  // console.log(direction)
 
   if (direction == '3') {
     response.direction = 'CLOCKWISE';
@@ -156,24 +155,18 @@ const intentToString = ({ intent }: { intent: Intent }): string => {
     intentString = intentString.concat('3');
   } else if (intent.direction == 'ANTI_CLOCKWISE') {
     intentString = intentString.concat('4');
-  } else {
-    return '00000';
   }
 
   if (intent.water == 'DRY') {
     intentString = intentString.concat('5');
   } else if (intent.water == 'WET') {
     intentString = intentString.concat('6');
-  } else {
-    return '00000';
   }
-
   if (intent.power == 'ON') {
     intentString = intentString.concat('1');
   } else if (intent.power == 'OFF') {
-    intentString = intentString.concat('2');
+    return '002000';
   } else {
-    return '00000';
   }
 
   // Adds the percentimeter to the end
@@ -182,7 +175,7 @@ const intentToString = ({ intent }: { intent: Intent }): string => {
     intentString = intentString.concat('99');
   } else {
     intentString = intentString.concat(
-      intent.percentimeter.toString().padStart(2, '0')
+      intent.percentimeter.toString().padStart(3, '0')
     );
   }
 
@@ -190,44 +183,52 @@ const intentToString = ({ intent }: { intent: Intent }): string => {
 };
 
 const processResponse = async (
-  pivot_name: Pivot['pivot_name'],
   intent: Intent,
   response: any,
   response_time: number
 ) => {
-  await updateRadioController(
-    pivot_name,
-    response.payload[3],
-    response.payload[0],
-    JSON.stringify(response),
-    response_time
-  );
+  console.log('[OK] on ', intent.pivot_name);
+  const newStatus = stringToStatus(response.payload);
+  // console.log(newStatus)
+  // console.log(intent)
+
+  if(newStatus.power == intent.power && newStatus.water == intent.water && newStatus.direction == intent.direction){
   await updatePivotController(
-    pivot_name,
+    intent.pivot_id,
     'ONLINE',
-    'ON',
-    'DRY',
-    'CLOCKWISE',
+    newStatus.power,
+    newStatus.water,
+    newStatus.direction,
     0,
+    newStatus.percentimeter, 
+  );
+  
+  await updateIntentController(
+    intent.pivot_id,
+    "NULL",
+    "NULL",
+    "NULL",
     0
   );
+  }
 };
 
 const sendData = async (intent: IntentData) => {
   let intentString: string = intentToString(intent);
 
   let bodyFormData = new FormData();
+  // console.log(intentString);
 
   bodyFormData.set('ID', intent.intent.pivot_name);
-  bodyFormData.set('CMD', '213');
-  bodyFormData.set('intencao', '000');
+  // bodyFormData.set('CMD', '213');
+  bodyFormData.set('intencao', intentString);
   const encoder = new FormDataEncoder(bodyFormData);
 
   const start = Date.now();
 
   let response = await Axios({
     method: 'POST',
-    url: `http://192.168.100.100:3031/comands`,
+    url: `http://192.168.100.108:3031/comands`,
     headers: encoder.headers,
     data: Readable.from(encoder),
     timeout: TIMEOUT
@@ -240,6 +241,8 @@ const sendData = async (intent: IntentData) => {
 
 const checkPool = async () => {
   ready = false;
+  console.log("[ACTIVES]: ", activePool.length);
+  console.log("[IDLES]: ", idlePool.length);
   if (fatherCounter < fatherUpdate) {
     // console.log(
     //   'Check Pool: ',
@@ -267,7 +270,6 @@ const checkPool = async () => {
           activeIntent.attempts = 0;
           idlePool.push(activeIntent);
           processResponse(
-            activeIntent.intent.pivot_name,
             activeIntent.intent,
             response.data,
             response_time
@@ -325,7 +327,6 @@ const checkPool = async () => {
             idleIntent.timestamp = new Date();
             idleIntent.attempts = 0;
             processResponse(
-              idleIntent.intent.pivot_name,
               idleIntent.intent,
               response.data,
               response_time

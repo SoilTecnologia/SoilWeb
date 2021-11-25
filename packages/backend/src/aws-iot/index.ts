@@ -101,14 +101,15 @@ class IoTDevice {
     // console.log(
     //   `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
     // );
+    console.log("RECEBIDOOOO")
     console.log(JSON.parse(decoder.decode(payload)))
 
     if(this.type == "Cloud") {
-      const ESPPayload: ESPToCloudMessage = JSON.parse(decoder.decode(payload as any));
-      const {type, node_id, pivot_name, esp_payload} = ESPPayload;
-      const {power, connection, water, direction, angle, percentimeter, timestamp} = StatusStringToPrisma(esp_payload)
+      // const ESPPayload: ESPToCloudMessage = JSON.parse(decoder.decode(payload as any));
+      // const {type, node_id, pivot_name, esp_payload} = ESPPayload;
+      // const {power, connection, water, direction, angle, percentimeter, timestamp} = StatusStringToPrisma(esp_payload)
 
-      await updatePivotController(pivot_name, connection, node_id, power, water, direction, angle, percentimeter, /*timestamp*/)
+      // await updatePivotController(pivot_name, connection, node_id, power, water, direction, angle, percentimeter, /*timestamp*/)
     } else if(this.type == "Raspberry") {
 
     }

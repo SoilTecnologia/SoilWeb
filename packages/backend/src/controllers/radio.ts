@@ -38,13 +38,13 @@ export const readRadioController = async (
 };
 
 export const updateRadioController = async (
-  radio_name: Radio['radio_name'],
+  pivot_id: Radio['pivot_id'],
   rssi: number,
   father: number,
   payload: string,
   response_time: number
 ): Promise<RadioVariable | null> => {
-  const radio = await db.radio.findFirst({ where: { radio_name } });
+  const radio = await db.radio.findFirst({ where: { pivot_id } });
 
   const newRadioVariables = await db.radioVariable.create({
     data: {
@@ -53,7 +53,7 @@ export const updateRadioController = async (
       rssi,
       payload,
       response_time,
-      radio_name,
+      radio_name: radio?.radio_name!,
       timestamp: new Date(),
       father: father.toString()
     }

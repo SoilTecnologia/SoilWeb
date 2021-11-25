@@ -111,6 +111,7 @@ router.get('/readAll/:farm_id', async (req, res, next) => {
       }
     }
 
+    console.log(response)
     res.send(response);
   } catch (err) {
     next(err);

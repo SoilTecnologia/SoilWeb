@@ -1,7 +1,6 @@
 import express from 'express';
 import { updateIntentController } from '../controllers/intent';
 import { start } from '../raspberry/index';
-import emitter from '../utils/eventBus';
 
 import {
   Pivot,
@@ -39,7 +38,6 @@ router.put('/:pivot_id', async (req, res, next) => {
       percentimeter
     );
 
-    emitter.emit('intent', newIntent);
     return res.send(newIntent);
   } catch (err) {
     next(err);
