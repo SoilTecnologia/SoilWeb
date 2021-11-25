@@ -20,7 +20,7 @@ class IoTDevice {
     this.type = type;
     this.qos = qos;
     if (type == 'Raspberry' && node_id) {
-      this.subTopic = `rasp/${node_id}`;
+      this.subTopic = `${node_id}`;
       this.pubTopic = `cloud`;
       this.clientId = node_id;
     } else {

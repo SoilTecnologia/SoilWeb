@@ -34,7 +34,7 @@ httpServer.listen(PORT, () => {
 
 raspberry.start();
 
-const iotDevice = new IoTDevice('Raspberry', 1);
+const iotDevice = new IoTDevice('Raspberry', 1, "marcos-0-0");
 iotDevice.start();
 
 // setInterval(() => {
