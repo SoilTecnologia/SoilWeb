@@ -32,14 +32,10 @@ httpServer.listen(PORT, () => {
   console.info(`Server Listening on PORT ${PORT}`);
 });
 
-raspberry.start();
+// raspberry.start();
 
-const iotDevice = new IoTDevice('Raspberry', 1, "marcos-0-0");
+const iotDevice = new IoTDevice('Cloud', 1);
 iotDevice.start();
-
-// setInterval(() => {
-//   iotDevice.publish({msg: "pirulitin"}, "cloud");
-// }, 1000)
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

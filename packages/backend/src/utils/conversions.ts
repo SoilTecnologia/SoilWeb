@@ -2,7 +2,7 @@ import {
   DirectionState,
   WaterState,
   PowerState,
-  ConnectionState,
+  ConnectionState
 } from '@prisma/client';
 
 export type StringStatusData =
@@ -63,4 +63,31 @@ export const StatusStringToPrisma = (status: StringStatusData) => {
   response.timestamp = Number(timestamp);
 
   return response;
+};
+
+export const IntentToString = (power: "ON" | "OFF", water: "DRY" | "WET", direction: "CLOCKWISE" | "ANTI_CLOCKWISE", percentimeter:number) => {
+  let intentString = '';
+
+  if (direction == 'CLOCKWISE') {
+    intentString = intentString.concat('3');
+  } else {
+    intentString = intentString.concat('4');
+  }
+
+  if(water == 'DRY'){
+    intentString = intentString.concat('5');
+  } else {
+    intentString = intentString.concat('6');
+  }
+
+  if (power == 'ON') {
+    intentString = intentString.concat('1');
+  } else {
+    intentString = intentString.concat('2');
+  }
+
+  intentString = intentString.concat(`-${percentimeter}`.padStart(3, '0'));
+  console.log("intentToSendDown: ", intentString)
+
+  return intentString;
 };

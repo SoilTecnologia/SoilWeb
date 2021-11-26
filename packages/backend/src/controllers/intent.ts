@@ -21,16 +21,36 @@ export const updateIntentController = async (
     where: { pivot_id }
   });
 
-    response = await db.intent.update({
-      data: {
-        power,
-        water,
-        direction,
-        percentimeter
-      },
-      where: { intent_id: intent!.intent_id }
-    });
+  response = await db.intent.update({
+    data: {
+      power,
+      water,
+      direction,
+      percentimeter
+    },
+    where: { intent_id: intent!.intent_id }
+  });
 
-  emitter.emit('intent', response);
+  const pivot = await db.pivot.findFirst({ where: { pivot_id } });
+  const { node_id } = pivot!;
+
+  const node = await db.node.findFirst({ where: { node_id } });
+  const { farm_id, node_name, isGPRS } = node!;
+
+  if (isGPRS) {
+    emitter.emit('intent', {
+      isGPRS,
+      intent: { power, water, direction, percentimeter },
+      farm_id,
+      node_name
+    });
+  } else {
+    emitter.emit('intent', {
+      intent: { power, water, direction, percentimeter },
+      farm_id,
+      node_name,
+      pivot_id
+    });
+  }
   return response;
 };

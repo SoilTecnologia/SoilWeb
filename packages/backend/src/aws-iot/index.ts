@@ -3,7 +3,11 @@ import { mqtt, iot } from 'aws-iot-device-sdk-v2';
 import { decode } from 'punycode';
 import { TextDecoder } from 'util';
 import { updatePivotController } from '../controllers/pivot';
-import { StatusStringToPrisma, StringStatusData } from '../utils/conversions';
+import {
+  StatusStringToPrisma,
+  StringStatusData,
+  IntentToString
+} from '../utils/conversions';
 import emitter from '../utils/eventBus';
 
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
@@ -62,12 +66,27 @@ class IoTDevice {
     }
 
     if (this.type == 'Cloud') {
-      emitter.on('intent', (intent) => {
-        this.publish(intent, 'marcos-0-0');
+      emitter.on('intent', (intentDetails) => {
+        const { power, water, direction, percentimeter } = intentDetails;
+        const { pivot_id, node_name, farm_id } = intentDetails;
+
+        // Publish intent updates to nodes
+
+        if (!pivot_id) {
+          console.log('Publishing down to a GPRS');
+          this.publish(
+            IntentToString(power, water, direction, percentimeter),
+            `${farm_id}/${node_name}`
+          );
+        } else {
+          console.log('Publishing down to a Raspberry');
+          this.publish(
+            { pivot_id, power, water, direction, percentimeter },
+            `${farm_id}/${node_name}`
+          );
+        }
       });
     }
-
-    console.log('subscribed!');
   }
 
   publish(payload: Object, topic?: string) {
