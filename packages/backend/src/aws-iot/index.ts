@@ -20,13 +20,13 @@ class IoTDevice {
   private connection: mqtt.MqttClientConnection;
   // endpoint
 
-  constructor(type: IoTDeviceType, qos: 0 | 1, node_id?: string) {
+  constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
     this.type = type;
     this.qos = qos;
-    if (type == 'Raspberry' && node_id) {
-      this.subTopic = `${node_id}`;
+    if (type == 'Raspberry' && topic) {
+      this.subTopic = `${topic}`;
       this.pubTopic = `cloud`;
-      this.clientId = node_id;
+      this.clientId = topic;
     } else {
       this.subTopic = 'cloud';
       this.clientId = 'cloud';
@@ -37,6 +37,8 @@ class IoTDevice {
     const certPath = './src/aws-iot/device.pem.crt';
     const keyPath = './src/aws-iot/private.pem.key';
     const endpoint = 'a19mijesri84u2-ats.iot.us-east-1.amazonaws.com';
+
+    console.log("Starting Cloud.. Wait for connection..")
 
     try {
       let configBuilder: iot.AwsIotMqttConnectionConfigBuilder;
@@ -61,42 +63,49 @@ class IoTDevice {
         this.qos,
         this.processMessage
       );
+      console.log("Connected!")
     } catch (err) {
       console.log(err);
+      await this.start(); 
     }
 
     if (this.type == 'Cloud') {
-      emitter.on('intent', (intentDetails) => {
-        const { power, water, direction, percentimeter } = intentDetails;
-        const { pivot_id, node_name, farm_id } = intentDetails;
+      console.log("CLOUD")
+      emitter.on('intent', async (intentDetails) => {
+        console.log("OPAA")
+        console.log(intentDetails)
+        const { power, water, direction, percentimeter } = intentDetails.intent;
+        const { pivot_id, node_name, farm_name } = intentDetails;
 
         // Publish intent updates to nodes
 
+        console.log("GOT HERE")
         if (!pivot_id) {
-          console.log('Publishing down to a GPRS');
-          this.publish(
+          console.log(`Publishing down to a GPRS: ${farm_name}/${node_name}`);
+          await this.publish(
             IntentToString(power, water, direction, percentimeter),
-            `${farm_id}/${node_name}`
+            `${farm_name}/${node_name}`
           );
         } else {
-          console.log('Publishing down to a Raspberry');
-          this.publish(
-            { pivot_id, power, water, direction, percentimeter },
-            `${farm_id}/${node_name}`
-          );
+          // console.log(`Publishing down to a Raspberry: ${farm_name}/${node_name}`);
+          // await this.publish(
+          //   { pivot_id, power, water, direction, percentimeter },
+          //   `${farm_name}/${node_name}`
+          // );
         }
       });
     }
   }
 
-  publish(payload: Object, topic?: string) {
+  async publish(payload: string, topic?: string) {
     let finalTopic;
     if (this.type == 'Cloud') finalTopic = topic;
     else finalTopic = this.pubTopic;
 
     console.log('publishing...');
     try {
-      this.connection.publish(finalTopic!, JSON.stringify(payload), 1, false);
+      await this.connection.publish(finalTopic!, payload, 1, false);
+      console.log("Published!")
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -128,7 +137,12 @@ class IoTDevice {
     //   `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
     // );
     console.log('RECEBIDOOOO');
+    try {
     console.log(JSON.parse(decoder.decode(payload)));
+    }catch(err) {
+      console.log("Failed to parse message:");
+      console.log(payload)
+    }
 
     if (this.type == 'Cloud') {
       // const ESPPayload: ESPToCloudMessage = JSON.parse(decoder.decode(payload as any));

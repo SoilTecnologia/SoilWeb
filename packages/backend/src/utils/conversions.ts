@@ -83,10 +83,12 @@ export const IntentToString = (power: "ON" | "OFF", water: "DRY" | "WET", direct
   if (power == 'ON') {
     intentString = intentString.concat('1');
   } else {
-    intentString = intentString.concat('2');
+    return '002';
   }
 
-  intentString = intentString.concat(`-${percentimeter}`.padStart(3, '0'));
+  console.log(percentimeter);
+
+  intentString = intentString.concat(`${percentimeter}`.padStart(3, '0'));
   console.log("intentToSendDown: ", intentString)
 
   return intentString;
