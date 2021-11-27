@@ -34,7 +34,7 @@ httpServer.listen(PORT, () => {
 
 // raspberry.start();
 
-const iotDevice = new IoTDevice('Cloud', 1);
+const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
 
 app.get('/', (req, res) => {

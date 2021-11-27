@@ -65,7 +65,72 @@ export const StatusStringToPrisma = (status: StringStatusData) => {
   return response;
 };
 
-export const IntentToString = (power: "ON" | "OFF", water: "DRY" | "WET", direction: "CLOCKWISE" | "ANTI_CLOCKWISE", percentimeter:number) => {
+export const stringToStatus = (responseString: string) => {
+  console.log(responseString);
+  let [totalResult, direction, water, power, percentimeter, angle, timestamp] =
+    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(responseString) || [
+      "",
+      "0",
+      "0",
+      "2",
+      0,
+      0,
+      new Date()
+    ];
+
+  console.log(direction, water);
+
+  let response: {
+    connection: ConnectionState;
+    direction: DirectionState;
+    water: WaterState;
+    power: PowerState;
+    percentimeter: number;
+    angle: number;
+    timestamp: number;
+  } = {
+    connection: 'ONLINE',
+    direction: 'NULL',
+    water: 'NULL',
+    power: 'NULL',
+    percentimeter: 0,
+    angle: 0,
+    timestamp: 0
+  };
+
+  if (power == '1') {
+    response.power = 'ON';
+    if (direction == '3') {
+      response.direction = 'CLOCKWISE';
+    } else if (direction == '4') {
+      response.direction = 'ANTI_CLOCKWISE';
+    }
+
+    if (water == '5') {
+      response.water = 'DRY';
+    } else if (water == '6') {
+      response.water = 'WET';
+    }
+    response.percentimeter = Number(percentimeter);
+  } else if (power == '2') {
+    response.power = 'OFF';
+    response.direction = 'NULL';
+    response.water = 'NULL';
+    response.percentimeter = 0;
+  }
+
+  response.angle = Number(angle);
+  response.timestamp = Number(timestamp);
+
+  return response;
+};
+
+export const IntentToString = (
+  power: 'ON' | 'OFF',
+  water: 'DRY' | 'WET',
+  direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE',
+  percentimeter: number
+) => {
   let intentString = '';
 
   if (direction == 'CLOCKWISE') {
@@ -74,7 +139,7 @@ export const IntentToString = (power: "ON" | "OFF", water: "DRY" | "WET", direct
     intentString = intentString.concat('4');
   }
 
-  if(water == 'DRY'){
+  if (water == 'DRY') {
     intentString = intentString.concat('5');
   } else {
     intentString = intentString.concat('6');
@@ -89,7 +154,7 @@ export const IntentToString = (power: "ON" | "OFF", water: "DRY" | "WET", direct
   console.log(percentimeter);
 
   intentString = intentString.concat(`${percentimeter}`.padStart(3, '0'));
-  console.log("intentToSendDown: ", intentString)
+  console.log('intentToSendDown: ', intentString);
 
   return intentString;
 };

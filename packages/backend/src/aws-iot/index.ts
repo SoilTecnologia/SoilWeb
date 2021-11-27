@@ -4,11 +4,11 @@ import { decode } from 'punycode';
 import { TextDecoder } from 'util';
 import { updatePivotController } from '../controllers/pivot';
 import {
-  StatusStringToPrisma,
-  StringStatusData,
-  IntentToString
+  IntentToString,
+  stringToStatus,
 } from '../utils/conversions';
 import emitter from '../utils/eventBus';
+import db from '../database';
 
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 class IoTDevice {
@@ -18,6 +18,7 @@ class IoTDevice {
   private subTopic: string = '';
   private clientId: string = '';
   private connection: mqtt.MqttClientConnection;
+  private db: any;
 
   private pendingMessages: Array<any> = [];
   // endpoint
@@ -84,11 +85,13 @@ class IoTDevice {
         console.log('Adding new Intent to pending messages...');
         this.pendingMessages.push(intentDetails);
       });
-    }
+
 
     setInterval(() => {
       this.checkPendingMessages();
-    }, 20000);
+    }, 5000);
+    }
+
   }
 
   async checkPendingMessages() {
@@ -106,7 +109,7 @@ class IoTDevice {
           `Publishing down to a Raspberry: ${farm_name}/${node_name}`
         );
         await this.publish(
-          JSON.stringify({ pivot_id, power, water, direction, percentimeter }),
+          JSON.stringify({ farm_name, node_name, pivot_id, power, water, direction, percentimeter }),
           `${farm_name}/${node_name}`
         );
       }
@@ -146,7 +149,7 @@ class IoTDevice {
         const { pivot_id, payload } = json;
 
         console.log(`Received message from ${farm_name}/${node_name}`);
-        console.log(pivot_id)
+        console.log(pivot_id);
         if (!pivot_id) {
           for (let pendingMessage of this.pendingMessages) {
             console.log(pendingMessage);
@@ -154,15 +157,64 @@ class IoTDevice {
               pendingMessage.node_name === node_name &&
               pendingMessage.farm_name === farm_name
             ) {
-              console.log("Removing pending message: ", pendingMessage);
+              const gprsStatus = stringToStatus(payload);
+              console.log(payload)
+              console.log("RECEIVED NEW STATUS FROM GPRS:")
+              console.log(gprsStatus);
+
+              if(gprsStatus.power == pendingMessage.intent.power &&
+                gprsStatus.water == pendingMessage.intent.water &&
+                gprsStatus.direction == pendingMessage.intent.direction) {
+              console.log('Removing pending message: ', pendingMessage);
               this.pendingMessages = this.pendingMessages.filter(
                 ({ node_name, farm_name }) =>
                   node_name != pendingMessage.node_name &&
                   farm_name != pendingMessage.farm_name
               );
+
+
+              console.log('Updating Pivot');
+
+              const farm = await db.farm.findFirst({where: {farm_name}})
+              const node = await db.node.findFirst({where: {node_name, farm_id: farm!.farm_id}});
+              const pivot = await db.pivot.findFirst({where: {node_id: node!.node_id}});
+              const{pivot_id} = pivot!;
+
+              await updatePivotController(pivot_id, "ONLINE", gprsStatus.power, gprsStatus.water, gprsStatus.direction, gprsStatus.angle, gprsStatus.percentimeter);
+                }
+            }
+          }
+        } else {
+              await updatePivotController(json.pivot_id, "ONLINE", json.power, json.water, json.direction, json.angle, json.percentimeter);
+          for (let pendingMessage of this.pendingMessages) {
+            console.log(pendingMessage);
+            if (
+              pendingMessage.node_name === node_name &&
+              pendingMessage.farm_name === farm_name &&
+              pendingMessage.pivot_id === pivot_id
+            ) {
+              console.log('Removing pending message: ', pendingMessage);
+
+              this.pendingMessages = this.pendingMessages.filter(
+                ({ node_name, farm_name }) =>
+                  node_name != pendingMessage.node_name &&
+                  farm_name != pendingMessage.farm_name &&
+                  pivot_id != pendingMessage.pivot_id
+              );
             }
           }
         }
+      } else {
+        const { farm_name, node_name, pivot_id, power, water, direction, percentimeter } = json;
+
+        console.log('Updating intent...');
+
+        const newIntent = await db.intent.update({
+          data: { pivot_id, power, water, direction, percentimeter },
+          where: { pivot_id }
+        });
+
+        this.publish(JSON.stringify({farm_name, node_name, pivot_id, power, water, direction, percentimeter}), `cloud`);
       }
     } catch (err) {
       console.log('Failed to decode message: ');

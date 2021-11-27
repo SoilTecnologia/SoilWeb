@@ -10,6 +10,7 @@ import Axios from 'axios';
 import { readAllIntentController } from '../controllers/intent';
 import { updatePivotController } from '../controllers/pivot';
 import emitter from '../utils/eventBus';
+import { stringToStatus } from '../utils/conversions';
 
 const TIMEOUT = 5000;
 
@@ -87,55 +88,6 @@ type RaspberryResponse = {
   timestamp: number;
 };
 
-const stringToStatus = (responseString: string) => {
-  console.log(responseString);
-  let [_, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d{2})-(\d{3})-(\d+)/.exec(responseString) || [
-      '',
-      '',
-      '',
-      '',
-      0,
-      0,
-      0
-    ];
-
-  console.log(direction, water);
-
-  let response: RaspberryResponse = {
-    connection: 'ONLINE',
-    direction: 'NULL',
-    water: 'NULL',
-    power: 'NULL',
-    percentimeter: 0,
-    angle: 0,
-    timestamp: 0
-  };
-
-  if (direction == '3') {
-    response.direction = 'CLOCKWISE';
-  } else if (direction == '4') {
-    response.direction = 'ANTI_CLOCKWISE';
-  }
-
-  if (water == '5') {
-    response.water = 'DRY';
-  } else if (water == '6') {
-    response.water = 'WET';
-  }
-
-  if (power == '1') {
-    response.power = 'ON';
-  } else if (direction == '2') {
-    response.power = 'OFF';
-  }
-
-  response.percentimeter = Number(percentimeter);
-  response.angle = Number(angle);
-  response.timestamp = Number(timestamp);
-
-  return response;
-};
 
 const intentToString = ({ intent }: { intent: Intent }): string => {
   let intentString = '';

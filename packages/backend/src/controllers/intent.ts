@@ -23,6 +23,12 @@ export const updateIntentController = async (
     where: { pivot_id }
   });
 
+  if(power == "OFF") {
+    water = "NULL";
+    direction = "NULL";
+    percentimeter = 0;
+  }
+
   console.log(intent)
 
   response = await db.intent.update({

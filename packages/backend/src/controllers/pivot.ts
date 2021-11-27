@@ -94,6 +94,7 @@ export const updatePivotController = async (
   curr_angle?: CycleVariable['angle'],
   percentimeter?: CycleVariable['percentimeter']
 ) => {
+  console.log("CHAMADO!!")
   // if (node_id) {
   //   pivot = await db.pivot.findFirst({ where: { node_id, pivot_name } });
   // }
@@ -110,11 +111,11 @@ export const updatePivotController = async (
   let changes = [];
 
   if (connection == 'ONLINE') {
-    // console.log('ONLINE!');
+    console.log('ONLINE!', power, water, direction);
     if (power === 'ON') {
-      // console.log("POWER ON")
+      console.log("POWER ON")
       if (lastCycle && lastCycle.is_running) {
-        // console.log(lastCycle)
+        console.log(lastCycle)
         await updateRunningCycle(
           cycle_id!,
           connection,
@@ -124,7 +125,7 @@ export const updatePivotController = async (
           percentimeter
         );
       } else {
-        // console.log("SEM LAST CYCLE")
+        console.log("SEM LAST CYCLE")
         await createNewCycle(
           pivot_id,
           connection,
@@ -135,12 +136,13 @@ export const updatePivotController = async (
         );
       }
     } else if (power == 'OFF') {
+      console.log("POWER POFF")
       if (lastCycle && lastCycle.is_running) {
         await closeCycle(cycle_id!, curr_angle!);
       }
     }
   } else {
-    // console.log('OFFLINE!');
+    console.log('OFFLINE!');
     if (lastCycle && lastCycle.is_running) {
       // console.log('updateRunningCycle soh com connection!');
       await updateRunningCycle(cycle_id!, connection);
@@ -365,8 +367,8 @@ const createNewCycle = async (
   curr_angle: CycleVariable['angle'],
   percentimeter: CycleVariable['percentimeter']
 ) => {
-  // console.log('TRYINFGGG');
-  // console.log(pivot_id);
+  console.log('TRYINFGGG');
+  console.log(pivot_id);
   const newCycle = await db.cycle.create({
     data: { pivot_id, is_running: true, timestamp: new Date(Date.now()) }
   });
