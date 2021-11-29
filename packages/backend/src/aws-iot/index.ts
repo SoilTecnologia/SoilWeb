@@ -224,10 +224,7 @@ class IoTDevice {
             }
           }
         } else {
-          //SEPARAR POR TIPO, status ou intent response
-          for (let pendingMessage of this.pendingMessages) {
-            // console.log(pendingMessage);
-            if (pendingMessage.type == 'status') {
+          if(json.type == "status") {
               await updatePivotController(
                 json.pivot_id,
                 json.connection,
@@ -238,11 +235,11 @@ class IoTDevice {
                 json.percentimeter
               );
 
-              // console.log('Removing pending message: ', pendingMessage);
-              this.pendingMessages = this.pendingMessages.filter(
-                (value) => value != pendingMessage
-              );
-            } else {
+        this.pendingMessages.push({type: "status", pivot_id});
+          } else {
+          //SEPARAR POR TIPO, status ou intent response
+          for (let pendingMessage of this.pendingMessages) {
+            // console.log(pendingMessage);
               if (
                 pendingMessage.node_name === node_name &&
                 pendingMessage.farm_name === farm_name &&
@@ -273,6 +270,22 @@ class IoTDevice {
 
         // console.log('Updating intent...');
 
+        if(json.type && json.type == "status") {
+          for (let pendingMessage of this.pendingMessages) {
+            // console.log(pendingMessage);
+              if (
+                pendingMessage.pivot_id === pivot_id
+              ) {
+                // console.log('Removing pending message: ', pendingMessage);
+
+                this.pendingMessages = this.pendingMessages.filter(
+                  ({ pivot_id }) =>
+                    pivot_id != pendingMessage.pivot_id
+                );
+              }
+            }
+        } else {
+
         updateIntentController(
           pivot_id,
           power,
@@ -295,6 +308,7 @@ class IoTDevice {
           `cloud`
         );
       }
+    }
     } catch (err) {
       // console.log('Failed to decode message: ');
       // console.log(err);
