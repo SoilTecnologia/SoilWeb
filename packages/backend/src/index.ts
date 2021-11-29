@@ -18,9 +18,6 @@ app.use(cors());
 app.use(express.json());
 app.use(router);
 
-eventEmitter.on('intent', (intent) => {
-  console.log('INTENT event received!');
-});
 
 io.on("connection", socket => {
   eventEmitter.on('status', status => {

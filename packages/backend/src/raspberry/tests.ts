@@ -33,56 +33,74 @@ let idlePool: Array<IntentData> = []; // Guarda as intenções 00000, vao partic
 
 let ready = true;
 
+export const switchPools = (
+  value: IntentData,
+  origin: Array<IntentData>,
+  destination: Array<IntentData>
+) => {
+  console.log('SWITCHING');
+  let state = 0;
+  try {
+    destination.push(value);
+    state = 1;
+
+    origin = origin.filter((v) => v == value);
+    state = 2;
+    return origin;
+  } catch (err) {
+    if (state > 0) {
+      destination = destination.filter((v) => v == value);
+    }
+
+    if (state > 1) {
+      origin.push(value);
+    }
+
+    console.log('Tentado recuperar mudança nas pools..');
+  }
+};
+
 export const start = async () => {
   loadIntents();
 
   emitter.on('intent', (intent) => {
+    console.log('EVENT INTENT', intent);
     ready = false;
     let counter = idlePool.length - 1;
     let found = false;
     let state = 0;
 
     try {
-    while (counter >= 0) {
-      if (idlePool[counter].intent.intent_id == intent.intent_id) {
-        found = true;
-
-        state = 0;
-        activePool.push({
-          intent,
-          timestamp: new Date(),
-          attempts: idlePool[counter].attempts
-        });
-
-        state = 1;
-        idlePool = idlePool.filter((value) => value != idlePool[counter]);
-
-        break;
-      }
-      counter--;
-    }
-
-    if (!found) {
-      counter = activePool.length - 1;
       while (counter >= 0) {
-        if (activePool[counter].intent.intent_id == intent.intent_id) {
-          activePool = activePool.filter(
-            (value) => value != activePool[counter]
+        if (idlePool[counter].intent.intent_id == intent.intent_id) {
+          found = true;
+          const switchedPools = switchPools(
+            { intent, timestamp: new Date(), attempts: 0 },
+            idlePool,
+            activePool
           );
-          activePool.push({
-            intent,
-            timestamp: new Date(),
-            attempts: activePool[counter].attempts
-          });
+          idlePool = switchedPools!;
           break;
         }
+        counter--;
       }
-      counter--;
+
+      // if (!found) {
+      //   counter = activePool.length - 1;
+      //   while (counter >= 0) {
+      //     if (activePool[counter].intent.intent_id == intent.intent_id) {
+      //       activePool[counter].intent = intent;
+      //       activePool[counter].timestamp = new Date();
+      //       activePool[counter].attempts = 0;
+      //       break;
+      //     }
+      //   }
+      //   counter--;
+      // }
+    } catch (err) {
+      console.log('Erro durante mudança de pools');
+      console.log(err);
     }
-  } catch(err) {
-    console.log("Erro durante mudança")
-    console.log(err)
-  }
 
     ready = true;
   });
@@ -114,16 +132,13 @@ type RaspberryResponse = {
 
 const stringToStatus = (statusPayload: []) => {
   const responseString = String.fromCharCode(...statusPayload);
-  let [_, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(responseString) || [
-      '',
-      '',
-      '',
-      '',
-      0,
-      0,
-      0
-    ];
+  console.log('RECEBIDO:', responseString);
+  let [full, direction, water, power, percentimeter, angle, timestamp] =
+    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(
+      responseString.replace(/\s*/g, '')
+    ) || ['', '', '', '', 0, 0, 0];
+
+  if (!full) throw Error('deu ruim');
 
   let response: RaspberryResponse = {
     connection: 'ONLINE',
@@ -162,7 +177,7 @@ const stringToStatus = (statusPayload: []) => {
   return response;
 };
 
-const intentToString = ({ intent }: { intent: Intent }): string => {
+const intentToString = ({ intent }: any): string => {
   let intentString = '';
 
   if (intent.direction == 'CLOCKWISE') {
@@ -201,47 +216,66 @@ const processResponse = async (
   response: any,
   response_time: number
 ) => {
-  console.log('[OK] on ', intent.pivot_name);
-  const newStatus = stringToStatus(response.payload);
-  // console.log(newStatus);
-  // console.log(intent);
+  try {
+    const newStatus = stringToStatus(response.payload);
+    // console.log('[OK] on ', intent.pivot_name, ": ", newStatus);
+    console.log(newStatus);
+    console.log(intent);
+    // const {power, water, direction} = intent.intent;
 
-  if (newStatus.power != 'OFF') {
-    if (
-      newStatus.power == intent.power &&
-      newStatus.water == intent.water &&
-      newStatus.direction == intent.direction
-    ) {
-      await updatePivotController(
-        intent.pivot_id,
-        'ONLINE',
-        newStatus.power,
-        newStatus.water,
-        newStatus.direction,
-        0,
-        newStatus.percentimeter
-      );
+    if (newStatus.power != 'OFF') {
+      if (
+        newStatus.power == intent.power &&
+        newStatus.water == intent.water &&
+        newStatus.direction == intent.direction
+      ) {
+        console.log(intent.pivot_id);
+        await updatePivotController(
+          intent.pivot_id,
+          'ONLINE',
+          newStatus.power,
+          newStatus.water,
+          newStatus.direction,
+          0,
+          newStatus.percentimeter
+        );
 
-      await updateIntentController(intent.pivot_id, 'NULL', 'NULL', 'NULL', 0);
+        await updateIntentController(
+          intent.pivot_id,
+          'NULL',
+          'NULL',
+          'NULL',
+          0
+        );
+      }
+    } else {
+      if (newStatus.power == intent.power) {
+        await updatePivotController(
+          intent.pivot_id,
+          'ONLINE',
+          newStatus.power,
+          'NULL',
+          'NULL',
+          0,
+          0
+        );
+
+        await updateIntentController(
+          intent.pivot_id,
+          'NULL',
+          'NULL',
+          'NULL',
+          0
+        );
+      }
     }
-  } else {
-    if (newStatus.power == intent.power) {
-      await updatePivotController(
-        intent.pivot_id,
-        'ONLINE',
-        newStatus.power,
-        'NULL',
-        'NULL',
-        0,
-        0
-      );
-
-      await updateIntentController(intent.pivot_id, 'NULL', 'NULL', 'NULL', 0);
-    }
+  } catch (err) {
+    console.log('Erro no processResponse');
   }
 };
 
 const sendData = async (intent: IntentData) => {
+  // console.log("ORIGINAL INTENT", intent)
   let intentString: string = intentToString(intent);
 
   let bodyFormData = new FormData();
@@ -249,6 +283,7 @@ const sendData = async (intent: IntentData) => {
 
   bodyFormData.set('ID', intent.intent.pivot_name);
   // bodyFormData.set('CMD', '213');
+  console.log('INTENCAOOOO', intentString);
   bodyFormData.set('intencao', intentString);
   const encoder = new FormDataEncoder(bodyFormData);
 
@@ -271,6 +306,7 @@ const checkPool = async () => {
   ready = false;
   console.log('[ACTIVES]: ', activePool.length);
   console.log('[IDLES]: ', idlePool.length);
+
   if (fatherCounter < fatherUpdate) {
     // console.log(
     //   'Check Pool: ',
@@ -288,13 +324,13 @@ const checkPool = async () => {
       try {
         const result = await sendData(activeIntent);
         const { response, response_time } = result;
+        activeIntent.timestamp = new Date();
         if (
           response.status == 200 &&
           response.data.id == activeIntent.intent.pivot_name
         ) {
           activePool = activePool.filter((value) => value != activeIntent);
 
-          activeIntent.timestamp = new Date();
           activeIntent.attempts = 0;
           idlePool.push(activeIntent);
           processResponse(activeIntent.intent, response.data, response_time);
@@ -313,13 +349,11 @@ const checkPool = async () => {
           }
         }
       } catch (err) {
+        console.log(err);
         console.log('[TIMEOUT]\ton', activeIntent.intent.pivot_name);
         activeIntent.attempts++;
 
-        activePool = activePool.filter((value) => value != activeIntent);
-
-        activeIntent.timestamp = new Date();
-        idlePool.push(activeIntent);
+        idlePool = switchPools(activeIntent, idlePool, activePool)!;
 
         if (activeIntent.attempts >= 5) {
           await updatePivotController(
@@ -344,11 +378,13 @@ const checkPool = async () => {
         try {
           const result = await sendData(idleIntent);
           const { response, response_time } = result;
+
+          idleIntent.timestamp = new Date();
           if (
             response.status == 200 &&
             response.data.id == idleIntent.intent.pivot_name
           ) {
-            idleIntent.timestamp = new Date();
+            console.log("VOLTOU RESPOSTA -> PROCESSRESPONSE")
             idleIntent.attempts = 0;
             processResponse(idleIntent.intent, response.data, response_time);
           } else {
