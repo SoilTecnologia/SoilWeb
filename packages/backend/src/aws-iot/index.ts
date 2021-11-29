@@ -83,14 +83,26 @@ class IoTDevice {
       emitter.on('status', async (statusDetails) => {
         // Publish status updates to aws
 
-        console.log('Adding new Status to pending messages...', statusDetails);
-        this.pendingMessages.push(statusDetails);
+        // console.log('Adding new Status to pending messages...', statusDetails);
+        this.publish(
+          JSON.stringify({
+            type: 'status',
+            connection: statusDetails.connection,
+            pivot_id: statusDetails.pivot_id,
+            power: statusDetails.power,
+            water: statusDetails.water,
+            direction: statusDetails.direction,
+            percentimeter: statusDetails.percentimeter
+          }),
+          'cloud'
+        );
+        // this.pendingMessages.push(statusDetails);
       });
     }
 
     setInterval(() => {
       this.checkPendingMessages();
-    }, 5000);
+    }, 15000);
   }
 
   async checkPendingMessages() {

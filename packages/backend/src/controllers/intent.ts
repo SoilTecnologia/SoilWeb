@@ -68,6 +68,7 @@ export const updateIntentController = async (
       power, water, direction, percentimeter,
       farm_name,
       node_name,
+      pivot_id,
       pivot_name: pivot?.pivot_name
     });
 
