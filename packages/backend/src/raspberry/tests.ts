@@ -225,13 +225,15 @@ const processResponse = async (
     // console.log(intent);
     // const {power, water, direction} = intent.intent;
 
+        console.log("N ATUALIZANDO 0");
+        console.log(newStatus)
     if (newStatus.power != 'OFF') {
       if (
         newStatus.power == intent.power &&
         newStatus.water == intent.water &&
         newStatus.direction == intent.direction
       ) {
-        // console.log(intent.pivot_id);
+        console.log("ATUALIZANDO 1");
         await updatePivotController(
           intent.pivot_id,
           'ONLINE',
@@ -252,6 +254,7 @@ const processResponse = async (
       }
     } else {
       if (newStatus.power == intent.power) {
+        console.log("ATUALIZANDO 2");
         await updatePivotController(
           intent.pivot_id,
           'ONLINE',
