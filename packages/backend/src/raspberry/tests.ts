@@ -180,6 +180,8 @@ const stringToStatus = (statusPayload: []) => {
 const intentToString = ({ intent }: any): string => {
   let intentString = '';
 
+  console.log("INTENT", intent)
+
   if (intent.direction == 'CLOCKWISE') {
     intentString = intentString.concat('3');
   } else if (intent.direction == 'ANTI_CLOCKWISE') {
@@ -342,7 +344,7 @@ const checkPool = async () => {
 
           if (activeIntent.attempts >= 5) {
             await updatePivotController(
-              activeIntent.intent.pivot_name,
+              activeIntent.intent.pivot_id,
               'OFFLINE'
             );
             activeIntent.attempts = 0;
@@ -395,7 +397,7 @@ const checkPool = async () => {
 
             if (idleIntent.attempts >= 5) {
               await updatePivotController(
-                idleIntent.intent.pivot_name,
+                idleIntent.intent.pivot_id,
                 'OFFLINE'
               );
               idleIntent.attempts = 0;
