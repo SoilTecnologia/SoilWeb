@@ -77,8 +77,6 @@ class IoTDevice {
       emitter.on('intent', async (intentDetails) => {
         console.log('OPAA');
         console.log(intentDetails);
-        const { power, water, direction, percentimeter } = intentDetails.intent;
-        const { pivot_id, node_name, farm_name } = intentDetails;
 
         // Publish intent updates to nodes
 
