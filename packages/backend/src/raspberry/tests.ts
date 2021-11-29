@@ -38,7 +38,7 @@ export const switchPools = (
   origin: Array<IntentData>,
   destination: Array<IntentData>
 ) => {
-  console.log('SWITCHING');
+  // console.log('SWITCHING');
   let state = 0;
   try {
     destination.push(value);
@@ -64,7 +64,7 @@ export const start = async () => {
   loadIntents();
 
   emitter.on('intent', (intent) => {
-    console.log('EVENT INTENT', intent);
+    // console.log('EVENT INTENT', intent);
     ready = false;
     let counter = idlePool.length - 1;
     let found = false;
@@ -132,7 +132,7 @@ type RaspberryResponse = {
 
 const stringToStatus = (statusPayload: []) => {
   const responseString = String.fromCharCode(...statusPayload);
-  console.log('RECEBIDO:', responseString);
+  // console.log('RECEBIDO:', responseString);
   let [full, direction, water, power, percentimeter, angle, timestamp] =
     /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(
       responseString.replace(/\s*/g, '')
@@ -218,9 +218,9 @@ const processResponse = async (
 ) => {
   try {
     const newStatus = stringToStatus(response.payload);
-    // console.log('[OK] on ', intent.pivot_name, ": ", newStatus);
-    console.log(newStatus);
-    console.log(intent);
+    console.log('[OK] on ', intent.pivot_name);
+    // console.log(newStatus);
+    // console.log(intent);
     // const {power, water, direction} = intent.intent;
 
     if (newStatus.power != 'OFF') {
@@ -229,7 +229,7 @@ const processResponse = async (
         newStatus.water == intent.water &&
         newStatus.direction == intent.direction
       ) {
-        console.log(intent.pivot_id);
+        // console.log(intent.pivot_id);
         await updatePivotController(
           intent.pivot_id,
           'ONLINE',
@@ -283,7 +283,7 @@ const sendData = async (intent: IntentData) => {
 
   bodyFormData.set('ID', intent.intent.pivot_name);
   // bodyFormData.set('CMD', '213');
-  console.log('INTENCAOOOO', intentString);
+  // console.log('INTENCAOOOO', intentString);
   bodyFormData.set('intencao', intentString);
   const encoder = new FormDataEncoder(bodyFormData);
 
@@ -357,7 +357,7 @@ const checkPool = async () => {
 
         if (activeIntent.attempts >= 5) {
           await updatePivotController(
-            activeIntent.intent.pivot_name,
+            activeIntent.intent.pivot_id,
             'OFFLINE'
           );
           activeIntent.attempts = 0;
@@ -384,7 +384,7 @@ const checkPool = async () => {
             response.status == 200 &&
             response.data.id == idleIntent.intent.pivot_name
           ) {
-            console.log("VOLTOU RESPOSTA -> PROCESSRESPONSE")
+            // console.log("VOLTOU RESPOSTA -> PROCESSRESPONSE")
             idleIntent.attempts = 0;
             processResponse(idleIntent.intent, response.data, response_time);
           } else {
@@ -407,7 +407,7 @@ const checkPool = async () => {
 
           if (idleIntent.attempts >= 5) {
             await updatePivotController(
-              idleIntent.intent.pivot_name,
+              idleIntent.intent.pivot_id,
               'OFFLINE'
             );
             idleIntent.attempts = 0;

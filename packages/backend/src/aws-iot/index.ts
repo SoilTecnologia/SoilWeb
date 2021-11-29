@@ -83,7 +83,7 @@ class IoTDevice {
       emitter.on('status', async (statusDetails) => {
         // Publish status updates to aws
 
-        console.log('Adding new Intent to pending messages...');
+        console.log('Adding new Status to pending messages...', statusDetails);
         this.pendingMessages.push(statusDetails);
       });
     }
@@ -125,10 +125,13 @@ class IoTDevice {
     } else {
       for (let pendingMessage of this.pendingMessages) {
         const { power, water, direction, percentimeter } = pendingMessage;
-        const { pivot_id, node_name, farm_name } = pendingMessage;
+        const { pivot_id, node_name, farm_name, connection } = pendingMessage;
         await this.publish(
           JSON.stringify({
             type: 'status',
+            node_name,
+            farm_name,
+            connection,
             pivot_id,
             power,
             water,
@@ -146,10 +149,8 @@ class IoTDevice {
     if (this.type == 'Cloud') finalTopic = topic;
     else finalTopic = this.pubTopic;
 
-    console.log('publishing...');
     try {
       await this.connection.publish(finalTopic!, payload, 1, false);
-      console.log('Published!');
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -184,22 +185,22 @@ class IoTDevice {
             ) {
               const gprsStatus = stringToStatus(payload);
               // console.log(payload);
-              console.log('RECEIVED NEW STATUS FROM GPRS:');
-              console.log(gprsStatus);
+              // console.log('RECEIVED NEW STATUS FROM GPRS:');
+              // console.log(gprsStatus);
 
               if (
                 gprsStatus.power == pendingMessage.power &&
                 gprsStatus.water == pendingMessage.water &&
                 gprsStatus.direction == pendingMessage.direction
               ) {
-                console.log('Removing pending message: ', pendingMessage);
+                // console.log('Removing pending message: ', pendingMessage);
                 this.pendingMessages = this.pendingMessages.filter(
                   ({ node_name, farm_name }) =>
                     node_name != pendingMessage.node_name &&
                     farm_name != pendingMessage.farm_name
                 );
 
-                console.log('Updating Pivot');
+                // console.log('Updating Pivot');
 
                 const farm = await db.farm.findFirst({ where: { farm_name } });
                 const node = await db.node.findFirst({
@@ -225,11 +226,11 @@ class IoTDevice {
         } else {
           //SEPARAR POR TIPO, status ou intent response
           for (let pendingMessage of this.pendingMessages) {
-            console.log(pendingMessage);
+            // console.log(pendingMessage);
             if (pendingMessage.type == 'status') {
               await updatePivotController(
                 json.pivot_id,
-                'ONLINE',
+                json.connection,
                 json.power,
                 json.water,
                 json.direction,
@@ -237,7 +238,7 @@ class IoTDevice {
                 json.percentimeter
               );
 
-              console.log('Removing pending message: ', pendingMessage);
+              // console.log('Removing pending message: ', pendingMessage);
               this.pendingMessages = this.pendingMessages.filter(
                 (value) => value != pendingMessage
               );
@@ -247,7 +248,7 @@ class IoTDevice {
                 pendingMessage.farm_name === farm_name &&
                 pendingMessage.pivot_id === pivot_id
               ) {
-                console.log('Removing pending message: ', pendingMessage);
+                // console.log('Removing pending message: ', pendingMessage);
 
                 this.pendingMessages = this.pendingMessages.filter(
                   ({ node_name, farm_name }) =>
@@ -270,7 +271,7 @@ class IoTDevice {
           percentimeter
         } = json;
 
-        console.log('Updating intent...');
+        // console.log('Updating intent...');
 
         updateIntentController(
           pivot_id,
@@ -295,14 +296,14 @@ class IoTDevice {
         );
       }
     } catch (err) {
-      console.log('Failed to decode message: ');
-      console.log(err);
+      // console.log('Failed to decode message: ');
+      // console.log(err);
     }
 
-    console.log(
-      `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
-    );
-    console.log('RECEBIDOOOO');
+    // console.log(
+    //   `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
+    // // );
+    // console.log('RECEBIDOOOO');
   };
 }
 

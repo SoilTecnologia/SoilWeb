@@ -130,13 +130,14 @@ const intentToString = ({ intent }: { intent: Intent }): string => {
 };
 
 const processResponse = async (
-  pivot_name: Pivot['pivot_name'],
+  pivot_id: Pivot['pivot_id'],
   intent: Intent,
   response: string
 ) => {
+  console.log("PIVOTIDDDD")
   const raspberryResponse: RaspberryResponse = stringToStatus(response);
   await updatePivotController(
-    pivot_name,
+    pivot_id,
     raspberryResponse.connection,
     raspberryResponse.power,
     raspberryResponse.water,
@@ -148,7 +149,7 @@ const processResponse = async (
 
 const sendData = async (intent: IntentData) => {
   let intentString: string = intentToString(intent);
-  console.log(intentString);
+  // console.log(intentString);
 
   const response = await Axios({
     url: `http://localhost:3308/test/${intentString}`,
@@ -181,7 +182,7 @@ const checkPool = async () => {
         activeIntent.timestamp = new Date();
         idlePool.push(activeIntent);
         processResponse(
-          activeIntent.intent.pivot_name,
+          activeIntent.intent.pivot_id,
           activeIntent.intent,
           response.data
         );
@@ -206,7 +207,7 @@ const checkPool = async () => {
         const response = await sendData(idleIntent);
         idleIntent.timestamp = new Date();
         processResponse(
-          idleIntent.intent.pivot_name,
+          idleIntent.intent.pivot_id,
           idleIntent.intent,
           response.data
         );

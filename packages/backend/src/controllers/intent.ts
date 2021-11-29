@@ -29,8 +29,8 @@ export const updateIntentController = async (
     percentimeter = 0;
   }
 
-  console.log("INTENT NO INTENT>JS")
-  console.log(intent)
+  // console.log("INTENT NO INTENT>JS")
+  // console.log(intent)
 
   response = await db.intent.update({
     data: {
@@ -51,7 +51,7 @@ export const updateIntentController = async (
   const farm = await db.farm.findFirst({ where: { farm_id } });
   const { farm_name } = farm!;
 
-  console.log(`Percentimeter: ${percentimeter}`)
+  // console.log(`Percentimeter: ${percentimeter}`)
 
   if (isGPRS) {
     emitter.emit('intent', {
@@ -61,7 +61,7 @@ export const updateIntentController = async (
       farm_name,
       node_name
     });
-    console.log("EMITTED")
+    // console.log("EMITTED")
   } else {
     emitter.emit('intent', {
       intent_id: intent?.intent_id,
@@ -71,7 +71,7 @@ export const updateIntentController = async (
       pivot_name: pivot?.pivot_name
     });
 
-    console.log("EMITTED")
+    // console.log("EMITTED")
   }
   return response;
 };
