@@ -3,10 +3,7 @@ import { mqtt, iot } from 'aws-iot-device-sdk-v2';
 import { decode } from 'punycode';
 import { TextDecoder } from 'util';
 import { updatePivotController } from '../controllers/pivot';
-import {
-  IntentToString,
-  stringToStatus,
-} from '../utils/conversions';
+import { IntentToString, stringToStatus } from '../utils/conversions';
 import emitter from '../utils/eventBus';
 import db from '../database';
 
@@ -83,13 +80,22 @@ class IoTDevice {
         console.log('Adding new Intent to pending messages...');
         this.pendingMessages.push(intentDetails);
       });
+    } else {
+      console.log('CLOUD');
+      emitter.on('status', async (statusDetails) => {
+        console.log('OPAA');
+        console.log(statusDetails);
 
+        // Publish status updates to aws
+
+        console.log('Adding new Intent to pending messages...');
+        this.pendingMessages.push(statusDetails);
+      });
+    }
 
     setInterval(() => {
       this.checkPendingMessages();
     }, 5000);
-    }
-
   }
 
   async checkPendingMessages() {
@@ -107,7 +113,15 @@ class IoTDevice {
           `Publishing down to a Raspberry: ${farm_name}/${node_name}`
         );
         await this.publish(
-          JSON.stringify({ farm_name, node_name, pivot_id, power, water, direction, percentimeter }),
+          JSON.stringify({
+            farm_name,
+            node_name,
+            pivot_id,
+            power,
+            water,
+            direction,
+            percentimeter
+          }),
           `${farm_name}/${node_name}`
         );
       }
@@ -156,54 +170,90 @@ class IoTDevice {
               pendingMessage.farm_name === farm_name
             ) {
               const gprsStatus = stringToStatus(payload);
-              console.log(payload)
-              console.log("RECEIVED NEW STATUS FROM GPRS:")
+              console.log(payload);
+              console.log('RECEIVED NEW STATUS FROM GPRS:');
               console.log(gprsStatus);
 
-              if(gprsStatus.power == pendingMessage.intent.power &&
+              if (
+                gprsStatus.power == pendingMessage.intent.power &&
                 gprsStatus.water == pendingMessage.intent.water &&
-                gprsStatus.direction == pendingMessage.intent.direction) {
-              console.log('Removing pending message: ', pendingMessage);
-              this.pendingMessages = this.pendingMessages.filter(
-                ({ node_name, farm_name }) =>
-                  node_name != pendingMessage.node_name &&
-                  farm_name != pendingMessage.farm_name
-              );
+                gprsStatus.direction == pendingMessage.intent.direction
+              ) {
+                console.log('Removing pending message: ', pendingMessage);
+                this.pendingMessages = this.pendingMessages.filter(
+                  ({ node_name, farm_name }) =>
+                    node_name != pendingMessage.node_name &&
+                    farm_name != pendingMessage.farm_name
+                );
 
+                console.log('Updating Pivot');
 
-              console.log('Updating Pivot');
+                const farm = await db.farm.findFirst({ where: { farm_name } });
+                const node = await db.node.findFirst({
+                  where: { node_name, farm_id: farm!.farm_id }
+                });
+                const pivot = await db.pivot.findFirst({
+                  where: { node_id: node!.node_id }
+                });
+                const { pivot_id } = pivot!;
 
-              const farm = await db.farm.findFirst({where: {farm_name}})
-              const node = await db.node.findFirst({where: {node_name, farm_id: farm!.farm_id}});
-              const pivot = await db.pivot.findFirst({where: {node_id: node!.node_id}});
-              const{pivot_id} = pivot!;
-
-              await updatePivotController(pivot_id, "ONLINE", gprsStatus.power, gprsStatus.water, gprsStatus.direction, gprsStatus.angle, gprsStatus.percentimeter);
-                }
+                await updatePivotController(
+                  pivot_id,
+                  'ONLINE',
+                  gprsStatus.power,
+                  gprsStatus.water,
+                  gprsStatus.direction,
+                  gprsStatus.angle,
+                  gprsStatus.percentimeter
+                );
+              }
             }
           }
         } else {
-              await updatePivotController(json.pivot_id, "ONLINE", json.power, json.water, json.direction, json.angle, json.percentimeter);
+          //SEPARAR POR TIPO, status ou intent response
           for (let pendingMessage of this.pendingMessages) {
             console.log(pendingMessage);
-            if (
-              pendingMessage.node_name === node_name &&
-              pendingMessage.farm_name === farm_name &&
-              pendingMessage.pivot_id === pivot_id
-            ) {
-              console.log('Removing pending message: ', pendingMessage);
-
-              this.pendingMessages = this.pendingMessages.filter(
-                ({ node_name, farm_name }) =>
-                  node_name != pendingMessage.node_name &&
-                  farm_name != pendingMessage.farm_name &&
-                  pivot_id != pendingMessage.pivot_id
+            if (pendingMessage.type == 'status') {
+              await updatePivotController(
+                json.pivot_id,
+                'ONLINE',
+                json.power,
+                json.water,
+                json.direction,
+                json.angle,
+                json.percentimeter
               );
+
+              console.log('Removing pending message: ', pendingMessage);
+              this.pendingMessages = this.pendingMessages.filter(value => value != pendingMessage);
+            } else {
+              if (
+                pendingMessage.node_name === node_name &&
+                pendingMessage.farm_name === farm_name &&
+                pendingMessage.pivot_id === pivot_id
+              ) {
+                console.log('Removing pending message: ', pendingMessage);
+
+                this.pendingMessages = this.pendingMessages.filter(
+                  ({ node_name, farm_name }) =>
+                    node_name != pendingMessage.node_name &&
+                    farm_name != pendingMessage.farm_name &&
+                    pivot_id != pendingMessage.pivot_id
+                );
+              }
             }
           }
         }
       } else {
-        const { farm_name, node_name, pivot_id, power, water, direction, percentimeter } = json;
+        const {
+          farm_name,
+          node_name,
+          pivot_id,
+          power,
+          water,
+          direction,
+          percentimeter
+        } = json;
 
         console.log('Updating intent...');
 
@@ -212,7 +262,19 @@ class IoTDevice {
           where: { pivot_id }
         });
 
-        this.publish(JSON.stringify({farm_name, node_name, pivot_id, power, water, direction, percentimeter}), `cloud`);
+        this.publish(
+          JSON.stringify({
+            type: 'intent',
+            farm_name,
+            node_name,
+            pivot_id,
+            power,
+            water,
+            direction,
+            percentimeter
+          }),
+          `cloud`
+        );
       }
     } catch (err) {
       console.log('Failed to decode message: ');

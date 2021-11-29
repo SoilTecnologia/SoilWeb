@@ -124,6 +124,14 @@ export const updatePivotController = async (
           curr_angle,
           percentimeter
         );
+        emitter.emit('status', {
+          pivot_id,
+          power,
+          water,
+          direction,
+          curr_angle,
+          percentimeter
+        })
       } else {
         console.log("SEM LAST CYCLE")
         await createNewCycle(
@@ -134,11 +142,29 @@ export const updatePivotController = async (
           curr_angle!,
           percentimeter!
         );
+
+        emitter.emit('status', {
+          pivot_id,
+          power,
+          water,
+          direction,
+          curr_angle,
+          percentimeter
+        })
       }
     } else if (power == 'OFF') {
       console.log("POWER POFF")
       if (lastCycle && lastCycle.is_running) {
         await closeCycle(cycle_id!, curr_angle!);
+
+        emitter.emit('status', {
+          pivot_id,
+          power,
+          water,
+          direction,
+          curr_angle,
+          percentimeter
+        })
       }
     }
   } else {
@@ -146,6 +172,15 @@ export const updatePivotController = async (
     if (lastCycle && lastCycle.is_running) {
       // console.log('updateRunningCycle soh com connection!');
       await updateRunningCycle(cycle_id!, connection);
+
+        emitter.emit('status', {
+          pivot_id,
+          power,
+          water,
+          direction,
+          curr_angle,
+          percentimeter
+        })
     }
   }
 
