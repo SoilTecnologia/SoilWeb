@@ -17,7 +17,7 @@ export const updateIntentController = async (
 ): Promise<Intent> => {
   let response: Intent;
 
-  console.log(pivot_id)
+
 
   const intent = await db.intent.findFirst({
     where: { pivot_id }
@@ -29,7 +29,8 @@ export const updateIntentController = async (
     percentimeter = 0;
   }
 
-  console.log(intent)
+  // console.log("INTENT NO INTENT>JS")
+  // console.log(intent)
 
   response = await db.intent.update({
     data: {
@@ -50,25 +51,27 @@ export const updateIntentController = async (
   const farm = await db.farm.findFirst({ where: { farm_id } });
   const { farm_name } = farm!;
 
-  console.log(`Percentimeter: ${percentimeter}`)
+  // console.log(`Percentimeter: ${percentimeter}`)
 
   if (isGPRS) {
     emitter.emit('intent', {
       isGPRS,
-      intent: { power, water, direction, percentimeter },
+      intent_id: intent?.intent_id,
+      power, water, direction, percentimeter,
       farm_name,
       node_name
     });
-    console.log("EMITTED")
+    // console.log("EMITTED")
   } else {
     emitter.emit('intent', {
-      intent: { power, water, direction, percentimeter },
+      intent_id: intent?.intent_id,
+      power, water, direction, percentimeter,
       farm_name,
       node_name,
-      pivot_id
+      pivot_name: pivot?.pivot_name
     });
 
-    console.log("EMITTED")
+    // console.log("EMITTED")
   }
   return response;
 };

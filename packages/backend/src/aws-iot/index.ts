@@ -6,6 +6,7 @@ import { updatePivotController } from '../controllers/pivot';
 import { IntentToString, stringToStatus } from '../utils/conversions';
 import emitter from '../utils/eventBus';
 import db from '../database';
+import { updateIntentController } from '../controllers/intent';
 
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 class IoTDevice {
@@ -70,25 +71,19 @@ class IoTDevice {
     }
 
     if (this.type == 'Cloud') {
-      console.log('CLOUD');
+      console.log('on Cloud');
       emitter.on('intent', async (intentDetails) => {
-        console.log('OPAA');
-        console.log(intentDetails);
-
         // Publish intent updates to nodes
 
         console.log('Adding new Intent to pending messages...');
         this.pendingMessages.push(intentDetails);
       });
     } else {
-      console.log('CLOUD');
+      console.log('on Rasp');
       emitter.on('status', async (statusDetails) => {
-        console.log('OPAA');
-        console.log(statusDetails);
-
         // Publish status updates to aws
 
-        console.log('Adding new Intent to pending messages...');
+        console.log('Adding new Status to pending messages...', statusDetails);
         this.pendingMessages.push(statusDetails);
       });
     }
@@ -99,30 +94,51 @@ class IoTDevice {
   }
 
   async checkPendingMessages() {
-    for (let pendingMessage of this.pendingMessages) {
-      const { power, water, direction, percentimeter } = pendingMessage.intent;
-      const { pivot_id, node_name, farm_name } = pendingMessage;
-      if (!pivot_id) {
-        console.log(`Publishing down to a GPRS: ${farm_name}/${node_name}`);
-        await this.publish(
-          IntentToString(power, water, direction, percentimeter),
-          `${farm_name}/${node_name}`
-        );
-      } else {
-        console.log(
-          `Publishing down to a Raspberry: ${farm_name}/${node_name}`
-        );
+    if (this.type == 'Cloud') {
+      for (let pendingMessage of this.pendingMessages) {
+        const { power, water, direction, percentimeter } = pendingMessage;
+        const { pivot_id, node_name, farm_name } = pendingMessage;
+        if (!pivot_id) {
+          console.log(`Publishing down to a GPRS: ${farm_name}/${node_name}`);
+          await this.publish(
+            IntentToString(power, water, direction, percentimeter),
+            `${farm_name}/${node_name}`
+          );
+        } else {
+          console.log(
+            `Publishing down to a Raspberry: ${farm_name}/${node_name}`
+          );
+          await this.publish(
+            JSON.stringify({
+              farm_name,
+              node_name,
+              pivot_id,
+              power,
+              water,
+              direction,
+              percentimeter
+            }),
+            `${farm_name}/${node_name}`
+          );
+        }
+      }
+    } else {
+      for (let pendingMessage of this.pendingMessages) {
+        const { power, water, direction, percentimeter } = pendingMessage;
+        const { pivot_id, node_name, farm_name, connection } = pendingMessage;
         await this.publish(
           JSON.stringify({
-            farm_name,
+            type: 'status',
             node_name,
+            farm_name,
+            connection,
             pivot_id,
             power,
             water,
             direction,
             percentimeter
           }),
-          `${farm_name}/${node_name}`
+          'cloud'
         );
       }
     }
@@ -133,10 +149,8 @@ class IoTDevice {
     if (this.type == 'Cloud') finalTopic = topic;
     else finalTopic = this.pubTopic;
 
-    console.log('publishing...');
     try {
       await this.connection.publish(finalTopic!, payload, 1, false);
-      console.log('Published!');
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -161,32 +175,32 @@ class IoTDevice {
         const { pivot_id, payload } = json;
 
         console.log(`Received message from ${farm_name}/${node_name}`);
-        console.log(pivot_id);
+        // console.log(pivot_id);
         if (!pivot_id) {
           for (let pendingMessage of this.pendingMessages) {
-            console.log(pendingMessage);
+            // console.log(pendingMessage);
             if (
               pendingMessage.node_name === node_name &&
               pendingMessage.farm_name === farm_name
             ) {
               const gprsStatus = stringToStatus(payload);
-              console.log(payload);
-              console.log('RECEIVED NEW STATUS FROM GPRS:');
-              console.log(gprsStatus);
+              // console.log(payload);
+              // console.log('RECEIVED NEW STATUS FROM GPRS:');
+              // console.log(gprsStatus);
 
               if (
-                gprsStatus.power == pendingMessage.intent.power &&
-                gprsStatus.water == pendingMessage.intent.water &&
-                gprsStatus.direction == pendingMessage.intent.direction
+                gprsStatus.power == pendingMessage.power &&
+                gprsStatus.water == pendingMessage.water &&
+                gprsStatus.direction == pendingMessage.direction
               ) {
-                console.log('Removing pending message: ', pendingMessage);
+                // console.log('Removing pending message: ', pendingMessage);
                 this.pendingMessages = this.pendingMessages.filter(
                   ({ node_name, farm_name }) =>
                     node_name != pendingMessage.node_name &&
                     farm_name != pendingMessage.farm_name
                 );
 
-                console.log('Updating Pivot');
+                // console.log('Updating Pivot');
 
                 const farm = await db.farm.findFirst({ where: { farm_name } });
                 const node = await db.node.findFirst({
@@ -212,11 +226,11 @@ class IoTDevice {
         } else {
           //SEPARAR POR TIPO, status ou intent response
           for (let pendingMessage of this.pendingMessages) {
-            console.log(pendingMessage);
+            // console.log(pendingMessage);
             if (pendingMessage.type == 'status') {
               await updatePivotController(
                 json.pivot_id,
-                'ONLINE',
+                json.connection,
                 json.power,
                 json.water,
                 json.direction,
@@ -224,15 +238,17 @@ class IoTDevice {
                 json.percentimeter
               );
 
-              console.log('Removing pending message: ', pendingMessage);
-              this.pendingMessages = this.pendingMessages.filter(value => value != pendingMessage);
+              // console.log('Removing pending message: ', pendingMessage);
+              this.pendingMessages = this.pendingMessages.filter(
+                (value) => value != pendingMessage
+              );
             } else {
               if (
                 pendingMessage.node_name === node_name &&
                 pendingMessage.farm_name === farm_name &&
                 pendingMessage.pivot_id === pivot_id
               ) {
-                console.log('Removing pending message: ', pendingMessage);
+                // console.log('Removing pending message: ', pendingMessage);
 
                 this.pendingMessages = this.pendingMessages.filter(
                   ({ node_name, farm_name }) =>
@@ -255,12 +271,15 @@ class IoTDevice {
           percentimeter
         } = json;
 
-        console.log('Updating intent...');
+        // console.log('Updating intent...');
 
-        const newIntent = await db.intent.update({
-          data: { pivot_id, power, water, direction, percentimeter },
-          where: { pivot_id }
-        });
+        updateIntentController(
+          pivot_id,
+          power,
+          water,
+          direction,
+          percentimeter
+        );
 
         this.publish(
           JSON.stringify({
@@ -277,14 +296,14 @@ class IoTDevice {
         );
       }
     } catch (err) {
-      console.log('Failed to decode message: ');
-      console.log(err);
+      // console.log('Failed to decode message: ');
+      // console.log(err);
     }
 
-    console.log(
-      `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
-    );
-    console.log('RECEBIDOOOO');
+    // console.log(
+    //   `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
+    // // );
+    // console.log('RECEBIDOOOO');
   };
 }
 
