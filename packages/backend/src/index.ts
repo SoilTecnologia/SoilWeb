@@ -32,9 +32,9 @@ httpServer.listen(PORT, () => {
   console.info(`Server Listening on PORT ${PORT}`);
 });
 
-raspberry.start();
+//raspberry.start();
 
-const iotDevice = new IoTDevice('Raspberry', 0, "marcos/2");
+const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
 
 app.get('/', (req, res) => {
