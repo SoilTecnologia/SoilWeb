@@ -94,8 +94,12 @@ class IoTDevice {
   }
 
   async checkPendingMessages() {
+  console.log("PENDING");
     if (this.type == 'Cloud') {
+    console.log("CLOUD", this.pendingMessages.length);
       for (let pendingMessage of this.pendingMessages) {
+
+      console.log(pendingMessage);
         const { power, water, direction, percentimeter } = pendingMessage;
         const { pivot_id, node_name, farm_name } = pendingMessage;
         if (!pivot_id) {
@@ -224,7 +228,9 @@ class IoTDevice {
             }
           }
         } else {
+	console.log("SEILA");
           if(json.type == "status") {
+	  console.log("STATUS CHEGANTE");
               await updatePivotController(
                 json.pivot_id,
                 json.connection,
@@ -235,7 +241,6 @@ class IoTDevice {
                 json.percentimeter
               );
 
-        this.pendingMessages.push({type: "status", pivot_id});
           } else {
           //SEPARAR POR TIPO, status ou intent response
           for (let pendingMessage of this.pendingMessages) {
