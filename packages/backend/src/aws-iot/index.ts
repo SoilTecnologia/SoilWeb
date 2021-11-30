@@ -102,7 +102,7 @@ class IoTDevice {
 
     setInterval(() => {
       this.checkPendingMessages();
-    }, 15000);
+    }, 5000);
   }
 
   async checkPendingMessages() {

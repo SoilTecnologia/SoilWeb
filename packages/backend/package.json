@@ -25,6 +25,8 @@
   },
   "scripts": {
     "dev": "nodemon src/index.ts",
+    "run": "$(npm bin)/pm2 start src/index.ts",
+    "postinstall": "$(npm bin)/pm2 install typescript",
     "test": "jest"
   },
   "prisma": {
@@ -43,6 +45,7 @@
     "formdata-node": "^4.3.1",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.0",
+    "pm2": "^5.1.2",
     "socket.io": "^4.3.1",
     "socket.io-client": "^4.3.2"
   }

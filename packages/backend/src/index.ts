@@ -31,7 +31,11 @@ httpServer.listen(PORT, () => {
 
 //raspberry.start();
 
+<<<<<<< HEAD
 const iotDevice = new IoTDevice('Cloud', 0);
+=======
+const iotDevice = new IoTDevice('Raspberry', 0, "inatel/1");
+>>>>>>> 4db571cc6600c4b2723c36cb6e54727460c1f552
 iotDevice.start();
 
 app.get('/', (req, res) => {
