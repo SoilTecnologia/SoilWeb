@@ -1,5 +1,4 @@
 import express from 'express';
-import { DuplicateUniqueError } from '../types/errors';
 import { signUpController, signInController } from '../controllers/users';
 
 const router = express.Router();

@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
       table.enum('user_type', ['SUDO', 'USER']).defaultTo("USER");
     })
     .createTable('farms', (table) => {
-      table.string('farm_id').primary();
+      table.string('farm_id').primary().defaultTo(knex.raw('(UUID())'));
       table.string('farm_name').notNullable();
       table.string('farm_city').notNullable();
       table.float('farm_lng').notNullable();
@@ -17,13 +17,15 @@ export async function up(knex: Knex): Promise<void> {
       table.uuid('user_id').references('user_id').inTable('users').index().notNullable();
     })
     .createTable('nodes', (table) => {
-      table.string('node_id').primary();
+      table.string('node_id').primary().defaultTo(knex.raw('(UUID())'));
+      table.string('node_name').notNullable();
+      table.boolean('is_gprs').notNullable();
       table.string('gateway');
 
       table.string('farm_id').references('farm_id').inTable('farms').index();
     })
     .createTable('pivots', (table) => {
-      table.string('pivot_id').primary();
+      table.string('pivot_id').primary().defaultTo(knex.raw('(UUID())'));
       table.integer('pivot_name').notNullable();
       table.float('pivot_lng').notNullable();
       table.float('pivot_lat').notNullable();
@@ -31,7 +33,6 @@ export async function up(knex: Knex): Promise<void> {
       table.float('pivot_end_angle').notNullable();
       table.float('pivot_radius').notNullable();
       table.integer('radio_id').notNullable();
-      table.datetime('last_communication').notNullable();
 
       table.string('node_id').references('node_id').inTable('nodes').index().notNullable();
     })
@@ -53,7 +54,7 @@ export async function up(knex: Knex): Promise<void> {
       table.float('percentimeter');
       table.datetime('timestamp').notNullable();
 
-      table.uuid('state_id').references('state_id').inTable('states').index().notNullable();
+      table.uuid('pivot_id').references('pivot_id').inTable('pivots').index().notNullable();
     })
     .createTable('actions', (table) => {
       table.uuid('action_id').primary().defaultTo(knex.raw('(UUID())'));
@@ -70,4 +71,13 @@ export async function up(knex: Knex): Promise<void> {
     })
 }
 
-export async function down(knex: Knex): Promise<void> {}
+export async function down(knex: Knex): Promise<void> {
+  return knex.schema
+      .dropTable('actions')
+      .dropTable("states")
+      .dropTable("state_variables")
+      .dropTable('pivots')
+      .dropTable('nodes')
+      .dropTable('farms')
+      .dropTable('users');
+}
