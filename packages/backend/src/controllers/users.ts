@@ -7,7 +7,7 @@ import {
   InvalidRequestBody
 } from '../types/errors';
 
-import User from '../models/user';
+import User from '../models/users';
 
 type Response = {
   user_type: User['user_type'];
@@ -95,33 +95,3 @@ export const signUpController = async (
     throw new InvalidRequestBody();
   }
 };
-
-// export const updateUserController = async (
-//   user_id: User['user_id'],
-//   login?: User['login'],
-//   newPassword?: User['password'],
-//   user_type?: User['user_type']
-// ): Promise<User | null> => {
-//   const updatedUser = await db.user.update({
-//     data: {
-//       login,
-//       password: newPassword,
-//       user_type
-//     },
-//     where: {
-//       user_id
-//     }
-//   });
-
-//   return updatedUser;
-// };
-
-// export const deleteUserController = async (
-//   user_id: User['user_id']
-// ): Promise<boolean> => {
-//   const deletedUser = await db.user.delete({ where: { user_id } });
-
-//   if (deletedUser) return true;
-
-//   return false;
-// };

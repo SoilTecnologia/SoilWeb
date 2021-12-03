@@ -32,7 +32,6 @@ export async function up(knex: Knex): Promise<void> {
       table.float('pivot_start_angle').notNullable();
       table.float('pivot_end_angle').notNullable();
       table.float('pivot_radius').notNullable();
-      table.integer('radio_id').notNullable();
 
       table.string('node_id').references('node_id').inTable('nodes').index().notNullable();
     })

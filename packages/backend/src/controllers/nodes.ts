@@ -1,4 +1,4 @@
-import Node from '../models/node';
+import Node from '../models/nodes';
 
 import knex from '../database';
 
@@ -18,3 +18,9 @@ export const createNodeController = async (
 
   return newNode;
 };
+
+export const readAllNodeController = async(farm_id: Node['farm_id']) => {
+  const allNodesFromFarm = await knex<Node>('nodes').select("*").where({farm_id});
+
+  return allNodesFromFarm;
+}

@@ -2,9 +2,7 @@ import jwt from 'jsonwebtoken';
 import express from 'express';
 import { isType } from '../utils/types';
 import { IUserAuthInfoRequest } from '../types/express';
-import { wrap } from 'module';
-import { UserType, FarmUserType } from '@prisma/client';
-import { Request } from 'express';
+import User from '../models/users';
 
 interface TokenInfo {
   user_id: string;
@@ -13,7 +11,7 @@ interface TokenInfo {
 
 // Esse middleware retorna uma
 const authMiddleware = (
-  user_types: (keyof typeof UserType)[],
+  user_types: User['user_type'][]
 ): ((
   req: express.Request,
   res: express.Response,
@@ -27,7 +25,9 @@ const authMiddleware = (
     const token = req.headers.authorization;
     if (!token) return res.status(401).send('No token provided');
 
-    const decode = <TokenInfo>jwt.verify(token, process.env.TOKEN_SECRET as jwt.Secret);
+    const decode = <TokenInfo>(
+      jwt.verify(token, process.env.TOKEN_SECRET as jwt.Secret)
+    );
 
     if (!isType(decode.user_type, user_types))
       return res.status(401).send('Failed to authenticate token.');

@@ -1,6 +1,6 @@
 
 import { Knex } from "knex";
-import User from '../src/models/user';
+import User from '../src/models/users';
 import { signUpController } from "../src/controllers/users";
 
 export async function seed(knex: Knex): Promise<void> {

@@ -1,5 +1,5 @@
-import Farm from '../models/farm';
-import User from '../models/user';
+import Farm from '../models/farms';
+import User from '../models/users';
 
 import knex from '../database';
 
@@ -30,35 +30,3 @@ export const readAllFarmController = async (
 
   return farms;
 };
-
-// export const updateFarmController = async (
-//   farm_id: Farm['farm_id'],
-//   farm_name?: Farm['farm_name'],
-//   city?: Farm['city'],
-//   lng?: Farm['lng'],
-//   lat?: Farm['lat'],
-// ): Promise<Farm> => {
-//   const newFarm = await db.farm.update({
-//     data: {
-//       farm_name,
-//       city,
-//       lng,
-//       lat,
-//     },
-//     where: {
-//       farm_id
-//     }
-//   });
-
-//   return newFarm;
-// };
-
-// export const deleteFarmController = async (
-//   farm_id: Farm['farm_id']
-// ): Promise<boolean> => {
-//   await db.node.deleteMany({where: {farm_id}})
-//   await db.farmUser.deleteMany({where: {farm_id}})
-//   await db.farm.delete({ where: { farm_id } });
-
-//   return true;
-// };

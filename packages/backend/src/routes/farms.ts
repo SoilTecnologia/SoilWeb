@@ -1,43 +1,10 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
-import {
-  createFarmController,
-  readAllFarmController
-} from '../controllers/farms';
+import { readAllFarmController } from '../controllers/farms';
 import { createNodeController } from '../controllers/nodes';
 
 const router = express.Router();
-
-router.post(
-  '/create',
-  authMiddleware(['SUDO', 'USER']),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const user = req.user;
-      const { farm_id, farm_name, farm_city, farm_lng, farm_lat } = req.body;
-
-      try {
-        const newFarm = await createFarmController(
-          farm_id,
-          user.user_id,
-          farm_name,
-          farm_city,
-          farm_lng,
-          farm_lat
-        );
-
-        res.send(newFarm);
-      } catch (err) {
-        next(err);
-      }
-    }
-  )
-);
 
 router.put(
   '/addNode/:farm_id',
@@ -61,6 +28,7 @@ router.put(
 
         res.send(newNode);
       } catch (err) {
+        console.log(`Server 500: ${err}`);
         next(err);
       }
     }
@@ -83,6 +51,7 @@ router.get(
 
         res.send(allFarmsFromUser);
       } catch (err) {
+        console.log(`Server 500: ${err}`);
         next(err);
       }
     }

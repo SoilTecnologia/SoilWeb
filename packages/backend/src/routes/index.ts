@@ -1,13 +1,9 @@
 import express from 'express';
-import userRoute from './user';
-import farmRoute from './farm';
-import pivotRoute from './pivot';
-import radioRoute from './radio';
-import nodeRoute from './node';
-import cycleRoute from './cycle';
-import intentRoute from './intent';
+import userRoute from './users';
+import farmRoute from './farms';
+import nodeRoute from './nodes';
+import pivotRoute from './pivots';
 // import raspberryRoute from './raspberry';
-import testRoute from './test';
 
 import {
   DuplicateUniqueError,
@@ -43,7 +39,7 @@ function error(
 
 router.use('/users', userRoute);
 router.use('/farms', farmRoute);
-// router.use('/pivot', pivotRoute);
+router.use('/pivots', pivotRoute);
 router.use('/nodes', nodeRoute);
 // router.use('/cycle', cycleRoute);
 // router.use('/radio', radioRoute);
