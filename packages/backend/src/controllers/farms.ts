@@ -1,5 +1,5 @@
-import Farm from '../models/farms';
-import User from '../models/users';
+import Farm from '../models/farm';
+import User from '../models/user';
 
 import knex from '../database';
 

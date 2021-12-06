@@ -1,4 +1,4 @@
-import Node from '../models/nodes';
+import Node from '../models/node';
 
 import knex from '../database';
 

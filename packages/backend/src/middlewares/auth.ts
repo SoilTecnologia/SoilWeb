@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import express from 'express';
 import { isType } from '../utils/types';
 import { IUserAuthInfoRequest } from '../types/express';
-import User from '../models/users';
+import User from '../models/user';
 
 interface TokenInfo {
   user_id: string;

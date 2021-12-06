@@ -1,4 +1,4 @@
-import User from "../models/users"
+import User from "../models/user"
 
 // user_types: tipo a ser testado
 // target_types: tipos que retornarão true

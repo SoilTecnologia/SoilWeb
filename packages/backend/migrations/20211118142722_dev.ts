@@ -22,6 +22,7 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('is_gprs').notNullable();
       table.string('gateway');
 
+      table.string('register_id').defaultTo(knex.raw('(UUID())'));
       table.string('farm_id').references('farm_id').inTable('farms').index();
     })
     .createTable('pivots', (table) => {
@@ -32,6 +33,7 @@ export async function up(knex: Knex): Promise<void> {
       table.float('pivot_start_angle').notNullable();
       table.float('pivot_end_angle').notNullable();
       table.float('pivot_radius').notNullable();
+      table.integer('radio_id');
 
       table.string('node_id').references('node_id').inTable('nodes').index().notNullable();
     })
@@ -39,7 +41,7 @@ export async function up(knex: Knex): Promise<void> {
       table.uuid('state_id').primary().defaultTo(knex.raw('(UUID())'));
       table.boolean('power');
       table.boolean('water');
-      table.boolean('direction');
+      table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);
       table.boolean('connection').notNullable();
       table.datetime('timestamp').notNullable();
 
@@ -48,17 +50,23 @@ export async function up(knex: Knex): Promise<void> {
     .createTable('state_variables', (table) => {
       table.uuid('state_variable_id').primary().defaultTo(knex.raw('(UUID())'));
       table.float('angle');
+      table.float('percentimeter');
+      table.datetime('timestamp').notNullable();
+
+      table.uuid('pivot_id').references('pivot_id').inTable('pivots').index().notNullable();
+    })
+    .createTable('radio_variables', (table) => {
+      table.uuid('radio_variable_id').primary().defaultTo(knex.raw('(UUID())'));
       table.string('father');
       table.float('rssi');
-      table.float('percentimeter');
       table.datetime('timestamp').notNullable();
 
       table.uuid('pivot_id').references('pivot_id').inTable('pivots').index().notNullable();
     })
     .createTable('actions', (table) => {
       table.uuid('action_id').primary().defaultTo(knex.raw('(UUID())'));
-      table.enum('power', ['ON', 'OFF']).notNullable();
-      table.enum('water', ['WET', 'DRY']).notNullable();
+      table.boolean('power').notNullable();
+      table.boolean('water').notNullable();
       table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']).notNullable();
       table.float('percentimeter').notNullable();
       table.boolean('success').defaultTo(false);

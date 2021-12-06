@@ -1,5 +1,14 @@
-import Pivot from '../models/pivots';
-import Farm from '../models/farms';
+import Farm from '../models/farm';
+import Pivot from '../models/pivot';
+import States from '../models/state';
+import StateVariables from '../models/stateVariable';
+import RadioVariables from '../models/radioVariable';
+
+import {
+  isStateDifferent,
+  isStateVariableDifferent,
+  isRadioVariableDifferent
+} from '../utils/isDifferent';
 
 import knex from '../database';
 
@@ -10,7 +19,7 @@ export const createPivotController = async (
   pivot_lat: Pivot['pivot_lat'],
   pivot_start_angle: Pivot['pivot_start_angle'],
   pivot_end_angle: Pivot['pivot_end_angle'],
-  pivot_radius: Pivot['pivot_radius'],
+  pivot_radius: Pivot['pivot_radius']
 ) => {
   const newPivot = await knex<Pivot>('pivots').insert({
     node_id,
@@ -19,14 +28,85 @@ export const createPivotController = async (
     pivot_lat,
     pivot_start_angle,
     pivot_end_angle,
-    pivot_radius,
+    pivot_radius
   });
 
   return newPivot;
 };
 
 export const readAllPivotController = async (farm_id: Farm['farm_id']) => {
-  const pivots = await knex<Pivot>('pivots').select('*').join('nodes', 'pivots.node_id', 'nodes.node_id').where('nodes.farm_id', farm_id);
+  const pivots = await knex<Pivot>('pivots')
+    .select('*')
+    .join('nodes', 'pivots.node_id', 'nodes.node_id')
+    .where('nodes.farm_id', farm_id);
 
   return pivots;
-}
+};
+
+export const updatePivotController = async (
+  pivot_id: Pivot['pivot_id'],
+  connection: States['connection'],
+  power?: States['power'],
+  water?: States['water'],
+  direction?: States['direction'],
+  angle?: StateVariables['angle'],
+  percentimeter?: StateVariables['percentimeter'],
+  father?: RadioVariables['father'],
+  rssi?: RadioVariables['rssi']
+) => {
+  const oldState = await knex<States>('states')
+    .where('pivot_id', pivot_id)
+    .orderBy('timestamp', 'desc')
+    .first();
+  const oldStateVariable = await knex<StateVariables>('state_variables')
+    .where('pivot_id', pivot_id)
+    .orderBy('timestamp', 'desc')
+    .first();
+
+  if (
+    !oldState ||
+    isStateDifferent(oldState, { connection, power, water, direction })
+  )
+    await knex<States>('states')
+      .insert({
+        pivot_id,
+        connection,
+        power,
+        water,
+        direction: undefined,
+        timestamp: new Date()
+      })
+
+  if (angle != undefined && percentimeter != undefined) {
+    if (
+      !oldStateVariable ||
+      isStateVariableDifferent(oldStateVariable, { angle, percentimeter })
+    )
+      await knex<StateVariables>('state_variables').insert({
+        pivot_id,
+        angle,
+        percentimeter,
+        timestamp: new Date()
+      });
+  }
+
+  if (father != undefined && rssi != undefined) {
+    const oldRadioVariable = await knex<RadioVariables>('radio_variables')
+      .where('pivot_id', pivot_id)
+      .orderBy('timestamp', 'desc')
+      .first();
+    if (
+      !oldRadioVariable ||
+      isRadioVariableDifferent(oldRadioVariable, { father, rssi })
+    )
+      await knex<RadioVariables>('radio_variables').insert({
+        pivot_id,
+        father,
+        rssi,
+        timestamp: new Date()
+      });
+
+  }
+
+  return
+};
