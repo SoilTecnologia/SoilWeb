@@ -23,9 +23,7 @@ export const createFarmController = async (
   return newFarm;
 };
 
-export const readAllFarmController = async (
-  user_id: User['user_id']
-): Promise<Farm[]> => {
+export const readAllFarmController = async (user_id: User['user_id']): Promise<Farm[]> => {
   const farms = await knex<Farm>('farms').select('*').where({ user_id });
 
   return farms;

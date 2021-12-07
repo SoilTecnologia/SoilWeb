@@ -33,7 +33,7 @@ export async function up(knex: Knex): Promise<void> {
       table.float('pivot_start_angle').notNullable();
       table.float('pivot_end_angle').notNullable();
       table.float('pivot_radius').notNullable();
-      table.integer('radio_id');
+      table.integer('radio_id').notNullable().index();
 
       table.string('node_id').references('node_id').inTable('nodes').index().notNullable();
     })
@@ -73,6 +73,7 @@ export async function up(knex: Knex): Promise<void> {
       table.datetime('timestamp_sent').notNullable();
       table.datetime('timestamp_success');
 
+      table.integer('radio_id').references('radio_id').inTable('pivots').index().notNullable();
       table.uuid('author').references('user_id').inTable('users').index().notNullable();
       table.uuid('pivot_id').references('pivot_id').inTable('pivots').index().notNullable();
     })

@@ -4,7 +4,10 @@ import { FormData } from 'formdata-node';
 import Axios, { AxiosResponse } from 'axios';
 import emitter from '../utils/eventBus';
 import Queue from '../utils/queue';
-import { statusStringToObject } from '../utils/conversions';
+import { StatusObject, statusStringToObject } from '../utils/conversions';
+import { updatePivotController, readAllPivotsController2 } from '../controllers/pivots';
+import { readAllActionsController } from '../controllers/actions';
+import Action from '../models/action';
 
 const TIMEOUT = 10000;
 
@@ -16,9 +19,9 @@ type ActionData = {
 
 type IdleData = {
   pivot_id: string;
-  radio_id: string;
+  radio_id: number;
   attempts: number;
-}
+};
 
 let activeQueue: Queue<ActionData> = new Queue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
 let idleQueue: Queue<IdleData> = new Queue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
@@ -26,202 +29,170 @@ let idleQueue: Queue<IdleData> = new Queue<IdleData>(); // Guarda as intenções
 let ready = true;
 
 export const start = async () => {
-  loadIntents();
+  loadActions();
+  loadPivots();
 
   emitter.on('action', (action) => {
-    activeQueue.enqueue({action, timestamp: new Date(), attempts: 0});
+    activeQueue.enqueue({ action, timestamp: new Date(), attempts: 0 });
   });
 
   // Seta um intervalo para ficar checando a pool
   // Dentro da checkPool existe uma flag ready para ver se ja posso checar o proximo
   setInterval(() => {
+    console.log("sera..")
     if (ready) checkPool();
   }, 2000);
 };
 
-const checkPool = async () => {
-  ready = false;
-  if(!activeQueue.isEmpty()) {
-    let current = activeQueue.peek();
-
-    try {
-      const data = await sendData(1, );
-      if(checkResponse(current.action, data.response)) {
-        activeQueue.dequeue();
-        ready = true;
-      }
-    }
-  }
-}
-
-const loadIntents = async () => {
-  const allIntents = await readAllIntentController();
-
-  for (let intent of allIntents) {
-    if (intent.power == 'NULL') {
-      idlePool.push({ intent, timestamp: new Date(), attempts: 0 });
-    } else {
-      activePool.push({ intent, timestamp: new Date(), attempts: 0 });
-    }
-  }
-};
-
-type RaspberryResponse = {
-  connection: ConnectionState;
-  direction: DirectionState;
-  water: WaterState;
-  power: PowerState;
-  percentimeter: number;
-  angle: number;
-  timestamp: number;
-};
-
-const stringToStatus = (responseString: string) => {
-  let [_, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d{2})-(\d{3})-(\d+)/.exec(responseString) || [
-      '',
-      '',
-      '',
-      '',
-      0,
-      0,
-      0
-    ];
-
-  let response: RaspberryResponse = {
-    connection: 'ONLINE',
-    direction: 'NULL',
-    water: 'NULL',
-    power: 'NULL',
-    percentimeter: 0,
-    angle: 0,
-    timestamp: 0
-  };
-
-  if (direction == '3') {
-    response.direction = 'CLOCKWISE';
-  } else if (direction == '4') {
-    response.direction = 'ANTI_CLOCKWISE';
-  }
-
-  if (water == '5') {
-    response.water = 'DRY';
-  } else if (water == '6') {
-    response.water = 'WET';
-  }
-
-  if (power == '1') {
-    response.power = 'ON';
-  } else if (direction == '2') {
-    response.power = 'OFF';
-  }
-
-  response.percentimeter = Number(percentimeter);
-  response.angle = Number(angle);
-  response.timestamp = Number(timestamp);
-
-  return response;
-};
-
-const intentToString = ({ intent }: { intent: Intent }): string => {
-  let intentString = '';
-
-  if (intent.direction == 'CLOCKWISE') {
-    intentString = intentString.concat('3');
-  } else if (intent.direction == 'ANTI_CLOCKWISE') {
-    intentString = intentString.concat('4');
-  } else {
-    return '00000';
-  }
-
-  if (intent.water == 'DRY') {
-    intentString = intentString.concat('5');
-  } else if (intent.water == 'WET') {
-    intentString = intentString.concat('6');
-  } else {
-    return '00000';
-  }
-
-  if (intent.power == 'ON') {
-    intentString = intentString.concat('1');
-  } else if (intent.power == 'OFF') {
-    intentString = intentString.concat('2');
-  } else {
-    return '00000';
-  }
-
-  // Adds the percentimeter to the end
-  // padStart adds 0's if the percentimeter string < 3, ie: 10 turns into 010
-  if (intent.percentimeter == 100) {
-    intentString = intentString.concat('99');
-  } else {
-    intentString = intentString.concat(
-      intent.percentimeter.toString().padStart(2, '0')
-    );
-  }
-
-  return intentString;
-};
-
-const processResponse = async (
-  pivot_name: Pivot['pivot_name'],
-  intent: Intent,
-  response: any,
-  response_time: number
-) => {
-  await updateRadioController(
-    pivot_name,
-    response.payload[3],
-    response.payload[0],
-    JSON.stringify(response),
-    response_time
-  );
-  await updatePivotController(
-    pivot_name,
-    'ONLINE',
-    undefined,
-    'ON',
-    'DRY',
-    'CLOCKWISE',
-    0,
-    0
-  );
-};
-
-// Sends data to radio
-// Returns the response
-// The payload is a array of Decimal numbers, needs to be converted
 type RadioResponse = {
   cmd: number;
   id: number;
   payload: Array<number>;
   status: string;
-}
+};
 
 const sendData = async (radio_id: number, data: string) => {
-let bodyFormData = new FormData();
+  let bodyFormData = new FormData();
 
   bodyFormData.set('ID', radio_id);
-  bodyFormData.set('CMD', '213');
+  bodyFormData.set('CMD', '40');
   bodyFormData.set('intencao', data);
   const encoder = new FormDataEncoder(bodyFormData);
 
-  let response = await Axios.post<RadioResponse>('http://192.168.100.100:3031/comands', Readable.from(encoder), {headers: encoder.headers});
+  let response = await Axios.post<RadioResponse>(
+    'http://192.168.100.107:3031/comands',
+    Readable.from(encoder),
+    { headers: encoder.headers, timeout: TIMEOUT }
+  );
 
   return response;
 };
 
-
-const checkResponse = (action: Action, response: string) => {
-  const responseObject = stringToStatus(response);
-
-  if(responseObject) {
-    if(responseObject.power == action.power && responseObject.water == action.water && responseObject.direction == action.direction)
+const checkResponse = (action: Action, payload: StatusObject) => {
+  if (payload) {
+    if (
+      payload.power == action.power &&
+      payload.water == action.water &&
+      payload.direction == action.direction
+    )
       return true;
   }
 
   return false;
-}
+};
+
+const checkPool = async () => {
+  ready = false;
+  if (!activeQueue.isEmpty()) {
+    console.log("CHECKING ACTIVE")
+    let current = activeQueue.peek();
+
+    try {
+      const request = await sendData(current.action.radio_id, '351000');
+      const payload = request.data.payload;
+      const payloadObject = statusStringToObject(
+        String.fromCharCode(...payload)
+      );
+
+      if (payloadObject && checkResponse(current.action, payloadObject)) {
+        updatePivotController(
+          current.action.pivot_id,
+          true,
+          payloadObject.power,
+          payloadObject.water,
+          payloadObject.direction,
+          payloadObject.percentimeter,
+          payloadObject.angle
+        );
+        activeQueue.dequeue();
+      }
+    } catch (err) {
+      console.log(`[ERROR]: ${err}`);
+      current.attempts++;
+    } finally {
+      if (current.attempts >= 3) {
+        updatePivotController(
+          current.action.pivot_id,
+          false,
+          undefined,
+          undefined,
+          undefined
+        );
+        activeQueue.dequeue();
+      } else {
+        const current = activeQueue.dequeue();
+        activeQueue.enqueue(current!);
+      }
+    }
+  } else if(!idleQueue.isEmpty()) {
+    let current = idleQueue.peek();
+    console.log("CHECKING IDLE")
+
+    try {
+      const request = await sendData(current.radio_id, '000000');
+      const payload = request.data.payload;
+      const payloadObject = statusStringToObject(
+        String.fromCharCode(...payload)
+      );
+      console.log(payloadObject)
+		console.log(String.fromCharCode(...payload))
+
+
+      if (payloadObject) {
+        updatePivotController(
+          current.pivot_id,
+          true,
+          payloadObject.power,
+          payloadObject.water,
+          payloadObject.direction,
+          payloadObject.percentimeter,
+          payloadObject.angle
+        );
+      }
+    } catch (err) {
+      console.log(`[ERROR]: ${err}`);
+      current.attempts++;
+    } finally {
+      if (current.attempts >= 3) {
+        updatePivotController(
+          current.pivot_id,
+          false,
+          undefined,
+          undefined,
+          undefined
+        );
+      }
+
+      current = idleQueue.dequeue()!;
+      idleQueue.enqueue(current);
+    }
+  }
+  ready = true;
+};
+
+export const loadActions = async () => {
+  const allActions = await readAllActionsController();
+
+  for (let action of allActions) {
+    activeQueue.enqueue({ action, attempts: 0, timestamp: new Date() });
+  }
+};
+
+export const loadPivots = async () => {
+  const allPivots = await readAllPivotsController2();
+
+  for (let pivot of allPivots) {
+    idleQueue.enqueue({
+      pivot_id: pivot.pivot_id,
+      radio_id: pivot.radio_id,
+      attempts: 0
+    });
+  }
+};
+
+// Sends data to radio
+// Returns the response
+// The payload is a array of Decimal numbers, needs to be converted
 
 // const checkPool = async () => {
 //   ready = false;

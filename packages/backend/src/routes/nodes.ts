@@ -31,6 +31,7 @@ router.put(
     const { node_id } = req.params;
     const {
       pivot_name,
+      radio_id,
       pivot_lng,
       pivot_lat,
       pivot_start_angle,
@@ -41,6 +42,7 @@ router.put(
     try {
       const newPivot = await createPivotController(
         node_id,
+        radio_id,
         pivot_name,
         pivot_lng,
         pivot_lat,

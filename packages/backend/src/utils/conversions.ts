@@ -7,7 +7,7 @@ export type StringStatusData =
 export type StringIntentData =
   `${number}${number}${number}-${number}${number}${number}`;
 
-type StatusObject = {
+export type StatusObject = {
   direction: State['direction'];
   water: State['water'];
   power: State['power'];
@@ -57,6 +57,6 @@ export const statusStringToObject = (status: string) => {
   return null;
 };
 
-export const actionToString = {
-  
+export const decimalArrayToASCII = (decArray: Array<number>) => {
+
 }
