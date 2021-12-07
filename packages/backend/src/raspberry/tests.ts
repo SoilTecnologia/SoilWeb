@@ -1,76 +1,35 @@
-import {
-  DirectionState,
-  Intent,
-  WaterState,
-  PowerState,
-  ConnectionState,
-  Pivot
-} from '@prisma/client';
 import { Readable } from 'stream';
 import { FormDataEncoder } from 'form-data-encoder';
 import { FormData } from 'formdata-node';
 import Axios, { AxiosResponse } from 'axios';
-import { readAllIntentController } from '../controllers/intent';
-import { updatePivotController } from '../controllers/pivot';
-import { updateRadioController } from '../controllers/radio';
 import emitter from '../utils/eventBus';
+import Queue from '../utils/queue';
+import { statusStringToObject } from '../utils/conversions';
 
 const TIMEOUT = 10000;
-const fatherUpdate = 10;
-let fatherCounter = 0;
 
-type IntentData = {
-  intent: Intent;
+type ActionData = {
+  action: Action;
   timestamp: Date;
   attempts: number;
 };
 
-let activePool: Array<IntentData> = []; // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
-let idlePool: Array<IntentData> = []; // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
+type IdleData = {
+  pivot_id: string;
+  radio_id: string;
+  attempts: number;
+}
+
+let activeQueue: Queue<ActionData> = new Queue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
+let idleQueue: Queue<IdleData> = new Queue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
 
 let ready = true;
 
 export const start = async () => {
   loadIntents();
 
-  emitter.on('intent', (intent) => {
-    ready = false;
-    let counter = idlePool.length - 1;
-    let found = false;
-    while (counter >= 0) {
-      if (idlePool[counter].intent.intent_id == intent.intent_id) {
-        found = true;
-        idlePool = idlePool.filter((value) => value != idlePool[counter]);
-        activePool.push({
-          intent,
-          timestamp: new Date(),
-          attempts: idlePool[counter].attempts
-        });
-
-        break;
-      }
-      counter--;
-    }
-
-    if (!found) {
-      counter = activePool.length - 1;
-      while (counter >= 0) {
-        if (activePool[counter].intent.intent_id == intent.intent_id) {
-          activePool = activePool.filter(
-            (value) => value != activePool[counter]
-          );
-          activePool.push({
-            intent,
-            timestamp: new Date(),
-            attempts: activePool[counter].attempts
-          });
-          break;
-        }
-      }
-      counter--;
-    }
-
-    ready = true;
+  emitter.on('action', (action) => {
+    activeQueue.enqueue({action, timestamp: new Date(), attempts: 0});
   });
 
   // Seta um intervalo para ficar checando a pool
@@ -79,6 +38,21 @@ export const start = async () => {
     if (ready) checkPool();
   }, 2000);
 };
+
+const checkPool = async () => {
+  ready = false;
+  if(!activeQueue.isEmpty()) {
+    let current = activeQueue.peek();
+
+    try {
+      const data = await sendData(1, );
+      if(checkResponse(current.action, data.response)) {
+        activeQueue.dequeue();
+        ready = true;
+      }
+    }
+  }
+}
 
 const loadIntents = async () => {
   const allIntents = await readAllIntentController();
@@ -214,154 +188,164 @@ const processResponse = async (
   );
 };
 
-const sendData = async (intent: IntentData) => {
-  let intentString: string = intentToString(intent);
+// Sends data to radio
+// Returns the response
+// The payload is a array of Decimal numbers, needs to be converted
+type RadioResponse = {
+  cmd: number;
+  id: number;
+  payload: Array<number>;
+  status: string;
+}
 
-  let bodyFormData = new FormData();
+const sendData = async (radio_id: number, data: string) => {
+let bodyFormData = new FormData();
 
-  bodyFormData.set('ID', intent.intent.radio_name);
+  bodyFormData.set('ID', radio_id);
   bodyFormData.set('CMD', '213');
-  bodyFormData.set('intencao', '000');
+  bodyFormData.set('intencao', data);
   const encoder = new FormDataEncoder(bodyFormData);
 
-  const start = Date.now();
+  let response = await Axios.post<RadioResponse>('http://192.168.100.100:3031/comands', Readable.from(encoder), {headers: encoder.headers});
 
-  let response = await Axios({
-    method: 'POST',
-    url: `http://192.168.100.100:3031/comands`,
-    headers: encoder.headers,
-    data: Readable.from(encoder),
-    timeout: TIMEOUT
-  });
-
-  const end = Date.now();
-
-  return { response, response_time: end - start };
+  return response;
 };
 
-const checkPool = async () => {
-  ready = false;
-  if (fatherCounter < fatherUpdate) {
-    // console.log(
-    //   'Check Pool: ',
-    //   'IDLE: ',
-    //   idlePool.length,
-    //   ' ACTIVE: ',
-    //   activePool.length
-    // );
-    for (let activeIntent of activePool) {
-      console.log(
-        '[ACTIVE]\tSending data to pivot',
-        activeIntent.intent.radio_name
-      );
 
-      try {
-        const result = await sendData(activeIntent);
-        const { response, response_time } = result;
-        if (
-          response.status == 200 &&
-          response.data.id == activeIntent.intent.radio_name
-        ) {
-          activePool = activePool.filter((value) => value != activeIntent);
+const checkResponse = (action: Action, response: string) => {
+  const responseObject = stringToStatus(response);
 
-          activeIntent.timestamp = new Date();
-          activeIntent.attempts = 0;
-          idlePool.push(activeIntent);
-          processResponse(
-            activeIntent.intent.radio_name,
-            activeIntent.intent,
-            response.data,
-            response_time
-          );
-        } else {
-          console.log(
-            `[ERROR]\tResposta de outro id: -> ${activeIntent.intent.radio_name} | -> ${response.data.id}`
-          );
-          activeIntent.attempts++;
-
-          if (activeIntent.attempts >= 5) {
-            await updatePivotController(
-              activeIntent.intent.radio_name,
-              'OFFLINE'
-            );
-            activeIntent.attempts = 0;
-          }
-        }
-      } catch (err) {
-        console.log('[TIMEOUT]\ton', activeIntent.intent.radio_name);
-        activeIntent.attempts++;
-
-        activePool = activePool.filter((value) => value != activeIntent);
-
-        activeIntent.timestamp = new Date();
-        idlePool.push(activeIntent);
-
-        if (activeIntent.attempts >= 5) {
-          await updatePivotController(
-            activeIntent.intent.radio_name,
-            'OFFLINE'
-          );
-          activeIntent.attempts = 0;
-        }
-      }
-    }
-
-    for (let idleIntent of idlePool) {
-      if (
-        new Date().getTime() - new Date(idleIntent.timestamp).getTime() >=
-        8000
-      ) {
-        console.log(
-          '[IDLE]\tSending data to pivot',
-          idleIntent.intent.radio_name
-        );
-
-        try {
-          const result = await sendData(idleIntent);
-          const { response, response_time } = result;
-          if (
-            response.status == 200 &&
-            response.data.id == idleIntent.intent.radio_name
-          ) {
-            idleIntent.timestamp = new Date();
-            idleIntent.attempts = 0;
-            processResponse(
-              idleIntent.intent.radio_name,
-              idleIntent.intent,
-              response.data,
-              response_time
-            );
-          } else {
-            console.log(
-              `[ERROR]\tResposta de outro id: -> ${idleIntent.intent.radio_name} | -> ${response.data.id}`
-            );
-            idleIntent.attempts++;
-
-            if (idleIntent.attempts >= 5) {
-              await updatePivotController(
-                idleIntent.intent.radio_name,
-                'OFFLINE'
-              );
-              idleIntent.attempts = 0;
-            }
-          }
-        } catch (err) {
-          idleIntent.attempts++;
-          console.log('[TIMEOUT]\ton', idleIntent.intent.radio_name);
-
-          if (idleIntent.attempts >= 5) {
-            await updatePivotController(
-              idleIntent.intent.radio_name,
-              'OFFLINE'
-            );
-            idleIntent.attempts = 0;
-          }
-        }
-      }
-    }
-  } else {
-    fatherCounter = 0;
+  if(responseObject) {
+    if(responseObject.power == action.power && responseObject.water == action.water && responseObject.direction == action.direction)
+      return true;
   }
-  fatherCounter++;
-  ready = true;
-};
+
+  return false;
+}
+
+// const checkPool = async () => {
+//   ready = false;
+//   if (fatherCounter < fatherUpdate) {
+//     // console.log(
+//     //   'Check Pool: ',
+//     //   'IDLE: ',
+//     //   idlePool.length,
+//     //   ' ACTIVE: ',
+//     //   activePool.length
+//     // );
+//     for (let activeIntent of activePool) {
+//       console.log(
+//         '[ACTIVE]\tSending data to pivot',
+//         activeIntent.intent.radio_name
+//       );
+
+//       try {
+//         const result = await sendData(activeIntent);
+//         const { response, response_time } = result;
+//         if (
+//           response.status == 200 &&
+//           response.data.id == activeIntent.intent.radio_name
+//         ) {
+//           activePool = activePool.filter((value) => value != activeIntent);
+
+//           activeIntent.timestamp = new Date();
+//           activeIntent.attempts = 0;
+//           idlePool.push(activeIntent);
+//           processResponse(
+//             activeIntent.intent.radio_name,
+//             activeIntent.intent,
+//             response.data,
+//             response_time
+//           );
+//         } else {
+//           console.log(
+//             `[ERROR]\tResposta de outro id: -> ${activeIntent.intent.radio_name} | -> ${response.data.id}`
+//           );
+//           activeIntent.attempts++;
+
+//           if (activeIntent.attempts >= 5) {
+//             await updatePivotController(
+//               activeIntent.intent.radio_name,
+//               'OFFLINE'
+//             );
+//             activeIntent.attempts = 0;
+//           }
+//         }
+//       } catch (err) {
+//         console.log('[TIMEOUT]\ton', activeIntent.intent.radio_name);
+//         activeIntent.attempts++;
+
+//         activePool = activePool.filter((value) => value != activeIntent);
+
+//         activeIntent.timestamp = new Date();
+//         idlePool.push(activeIntent);
+
+//         if (activeIntent.attempts >= 5) {
+//           await updatePivotController(
+//             activeIntent.intent.radio_name,
+//             'OFFLINE'
+//           );
+//           activeIntent.attempts = 0;
+//         }
+//       }
+//     }
+
+//     for (let idleIntent of idlePool) {
+//       if (
+//         new Date().getTime() - new Date(idleIntent.timestamp).getTime() >=
+//         8000
+//       ) {
+//         console.log(
+//           '[IDLE]\tSending data to pivot',
+//           idleIntent.intent.radio_name
+//         );
+
+//         try {
+//           const result = await sendData(idleIntent);
+//           const { response, response_time } = result;
+//           if (
+//             response.status == 200 &&
+//             response.data.id == idleIntent.intent.radio_name
+//           ) {
+//             idleIntent.timestamp = new Date();
+//             idleIntent.attempts = 0;
+//             processResponse(
+//               idleIntent.intent.radio_name,
+//               idleIntent.intent,
+//               response.data,
+//               response_time
+//             );
+//           } else {
+//             console.log(
+//               `[ERROR]\tResposta de outro id: -> ${idleIntent.intent.radio_name} | -> ${response.data.id}`
+//             );
+//             idleIntent.attempts++;
+
+//             if (idleIntent.attempts >= 5) {
+//               await updatePivotController(
+//                 idleIntent.intent.radio_name,
+//                 'OFFLINE'
+//               );
+//               idleIntent.attempts = 0;
+//             }
+//           }
+//         } catch (err) {
+//           idleIntent.attempts++;
+//           console.log('[TIMEOUT]\ton', idleIntent.intent.radio_name);
+
+//           if (idleIntent.attempts >= 5) {
+//             await updatePivotController(
+//               idleIntent.intent.radio_name,
+//               'OFFLINE'
+//             );
+//             idleIntent.attempts = 0;
+//           }
+//         }
+//       }
+//     }
+//   } else {
+//     fatherCounter = 0;
+//   }
+//   fatherCounter++;
+//   ready = true;
+// };

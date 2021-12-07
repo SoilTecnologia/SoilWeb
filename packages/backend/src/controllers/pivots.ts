@@ -105,7 +105,6 @@ export const updatePivotController = async (
         rssi,
         timestamp: new Date()
       });
-
   }
 
   return

@@ -1,9 +1,5 @@
-import {
-  DirectionState,
-  WaterState,
-  PowerState,
-  ConnectionState,
-} from '@prisma/client';
+import State from '../models/state';
+import StateVariable from '../models/stateVariable';
 
 export type StringStatusData =
   `${number}${number}${number}-${number}${number}${number}-${number}${number}${number}-${number}`;
@@ -11,105 +7,56 @@ export type StringStatusData =
 export type StringIntentData =
   `${number}${number}${number}-${number}${number}${number}`;
 
-type PrismaPivotUpdateType = {
-  connection: ConnectionState;
-  direction: DirectionState;
-  water: WaterState;
-  power: PowerState;
-  percentimeter: number;
-  angle: number;
-  timestamp: number;
+type StatusObject = {
+  direction: State['direction'];
+  water: State['water'];
+  power: State['power'];
+  percentimeter: StateVariable['percentimeter'];
+  angle: StateVariable['angle'];
+  timestamp: Date;
 };
 
-type PrismaIntentUpdateType = {
-  direction: DirectionState;
-  water: WaterState;
-  power: PowerState;
-  percentimeter: number;
-}
+export const statusStringToObject = (status: string) => {
+  let [match, direction, water, power, percentimeter, angle, timestamp] =
+    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(status) || [];
 
-export const StatusStringToPrisma = (status: StringStatusData) => {
-  let [_, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d{3})-(\d{3})-(\d+)/.exec(status) || [
-      '',
-      '',
-      '',
-      '',
-      0,
-      0,
-      0
-    ];
-
-  let response: PrismaPivotUpdateType = {
-    connection: 'ONLINE',
-    direction: 'NULL',
-    water: 'NULL',
-    power: 'NULL',
+  let response: StatusObject = {
+    power: undefined,
+    direction: undefined,
+    water: undefined,
     percentimeter: 0,
     angle: 0,
-    timestamp: 0
+    timestamp: new Date()
   };
 
-  if (direction == '3') {
-    response.direction = 'CLOCKWISE';
-  } else if (direction == '4') {
-    response.direction = 'ANTI_CLOCKWISE';
+  if (match) {
+    if (direction == '3') {
+      response.direction = 'CLOCKWISE';
+    } else if (direction == '4') {
+      response.direction = 'ANTI_CLOCKWISE';
+    }
+
+    if (water == '5') {
+      response.water = false;
+    } else if (water == '6') {
+      response.water = true;
+    }
+
+    if (power == '1') {
+      response.power = true;
+    } else if (power == '2') {
+      response.power = false;
+    }
+
+    response.percentimeter = Number(percentimeter);
+    response.angle = Number(angle);
+    response.timestamp = new Date(timestamp);
+
+    return response;
   }
-
-  if (water == '5') {
-    response.water = 'DRY';
-  } else if (water == '6') {
-    response.water = 'WET';
-  }
-
-  if (power == '1') {
-    response.power = 'ON';
-  } else if (direction == '2') {
-    response.power = 'OFF';
-  }
-
-  response.percentimeter = Number(percentimeter);
-  response.angle = Number(angle);
-  response.timestamp = Number(timestamp);
-
-  return response;
+  return null;
 };
 
-export const IntentStringToPrisma = (intent: StringIntentData) => {
-  let [_, direction, water, power, percentimeter] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d{3})/.exec(intent) || [
-      '',
-      '',
-      '',
-      ''
-    ];
-
-  let response: PrismaIntentUpdateType = {
-    direction: 'NULL',
-    water: 'NULL',
-    power: 'NULL',
-    percentimeter: 0,
-  };
-
-  if (direction == '3') {
-    response.direction = 'CLOCKWISE';
-  } else if (direction == '4') {
-    response.direction = 'ANTI_CLOCKWISE';
-  }
-
-  if (water == '5') {
-    response.water = 'DRY';
-  } else if (water == '6') {
-    response.water = 'WET';
-  }
-
-  if (power == '1') {
-    response.power = 'ON';
-  } else if (direction == '2') {
-    response.power = 'OFF';
-  }
-
-  response.percentimeter = Number(percentimeter);
-
-  return response;
-};
+export const actionToString = {
+  
+}

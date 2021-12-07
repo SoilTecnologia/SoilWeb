@@ -69,7 +69,7 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('water').notNullable();
       table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']).notNullable();
       table.float('percentimeter').notNullable();
-      table.boolean('success').defaultTo(false);
+      table.boolean('success').defaultTo(null);
       table.datetime('timestamp_sent').notNullable();
       table.datetime('timestamp_success');
 

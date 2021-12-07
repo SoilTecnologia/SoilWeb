@@ -1,10 +1,5 @@
-import { EnumNumberMember } from '@babel/types';
 import { mqtt, iot } from 'aws-iot-device-sdk-v2';
-import { decode } from 'punycode';
 import { TextDecoder } from 'util';
-import { updateIntentController } from '../controllers/intent';
-import { updatePivotController } from '../controllers/pivot';
-import { StatusStringToPrisma, IntentStringToPrisma, StringStatusData, StringIntentData } from '../utils/conversions';
 
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 class IoTDevice {
@@ -61,7 +56,7 @@ class IoTDevice {
       console.log(err);
     }
 
-    console.log('subscribed!');
+    console.log(`${this.type} connected to AWS IoT Core!`);
   }
 
   publish(payload: Object, topic?: string) {
@@ -71,7 +66,7 @@ class IoTDevice {
 
     console.log('publishing...');
     try {
-      this.connection.publish(finalTopic!, JSON.stringify(payload), 1, false);
+      this.connection.publish(finalTopic!, JSON.stringify(payload), 0, false);
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -88,49 +83,8 @@ class IoTDevice {
     retain: boolean
   ) => {
     const decoder = new TextDecoder('utf8');
-    // console.log(payload)
-
-    // if (this.type == 'Cloud') {
-    //   const json: PivotToCloudMessage = JSON.parse(decoder.decode(payload));
-    //   const{type, pivot_name, node_id, power, direction, water, angle, percentimeter, connection, timestamp} = json;
-
-    //   if(type == "status") {
-    //   // updatePivotController(pivot_name, "ONLINE", node_id, power, water, direction, angle, percentimeter);
-    //   }
-    // }
-
-    // console.log(
-    //   `Publish received. topic:"${topic}" dup:${dup} qos:${qos} retain:${retain}`
-    // );
-    console.log(JSON.parse(decoder.decode(payload)))
-
-    if(this.type == "Cloud") {
-      const EdgePayload: EdgeToCloudPayload = JSON.parse(decoder.decode(payload as any));
-      const {type, pivot_id, edge_payload} = EdgePayload;
-
-      const {power, connection, water, direction, angle, percentimeter, timestamp} = StatusStringToPrisma(edge_payload)
-
-      await updatePivotController(pivot_id, connection, power, water, direction, angle, percentimeter, /*timestamp*/)
-    } else if(this.type == "Raspberry") {
-      const CloudPayload: CloudToRaspMessage = JSON.parse(decoder.decode(payload as any));
-      const {type, pivot_id, cloud_payload} = CloudPayload;
-      const {power, water, direction, percentimeter} = IntentStringToPrisma(cloud_payload);
-
-      await updateIntentController(pivot_id, power, water, direction, percentimeter);
-    }
+    const json = JSON.parse(decoder.decode(payload));
   }
-}
-
-type EdgeToCloudPayload = {
-  type: "esp" | "rasp";
-  pivot_id: string;
-  edge_payload: StringStatusData;
-}
-
-type CloudToRaspMessage = {
-  type: "intent";
-  pivot_id: string;
-  cloud_payload: StringIntentData;
 }
 
 export default IoTDevice;
