@@ -84,7 +84,7 @@ export const updatePivotController = async (
       connection,
       power,
       water,
-      direction: undefined,
+      direction,
       timestamp: new Date()
     });
   }

@@ -18,8 +18,9 @@ export type StatusObject = {
 
 export const statusStringToObject = (status: string) => {
   let [match, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(status) || [];
+    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(`${status}`) || [];
 
+    console.log(status)
   let response: StatusObject = {
     power: undefined,
     direction: undefined,

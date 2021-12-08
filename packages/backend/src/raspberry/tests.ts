@@ -9,7 +9,7 @@ import { updatePivotController, readAllPivotsController2 } from '../controllers/
 import { readAllActionsController } from '../controllers/actions';
 import Action from '../models/action';
 
-const TIMEOUT = 10000;
+const TIMEOUT = 3000;
 
 type ActionData = {
   action: Action;
@@ -60,10 +60,15 @@ const sendData = async (radio_id: number, data: string) => {
   const encoder = new FormDataEncoder(bodyFormData);
 
   let response = await Axios.post<RadioResponse>(
-    'http://192.168.100.107:3031/comands',
+    'http://localhost:8080/comands',
     Readable.from(encoder),
     { headers: encoder.headers, timeout: TIMEOUT }
   );
+  // let response = await Axios.post<RadioResponse>(
+  //   'http://192.168.100.107:3031/comands',
+  //   Readable.from(encoder),
+  //   { headers: encoder.headers, timeout: TIMEOUT }
+  // );
 
   return response;
 };
@@ -95,7 +100,8 @@ const checkPool = async () => {
       );
 
       if (payloadObject && checkResponse(current.action, payloadObject)) {
-        updatePivotController(
+        console.log(payloadObject);
+        await updatePivotController(
           current.action.pivot_id,
           true,
           payloadObject.power,
@@ -104,6 +110,7 @@ const checkPool = async () => {
           payloadObject.percentimeter,
           payloadObject.angle
         );
+          current.attempts = 0;
         activeQueue.dequeue();
       }
     } catch (err) {
@@ -111,7 +118,7 @@ const checkPool = async () => {
       current.attempts++;
     } finally {
       if (current.attempts >= 3) {
-        updatePivotController(
+        await updatePivotController(
           current.action.pivot_id,
           false,
           undefined,
@@ -134,12 +141,9 @@ const checkPool = async () => {
       const payloadObject = statusStringToObject(
         String.fromCharCode(...payload)
       );
-      console.log(payloadObject)
-		console.log(String.fromCharCode(...payload))
-
 
       if (payloadObject) {
-        updatePivotController(
+        await updatePivotController(
           current.pivot_id,
           true,
           payloadObject.power,
@@ -148,13 +152,14 @@ const checkPool = async () => {
           payloadObject.percentimeter,
           payloadObject.angle
         );
+        current.attempts = 0;
       }
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
       current.attempts++;
     } finally {
       if (current.attempts >= 3) {
-        updatePivotController(
+        await updatePivotController(
           current.pivot_id,
           false,
           undefined,
