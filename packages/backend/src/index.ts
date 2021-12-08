@@ -19,14 +19,15 @@ app.listen(PORT, () => {
 });
 
 eventEmitter.on('intent', () => {
-  console.log('INTENT event received!');
+  // console.log('INTENT event received!');
 });
 
 
 raspberry.start();
 
-// const iotDevice = new IoTDevice('Cloud', 1);
-// iotDevice.start();
+// const iotDevice = new IoTDevice('Cloud', 0);
+const iotDevice = new IoTDevice('Raspberry', 0, '3cadb957-5787-11ec-bcf7-6432a83ce5f6/0');
+iotDevice.start();
 
 // setInterval(() => {
 //   iotDevice.publish({msg: "pirulitin"}, "cloud");

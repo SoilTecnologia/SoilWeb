@@ -16,17 +16,17 @@ class IoTDevice {
   private queue: Queue<MessageQueue>;
   // endpoint
 
-  constructor(type: IoTDeviceType, qos: 0 | 1, node_id?: string) {
+  constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
     this.type = type;
     this.qos = qos;
     this.queue = new Queue<MessageQueue>();
-    if (type == 'Raspberry' && node_id) {
-      this.subTopic = `rasp/${node_id}`;
-      this.pubTopic = `cloud`;
-      this.clientId = node_id;
+    if (type == 'Raspberry' && topic) {
+      this.subTopic = `${topic}`;
+      this.pubTopic = `cloud2`;
+      this.clientId = topic;
     } else {
-      this.subTopic = 'cloud';
-      this.clientId = 'cloud';
+      this.subTopic = 'cloud2';
+      this.clientId = 'cloud2';
     }
   }
 
@@ -62,7 +62,7 @@ class IoTDevice {
       await this.setupQueue();
       setInterval(() => {
         if (this.ready) this.processQueue();
-      }, 2000);
+      }, 5000);
     } catch (err) {
       console.log(err);
     }
@@ -75,9 +75,11 @@ class IoTDevice {
     if (this.type == 'Cloud') finalTopic = topic;
     else finalTopic = this.pubTopic;
 
-    console.log('publishing...');
     try {
-      this.connection.publish(finalTopic!, JSON.stringify(payload), 0, false);
+      var string = JSON.stringify(payload, function (k, v) {
+        return v === undefined ? null : v;
+      });
+      this.connection.publish(finalTopic!, string, 0, false);
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -97,7 +99,9 @@ class IoTDevice {
     const json = JSON.parse(decoder.decode(payload));
 
     if (this.type === 'Cloud') {
+      console.log("CHEGO AK NO TREM")
       if (json.type === 'status') {
+        console.log("OP")
         const {
           pivot_id,
           connection,
@@ -106,6 +110,7 @@ class IoTDevice {
           direction,
           angle,
           percentimeter,
+          timestamp,
           father,
           rssi
         } = json.payload;
@@ -117,6 +122,7 @@ class IoTDevice {
           direction,
           angle,
           percentimeter,
+          timestamp,
           father,
           rssi
         );
@@ -128,10 +134,10 @@ class IoTDevice {
         // TODO dar um jeito de remover o action respondido da queue da cloud
       }
     } else {
-      console.log("Resposta de status recebido na rasp");
-      if(json.type === "status") {
-        // TODO dar um jeito de remover o status respondido da queue da raspberry
-      } else if(json.type === "action") {
+      if (json.type === 'status') {
+        console.log('Resposta de status recebido na rasp');
+        this.queue.remove(json);
+      } else if (json.type === 'action') {
         // TODO assim que receber a intencao, publicar o mesmo payload pra cloud pra avisar que recebeu
       }
     }
@@ -144,8 +150,10 @@ class IoTDevice {
           type: 'status',
           farm_id: status.farm_id,
           node_name: status.node_name,
-          payload: status.payload
+          payload: {...status.payload, timestamp: status.payload.timestamp.toString()}
+
         });
+        //OBS: a conversao do timestamp pra string é pra facilitar a comparação no método queue.remove
       });
     } else {
       // TODO fazer um emitter pra qndo receber intenções na nuvem, dai adicionar a queue
@@ -154,7 +162,7 @@ class IoTDevice {
 
   processQueue = () => {
     if (!this.queue.isEmpty()) {
-      const current = this.queue.dequeue()!;
+      const current = this.queue.peek()!;
 
       if (this.type === 'Raspberry') this.publish(current, this.pubTopic);
       else this.publish(current, `${current.farm_id}/${current.node_name}`);

@@ -2,9 +2,9 @@ type State = {
   state_id: string;
 	pivot_id: string;
 	connection: boolean;
-  power: boolean | undefined;
-  water: boolean | undefined;
-  direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE' | undefined;
+  power: boolean | null;
+  water: boolean | null;
+  direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE' | null;
 	timestamp: Date;
 };
 

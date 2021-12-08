@@ -39,9 +39,8 @@ export const start = async () => {
   // Seta um intervalo para ficar checando a pool
   // Dentro da checkPool existe uma flag ready para ver se ja posso checar o proximo
   setInterval(() => {
-    console.log("sera..")
     if (ready) checkPool();
-  }, 2000);
+  }, 5000);
 };
 
 type RadioResponse = {
@@ -59,16 +58,16 @@ const sendData = async (radio_id: number, data: string) => {
   bodyFormData.set('intencao', data);
   const encoder = new FormDataEncoder(bodyFormData);
 
-  let response = await Axios.post<RadioResponse>(
-    'http://localhost:8080/comands',
-    Readable.from(encoder),
-    { headers: encoder.headers, timeout: TIMEOUT }
-  );
   // let response = await Axios.post<RadioResponse>(
-  //   'http://192.168.100.107:3031/comands',
+  //   'http://localhost:8080/comands',
   //   Readable.from(encoder),
   //   { headers: encoder.headers, timeout: TIMEOUT }
   // );
+  let response = await Axios.post<RadioResponse>(
+    'http://192.168.100.107:3031/comands',
+    Readable.from(encoder),
+    { headers: encoder.headers, timeout: TIMEOUT }
+  );
 
   return response;
 };
@@ -100,15 +99,17 @@ const checkPool = async () => {
       );
 
       if (payloadObject && checkResponse(current.action, payloadObject)) {
-        console.log(payloadObject);
         await updatePivotController(
           current.action.pivot_id,
           true,
           payloadObject.power,
           payloadObject.water,
           payloadObject.direction,
+          payloadObject.angle,
           payloadObject.percentimeter,
-          payloadObject.angle
+          payloadObject.timestamp,
+          "",
+          null
         );
           current.attempts = 0;
         activeQueue.dequeue();
@@ -121,9 +122,14 @@ const checkPool = async () => {
         await updatePivotController(
           current.action.pivot_id,
           false,
-          undefined,
-          undefined,
-          undefined
+          null,
+          null,
+          null,
+          null,
+          null,
+          new Date(),
+          null,
+          null
         );
         activeQueue.dequeue();
       } else {
@@ -149,8 +155,11 @@ const checkPool = async () => {
           payloadObject.power,
           payloadObject.water,
           payloadObject.direction,
+          payloadObject.angle,
           payloadObject.percentimeter,
-          payloadObject.angle
+          payloadObject.timestamp,
+          null,
+          null
         );
         current.attempts = 0;
       }
@@ -162,9 +171,14 @@ const checkPool = async () => {
         await updatePivotController(
           current.pivot_id,
           false,
-          undefined,
-          undefined,
-          undefined
+          null,
+          null,
+          null,
+          null,
+          null,
+          new Date(),
+          null,
+          null
         );
       }
 

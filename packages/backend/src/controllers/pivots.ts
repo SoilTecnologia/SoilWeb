@@ -55,15 +55,17 @@ export const readAllPivotsController2 = async () => {
 export const updatePivotController = async (
   pivot_id: Pivot['pivot_id'],
   connection: States['connection'],
-  power?: States['power'],
-  water?: States['water'],
-  direction?: States['direction'],
-  angle?: StateVariables['angle'],
-  percentimeter?: StateVariables['percentimeter'],
-  father?: RadioVariables['father'],
-  rssi?: RadioVariables['rssi']
+  power: States['power'],
+  water: States['water'],
+  direction: States['direction'],
+  angle: StateVariables['angle'],
+  percentimeter: StateVariables['percentimeter'],
+  timestamp: Date,
+  father: RadioVariables['father'],
+  rssi: RadioVariables['rssi']
 ) => {
   let shouldNotifyUpdate = false;
+  timestamp = new Date(); // TODO usar a da placa (ta vindo com 2 bytes a mais me buganddo)
 
   const oldState = await knex<States>('states')
     .where('pivot_id', pivot_id)
@@ -85,7 +87,7 @@ export const updatePivotController = async (
       power,
       water,
       direction,
-      timestamp: new Date()
+      timestamp
     });
   }
 
@@ -99,7 +101,7 @@ export const updatePivotController = async (
         pivot_id,
         angle,
         percentimeter,
-        timestamp: new Date()
+        timestamp 
       });
     }
   }
@@ -118,7 +120,7 @@ export const updatePivotController = async (
         pivot_id,
         father,
         rssi,
-        timestamp: new Date()
+        timestamp
       });
     }
   }
@@ -141,8 +143,9 @@ export const updatePivotController = async (
         direction,
         angle,
         percentimeter,
+        timestamp,
         father,
-        rssi
+        rssi,
       }
     });
   }
