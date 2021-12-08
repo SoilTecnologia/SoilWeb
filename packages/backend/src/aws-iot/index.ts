@@ -3,6 +3,7 @@ import { TextDecoder } from 'util';
 import Queue from '../utils/queue';
 import emitter from '../utils/eventBus';
 import { updatePivotController } from '../controllers/pivots';
+import { createActionController } from '../controllers/actions';
 
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 class IoTDevice {
@@ -99,9 +100,9 @@ class IoTDevice {
     const json = JSON.parse(decoder.decode(payload));
 
     if (this.type === 'Cloud') {
-      console.log("CHEGO AK NO TREM")
+      console.log('CHEGO AK NO TREM');
       if (json.type === 'status') {
-        console.log("OP")
+        console.log('OP');
         const {
           pivot_id,
           connection,
@@ -130,15 +131,36 @@ class IoTDevice {
         /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
         const { farm_id, node_name } = json;
         this.publish(json, `${farm_id}/${node_name}`);
-      } else {
-        // TODO dar um jeito de remover o action respondido da queue da cloud
+      } else if (json.type === 'action') {
+          console.log('Resposta de action recebido na cloud');
+          this.queue.remove(json);
       }
     } else {
       if (json.type === 'status') {
         console.log('Resposta de status recebido na rasp');
         this.queue.remove(json);
       } else if (json.type === 'action') {
-        // TODO assim que receber a intencao, publicar o mesmo payload pra cloud pra avisar que recebeu
+        const {
+          pivot_id,
+          radio_id,
+          author,
+          power,
+          water,
+          direction,
+          percentimeter,
+          timestamp
+        } = json.payload;
+        await createActionController(
+          pivot_id,
+          radio_id,
+          author,
+          power,
+          water,
+          direction,
+          percentimeter,
+          timestamp
+        );
+        this.publish(json);
       }
     }
   };
@@ -150,13 +172,25 @@ class IoTDevice {
           type: 'status',
           farm_id: status.farm_id,
           node_name: status.node_name,
-          payload: {...status.payload, timestamp: status.payload.timestamp.toString()}
-
+          payload: {
+            ...status.payload,
+            timestamp: status.payload.timestamp.toString()
+          }
         });
         //OBS: a conversao do timestamp pra string é pra facilitar a comparação no método queue.remove
       });
     } else {
-      // TODO fazer um emitter pra qndo receber intenções na nuvem, dai adicionar a queue
+      emitter.on('action', (action) => {
+        this.queue.enqueue({
+          type: 'action',
+          farm_id: action.farm_id,
+          node_name: action.node_name,
+          payload: {
+            ...action.payload,
+            timestamp: action.payload.timestamp.toString()
+          }
+        });
+      });
     }
   };
 

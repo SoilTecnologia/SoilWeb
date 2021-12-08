@@ -46,6 +46,14 @@ export const readAllPivotController = async (farm_id: Farm['farm_id']) => {
   return pivots;
 };
 
+export const readOnePivotController = async (pivot_id: Pivot['pivot_id']) => {
+  const pivot = await knex<Pivot>('pivots')
+    .select('*')
+    .where({pivot_id}).first();
+
+  return pivot;
+};
+
 export const readAllPivotsController2 = async () => {
   const pivots = await knex<Pivot>('pivots').select('*');
 

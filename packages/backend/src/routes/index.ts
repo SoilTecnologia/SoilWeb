@@ -3,6 +3,7 @@ import userRoute from './users';
 import farmRoute from './farms';
 import nodeRoute from './nodes';
 import pivotRoute from './pivots';
+import actionRoute from './actions';
 // import raspberryRoute from './raspberry';
 
 import {
@@ -41,6 +42,7 @@ router.use('/users', userRoute);
 router.use('/farms', farmRoute);
 router.use('/pivots', pivotRoute);
 router.use('/nodes', nodeRoute);
+router.use('/actions', actionRoute);
 // router.use('/cycle', cycleRoute);
 // router.use('/radio', radioRoute);
 // router.use('/intent', intentRoute);

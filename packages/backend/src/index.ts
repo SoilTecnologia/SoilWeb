@@ -5,7 +5,6 @@ import router from './routes';
 import * as raspberry from './raspberry/tests';
 import EventEmitter from 'events';
 import IoTDevice from './aws-iot/index';
-import Queue from './utils/queue';
 
 const PORT = 3308;
 const app = express();
@@ -23,10 +22,10 @@ eventEmitter.on('intent', () => {
 });
 
 
-raspberry.start();
+// raspberry.start();
 
-// const iotDevice = new IoTDevice('Cloud', 0);
-const iotDevice = new IoTDevice('Raspberry', 0, '3cadb957-5787-11ec-bcf7-6432a83ce5f6/0');
+const iotDevice = new IoTDevice('Cloud', 0);
+// const iotDevice = new IoTDevice('Raspberry', 0, '3cadb957-5787-11ec-bcf7-6432a83ce5f6/0');
 iotDevice.start();
 
 // setInterval(() => {
