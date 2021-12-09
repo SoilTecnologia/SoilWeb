@@ -5,11 +5,14 @@ import Axios, { AxiosResponse } from 'axios';
 import emitter from '../utils/eventBus';
 import Queue from '../utils/queue';
 import { StatusObject, statusStringToObject } from '../utils/conversions';
-import { updatePivotController, readAllPivotsController2 } from '../controllers/pivots';
+import {
+  updatePivotController,
+  readAllPivotsController2
+} from '../controllers/pivots';
 import { readAllActionsController } from '../controllers/actions';
 import Action from '../models/action';
 
-const TIMEOUT = 3000;
+const TIMEOUT = 2000;
 
 type ActionData = {
   action: Action;
@@ -88,8 +91,8 @@ const checkResponse = (action: Action, payload: StatusObject) => {
 const checkPool = async () => {
   ready = false;
   if (!activeQueue.isEmpty()) {
-    console.log("CHECKING ACTIVE")
-    let current = activeQueue.peek();
+    console.log('CHECKING ACTIVE');
+    const current = activeQueue.peek();
 
     try {
       const request = await sendData(current.action.radio_id, '351000');
@@ -108,17 +111,15 @@ const checkPool = async () => {
           payloadObject.angle,
           payloadObject.percentimeter,
           payloadObject.timestamp,
-          "",
+          '',
           null
         );
-          current.attempts = 0;
         activeQueue.dequeue();
       }
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
-      current.attempts++;
-    } finally {
-      if (current.attempts >= 3) {
+
+      if (current.attempts > 0) {
         await updatePivotController(
           current.action.pivot_id,
           false,
@@ -131,15 +132,16 @@ const checkPool = async () => {
           null,
           null
         );
-        activeQueue.dequeue();
+        const removed = activeQueue.dequeue();
       } else {
-        const current = activeQueue.dequeue();
+        const current = activeQueue.dequeue()!;
+        current.attempts++;
         activeQueue.enqueue(current!);
       }
     }
-  } else if(!idleQueue.isEmpty()) {
+  } else if (!idleQueue.isEmpty()) {
     let current = idleQueue.peek();
-    console.log("CHECKING IDLE")
+    console.log('CHECKING IDLE');
 
     try {
       const request = await sendData(current.radio_id, '000000');
@@ -166,8 +168,7 @@ const checkPool = async () => {
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
       current.attempts++;
-    } finally {
-      if (current.attempts >= 3) {
+      if (current.attempts >= 1) {
         await updatePivotController(
           current.pivot_id,
           false,
@@ -181,7 +182,7 @@ const checkPool = async () => {
           null
         );
       }
-
+    } finally {
       current = idleQueue.dequeue()!;
       idleQueue.enqueue(current);
     }
