@@ -99,15 +99,19 @@ const checkPool = async () => {
     const current = activeQueue.peek();
 
     try {
+      console.log('SENDING ACTION');
       const { power, water, direction, percentimeter } = current.action;
       const request = await sendData(
         current.action.radio_id,
         objectToActionString(power, water, direction, percentimeter)
       );
+      console.log("SENT")
       const payload = request.data.payload;
       const payloadObject = statusStringToObject(
         String.fromCharCode(...payload)
       );
+      console.log("RECEIVED")
+      console.log(payloadObject)
 
       if (payloadObject && checkResponse(current.action, payloadObject)) {
         await updatePivotController(
