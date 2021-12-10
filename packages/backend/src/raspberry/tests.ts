@@ -4,7 +4,11 @@ import { FormData } from 'formdata-node';
 import Axios, { AxiosResponse } from 'axios';
 import emitter from '../utils/eventBus';
 import Queue from '../utils/queue';
-import { StatusObject, statusStringToObject } from '../utils/conversions';
+import {
+  StatusObject,
+  statusStringToObject,
+  objectToActionString
+} from '../utils/conversions';
 import {
   updatePivotController,
   readAllPivotsController2
@@ -95,7 +99,11 @@ const checkPool = async () => {
     const current = activeQueue.peek();
 
     try {
-      const request = await sendData(current.action.radio_id, '351000');
+      const { power, water, direction, percentimeter } = current.action;
+      const request = await sendData(
+        current.action.radio_id,
+        objectToActionString(power, water, direction, percentimeter)
+      );
       const payload = request.data.payload;
       const payloadObject = statusStringToObject(
         String.fromCharCode(...payload)

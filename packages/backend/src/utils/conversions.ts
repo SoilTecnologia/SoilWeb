@@ -1,5 +1,6 @@
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
+import Action from '../models/action';
 
 export type StringStatusData =
   `${number}${number}${number}-${number}${number}${number}-${number}${number}${number}-${number}`;
@@ -56,6 +57,23 @@ export const statusStringToObject = (status: string) => {
   }
   return null;
 };
+
+export const objectToActionString = (power: Action['power'], water: Action['water'], direction: Action['direction'], percentimeter: Action['percentimeter']) => {
+  let actionString = '';
+  if(power) {
+    if(direction == "CLOCKWISE") actionString += '3';
+    else if(direction == "ANTI_CLOCKWISE") actionString += '4';
+    if(water) actionString += '6';
+    else actionString += '5';
+    actionString += '1';
+    actionString += percentimeter.toString().padStart(3, '0');
+  } else {
+    return '00200';
+  }
+
+  console.log("SENDING ACTION: " + actionString);
+  return actionString;
+}
 
 export const decimalArrayToASCII = (decArray: Array<number>) => {
 
