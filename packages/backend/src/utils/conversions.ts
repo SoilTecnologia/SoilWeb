@@ -71,7 +71,6 @@ export const objectToActionString = (power: Action['power'], water: Action['wate
     return '00200';
   }
 
-  console.log("SENDING ACTION: " + actionString);
   return actionString;
 }
 

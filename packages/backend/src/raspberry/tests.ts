@@ -13,10 +13,10 @@ import {
   updatePivotController,
   readAllPivotsController2
 } from '../controllers/pivots';
-import { readAllActionsController } from '../controllers/actions';
+import { readAllActionsController, updateActionController } from '../controllers/actions';
 import Action from '../models/action';
 
-const TIMEOUT = 2000;
+const TIMEOUT = 10000;
 
 type ActionData = {
   action: Action;
@@ -40,7 +40,7 @@ export const start = async () => {
   loadPivots();
 
   emitter.on('action', (action) => {
-    activeQueue.enqueue({ action, timestamp: new Date(), attempts: 0 });
+    activeQueue.enqueue({ action: action.payload, timestamp: new Date(), attempts: 0 });
   });
 
   // Seta um intervalo para ficar checando a pool
@@ -59,6 +59,7 @@ type RadioResponse = {
 
 const sendData = async (radio_id: number, data: string) => {
   let bodyFormData = new FormData();
+  console.log("TRYING TO SEND DATA")
 
   bodyFormData.set('ID', radio_id);
   bodyFormData.set('CMD', '40');
@@ -75,6 +76,8 @@ const sendData = async (radio_id: number, data: string) => {
     Readable.from(encoder),
     { headers: encoder.headers, timeout: TIMEOUT }
   );
+
+  console.log("SENT!!")
 
   return response;
 };
@@ -99,11 +102,12 @@ const checkPool = async () => {
     const current = activeQueue.peek();
 
     try {
-      console.log('SENDING ACTION');
       const { power, water, direction, percentimeter } = current.action;
+      const actionString = objectToActionString(power, water, direction, percentimeter);
+      console.log('SENDING ACTION: ', actionString);
       const request = await sendData(
         current.action.radio_id,
-        objectToActionString(power, water, direction, percentimeter)
+        actionString 
       );
       console.log("SENT")
       const payload = request.data.payload;
@@ -126,6 +130,9 @@ const checkPool = async () => {
           '',
           null
         );
+
+        console.log("UPDATING ACTION:", current.action.action_id);
+        await updateActionController(current.action.action_id, true);
         activeQueue.dequeue();
       }
     } catch (err) {
@@ -144,7 +151,8 @@ const checkPool = async () => {
           null,
           null
         );
-        const removed = activeQueue.dequeue();
+        const removed = activeQueue.dequeue()!;
+        await updateActionController(removed.action.action_id, false);
       } else {
         const current = activeQueue.dequeue()!;
         current.attempts++;
@@ -206,6 +214,7 @@ export const loadActions = async () => {
   const allActions = await readAllActionsController();
 
   for (let action of allActions) {
+    console.log(action)
     activeQueue.enqueue({ action, attempts: 0, timestamp: new Date() });
   }
 };
