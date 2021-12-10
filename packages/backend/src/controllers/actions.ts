@@ -6,14 +6,15 @@ import emitter from '../utils/eventBus';
 export const readAllActionsController = async (): Promise<Action[]> => {
   const actions = await knex<Action>('actions')
     .select('*')
-    .where({ success: null });
+    .where({ success: null })
+    .innerJoin('pivots', 'actions.pivot_id', '=', 'pivots.pivot_id');
+    console.log(actions)
 
   return actions;
 };
 
 export const createActionController = async (
   pivot_id: Action['pivot_id'],
-  radio_id: Action['radio_id'],
   author: Action['author'],
   power: Action['power'],
   water: Action['water'],
@@ -29,13 +30,8 @@ export const createActionController = async (
       direction,
       percentimeter,
       timestamp_sent: timestamp,
-      radio_id,
       author
-    })
-
-    const [row] = await knex.select(knex.raw('LAST_INSERT_ID() as id'));
-
-  console.log('CREATED ACTION: ', row.id);
+    }).returning("*")!;
 
   const pivot = await knex('pivots').select('*').where({ pivot_id }).first();
   const { node_id } = pivot;
@@ -47,9 +43,9 @@ export const createActionController = async (
     farm_id,
     node_name,
     payload: {
-      action_id: row.action_id,
+      action_id: action[0].action_id,
       pivot_id,
-      radio_id,
+      radio_id: pivot.radio_id,
       author,
       power,
       water,

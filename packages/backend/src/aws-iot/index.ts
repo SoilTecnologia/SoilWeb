@@ -100,9 +100,7 @@ class IoTDevice {
     const json = JSON.parse(decoder.decode(payload));
 
     if (this.type === 'Cloud') {
-      console.log('CHEGO AK NO TREM');
       if (json.type === 'status') {
-        console.log('OP');
         const {
           pivot_id,
           connection,
@@ -152,7 +150,6 @@ class IoTDevice {
         } = json.payload;
         await createActionController(
           pivot_id,
-          radio_id,
           author,
           power,
           water,

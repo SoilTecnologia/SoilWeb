@@ -66,16 +66,16 @@ const sendData = async (radio_id: number, data: string) => {
   bodyFormData.set('intencao', data);
   const encoder = new FormDataEncoder(bodyFormData);
 
-  // let response = await Axios.post<RadioResponse>(
-  //   'http://localhost:8080/comands',
-  //   Readable.from(encoder),
-  //   { headers: encoder.headers, timeout: TIMEOUT }
-  // );
   let response = await Axios.post<RadioResponse>(
-    'http://192.168.100.107:3031/comands',
+    'http://localhost:8080/comands',
     Readable.from(encoder),
     { headers: encoder.headers, timeout: TIMEOUT }
   );
+  // let response = await Axios.post<RadioResponse>(
+  //   'http://192.168.100.107:3031/comands',
+  //   Readable.from(encoder),
+  //   { headers: encoder.headers, timeout: TIMEOUT }
+  // );
 
   console.log("SENT!!")
 
