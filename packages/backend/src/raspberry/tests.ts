@@ -125,7 +125,7 @@ const checkPool = async () => {
         activeQueue.dequeue();
       }
     } catch (err) {
-      console.log(`[ERROR]: ${err}`);
+      console.log(`[ERROR - RASPBERRY.TEST]: ${err}`);
 
       if (current.attempts > 0) {
         await updatePivotController(
