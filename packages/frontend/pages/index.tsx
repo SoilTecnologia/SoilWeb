@@ -25,7 +25,6 @@ const index = ({ token }: { token: string }) => {
       }
 
       setFarms(newFarms as never);
-      console.log('setada!');
     };
 
     fetchData();

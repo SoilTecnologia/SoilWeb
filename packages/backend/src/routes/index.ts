@@ -11,10 +11,8 @@ import {
   InvalidCredentials,
   ServerError
 } from '../types/errors';
-import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
-const prismaClient = new PrismaClient();
 
 /*
   This functions is a error middleware
