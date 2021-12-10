@@ -138,6 +138,7 @@ class IoTDevice {
         console.log('Resposta de status recebido na rasp');
         this.queue.remove(json);
       } else if (json.type === 'action') {
+        console.log(json)
         const {
           pivot_id,
           radio_id,
@@ -155,7 +156,7 @@ class IoTDevice {
           water,
           direction,
           percentimeter,
-          timestamp
+          new Date(timestamp)
         );
         this.publish(json);
       }

@@ -59,23 +59,23 @@ type RadioResponse = {
 
 const sendData = async (radio_id: number, data: string) => {
   let bodyFormData = new FormData();
-  console.log("TRYING TO SEND DATA")
+  console.log("TRYING TO SEND DATA to radio", radio_id);
 
   bodyFormData.set('ID', radio_id);
   bodyFormData.set('CMD', '40');
   bodyFormData.set('intencao', data);
   const encoder = new FormDataEncoder(bodyFormData);
 
-  let response = await Axios.post<RadioResponse>(
-    'http://localhost:8080/comands',
-    Readable.from(encoder),
-    { headers: encoder.headers, timeout: TIMEOUT }
-  );
   // let response = await Axios.post<RadioResponse>(
-  //   'http://192.168.100.107:3031/comands',
+  //   'http://localhost:8080/comands',
   //   Readable.from(encoder),
   //   { headers: encoder.headers, timeout: TIMEOUT }
   // );
+  let response = await Axios.post<RadioResponse>(
+    'http://192.168.100.107:3031/comands',
+    Readable.from(encoder),
+    { headers: encoder.headers, timeout: TIMEOUT }
+  );
 
   console.log("SENT!!")
 
