@@ -6,36 +6,50 @@ import { createFarmController } from '../controllers/farms';
 
 const router = express.Router();
 
-  router.post('/signup', async (req, res, next) => {
-    const { login, password, user_type } = req.body;
+router.post('/signup', async (req, res, next) => {
+  const { login, password, user_type } = req.body;
 
-    try {
+  try {
+    const cookieInfo = await signUpController(login, password, user_type);
 
-      const cookieInfo = await signUpController(login, password, user_type);
+    res.send(cookieInfo);
+  } catch (err) {
+    console.log(`Server 500: ${err}`);
+    next(err);
+  }
+});
 
-      res.send(cookieInfo);
-    } catch (err) {
-      console.log(`Server 500: ${err}`);
-      next(err);
+router.post('/signin', async (req, res, next) => {
+  const { login, password } = req.body;
+
+  try {
+    const cookieInfo = await signInController(login, password);
+
+    res.send(cookieInfo);
+  } catch (err) {
+    console.log(`Server 500: ${err}`);
+    next(err);
+  }
+});
+
+router.get(
+  '/auth',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const user = req.user;
+      res.json({user_id: user.user_id});
     }
-  });
-
-  router.post('/signin', async (req, res, next) => {
-    const { login, password } = req.body;
-
-    try {
-      const cookieInfo = await signInController(login, password);
-
-      res.send(cookieInfo);
-    } catch (err) {
-      console.log(`Server 500: ${err}`);
-      next(err);
-    }
-  });
+  )
+);
 
 router.put(
   '/addFarm',
-  authMiddleware(['SUDO', 'USER']),
+  authMiddleware(),
   authHandler(
     async (
       req: IUserAuthInfoRequest,
@@ -64,4 +78,4 @@ router.put(
   )
 );
 
-  export default router;
+export default router;

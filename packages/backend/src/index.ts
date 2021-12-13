@@ -8,7 +8,6 @@ import * as raspberry from './raspberry/tests';
 import EventEmitter from 'events';
 import IoTDevice from './aws-iot/index';
 
-
 const PORT = 3308;
 const app = express();
 const eventEmitter = new EventEmitter();
@@ -25,7 +24,7 @@ eventEmitter.on('intent', () => {
 });
 
 
-raspberry.start();
+// raspberry.start();
 
 // const iotDevice = new IoTDevice('Cloud', 0);
 const iotDevice = new IoTDevice('Raspberry', 0, '7be630ac-1251-45df-98ff-0fbfcadeef1a/0');

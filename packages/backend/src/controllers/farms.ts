@@ -23,8 +23,20 @@ export const createFarmController = async (
   return newFarm;
 };
 
-export const readAllFarmController = async (user_id: User['user_id']): Promise<Farm[]> => {
-  const farms = await knex<Farm>('farms').select('*').where({ user_id });
+export const readAllFarmController = async (
+  user_id: User['user_id']
+): Promise<Pick<Farm, 'farm_id' | 'farm_name' | 'farm_city'>[]> => {
+  const farms = await knex<Farm>('farms')
+    .select('farm_name', 'farm_city', 'farm_id')
+    .where({ user_id });
 
   return farms;
+};
+
+export const readMapFarmControler = async (farm_id: Farm['farm_id']) => {
+  const result = await knex('farms')
+    .join('nodes', 'farms.farm_id', 'nodes.farm_id')
+    .select('*');
+
+  return result;
 };

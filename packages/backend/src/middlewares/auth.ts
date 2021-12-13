@@ -10,9 +10,7 @@ interface TokenInfo {
 }
 
 // Esse middleware retorna uma
-const authMiddleware = (
-  user_types: User['user_type'][]
-): ((
+const authMiddleware = (): ((
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -25,18 +23,19 @@ const authMiddleware = (
     const token = req.headers.authorization;
     if (!token) return res.status(401).send('No token provided');
 
-    const decode = <TokenInfo>(
-      jwt.verify(token, process.env.TOKEN_SECRET as jwt.Secret)
-    );
+    try {
+      const decode = <TokenInfo>(
+        jwt.verify(token, process.env.TOKEN_SECRET as jwt.Secret)
+      );
 
-    if (!isType(decode.user_type, user_types))
-      return res.status(401).send('Failed to authenticate token.');
+      let wrappedRequest = <IUserAuthInfoRequest>req;
+      wrappedRequest.user = decode;
 
-    let wrappedRequest = <IUserAuthInfoRequest>req;
-    wrappedRequest.user = decode;
-
-    req = wrappedRequest;
-    next();
+      req = wrappedRequest;
+      next();
+    } catch (err) {
+      res.status(401).send("Invalid Token!")
+    }
   };
 };
 

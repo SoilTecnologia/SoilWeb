@@ -1,14 +1,18 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
-import { readAllFarmController } from '../controllers/farms';
+import { readAllFarmController, readMapFarmControler } from '../controllers/farms';
 import { createNodeController } from '../controllers/nodes';
+import Farm from '../models/farm';
+import Pivot from '../models/pivot';
+import State from '../models/state';
+import StateVariable from '../models/stateVariable';
 
 const router = express.Router();
 
 router.put(
   '/addNode/:farm_id',
-  authMiddleware(['USER', 'SUDO']),
+  authMiddleware(),
   authHandler(
     async (
       req: IUserAuthInfoRequest,
@@ -37,7 +41,7 @@ router.put(
 
 router.get(
   '/readAll',
-  authMiddleware(['USER', 'SUDO']),
+  authMiddleware(),
   authHandler(
     async (
       req: IUserAuthInfoRequest,
@@ -57,6 +61,34 @@ router.get(
     }
   )
 );
+
+type PivotMapData = {
+  pivot_position: { lng: Pivot['pivot_lng']; lat: Pivot['pivot_lat'] };
+  power: State['power'];
+  water: State['water'];
+  direction: State['direction'];
+  angle: StateVariable['angle'];
+  start_angle: Pivot['pivot_start_angle'];
+  end_angle: Pivot['pivot_end_angle'];
+};
+
+type FullMapData = {
+  farm_position: { lng: Farm['farm_lng']; lat: Farm['farm_lat'] };
+  pivots: Array<PivotMapData>;
+};
+
+router.get('/map/:farm_id', authMiddleware(), async (req, res, next) /*: Promise<PivotMapData>*/ => {
+  const { farm_id } = req.params;
+
+  try {
+    const result = await readMapFarmControler(farm_id);
+
+    res.json(result);
+  } catch (err) {
+    console.log(`Server 500: ${err}`);
+    next(err);
+  }
+});
 
 // router.get(
 //   '/readAll',

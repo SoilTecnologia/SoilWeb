@@ -7,7 +7,7 @@ import { readOnePivotController } from '../controllers/pivots';
 const router = express.Router();
 router.post(
   '/create/:pivot_id',
-  authMiddleware(['USER', 'SUDO']),
+  authMiddleware(),
   authHandler(async (req, res, next) => {
     const { pivot_id } = req.params;
     const {

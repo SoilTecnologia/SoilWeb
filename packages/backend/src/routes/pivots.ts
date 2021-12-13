@@ -3,14 +3,15 @@ import authMiddleware from '../middlewares/auth';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
   readAllPivotController,
-  updatePivotController
+  updatePivotController,
+  readListPivotController
 } from '../controllers/pivots';
 
 const router = express.Router();
 
 router.get(
   '/readAll/:farm_id',
-  authMiddleware(['USER', 'SUDO']),
+  authMiddleware(),
   authHandler(
     async (
       req: IUserAuthInfoRequest,
@@ -31,9 +32,26 @@ router.get(
   )
 );
 
+router.get(
+  '/list/:farm_id',
+  authMiddleware(),
+  authHandler(async (req, res, next) => {
+    const {farm_id} = req.params;
+    const {user_id} = req.user;
+
+    try {
+      const pivotList = await readListPivotController(user_id, farm_id);
+      res.json(pivotList);
+    } catch (err) {
+      console.log(`Server 500: ${err}`);
+      next(err);
+    }
+  })
+);
+
 router.post(
   '/update/:pivot_id',
-  authMiddleware(['USER', 'SUDO']),
+  authMiddleware(),
   authHandler(async (req, res, next) => {
     const { pivot_id } = req.params;
     const {

@@ -1,4 +1,5 @@
 import Farm from '../models/farm';
+import User from '../models/user';
 import Pivot from '../models/pivot';
 import States from '../models/state';
 import StateVariables from '../models/stateVariable';
@@ -59,6 +60,10 @@ export const readAllPivotsController2 = async () => {
 
   return pivots;
 };
+
+export const readListPivotController = async (user_id:User['user_id'], farm_id: Farm['farm_id']) => {
+  const pivots = await knex<Pivot>('')
+}
 
 export const updatePivotController = async (
   pivot_id: Pivot['pivot_id'],

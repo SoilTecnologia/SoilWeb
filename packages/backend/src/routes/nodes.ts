@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get(
   '/readAll/:farm_id',
-  authMiddleware(['USER', 'SUDO']),
+  authMiddleware(),
   async (req, res, next) => {
     const { farm_id } = req.params;
 
@@ -25,7 +25,7 @@ router.get(
 
 router.put(
   '/addPivot/:node_id',
-  authMiddleware(['USER', 'SUDO']),
+  authMiddleware(),
   async (req, res, next) => {
     const { node_id } = req.params;
     const {
