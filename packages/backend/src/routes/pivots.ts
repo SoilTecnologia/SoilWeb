@@ -4,8 +4,10 @@ import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
   readAllPivotController,
   updatePivotController,
-  readListPivotController
+  readListPivotController,
+  // readMapPivotController
 } from '../controllers/pivots';
+import { getLastCycleFromPivot } from '../controllers/cycles';
 
 const router = express.Router();
 
@@ -30,6 +32,39 @@ router.get(
       }
     }
   )
+);
+
+// router.get(
+//   '/map/:farm_id',
+//   authMiddleware(),
+//   authHandler(async (req, res, next) => {
+//     const {farm_id} = req.params;
+//     const {user_id} = req.user;
+
+//     try {
+//       const pivotList = await readMapPivotController(user_id, farm_id);
+//       res.json(pivotList);
+//     } catch (err) {
+//       console.log(`Server 500: ${err}`);
+//       next(err);
+//     }
+//   })
+// );
+
+router.get(
+  '/cycles/:pivot_id',
+  authMiddleware(),
+  authHandler(async (req, res, next) => {
+    const {pivot_id} = req.params;
+
+    try {
+      const pivotList = await getLastCycleFromPivot(pivot_id);
+      res.json(pivotList);
+    } catch (err) {
+      console.log(`Server 500: ${err}`);
+      next(err);
+    }
+  })
 );
 
 router.get(

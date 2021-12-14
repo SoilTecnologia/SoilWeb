@@ -24,10 +24,10 @@ eventEmitter.on('intent', () => {
 });
 
 
-// raspberry.start();
+raspberry.start();
 
 // const iotDevice = new IoTDevice('Cloud', 0);
-const iotDevice = new IoTDevice('Raspberry', 0, '7be630ac-1251-45df-98ff-0fbfcadeef1a/0');
+const iotDevice = new IoTDevice('Raspberry', 0, '98b78b11-76e1-42c5-b6fc-f6c379d7ed09/0');
 iotDevice.start();
 
 // setInterval(() => {

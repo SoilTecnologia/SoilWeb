@@ -53,16 +53,16 @@ export async function up(knex: Knex): Promise<void> {
       table.float('percentimeter');
       table.datetime('timestamp').notNullable();
 
-      table.uuid('pivot_id').references('pivot_id').inTable('pivots').index().notNullable();
+      table.uuid('state_id').references('state_id').inTable('states').index().notNullable();
     })
-    .createTable('radio_variables', (table) => {
-      table.uuid('radio_variable_id').primary().defaultTo(knex.raw('(uuid_generate_v4())'));
-      table.string('father');
-      table.float('rssi');
-      table.datetime('timestamp').notNullable();
+    // .createTable('radio_variables', (table) => {
+    //   table.uuid('radio_variable_id').primary().defaultTo(knex.raw('(uuid_generate_v4())'));
+    //   table.string('father');
+    //   table.float('rssi');
+    //   table.datetime('timestamp').notNullable();
 
-      table.uuid('pivot_id').references('pivot_id').inTable('pivots').index().notNullable();
-    })
+    //   table.uuid('pivot_id').references('pivot_id').inTable('pivots').index().notNullable();
+    // })
     .createTable('actions', (table) => {
       table.uuid('action_id').primary().defaultTo(knex.raw('(uuid_generate_v4())'));
       table.boolean('power').notNullable();
