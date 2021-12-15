@@ -35,7 +35,6 @@ export const getLastCycleFromPivot = async (
 
       return beforeThat;
     } else {
-      
       return await knex<State>('state_variables')
         .select('angle')
         .where('state_id', lastState.state_id);
@@ -44,18 +43,164 @@ export const getLastCycleFromPivot = async (
   return [];
 };
 
+type PartialCycleResponse = {
+  start_date: Date;
+  end_date: Date;
+  is_running: boolean;
+  start_state: {
+    power: State['power'];
+    water: State['water'];
+    direction: State['direction'];
+  };
+  states: Array<{
+    power: State['power'];
+    water: State['water'];
+    direction: State['direction'];
+    timestamp: Date;
+  }>;
+  percentimeters: Array<number>;
+};
+type fullCycleResponse = Array<PartialCycleResponse>;
 
 // Date format for start/end must be: YYYY-MM-DD
-export const getCyclesFromPivot = async (pivot_id: Pivot['pivot_id'], start: string, end: string) => {
-  const cycles = await knex<State>('states')
-    .innerJoin(
-      'state_variables',
-      'state_variables.state_id',
-      'states.state_id'
+export const getCyclesFromPivot = async (
+  pivot_id: Pivot['pivot_id'],
+  start: string,
+  end: string
+) => {
+  // Get all status from a pivot and order it by last to more recent
+  const states = await knex<State>('states')
+    .select(
+      'states.state_id',
+      'power',
+      'water',
+      'direction',
+      'timestamp',
+      'connection'
     )
-    .select('angle', 'percentimeter', 'state_variables.timestamp as variable_timestamp', 'states.timestamp')
     .where('pivot_id', pivot_id)
-    .whereBetween('state_variables.timestamp', [start, end]);
+    .whereBetween('timestamp', [start, end])
+    .orderBy('timestamp', 'asc');
 
-  return cycles;
-}
+  let response: fullCycleResponse = [];
+
+  /* 
+      This will loop over all the states,
+      once it finds a state with power = true,
+      it will start a new cycle,
+      and will add the state to the cycle,
+      until it finds a state with power = false
+    */
+  let foundStart = false;
+  let currentCycle: PartialCycleResponse = {states: [], percentimeters: []} as unknown as PartialCycleResponse;
+
+  for (let state of states) {
+    if (foundStart) {
+      if (!state.power) {
+        currentCycle!.is_running = false;
+        currentCycle!.end_date = state.timestamp;
+        currentCycle!.states.push({
+          power: state.power,
+          water: state.water,
+          direction: state.direction,
+          timestamp: state.timestamp
+        });
+
+        response.push(currentCycle!);
+        foundStart = false;
+        currentCycle = {states: [], percentimeters: []} as unknown as PartialCycleResponse;
+      } else {
+        currentCycle!.states.push({
+          power: state.power,
+          water: state.water,
+          direction: state.direction,
+          timestamp: state.timestamp
+        });
+      }
+    } else {
+      if (state.power) {
+        foundStart = true;
+        currentCycle!.start_date = state.timestamp;
+        currentCycle!.is_running = true;
+        currentCycle!.start_state = {
+          power: state.power,
+          water: state.water,
+          direction: state.direction
+        };
+        currentCycle!.states.push({
+          power: state.power,
+          water: state.water,
+          direction: state.direction,
+          timestamp: state.timestamp
+        });
+      }
+    }
+
+    const variables = await knex<StateVariable>('state_variables')
+      .select('percentimeter')
+      .where('state_id', state.state_id);
+
+      console.log(variables)
+
+    for (let variable of variables) {
+      if (variable.percentimeter)
+        currentCycle!.percentimeters.push(variable.percentimeter);
+    }
+  }
+
+  //If there's one that started but hasn't ended, make sure to send it too
+  if(currentCycle.states.length > 0 || currentCycle.percentimeters.length > 0) {
+    response.push(currentCycle);
+  }
+
+  // let cycleResponse: any[] = [];
+
+  // let cycleMap = new Map<boolean, any>();
+  // for (let sv of statesAndVariables) {
+  //   console.log("entrandoo")
+  //   const {
+  //     power,
+  //     water,
+  //     direction,
+  //     angle,
+  //     percentimeter,
+  //     timestamp,
+  //     variable_timestamp
+  //   } = sv;
+  //   if (sv.power) {
+  //     if (!cycleMap.has(sv.power)) {
+  //       cycleMap.set(sv.power, [
+  //         { water, direction, angle, percentimeter, variable_timestamp }
+  //       ]);
+  //     } else {
+  //       cycleMap
+  //         .get(sv.power)!
+  //         .push({ water, direction, angle, percentimeter, variable_timestamp });
+  //     }
+  //   } else {
+  //     console.log("SETANDO UM FALSE")
+  //     cycleMap.set(sv.power, {
+  //       water,
+  //       direction,
+  //       angle,
+  //       percentimeter,
+  //       variable_timestamp
+  //     });
+
+  //     let obj = Array.from(cycleMap).reduce(
+  //       (obj, [key, value]) =>
+  //         Object.assign(obj, { [key ? "ON": "OFF"]: value }), // Be careful! Maps can have non-String keys; object literals can't.
+  //       {}
+  //     );
+
+  //     console.log('SENDING CYCLE MAP');
+  //     console.log(cycleMap);
+  //     cycleResponse.push(obj);
+  //     console.log(cycleResponse);
+  //     cycleMap = new Map<boolean, any[]>();
+  //   }
+  // }
+
+  // Return the reverse so that most recent cycles are shown
+  return response.reverse();
+};
