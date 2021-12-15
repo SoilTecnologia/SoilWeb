@@ -21,8 +21,8 @@ export const isStateVariableDifferent = (
   newStateVariable: CustomStateVariable
 ): boolean => {
   if (
-    oldStateVariable.angle != newStateVariable.angle ||
-    oldStateVariable.percentimeter != newStateVariable.percentimeter
+    (oldStateVariable.angle! <= newStateVariable.angle! -5 || oldStateVariable.angle! >= newStateVariable.angle! +5) ||
+    (oldStateVariable.percentimeter! <= newStateVariable.percentimeter! -5 || oldStateVariable.percentimeter! >= newStateVariable.percentimeter! +5)
   ) {
     return true;
   }
