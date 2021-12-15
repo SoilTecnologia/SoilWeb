@@ -5,9 +5,9 @@ import {
   readAllPivotController,
   updatePivotController,
   readListPivotController,
-  // readMapPivotController
+  readMapPivotController
 } from '../controllers/pivots';
-import { getLastCycleFromPivot } from '../controllers/cycles';
+import { getCyclesFromPivot, getLastCycleFromPivot } from '../controllers/cycles';
 
 const router = express.Router();
 
@@ -34,22 +34,22 @@ router.get(
   )
 );
 
-// router.get(
-//   '/map/:farm_id',
-//   authMiddleware(),
-//   authHandler(async (req, res, next) => {
-//     const {farm_id} = req.params;
-//     const {user_id} = req.user;
+router.get(
+  '/map/:farm_id',
+  authMiddleware(),
+  authHandler(async (req, res, next) => {
+    const {farm_id} = req.params;
+    const {user_id} = req.user;
 
-//     try {
-//       const pivotList = await readMapPivotController(user_id, farm_id);
-//       res.json(pivotList);
-//     } catch (err) {
-//       console.log(`Server 500: ${err}`);
-//       next(err);
-//     }
-//   })
-// );
+    try {
+      const pivotList = await readMapPivotController(user_id, farm_id);
+      res.json(pivotList);
+    } catch (err) {
+      console.log(`Server 500: ${err}`);
+      next(err);
+    }
+  })
+);
 
 router.get(
   '/cycles/:pivot_id',
@@ -59,6 +59,22 @@ router.get(
 
     try {
       const pivotList = await getLastCycleFromPivot(pivot_id);
+      res.json(pivotList);
+    } catch (err) {
+      console.log(`Server 500: ${err}`);
+      next(err);
+    }
+  })
+);
+
+router.get(
+  '/cycles/:pivot_id/:start/:end',
+  authMiddleware(),
+  authHandler(async (req, res, next) => {
+    const {pivot_id, start, end} = req.params;
+
+    try {
+      const pivotList = await getCyclesFromPivot(pivot_id, start, end);
       res.json(pivotList);
     } catch (err) {
       console.log(`Server 500: ${err}`);
