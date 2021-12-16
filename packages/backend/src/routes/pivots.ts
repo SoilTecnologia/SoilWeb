@@ -8,6 +8,7 @@ import {
   readMapPivotController
 } from '../controllers/pivots';
 import { getCyclesFromPivot, getLastCycleFromPivot } from '../controllers/cycles';
+import { readPivotStateController } from '../controllers/states';
 
 const router = express.Router();
 
@@ -27,7 +28,32 @@ router.get(
 
         res.send(allPivotsFromNode);
       } catch (err) {
-        console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /pivots/readAll`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.get(
+  '/state/:pivot_id',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { pivot_id } = req.params;
+
+      try {
+        const pivotState = await readPivotStateController(pivot_id);
+
+        res.send(pivotState);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /pivots/state`);
+        console.log(err);
         next(err);
       }
     }
@@ -45,7 +71,8 @@ router.get(
       const pivotList = await readMapPivotController(user_id, farm_id);
       res.json(pivotList);
     } catch (err) {
-      console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /pivots/map`);
+        console.log(err);
       next(err);
     }
   })
@@ -61,7 +88,8 @@ router.get(
       const pivotList = await getLastCycleFromPivot(pivot_id);
       res.json(pivotList);
     } catch (err) {
-      console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /pivots/cycles`);
+        console.log(err);
       next(err);
     }
   })
@@ -77,7 +105,8 @@ router.get(
       const pivotList = await getCyclesFromPivot(pivot_id, start, end);
       res.json(pivotList);
     } catch (err) {
-      console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /pivots/cycles/start/end`);
+        console.log(err);
       next(err);
     }
   })
@@ -94,7 +123,8 @@ router.get(
       const pivotList = await readListPivotController(user_id, farm_id);
       res.json(pivotList);
     } catch (err) {
-      console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /pivots/list`);
+        console.log(err);
       next(err);
     }
   })
@@ -132,7 +162,8 @@ router.post(
 
       res.json(updatedPivot);
     } catch (err) {
-      console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /pivots/update`);
+        console.log(err);
       next(err);
     }
   })

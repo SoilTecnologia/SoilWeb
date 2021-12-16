@@ -3,6 +3,7 @@ import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 
 import knex from '../database';
+import { last } from 'lodash';
 
 export const getLastCycleFromPivot = async (
   pivot_id: Pivot['pivot_id']
@@ -14,7 +15,8 @@ export const getLastCycleFromPivot = async (
     .first();
 
   if (lastState) {
-    if (lastState.power) {
+    console.log("LAST STATE")
+    if (lastState.power === true) {
       const lastOff = await knex<State>('states')
         .select('timestamp', 'power')
         .where('pivot_id', pivot_id)
@@ -34,12 +36,15 @@ export const getLastCycleFromPivot = async (
         .where('states.timestamp', '>', lastOff!.timestamp);
 
       return beforeThat;
-    } else {
+    } else if (lastState.power === false) {
+      console.log("FVARIABLES", lastState.state_id)
       return await knex<State>('state_variables')
         .select('angle')
         .where('state_id', lastState.state_id);
     }
   }
+
+  console.log("VORTANMDO AK")
   return [];
 };
 

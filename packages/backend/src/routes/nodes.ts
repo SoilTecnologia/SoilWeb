@@ -17,7 +17,8 @@ router.get(
 
       res.json(allNodesFromFarm);
     } catch (err) {
-      console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /nodes/readAll`);
+        console.log(err);
       next(err);
     }
   }
@@ -52,26 +53,11 @@ router.put(
 
       res.send(newPivot);
     } catch (err) {
-      console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /nodes/addPivot`);
+        console.log(err);
       next(err);
     }
   }
 );
-
-// router.delete(
-//   '/:node_id',
-//   authMiddleware(['SUDO']),
-//   async(req, res, next) => {
-//     const node_id = req.params.node_id;
-
-//     try {
-//       const deletedNode = await deleteNodeController(node_id);
-
-//       res.send(deletedNode);
-//     } catch(err) {
-//       next(err);
-//     }
-//   }
-// )
 
 export default router;

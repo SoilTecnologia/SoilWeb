@@ -14,7 +14,8 @@ router.post('/signup', async (req, res, next) => {
 
     res.send(cookieInfo);
   } catch (err) {
-    console.log(`Server 500: ${err}`);
+    console.log(`[ERROR] Server 500 on /users/signup:`);
+    console.log(err);
     next(err);
   }
 });
@@ -27,11 +28,17 @@ router.post('/signin', async (req, res, next) => {
 
     res.send(cookieInfo);
   } catch (err) {
-    console.log(`Server 500: ${err}`);
+    console.log(`[ERROR] Server 500 on /users/signin:`);
+    console.log(err);
     next(err);
   }
 });
 
+/* Returns the user id. This route is used by the mobile application to check if the token
+it has saved is still valid.
+  - If it is valid, it returns the user id
+  - If it isn't, it will return a 401 on the auth middleware
+*/
 router.get(
   '/auth',
   authMiddleware(),
@@ -56,13 +63,13 @@ router.put(
       res: express.Response,
       next: express.NextFunction
     ) => {
-      const user = req.user;
+      const {user_id} = req.user;
       const { farm_id, farm_name, farm_city, farm_lng, farm_lat } = req.body;
 
       try {
         const newFarm = await createFarmController(
           farm_id,
-          user.user_id,
+          user_id,
           farm_name,
           farm_city,
           farm_lng,
@@ -71,7 +78,8 @@ router.put(
 
         res.send(newFarm);
       } catch (err) {
-        console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /users/addFarm!`);
+        console.log(err);
         next(err);
       }
     }

@@ -32,7 +32,8 @@ router.put(
 
         res.send(newNode);
       } catch (err) {
-        console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /farms/addNode`);
+        console.log(err);
         next(err);
       }
     }
@@ -55,7 +56,8 @@ router.get(
 
         res.send(allFarmsFromUser);
       } catch (err) {
-        console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /farms/readAll`);
+        console.log(err);
         next(err);
       }
     }
@@ -85,7 +87,8 @@ router.get('/map/:farm_id', authMiddleware(), async (req, res, next) /*: Promise
 
     res.json(result);
   } catch (err) {
-    console.log(`Server 500: ${err}`);
+        console.log(`[ERROR] Server 500 on /farms/map`);
+        console.log(err);
     next(err);
   }
 });

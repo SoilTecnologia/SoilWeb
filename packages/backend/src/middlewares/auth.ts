@@ -9,7 +9,12 @@ interface TokenInfo {
   user_type: string;
 }
 
-// Esse middleware retorna uma
+/*
+  This middleware processes the token received on the request header Authorization.
+  
+  - Returns 200 and user details if it's valid
+  - Returns 40x if the token is invalid or not provided
+*/
 const authMiddleware = (): ((
   req: express.Request,
   res: express.Response,

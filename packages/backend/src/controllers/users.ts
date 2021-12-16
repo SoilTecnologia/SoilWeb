@@ -15,6 +15,10 @@ type Response = {
   token: string;
 };
 
+/*
+  Checks user credentials and if OK returns tokens and user details
+*/
+
 export const signInController = async (
   login: User['login'],
   password: User['password']
