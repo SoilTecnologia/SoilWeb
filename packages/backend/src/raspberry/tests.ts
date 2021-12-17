@@ -111,9 +111,9 @@ const checkPool = async () => {
       );
       console.log("SENT")
       const payload = request.data.payload;
-      const payloadObject = statusStringToObject(
-        String.fromCharCode(...payload)
-      );
+      // const payloadToString = String.fromCharCode(...payload);
+      const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
+      const payloadObject = statusStringToObject(payloadToString.substring(0, payloadToString.indexOf('#')));
       console.log("RECEIVED")
       console.log(payloadObject)
 
@@ -166,9 +166,10 @@ const checkPool = async () => {
     try {
       const request = await sendData(current.radio_id, '000000');
       const payload = request.data.payload;
-      const payloadObject = statusStringToObject(
-        String.fromCharCode(...payload)
-      );
+      const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
+      const payloadObject = statusStringToObject(payloadToString.substring(0, payloadToString.indexOf('#')));
+      console.log("RECEIVED")
+      console.log(payloadObject)
 
       if (payloadObject) {
         await updatePivotController(

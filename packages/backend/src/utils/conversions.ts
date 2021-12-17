@@ -51,7 +51,9 @@ export const statusStringToObject = (status: string) => {
 
     response.percentimeter = Number(percentimeter);
     response.angle = Number(angle);
-    response.timestamp = new Date(timestamp);
+    console.log("timestamp: ", timestamp);
+    console.log("final timestamp: ", new Date(Number(timestamp.replace(" ", ""))));
+    response.timestamp = new Date(Number(timestamp));
 
     return response;
   }
