@@ -1,25 +1,18 @@
 import express from 'express';
-import userRoute from './user';
-import farmRoute from './farm';
-import pivotRoute from './pivot';
-import radioRoute from './radio';
-import nodeRoute from './node';
-import cycleRoute from './cycle'
-import pivotListRoute from './pivot-list'
-import pivotMapRoute from './pivot-map'
-import intentRoute from './intent';
+import userRoute from './users';
+import farmRoute from './farms';
+import nodeRoute from './nodes';
+import pivotRoute from './pivots';
+import actionRoute from './actions';
 // import raspberryRoute from './raspberry';
-import testRoute from './test';
 
 import {
   DuplicateUniqueError,
   InvalidCredentials,
   ServerError
 } from '../types/errors';
-import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
-const prismaClient = new PrismaClient();
 
 /*
   This functions is a error middleware
@@ -43,17 +36,16 @@ function error(
   next();
 }
 
-router.use('/user', userRoute);
-router.use('/farm', farmRoute);
-router.use('/pivot', pivotRoute);
-router.use('/node', nodeRoute);
-router.use('/cycle', cycleRoute);
-router.use('/radio', radioRoute);
-router.use('/intent', intentRoute);
-router.use('/pivot-list', pivotListRoute);
-router.use('/pivot-map', pivotMapRoute);
-// router.use('/raspberry', raspberryRoute);
-router.use('/test', testRoute);
+router.use('/users', userRoute);
+router.use('/farms', farmRoute);
+router.use('/pivots', pivotRoute);
+router.use('/nodes', nodeRoute);
+router.use('/actions', actionRoute);
+// router.use('/cycle', cycleRoute);
+// router.use('/radio', radioRoute);
+// router.use('/intent', intentRoute);
+// // router.use('/raspberry', raspberryRoute);
+// router.use('/test', testRoute);
 router.use(error);
 
 export default router;

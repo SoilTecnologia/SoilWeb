@@ -1,105 +1,36 @@
-import {
-  DirectionState,
-  WaterState,
-  PowerState,
-  ConnectionState
-} from '@prisma/client';
+import State from '../models/state';
+import StateVariable from '../models/stateVariable';
+import Action from '../models/action';
 
 export type StringStatusData =
   `${number}${number}${number}-${number}${number}${number}-${number}${number}${number}-${number}`;
 
-type PrismaPivotUpdateType = {
-  connection: ConnectionState;
-  direction: DirectionState;
-  water: WaterState;
-  power: PowerState;
-  percentimeter: number;
-  angle: number;
-  timestamp: number;
+export type StringIntentData =
+  `${number}${number}${number}-${number}${number}${number}`;
+
+export type StatusObject = {
+  direction: State['direction'];
+  water: State['water'];
+  power: State['power'];
+  percentimeter: StateVariable['percentimeter'];
+  angle: StateVariable['angle'];
+  timestamp: Date;
 };
 
-export const StatusStringToPrisma = (status: StringStatusData) => {
-  let [_, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d{3})-(\d{3})-(\d+)/.exec(status) || [
-      '',
-      '',
-      '',
-      '',
-      0,
-      0,
-      0
-    ];
+export const statusStringToObject = (status: string) => {
+  let [match, direction, water, power, percentimeter, angle, timestamp] =
+    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(`${status}`) || [];
 
-  let response: PrismaPivotUpdateType = {
-    connection: 'ONLINE',
-    direction: 'NULL',
-    water: 'NULL',
-    power: 'NULL',
+  let response: StatusObject = {
+    power: null,
+    direction: null,
+    water: null,
     percentimeter: 0,
     angle: 0,
-    timestamp: 0
+    timestamp: new Date()
   };
 
-  if (direction == '3') {
-    response.direction = 'CLOCKWISE';
-  } else if (direction == '4') {
-    response.direction = 'ANTI_CLOCKWISE';
-  }
-
-  if (water == '5') {
-    response.water = 'DRY';
-  } else if (water == '6') {
-    response.water = 'WET';
-  }
-
-  if (power == '1') {
-    response.power = 'ON';
-  } else if (direction == '2') {
-    response.power = 'OFF';
-  }
-
-  response.percentimeter = Number(percentimeter);
-  response.angle = Number(angle);
-  response.timestamp = Number(timestamp);
-
-  return response;
-};
-
-export const stringToStatus = (responseString: string) => {
-  console.log(responseString);
-  let [totalResult, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(responseString) || [
-      "",
-      "0",
-      "0",
-      "2",
-      0,
-      0,
-      new Date()
-    ];
-
-  console.log(direction, water);
-
-  let response: {
-    connection: ConnectionState;
-    direction: DirectionState;
-    water: WaterState;
-    power: PowerState;
-    percentimeter: number;
-    angle: number;
-    timestamp: number;
-  } = {
-    connection: 'ONLINE',
-    direction: 'NULL',
-    water: 'NULL',
-    power: 'NULL',
-    percentimeter: 0,
-    angle: 0,
-    timestamp: 0
-  };
-
-  if (power == '1') {
-    response.power = 'ON';
+  if (match) {
     if (direction == '3') {
       response.direction = 'CLOCKWISE';
     } else if (direction == '4') {
@@ -107,54 +38,44 @@ export const stringToStatus = (responseString: string) => {
     }
 
     if (water == '5') {
-      response.water = 'DRY';
+      response.water = false;
     } else if (water == '6') {
-      response.water = 'WET';
+      response.water = true;
     }
+
+    if (power == '1') {
+      response.power = true;
+    } else if (power == '2') {
+      response.power = false;
+    }
+
     response.percentimeter = Number(percentimeter);
-  } else if (power == '2') {
-    response.power = 'OFF';
-    response.direction = 'NULL';
-    response.water = 'NULL';
-    response.percentimeter = 0;
+    response.angle = Number(angle);
+    console.log("timestamp: ", timestamp);
+    console.log("final timestamp: ", new Date(Number(timestamp.replace(" ", ""))));
+    response.timestamp = new Date(Number(timestamp));
+
+    return response;
   }
-
-  response.angle = Number(angle);
-  response.timestamp = Number(timestamp);
-
-  return response;
+  return null;
 };
 
-export const IntentToString = (
-  power: 'ON' | 'OFF',
-  water: 'DRY' | 'WET',
-  direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE',
-  percentimeter: number
-) => {
-  let intentString = '';
-
-  if (direction == 'CLOCKWISE') {
-    intentString = intentString.concat('3');
+export const objectToActionString = (power: Action['power'], water: Action['water'], direction: Action['direction'], percentimeter: Action['percentimeter']) => {
+  let actionString = '';
+  if(power) {
+    if(direction == "CLOCKWISE") actionString += '3';
+    else if(direction == "ANTI_CLOCKWISE") actionString += '4';
+    if(water) actionString += '6';
+    else actionString += '5';
+    actionString += '1';
+    actionString += percentimeter.toString().padStart(3, '0');
   } else {
-    intentString = intentString.concat('4');
+    return '00200';
   }
 
-  if (water == 'DRY') {
-    intentString = intentString.concat('5');
-  } else {
-    intentString = intentString.concat('6');
-  }
+  return actionString;
+}
 
-  if (power == 'ON') {
-    intentString = intentString.concat('1');
-  } else {
-    return '002';
-  }
+export const decimalArrayToASCII = (decArray: Array<number>) => {
 
-  console.log(percentimeter);
-
-  intentString = intentString.concat(`${percentimeter}`.padStart(3, '0'));
-  console.log('intentToSendDown: ', intentString);
-
-  return intentString;
-};
+}

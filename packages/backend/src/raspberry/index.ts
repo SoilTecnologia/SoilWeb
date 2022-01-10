@@ -1,221 +1,233 @@
-import {
-  DirectionState,
-  Intent,
-  WaterState,
-  PowerState,
-  ConnectionState,
-  Pivot
-} from '@prisma/client';
-import Axios from 'axios';
-import { readAllIntentController } from '../controllers/intent';
-import { updatePivotController } from '../controllers/pivot';
+import { Readable } from 'stream';
+import { FormDataEncoder } from 'form-data-encoder';
+import { FormData } from 'formdata-node';
+import Axios, { AxiosResponse } from 'axios';
 import emitter from '../utils/eventBus';
-import { stringToStatus } from '../utils/conversions';
+import Queue from '../utils/queue';
+import {
+  StatusObject,
+  statusStringToObject,
+  objectToActionString
+} from '../utils/conversions';
+import {
+  updatePivotController,
+  readAllPivotsController2
+} from '../controllers/pivots';
+import { readAllActionsController, updateActionController } from '../controllers/actions';
+import Action from '../models/action';
 
-const TIMEOUT = 5000;
+const TIMEOUT = 10000;
 
-type IntentData = {
-  intent: Intent;
+type ActionData = {
+  action: Action;
   timestamp: Date;
+  attempts: number;
 };
 
-let activePool: Array<IntentData> = []; // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
-let idlePool: Array<IntentData> = []; // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
+type IdleData = {
+  pivot_id: string;
+  radio_id: number;
+  attempts: number;
+};
+
+let activeQueue: Queue<ActionData> = new Queue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
+let idleQueue: Queue<IdleData> = new Queue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
 
 let ready = true;
 
 export const start = async () => {
-  loadIntents();
+  loadActions();
+  loadPivots();
 
-  emitter.on('intent', (intent) => {
-    ready = false;
-    let counter = idlePool.length - 1;
-    let found = false;
-    while (counter >= 0) {
-      if (idlePool[counter].intent.intent_id == intent.intent_id) {
-        found = true;
-        idlePool = idlePool.filter((value) => value != idlePool[counter]);
-        activePool.push({ intent, timestamp: new Date() });
-
-        break;
-      }
-      counter--;
-    }
-
-    if (!found) {
-      counter = activePool.length - 1;
-      while (counter >= 0) {
-        if (activePool[counter].intent.intent_id == intent.intent_id) {
-          activePool = activePool.filter(
-            (value) => value != activePool[counter]
-          );
-          activePool.push({ intent, timestamp: new Date() });
-          break;
-        }
-      }
-      counter--;
-    }
-
-    ready = true;
+  emitter.on('action', (action) => {
+    activeQueue.enqueue({ action: action.payload, timestamp: new Date(), attempts: 0 });
   });
 
   // Seta um intervalo para ficar checando a pool
   // Dentro da checkPool existe uma flag ready para ver se ja posso checar o proximo
   setInterval(() => {
     if (ready) checkPool();
-  }, 2000);
+  }, 5000);
 };
 
-const loadIntents = async () => {
-  const allIntents = await readAllIntentController();
-
-  for (let intent of allIntents) {
-    if (intent.power == 'NULL') {
-      idlePool.push({ intent, timestamp: new Date() });
-    } else {
-      activePool.push({ intent, timestamp: new Date() });
-    }
-  }
+type RadioResponse = {
+  cmd: number;
+  id: number;
+  payload: Array<number>;
+  status: string;
 };
 
-type RaspberryResponse = {
-  connection: ConnectionState;
-  direction: DirectionState;
-  water: WaterState;
-  power: PowerState;
-  percentimeter: number;
-  angle: number;
-  timestamp: number;
-};
+const sendData = async (radio_id: number, data: string) => {
+  let bodyFormData = new FormData();
+  console.log("TRYING TO SEND DATA to radio", radio_id);
 
+  bodyFormData.set('ID', radio_id);
+  bodyFormData.set('CMD', '40');
+  bodyFormData.set('intencao', data);
+  const encoder = new FormDataEncoder(bodyFormData);
 
-const intentToString = ({ intent }: { intent: Intent }): string => {
-  let intentString = '';
-
-  if (intent.direction == 'CLOCKWISE') {
-    intentString = intentString.concat('3');
-  } else if (intent.direction == 'ANTI_CLOCKWISE') {
-    intentString = intentString.concat('4');
-  } else {
-    return '00000';
-  }
-
-  if (intent.water == 'DRY') {
-    intentString = intentString.concat('5');
-  } else if (intent.water == 'WET') {
-    intentString = intentString.concat('6');
-  } else {
-    return '00000';
-  }
-
-  if (intent.power == 'ON') {
-    intentString = intentString.concat('1');
-  } else if (intent.power == 'OFF') {
-    intentString = intentString.concat('2');
-  } else {
-    return '00000';
-  }
-
-  // Adds the percentimeter to the end
-  // padStart adds 0's if the percentimeter string < 3, ie: 10 turns into 010
-  if (intent.percentimeter == 100) {
-    intentString = intentString.concat('99');
-  } else {
-    intentString = intentString.concat(
-      intent.percentimeter.toString().padStart(2, '0')
-    );
-  }
-
-  return intentString;
-};
-
-const processResponse = async (
-  pivot_id: Pivot['pivot_id'],
-  intent: Intent,
-  response: string
-) => {
-  console.log("PIVOTIDDDD")
-  const raspberryResponse: RaspberryResponse = stringToStatus(response);
-  await updatePivotController(
-    pivot_id,
-    raspberryResponse.connection,
-    raspberryResponse.power,
-    raspberryResponse.water,
-    raspberryResponse.direction,
-    raspberryResponse.angle,
-    raspberryResponse.percentimeter
+  // let response = await Axios.post<RadioResponse>(
+  //   'http://localhost:8080/comands',
+  //   Readable.from(encoder),
+  //   { headers: encoder.headers, timeout: TIMEOUT }
+  // );
+  let response = await Axios.post<RadioResponse>(
+    'http://192.168.100.104:3031/comands',
+    Readable.from(encoder),
+    { headers: encoder.headers, timeout: TIMEOUT }
   );
-};
 
-const sendData = async (intent: IntentData) => {
-  let intentString: string = intentToString(intent);
-  // console.log(intentString);
-
-  const response = await Axios({
-    url: `http://localhost:3308/test/${intentString}`,
-    timeout: TIMEOUT
-  });
+  console.log("SENT!!")
 
   return response;
 };
 
+const checkResponse = (action: Action, payload: StatusObject) => {
+  if (payload) {
+    if (
+      payload.power == action.power &&
+      payload.water == action.water &&
+      payload.direction == action.direction
+    )
+      return true;
+  }
+
+  return false;
+};
+
 const checkPool = async () => {
-  console.log(
-    'Check Pool: ',
-    'IDLE: ',
-    idlePool.length,
-    ' ACTIVE: ',
-    activePool.length
-  );
   ready = false;
-  for (let activeIntent of activePool) {
-    console.log(
-      '[ACTIVE] Sending data to pivot',
-      activeIntent.intent.pivot_name
-    );
+  if (!activeQueue.isEmpty()) {
+    console.log('CHECKING ACTIVE');
+    const current = activeQueue.peek();
 
     try {
-      const response = await sendData(activeIntent);
-      if (response.status == 200) {
-        activePool = activePool.filter((value) => value != activeIntent);
+      const { power, water, direction, percentimeter } = current.action;
+      const actionString = objectToActionString(power, water, direction, percentimeter);
+      console.log('SENDING ACTION: ', actionString);
+      const request = await sendData(
+        current.action.radio_id,
+        actionString 
+      );
+      console.log("SENT")
+      const payload = request.data.payload;
+      // const payloadToString = String.fromCharCode(...payload);
+      const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
+      const payloadObject = statusStringToObject(payloadToString.substring(0, payloadToString.indexOf('#')));
+      console.log("RECEIVED")
+      console.log(payloadObject)
 
-        activeIntent.timestamp = new Date();
-        idlePool.push(activeIntent);
-        processResponse(
-          activeIntent.intent.pivot_id,
-          activeIntent.intent,
-          response.data
+      if (payloadObject && checkResponse(current.action, payloadObject)) {
+        await updatePivotController(
+          current.action.pivot_id,
+          true,
+          payloadObject.power,
+          payloadObject.water,
+          payloadObject.direction,
+          payloadObject.angle,
+          payloadObject.percentimeter,
+          payloadObject.timestamp,
+          '',
+          null
         );
+
+        console.log("UPDATING ACTION:", current.action.action_id);
+        await updateActionController(current.action.action_id, true);
+        activeQueue.dequeue();
       }
     } catch (err) {
-        console.log('TIMEOUT on', activeIntent.intent.pivot_name);
-        activePool = activePool.filter((value) => value != activeIntent);
+      console.log(`[ERROR - RASPBERRY.TEST]: ${err}`);
 
-        activeIntent.timestamp = new Date();
-        idlePool.push(activeIntent);
-    }
-  }
-
-  for (let idleIntent of idlePool) {
-    if (
-      new Date().getTime() - new Date(idleIntent.timestamp).getTime() >=
-      20000
-    ) {
-      console.log('[IDLE] Sending data to pivot', idleIntent.intent.pivot_name);
-
-      try {
-        const response = await sendData(idleIntent);
-        idleIntent.timestamp = new Date();
-        processResponse(
-          idleIntent.intent.pivot_id,
-          idleIntent.intent,
-          response.data
+      if (current.attempts > 0) {
+        await updatePivotController(
+          current.action.pivot_id,
+          false,
+          null,
+          null,
+          null,
+          null,
+          null,
+          new Date(),
+          null,
+          null
         );
-      } catch (err) {
-        console.log('TIMEOUT on', idleIntent.intent.pivot_name);
+        const removed = activeQueue.dequeue()!;
+        await updateActionController(removed.action.action_id, false);
+      } else {
+        const current = activeQueue.dequeue()!;
+        current.attempts++;
+        activeQueue.enqueue(current!);
       }
     }
-  }
+  } else if (!idleQueue.isEmpty()) {
+    let current = idleQueue.peek();
+    console.log('CHECKING IDLE');
 
+    try {
+      const request = await sendData(current.radio_id, '000000');
+      const payload = request.data.payload;
+      const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
+      const payloadObject = statusStringToObject(payloadToString.substring(0, payloadToString.indexOf('#')));
+      console.log("RECEIVED")
+      console.log(payloadObject)
+
+      if (payloadObject) {
+        await updatePivotController(
+          current.pivot_id,
+          true,
+          payloadObject.power,
+          payloadObject.water,
+          payloadObject.direction,
+          payloadObject.angle,
+          payloadObject.percentimeter,
+          payloadObject.timestamp,
+          null,
+          null
+        );
+        current.attempts = 0;
+      }
+    } catch (err) {
+      console.log(`[ERROR]: ${err}`);
+      current.attempts++;
+      if (current.attempts >= 1) {
+        await updatePivotController(
+          current.pivot_id,
+          false,
+          null,
+          null,
+          null,
+          null,
+          null,
+          new Date(),
+          null,
+          null
+        );
+      }
+    } finally {
+      current = idleQueue.dequeue()!;
+      idleQueue.enqueue(current);
+    }
+  }
   ready = true;
+};
+
+export const loadActions = async () => {
+  const allActions = await readAllActionsController();
+
+  for (let action of allActions) {
+    console.log(action)
+    activeQueue.enqueue({ action, attempts: 0, timestamp: new Date() });
+  }
+};
+
+export const loadPivots = async () => {
+  const allPivots = await readAllPivotsController2();
+
+  for (let pivot of allPivots) {
+    idleQueue.enqueue({
+      pivot_id: pivot.pivot_id,
+      radio_id: pivot.radio_id,
+      attempts: 0
+    });
+  }
 };
