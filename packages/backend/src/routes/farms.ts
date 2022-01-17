@@ -40,6 +40,8 @@ router.put(
   )
 );
 
+router.get('/user/:id', function (req: express.Request, res: express.Response) {}    )
+
 router.get(
   '/readAll',
   authMiddleware(),

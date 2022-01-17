@@ -4,9 +4,9 @@ module.exports = {
   development: {
     client: 'postgres',
     connection: {
-      database: 'newnewsoildb',
+      database: 'soildb',
       user: 'soil',
-      password: 'password',
+      password: 'soil2021',
       host: '127.0.0.1',
       port: 5432
     }
@@ -15,9 +15,9 @@ module.exports = {
   production: {
     client: 'postgres',
     connection: {
-      database: 'newnewsoildb',
+      database: 'soildb',
       user: 'soil',
-      password: 'password',
+      password: 'soil2021',
       host: '127.0.0.1',
       port: 5432
     }
