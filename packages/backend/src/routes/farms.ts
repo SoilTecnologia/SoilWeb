@@ -20,10 +20,11 @@ router.put(
       next: express.NextFunction
     ) => {
       const { farm_id } = req.params;
-      const { node_name, gateway, is_gprs } = req.body;
+      const { node_name, gateway, is_gprs, node_id } = req.body;
 
       try {
         const newNode = await createNodeController(
+          node_id,
           farm_id,
           node_name,
           is_gprs,

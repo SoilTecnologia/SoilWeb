@@ -16,6 +16,7 @@ import emitter from '../utils/eventBus';
 import { getLastCycleFromPivot } from './cycles';
 
 export const createPivotController = async (
+  pivot_id: Pivot['pivot_id'],
   node_id: Pivot['node_id'],
   radio_id: Pivot['radio_id'],
   pivot_name: Pivot['pivot_name'],
@@ -26,6 +27,7 @@ export const createPivotController = async (
   pivot_radius: Pivot['pivot_radius']
 ) => {
   const newPivot = await knex<Pivot>('pivots').insert({
+    pivot_id,
     node_id,
     radio_id,
     pivot_name,

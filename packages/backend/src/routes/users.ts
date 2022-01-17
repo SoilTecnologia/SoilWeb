@@ -7,10 +7,10 @@ import { createFarmController } from '../controllers/farms';
 const router = express.Router();
 
 router.post('/signup', async (req, res, next) => {
-  const { login, password, user_type } = req.body;
+  const { user_id, login, password, user_type } = req.body;
 
   try {
-    const cookieInfo = await signUpController(login, password, user_type);
+    const cookieInfo = await signUpController(login, password, user_type, user_id);
 
     res.send(cookieInfo);
   } catch (err) {

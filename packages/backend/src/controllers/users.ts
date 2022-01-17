@@ -54,7 +54,8 @@ export const signInController = async (
 export const signUpController = async (
   login: User['login'],
   password: User['password'],
-  user_type?: User['user_type']
+  user_type: User['user_type'],
+  user_id?: User['user_id']
 ): Promise<Response | null> => {
   if (login && password) {
     const oldUser = await knex<User>('users')
@@ -69,7 +70,8 @@ export const signUpController = async (
     const newUser = await knex<User>('users').insert({
       login,
       password: encryptedPassword,
-      user_type
+      user_type,
+      user_id
     });
 
     const user = await knex<User>('users').select('*').where({ login }).first();

@@ -9,7 +9,7 @@ export const createFarmController = async (
   farm_name: Farm['farm_name'],
   farm_city: Farm['farm_city'],
   farm_lng: Farm['farm_lng'],
-  farm_lat: Farm['farm_lat']
+  farm_lat: Farm['farm_lat'],
 ) => {
   const newFarm = await knex<Farm>('farms').insert({
     farm_id,
