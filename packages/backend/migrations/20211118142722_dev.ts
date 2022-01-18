@@ -61,6 +61,7 @@ export async function up(knex: Knex): Promise<void> {
        table.float('rssi');
        table.datetime('timestamp').notNullable();
 
+       table.uuid('pivot_id').references('pivot_id').inTable('pivots').index().notNullable();
        table.uuid('state_id').references('state_id').inTable('states').index().notNullable();
      })
     .createTable('actions', (table) => {
