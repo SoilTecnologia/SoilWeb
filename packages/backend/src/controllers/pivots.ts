@@ -288,6 +288,8 @@ export const updatePivotController = async (
     }
   }
 
+  //teste
+
   if (shouldNotifyUpdate) {
     const pivot = await knex('pivots').select('*').where({ pivot_id }).first();
     const { node_id } = pivot;
