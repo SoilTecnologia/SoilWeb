@@ -214,6 +214,7 @@ export const updatePivotController = async (
   rssi: RadioVariable['rssi']
 ) => {
   let shouldNotifyUpdate = false;
+  let state: State | undefined;
   timestamp = new Date(); // TODO usar a da placa (ta vindo com 2 bytes a mais me buganddo)
 
   let oldState = await knex<State>('states')
@@ -221,19 +222,23 @@ export const updatePivotController = async (
     .orderBy('timestamp', 'desc')
     .first();
 
+    state = oldState;
+
   if (
     !oldState ||
     isStateDifferent(oldState, { connection, power, water, direction })
   ) {
     shouldNotifyUpdate = true;
-    await knex<State>('states').insert({
+    const newState = await knex<State>('states').insert({
       pivot_id,
       connection,
       power,
       water,
       direction,
       timestamp
-    });
+    }).returning('*');
+
+    state = newState[0];
   }
 
   oldState = await knex<State>('states')
@@ -275,6 +280,7 @@ export const updatePivotController = async (
       shouldNotifyUpdate = true;
       await knex<RadioVariable>('radio_variables').insert({
         pivot_id,
+        state_id: state!.state_id,
         father,
         rssi,
         timestamp
