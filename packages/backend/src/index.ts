@@ -27,8 +27,8 @@ app.listen(PORT, () => {
   console.info(`Server Listening on PORT ${PORT}`);
 });
 
-//raspberry.start();
+raspberry.start();
 
 // const iotDevice = new IoTDevice('Cloud', 0);
-const iotDevice = new IoTDevice('Raspberry', 0, '2e73f090-17c1-4b72-aeaf-610c977c7b08');
+const iotDevice = new IoTDevice('Raspberry', 0, '2e73f090-17c1-4b72-aeaf-610c977c7b08/0');
 iotDevice.start();

@@ -13,7 +13,10 @@ import {
   updatePivotController,
   readAllPivotsController2
 } from '../controllers/pivots';
-import { readAllActionsController, updateActionController } from '../controllers/actions';
+import {
+  readAllActionsController,
+  updateActionController
+} from '../controllers/actions';
 import Action from '../models/action';
 
 const TIMEOUT = 10000;
@@ -40,7 +43,11 @@ export const start = async () => {
   loadPivots();
 
   emitter.on('action', (action) => {
-    activeQueue.enqueue({ action: action.payload, timestamp: new Date(), attempts: 0 });
+    activeQueue.enqueue({
+      action: action.payload,
+      timestamp: new Date(),
+      attempts: 0
+    });
   });
 
   // Seta um intervalo para ficar checando a pool
@@ -59,7 +66,6 @@ type RadioResponse = {
 
 const sendData = async (radio_id: number, data: string) => {
   let bodyFormData = new FormData();
-  console.log("TRYING TO SEND DATA to radio", radio_id);
 
   bodyFormData.set('ID', radio_id);
   bodyFormData.set('CMD', '40');
@@ -72,24 +78,32 @@ const sendData = async (radio_id: number, data: string) => {
   //   { headers: encoder.headers, timeout: TIMEOUT }
   // );
   let response = await Axios.post<RadioResponse>(
-    'http://192.168.100.104:3031/comands',
+    'http://192.168.100.102:3031/comands',
     Readable.from(encoder),
     { headers: encoder.headers, timeout: TIMEOUT }
   );
 
-  console.log("SENT!!")
-
   return response;
 };
 
+/*
+Checa se a resposta da placa é igual à uma action que mandamos à ela
+*/
 const checkResponse = (action: Action, payload: StatusObject) => {
   if (payload) {
-    if (
-      payload.power == action.power &&
-      payload.water == action.water &&
-      payload.direction == action.direction
-    )
-      return true;
+    if (action.power) {
+      //Se nossa intenção era ligar, checamos todo o payload
+      if (
+        payload.power == action.power &&
+        payload.water == action.water &&
+        payload.direction == action.direction
+      )
+        return true;
+    } else {
+      // Caso contrário checamos apenas se o estado do pivo e da bomba, sem levar em conta a direction
+      if (payload.power == action.power && payload.water == action.water)
+        return true;
+    }
   }
 
   return false;
@@ -103,19 +117,23 @@ const checkPool = async () => {
 
     try {
       const { power, water, direction, percentimeter } = current.action;
-      const actionString = objectToActionString(power, water, direction, percentimeter);
-      console.log('SENDING ACTION: ', actionString);
-      const request = await sendData(
-        current.action.radio_id,
-        actionString 
+      const actionString = objectToActionString(
+        power,
+        water,
+        direction,
+        percentimeter
       );
-      console.log("SENT")
+      console.log('SENDING ACTION: ', actionString);
+      const request = await sendData(current.action.radio_id, actionString);
       const payload = request.data.payload;
       // const payloadToString = String.fromCharCode(...payload);
       const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
-      const payloadObject = statusStringToObject(payloadToString.substring(0, payloadToString.indexOf('#')));
-      console.log("RECEIVED")
-      console.log(payloadObject)
+
+      const payloadObject = statusStringToObject(
+        payloadToString.substring(0, payloadToString.indexOf('#'))
+      );
+      console.log(`Received payload:`);
+      console.log(payloadObject);
 
       if (payloadObject && checkResponse(current.action, payloadObject)) {
         await updatePivotController(
@@ -131,13 +149,16 @@ const checkPool = async () => {
           null
         );
 
-        console.log("UPDATING ACTION:", current.action.action_id);
+        console.log('UPDATING ACTION:', current.action.action_id);
         await updateActionController(current.action.action_id, true);
         activeQueue.dequeue();
+      } else {
+        current.attempts++;
       }
     } catch (err) {
+      current.attempts++;
       console.log(`[ERROR - RASPBERRY.TEST]: ${err}`);
-
+    } finally {
       if (current.attempts > 0) {
         await updatePivotController(
           current.action.pivot_id,
@@ -153,10 +174,6 @@ const checkPool = async () => {
         );
         const removed = activeQueue.dequeue()!;
         await updateActionController(removed.action.action_id, false);
-      } else {
-        const current = activeQueue.dequeue()!;
-        current.attempts++;
-        activeQueue.enqueue(current!);
       }
     }
   } else if (!idleQueue.isEmpty()) {
@@ -167,9 +184,9 @@ const checkPool = async () => {
       const request = await sendData(current.radio_id, '000000');
       const payload = request.data.payload;
       const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
-      const payloadObject = statusStringToObject(payloadToString.substring(0, payloadToString.indexOf('#')));
-      console.log("RECEIVED")
-      console.log(payloadObject)
+      const payloadObject = statusStringToObject(
+        payloadToString.substring(0, payloadToString.indexOf('#'))
+      );
 
       if (payloadObject) {
         await updatePivotController(
@@ -189,6 +206,7 @@ const checkPool = async () => {
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
       current.attempts++;
+    } finally {
       if (current.attempts >= 1) {
         await updatePivotController(
           current.pivot_id,
@@ -203,7 +221,7 @@ const checkPool = async () => {
           null
         );
       }
-    } finally {
+      
       current = idleQueue.dequeue()!;
       idleQueue.enqueue(current);
     }
@@ -215,7 +233,6 @@ export const loadActions = async () => {
   const allActions = await readAllActionsController();
 
   for (let action of allActions) {
-    console.log(action)
     activeQueue.enqueue({ action, attempts: 0, timestamp: new Date() });
   }
 };

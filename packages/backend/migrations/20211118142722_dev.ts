@@ -22,7 +22,6 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('is_gprs').notNullable();
       table.string('gateway');
 
-      table.uuid('register_id').defaultTo(knex.raw('(uuid_generate_v4())'));
       table.uuid('farm_id').references('farm_id').inTable('farms').index();
     })
     .createTable('pivots', (table) => {

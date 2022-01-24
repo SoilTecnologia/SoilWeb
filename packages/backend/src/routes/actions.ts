@@ -16,7 +16,6 @@ router.post(
     const { power, water, direction, percentimeter } = req.body;
 
     try {
-      const pivot = await readOnePivotController(pivot_id);
       const newAction = await createActionController(
         pivot_id,
         req.user.user_id,
