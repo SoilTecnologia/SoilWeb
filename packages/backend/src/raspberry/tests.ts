@@ -123,7 +123,7 @@ const checkPool = async () => {
         direction,
         percentimeter
       );
-      console.log('SENDING ACTION: ', actionString);
+      console.log(`Sending Action to radio ${current.action.radio_id}: ${actionString}`);
       const request = await sendData(current.action.radio_id, actionString);
       const payload = request.data.payload;
       // const payloadToString = String.fromCharCode(...payload);
@@ -132,6 +132,9 @@ const checkPool = async () => {
       const payloadObject = statusStringToObject(
         payloadToString.substring(0, payloadToString.indexOf('#'))
       );
+      console.log(`Received:`)
+      console.log(`Payload: ${payload}`);
+      console.log(`Payload string: ${payloadToString}`)
 
       if (payloadObject && checkResponse(current.action, payloadObject)) {
         await updatePivotController(
@@ -180,12 +183,16 @@ const checkPool = async () => {
     console.log('CHECKING IDLE');
 
     try {
+      console.log(`Checking radio ${current.radio_id}`);
       const request = await sendData(current.radio_id, '000000');
       const payload = request.data.payload;
       const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
       const payloadObject = statusStringToObject(
         payloadToString.substring(0, payloadToString.indexOf('#'))
       );
+      console.log(`Received:`)
+      console.log(`Payload: ${payload}`);
+      console.log(`Payload string: ${payloadToString}`)
 
       if (payloadObject) {
         await updatePivotController(
