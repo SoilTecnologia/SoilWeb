@@ -8,7 +8,6 @@ export const readAllActionsController = async (): Promise<Action[]> => {
     .select('*')
     .where({ success: null })
     .innerJoin('pivots', 'actions.pivot_id', '=', 'pivots.pivot_id');
-    console.log(actions)
 
   return actions;
 };

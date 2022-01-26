@@ -98,13 +98,11 @@ export const readMapPivotController = async (
     .where('farm_id', farm_id);
 
   for (let node of nodes) {
-    console.log("ONE NODE")
     const pivots = await knex<Pivot>('pivots')
       .select('pivot_id', 'pivot_name', 'pivot_lng', 'pivot_lat','pivot_start_angle', 'pivot_end_angle', 'pivot_radius')
       .where('node_id', node.node_id);
 
     for (let pivot of pivots) {
-      console.log("PIVOT")
       const state = await knex<State>('states')
         .select('state_id', 'power', 'water', 'direction', 'connection')
         .where('pivot_id', pivot.pivot_id)
@@ -163,13 +161,11 @@ export const readListPivotController = async (
     .where('farm_id', farm_id);
 
   for (let node of nodes) {
-    console.log("ONE NODE")
     const pivots = await knex<Pivot>('pivots')
       .select('pivot_id', 'pivot_name')
       .where('node_id', node.node_id);
 
     for (let pivot of pivots) {
-      console.log("PIVOT")
       const state = await knex<State>('states')
         .select('state_id', 'power', 'water', 'direction')
         .where('pivot_id', pivot.pivot_id)
@@ -241,15 +237,10 @@ export const updatePivotController = async (
     state = newState[0];
   }
 
-  oldState = await knex<State>('states')
-    .where('pivot_id', pivot_id)
-    .orderBy('timestamp', 'desc')
-    .first();
-
   if (angle != undefined && percentimeter != undefined) {
-    if (oldState) {
+    if (state) {
       const oldStateVariable = await knex<StateVariable>('state_variables')
-        .where('state_id', oldState.state_id)
+        .where('state_id', state.state_id)
         .orderBy('timestamp', 'desc')
         .first();
 
@@ -259,7 +250,7 @@ export const updatePivotController = async (
       ) {
         shouldNotifyUpdate = true;
         await knex<StateVariable>('state_variables').insert({
-          state_id: oldState.state_id,
+          state_id: state.state_id,
           angle,
           percentimeter,
           timestamp

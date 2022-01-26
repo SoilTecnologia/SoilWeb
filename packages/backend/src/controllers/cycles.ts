@@ -15,7 +15,6 @@ export const getLastCycleFromPivot = async (
     .first();
 
   if (lastState) {
-    console.log("LAST STATE")
     if (lastState.power === true) {
       const lastOff = await knex<State>('states')
         .select('timestamp', 'power')
@@ -24,7 +23,6 @@ export const getLastCycleFromPivot = async (
         .orderBy('timestamp', 'desc')
         .first();
 
-      console.log('last: ', lastOff!.timestamp);
       const beforeThat = await knex<State>('states')
         .innerJoin(
           'state_variables',
@@ -37,14 +35,12 @@ export const getLastCycleFromPivot = async (
 
       return beforeThat;
     } else if (lastState.power === false) {
-      console.log("FVARIABLES", lastState.state_id)
       return await knex<State>('state_variables')
         .select('angle')
         .where('state_id', lastState.state_id);
     }
   }
 
-  console.log("VORTANMDO AK")
   return [];
 };
 
@@ -64,7 +60,7 @@ type PartialCycleResponse = {
     connection: State['connection'];
     timestamp: Date;
   }>;
-  percentimeters: Array<number>;
+  percentimeters: Array<{value: number, timestamp: Date}>;
 };
 type fullCycleResponse = Array<PartialCycleResponse>;
 
@@ -87,7 +83,6 @@ export const getCyclesFromPivot = async (
     .where('pivot_id', pivot_id)
     .whereBetween('timestamp', [start, end])
     .orderBy('timestamp', 'asc');
-
   let response: fullCycleResponse = [];
 
   /* 
@@ -99,6 +94,7 @@ export const getCyclesFromPivot = async (
     */
   let foundStart = false;
   let currentCycle: PartialCycleResponse = {states: [], percentimeters: []} as unknown as PartialCycleResponse;
+
 
   for (let state of states) {
     if (foundStart) {
@@ -146,15 +142,14 @@ export const getCyclesFromPivot = async (
     }
 
     const variables = await knex<StateVariable>('state_variables')
-      .select('percentimeter', knex.raw('AVG(percentimeter)'))
+      .select('percentimeter', 'timestamp'/*'AVG(percentimeter)')*/)
       .where('state_id', state.state_id)
       .groupBy('angle', 'percentimeter')
 
-      console.log(variables)
 
     for (let variable of variables) {
       if (variable.percentimeter)
-        currentCycle!.percentimeters.push(variable.percentimeter);
+        currentCycle!.percentimeters.push({value: variable.percentimeter, timestamp: variable.timestamp});
     }
   }
 

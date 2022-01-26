@@ -81,6 +81,7 @@ class IoTDevice {
         return v === undefined ? null : v;
       });
       this.connection.publish(finalTopic!, string, 0, false);
+        console.log(`[IOT] Enviando mensagem...`);
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -125,20 +126,19 @@ class IoTDevice {
           father,
           rssi
         );
-
         /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
         const { farm_id, node_name } = json;
         this.publish(json, `${farm_id}/${node_name}`);
+        console.log(`[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`);
       } else if (json.type === 'action') {
-          console.log('Resposta de action recebido na cloud');
+          console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
           this.queue.remove(json);
       }
     } else {
       if (json.type === 'status') {
-        console.log('Resposta de status recebido na rasp');
+          console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
         this.queue.remove(json);
       } else if (json.type === 'action') {
-        console.log(json)
         const {
           pivot_id,
           radio_id,
@@ -158,6 +158,7 @@ class IoTDevice {
           percentimeter,
           new Date(timestamp)
         );
+        console.log(`[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`);
         this.publish(json);
       }
     }
@@ -175,6 +176,7 @@ class IoTDevice {
             timestamp: status.payload.timestamp.toString()
           }
         });
+        console.log(`[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`);
         //OBS: a conversao do timestamp pra string é pra facilitar a comparação no método queue.remove
       });
     } else {
@@ -189,6 +191,8 @@ class IoTDevice {
           }
         });
       });
+
+        console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
     }
   };
 
@@ -199,7 +203,6 @@ class IoTDevice {
       if (this.type === 'Raspberry') this.publish(current, this.pubTopic);
       else this.publish(current, `${current.farm_id}/${current.node_name}`);
 
-      console.log('Published...');
     }
   };
 }

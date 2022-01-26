@@ -47,7 +47,6 @@ export const readPivotStateController = async (
     const variables = await getLastCycleFromPivot(pivot_id);
 
     if (variables && variables.length > 0) {
-			console.log("VARIABLES!!")
       return {
         pivot_id: pivot_id,
         pivot_lng: pivot!.pivot_lng,

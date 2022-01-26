@@ -132,8 +132,6 @@ const checkPool = async () => {
       const payloadObject = statusStringToObject(
         payloadToString.substring(0, payloadToString.indexOf('#'))
       );
-      console.log(`Received payload:`);
-      console.log(payloadObject);
 
       if (payloadObject && checkResponse(current.action, payloadObject)) {
         await updatePivotController(
@@ -148,6 +146,7 @@ const checkPool = async () => {
           '',
           null
         );
+        current.attempts = 0;
 
         console.log('UPDATING ACTION:', current.action.action_id);
         await updateActionController(current.action.action_id, true);
