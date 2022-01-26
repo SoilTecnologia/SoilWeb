@@ -10,7 +10,6 @@ require('dotenv').config();
 
 import express from 'express';
 import cors from 'cors';
-import { Server } from 'socket.io';
 import router from './routes';
 import * as raspberry from './raspberry/tests';
 import EventEmitter from 'events';
