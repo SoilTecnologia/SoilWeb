@@ -211,7 +211,6 @@ export const updatePivotController = async (
 ) => {
   let shouldNotifyUpdate = false;
   let state: State | undefined;
-  timestamp = new Date(); // TODO usar a da placa (ta vindo com 2 bytes a mais me buganddo)
 
   let oldState = await knex<State>('states')
     .where('pivot_id', pivot_id)
