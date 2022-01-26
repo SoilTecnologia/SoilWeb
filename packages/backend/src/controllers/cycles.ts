@@ -144,7 +144,7 @@ export const getCyclesFromPivot = async (
     const variables = await knex<StateVariable>('state_variables')
       .select('percentimeter', 'timestamp'/*'AVG(percentimeter)')*/)
       .where('state_id', state.state_id)
-      .groupBy('angle', 'percentimeter')
+      // .groupBy('angle', 'percentimeter')
 
 
     for (let variable of variables) {
