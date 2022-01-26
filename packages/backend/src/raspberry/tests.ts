@@ -145,7 +145,7 @@ const checkPool = async () => {
           payloadObject.direction,
           payloadObject.angle,
           payloadObject.percentimeter,
-          payloadObject.timestamp,
+          new Date(),
           '',
           null
         );
@@ -203,7 +203,7 @@ const checkPool = async () => {
           payloadObject.direction,
           payloadObject.angle,
           payloadObject.percentimeter,
-          payloadObject.timestamp,
+          new Date(),
           null,
           null
         );

@@ -211,7 +211,6 @@ export const updatePivotController = async (
 ) => {
   let shouldNotifyUpdate = false;
   let state: State | undefined;
-  timestamp = new Date(); // TODO retirar essa linha quando a placa estiver enviando corretamente o timestamp 
 
   let oldState = await knex<State>('states')
     .where('pivot_id', pivot_id)
