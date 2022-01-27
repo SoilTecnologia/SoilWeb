@@ -68,7 +68,7 @@ const sendData = async (radio_id: number, data: string) => {
   let bodyFormData = new FormData();
 
   bodyFormData.set('ID', radio_id);
-  bodyFormData.set('CMD', '40');
+  // bodyFormData.set('CMD', '40');
   bodyFormData.set('intencao', data);
   const encoder = new FormDataEncoder(bodyFormData);
 
@@ -124,19 +124,18 @@ const checkPool = async () => {
         percentimeter
       );
       console.log(`Sending Action to radio ${current.action.radio_id}: ${actionString}`);
-      const request = await sendData(current.action.radio_id, actionString);
-      const payload = request.data.payload;
+      const response = await sendData(current.action.radio_id, actionString);
+      const data = response.data;
+
+      const payload = data.payload;
       // const payloadToString = String.fromCharCode(...payload);
       const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
 
       const payloadObject = statusStringToObject(
         payloadToString.substring(0, payloadToString.indexOf('#'))
       );
-      console.log(`Received:`)
-      console.log(`Payload: ${payload}`);
-      console.log(`Payload string: ${payloadToString}`)
 
-      if (payloadObject && checkResponse(current.action, payloadObject)) {
+      if (payloadObject && current.action.radio_id == data.id && checkResponse(current.action, payloadObject)) {
         await updatePivotController(
           current.action.pivot_id,
           true,
@@ -184,17 +183,16 @@ const checkPool = async () => {
 
     try {
       console.log(`Checking radio ${current.radio_id}`);
-      const request = await sendData(current.radio_id, '000000');
-      const payload = request.data.payload;
+      const response = await sendData(current.radio_id, '000000');
+      const data = response.data;
+      
+      const payload = data.payload;
       const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
       const payloadObject = statusStringToObject(
         payloadToString.substring(0, payloadToString.indexOf('#'))
       );
-      console.log(`Received:`)
-      console.log(`Payload: ${payload}`);
-      console.log(`Payload string: ${payloadToString}`)
 
-      if (payloadObject) {
+      if (payloadObject && current.radio_id == data.id) {
         await updatePivotController(
           current.pivot_id,
           true,

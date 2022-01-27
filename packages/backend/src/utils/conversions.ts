@@ -31,6 +31,7 @@ export const statusStringToObject = (status: string) => {
   };
 
   if (match) {
+    console.log("THE MATCH IS", match);
     if (direction == '3') {
       response.direction = 'CLOCKWISE';
     } else if (direction == '4') {
