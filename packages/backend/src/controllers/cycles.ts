@@ -81,7 +81,8 @@ export const getCyclesFromPivot = async (
       'connection'
     )
     .where('pivot_id', pivot_id)
-    .whereBetween('timestamp', [start, end])
+    .where('timestamp', '>=', `${start}T00:00:00`)
+    .where('timestamp', '<=', `${end}T23:59:59Z`)
     .orderBy('timestamp', 'asc');
   let response: fullCycleResponse = [];
 
