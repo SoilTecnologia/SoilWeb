@@ -136,8 +136,6 @@ const checkPool = async () => {
       );
 
       if (payloadObject && current.action.radio_id == data.id && checkResponse(current.action, payloadObject)) {
-        console.log("Updating PIVOT")
-        console.log(payloadObject);
         await updatePivotController(
           current.action.pivot_id,
           true,
@@ -156,7 +154,6 @@ const checkPool = async () => {
         await updateActionController(current.action.action_id, true);
         activeQueue.dequeue();
       } else {
-        console.log("NO PAYLOAD OR WRONG RESPONSE ID");
         current.attempts++;
       }
     } catch (err) {
@@ -197,8 +194,6 @@ const checkPool = async () => {
       );
 
       if (payloadObject && current.radio_id == data.id) {
-        console.log("Updating PIVOT")
-        console.log(payloadObject);
         await updatePivotController(
           current.pivot_id,
           true,
@@ -213,7 +208,6 @@ const checkPool = async () => {
         );
         current.attempts = 0;
       } else {
-        console.log("NO PAYLOAD OR WRONG RESPONSE ID");
         current.attempts++;
       }
     } catch (err) {
