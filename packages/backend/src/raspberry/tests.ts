@@ -220,7 +220,7 @@ const checkPool = async () => {
       console.log(`[ERROR]: ${err}`);
       current.attempts++;
     } finally {
-      if (current.attempts >= 1) {
+      if (current.attempts >= 10) {
         console.log("Failing PIVOT")
         await updatePivotController(
           current.pivot_id,
