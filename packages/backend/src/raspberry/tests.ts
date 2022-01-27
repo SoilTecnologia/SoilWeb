@@ -136,6 +136,8 @@ const checkPool = async () => {
       );
 
       if (payloadObject && current.action.radio_id == data.id && checkResponse(current.action, payloadObject)) {
+        console.log("Updating PIVOT")
+        console.log(payloadObject);
         await updatePivotController(
           current.action.pivot_id,
           true,
@@ -161,6 +163,7 @@ const checkPool = async () => {
       console.log(`[ERROR - RASPBERRY.TEST]: ${err}`);
     } finally {
       if (current.attempts > 0) {
+        console.log("Failing PIVOT")
         await updatePivotController(
           current.action.pivot_id,
           false,
@@ -193,6 +196,8 @@ const checkPool = async () => {
       );
 
       if (payloadObject && current.radio_id == data.id) {
+        console.log("Updating PIVOT")
+        console.log(payloadObject);
         await updatePivotController(
           current.pivot_id,
           true,
@@ -214,6 +219,7 @@ const checkPool = async () => {
       current.attempts++;
     } finally {
       if (current.attempts >= 1) {
+        console.log("Failing PIVOT")
         await updatePivotController(
           current.pivot_id,
           false,
