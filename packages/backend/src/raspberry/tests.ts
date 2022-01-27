@@ -156,6 +156,7 @@ const checkPool = async () => {
         await updateActionController(current.action.action_id, true);
         activeQueue.dequeue();
       } else {
+        console.log("NO PAYLOAD OR WRONG RESPONSE ID");
         current.attempts++;
       }
     } catch (err) {
@@ -212,6 +213,7 @@ const checkPool = async () => {
         );
         current.attempts = 0;
       } else {
+        console.log("NO PAYLOAD OR WRONG RESPONSE ID");
         current.attempts++;
       }
     } catch (err) {
