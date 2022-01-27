@@ -206,6 +206,8 @@ const checkPool = async () => {
           null
         );
         current.attempts = 0;
+      } else {
+        current.attempts++;
       }
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
@@ -225,7 +227,7 @@ const checkPool = async () => {
           null
         );
       }
-      
+
       current = idleQueue.dequeue()!;
       idleQueue.enqueue(current);
     }
