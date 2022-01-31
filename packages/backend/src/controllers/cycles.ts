@@ -64,7 +64,7 @@ type PartialCycleResponse = {
 };
 type fullCycleResponse = Array<PartialCycleResponse>;
 
-// Date format for start/end must be: YYYY-MM-DD
+// Date format for start/end must be: DD-MM-YYYY
 export const getCyclesFromPivot = async (
   pivot_id: Pivot['pivot_id'],
   start: string,

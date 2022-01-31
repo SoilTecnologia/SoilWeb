@@ -190,6 +190,18 @@ export const readListPivotController = async (
           father: null,
           timestamp: variable ? new Date(variable.timestamp) : null
         });
+      } else {
+        response.push({
+          pivot_id: pivot.pivot_id,
+          pivot_name: pivot.pivot_name,
+          power: false,
+          water: false,
+          direction: null,
+          percentimeter: 0,
+          rssi: null,
+          father: null,
+          timestamp: null
+        });
       }
     }
   }
