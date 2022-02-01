@@ -36,11 +36,12 @@ export const createActionController = async (
   const { node_id } = pivot;
 
   const node = await knex('nodes').select('*').where({ node_id }).first();
-  const { farm_id, node_name } = node;
+  const { farm_id, node_name, is_gprs } = node;
 
   emitter.emit('action', {
     farm_id,
     node_name,
+    is_gprs,
     payload: {
       action_id: action[0].action_id,
       pivot_id,

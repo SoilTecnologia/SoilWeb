@@ -4,6 +4,7 @@ import Queue from '../utils/queue';
 import emitter from '../utils/eventBus';
 import { updatePivotController } from '../controllers/pivots';
 import { createActionController } from '../controllers/actions';
+import { objectToActionString } from '../utils/conversions';
 
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
@@ -74,7 +75,6 @@ class IoTDevice {
         this.qos,
         this.processMessage
       );
-
 
       /*
       Aqui criamos a queue e o loop que irá ficar verificando se há mensagens na fila e enviando para o broker.
@@ -156,7 +156,7 @@ class IoTDevice {
           father,
           rssi
         );
-        
+
         /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
         const { farm_id, node_name } = json;
         this.publish(json, `${farm_id}/${node_name}`);
@@ -222,6 +222,19 @@ class IoTDevice {
       });
     } else {
       emitter.on('action', (action) => {
+        if (action.is_gprs) {
+          this.queue.enqueue({
+            type: 'action',
+            farm_id: action.farm_id,
+            node_name: action.node_name,
+            payload: objectToActionString(
+              action.power,
+              action.water,
+              action.direction,
+              action.percentimeter
+            )
+          });
+        }
         this.queue.enqueue({
           type: 'action',
           farm_id: action.farm_id,
@@ -242,7 +255,11 @@ class IoTDevice {
       const current = this.queue.peek()!;
 
       if (this.type === 'Raspberry') this.publish(current, this.pubTopic);
-      else this.publish(current, `${current.farm_id}/${current.node_name}`);
+      else {
+        if (typeof current.payload === 'string')
+          this.publish(current.payload, `${current.farm_id}/${current.node_name}`);
+        else this.publish(current, `${current.farm_id}/${current.node_name}`);
+      }
     }
   };
 }
