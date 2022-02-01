@@ -96,17 +96,22 @@ class IoTDevice {
   A função JSON.stringify() customizada converte o objeto em uma string, além de converter campos especiais como null para string, isso é importante pois a resposta deve ser exatamente igual ao que o cliente enviou, e campos null normalmente são apagados quando se usa a função JSON.stringify() original.
   */
 
-  publish(payload: Object, topic?: string) {
+  publish(payload: any, topic?: string) {
     let finalTopic;
     if (this.type == 'Cloud') finalTopic = topic;
     else finalTopic = this.pubTopic;
 
     try {
+      if (typeof payload === 'string') {
+        this.connection.publish(finalTopic!, payload, 0, false);
+        console.log(`[IOT] Enviando mensagem à um GPRS...`);
+      } else {
       let string = JSON.stringify(payload, function (k, v) {
         return v === undefined ? null : v;
       });
       this.connection.publish(finalTopic!, string, 0, false);
-      console.log(`[IOT] Enviando mensagem...`);
+        console.log(`[IOT] Enviando mensagem...`);
+    }
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -257,7 +262,10 @@ class IoTDevice {
       if (this.type === 'Raspberry') this.publish(current, this.pubTopic);
       else {
         if (typeof current.payload === 'string')
-          this.publish(current.payload, `${current.farm_id}/${current.node_name}`);
+          this.publish(
+            current.payload,
+            `${current.farm_id}/${current.node_name}`
+          );
         else this.publish(current, `${current.farm_id}/${current.node_name}`);
       }
     }
