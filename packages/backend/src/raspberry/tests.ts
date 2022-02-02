@@ -78,7 +78,7 @@ const sendData = async (radio_id: number, data: string) => {
   //   { headers: encoder.headers, timeout: TIMEOUT }
   // );
   let response = await Axios.post<RadioResponse>(
-    'http://192.168.100.102:3031/comands',
+    'http://192.168.100.101:3031/comands',
     Readable.from(encoder),
     { headers: encoder.headers, timeout: TIMEOUT }
   );

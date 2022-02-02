@@ -14,7 +14,7 @@ import { createServer } from "http";
 import cors from 'cors';
 import router from './routes';
 import * as raspberry from './raspberry/tests';
-import EventEmitter from 'events';
+import emitter from './utils/eventBus';
 import IoTDevice from './aws-iot/index';
 
 
@@ -22,7 +22,6 @@ const PORT = 3308;
 const app = express();
 const httpServer = createServer(app); 
 const io = new Server(httpServer);
-const emitter = new EventEmitter();
 
 app.use(cors());
 app.use(express.json());
