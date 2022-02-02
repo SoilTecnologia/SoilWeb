@@ -59,6 +59,8 @@ class IoTDevice {
       configBuilder.with_clean_session(false);
       configBuilder.with_client_id(this.clientId);
       configBuilder.with_endpoint(endpoint);
+      configBuilder.with_keep_alive_seconds(10);
+      configBuilder.with_ping_timeout_ms(1000);
 
       const config = configBuilder.build();
       const client = new mqtt.MqttClient();
