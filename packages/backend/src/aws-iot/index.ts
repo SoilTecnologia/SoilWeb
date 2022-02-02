@@ -106,12 +106,12 @@ class IoTDevice {
         this.connection.publish(finalTopic!, payload, 0, false);
         console.log(`[IOT] Enviando mensagem à um GPRS...`);
       } else {
-      let string = JSON.stringify(payload, function (k, v) {
-        return v === undefined ? null : v;
-      });
-      this.connection.publish(finalTopic!, string, 0, false);
+        let string = JSON.stringify(payload, function (k, v) {
+          return v === undefined ? null : v;
+        });
+        this.connection.publish(finalTopic!, string, 0, false);
         console.log(`[IOT] Enviando mensagem...`);
-    }
+      }
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,

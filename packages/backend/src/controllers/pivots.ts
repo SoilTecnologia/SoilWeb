@@ -222,7 +222,15 @@ export const updatePivotController = async (
   rssi: RadioVariable['rssi']
 ) => {
   let shouldNotifyUpdate = false;
+  let shouldNotifyState = false;
   let state: State | undefined;
+
+  let pivot = await knex<Pivot>('pivots').select('node_id, pivot_name').where('pivot_id', pivot_id).first();
+  const {node_id, pivot_name} = pivot;
+  let node = await knex<Node>('nodes').select('farm_id').where('node_id', node_id).first();
+  const {farm_id} = node;
+  let farm = await knex<Node>('farms').select('user_id, farm_name').where('farm_id', farm_id).first();
+  const {user_id, farm_name} = farm;
 
   let oldState = await knex<State>('states')
     .where('pivot_id', pivot_id)
@@ -236,13 +244,14 @@ export const updatePivotController = async (
     isStateDifferent(oldState, { connection, power, water, direction })
   ) {
     shouldNotifyUpdate = true;
+    shouldNotifyState = true;
     const newState = await knex<State>('states').insert({
       pivot_id,
       connection,
       power,
       water,
       direction,
-      timestamp
+      timestamp: new Date(timestamp),
     }).returning('*');
 
     state = newState[0];
@@ -264,7 +273,7 @@ export const updatePivotController = async (
           state_id: state.state_id,
           angle,
           percentimeter,
-          timestamp
+      timestamp: new Date(timestamp),
         });
       }
     }
@@ -285,7 +294,7 @@ export const updatePivotController = async (
         state_id: state!.state_id,
         father,
         rssi,
-        timestamp
+      timestamp: new Date(timestamp),
       });
     }
   }
@@ -315,6 +324,27 @@ export const updatePivotController = async (
         rssi
       }
     });
+
+    if(shouldNotifyState) {
+      emitter.emit('state-change', {
+        user_id,
+        pivot_id,
+        pivot_name,
+        farm_name,
+        power,
+        water,
+        direction,
+        connection,
+        percentimeter
+      });
+    } else {
+      emitter.emit('variable-change', {
+        user_id,
+        pivot_id,
+        percentimeter,
+        angle
+      });
+    }
   }
 
   return;
