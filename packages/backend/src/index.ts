@@ -9,7 +9,7 @@ this file is responsible for:
 require('dotenv').config();
 
 import express from 'express';
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { createServer } from "http";
 import cors from 'cors';
 import router from './routes';
@@ -31,8 +31,8 @@ httpServer.listen(PORT, () => {
   console.info(`Server Listening on PORT ${PORT}`);
 });
 
-io.on("connection", socket => {
-  emitter.on('state-change', status => {
+io.on("connection", (socket: Socket) => {
+  emitter.on('state-change', (status: any) => {
     const {user_id, pivot_name, farm_name, pivot_id, connection, power, water, direction, percentimeter} = status;
     socket.emit(`${user_id}-status`, {
       type: "status",
@@ -49,7 +49,7 @@ io.on("connection", socket => {
     console.log(`socket de state: `, status)
   })
 
-  emitter.on('variable-change', status => {
+  emitter.on('variable-change', (status: any) => {
     const {user_id, pivot_id, angle, percentimeter} = status;
     socket.emit(`${user_id}-status`, {
       type: "variable",
