@@ -59,8 +59,8 @@ class IoTDevice {
       configBuilder.with_clean_session(false);
       configBuilder.with_client_id(this.clientId);
       configBuilder.with_endpoint(endpoint);
-      configBuilder.with_keep_alive_seconds(10);
-      configBuilder.with_ping_timeout_ms(1000);
+     // configBuilder.with_keep_alive_seconds(10);
+     // configBuilder.with_ping_timeout_ms(1000);
 
       const config = configBuilder.build();
       const client = new mqtt.MqttClient();
@@ -95,7 +95,7 @@ class IoTDevice {
 
   /*
   Função que faz a publicação de mensagens e respostas.
-  A função JSON.stringify() customizada converte o objeto em uma string, além de converter campos especiais como null para string, isso é importante pois a resposta deve ser exatamente igual ao que o cliente enviou, e campos null normalmente são apagados quando se usa a função JSON.stringify() original.
+  A função JSON.stringify() customizada converte o objeto em uma string, além de converter campos especiais como null para string. Isso é importante pois a resposta deve ser exatamente igual ao que o cliente enviou, e campos null normalmente são apagados quando se usa a função JSON.stringify() original.
   */
 
   publish(payload: any, topic?: string) {
@@ -242,7 +242,10 @@ class IoTDevice {
             )
           });
         }
-        this.queue.enqueue({
+
+        this.queue.enqueue(
+          
+          {
           type: 'action',
           farm_id: action.farm_id,
           node_name: action.node_name,
@@ -250,7 +253,9 @@ class IoTDevice {
             ...action.payload,
             timestamp: action.payload.timestamp.toString()
           }
-        });
+        }
+        
+        );
       });
 
       console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);

@@ -49,6 +49,7 @@ export const readPivotStateController = async (
     if (variables && variables.length > 0) {
       return {
         pivot_id: pivot_id,
+        pivot_name: pivot!.pivot_name,
         pivot_lng: pivot!.pivot_lng,
         pivot_lat: pivot!.pivot_lat,
         pivot_start_angle: pivot!.pivot_start_angle,
@@ -64,6 +65,7 @@ export const readPivotStateController = async (
     } else {
       return {
         pivot_id: pivot_id,
+        pivot_name: pivot!.pivot_name,
         pivot_lng: pivot!.pivot_lng,
         pivot_lat: pivot!.pivot_lat,
         pivot_start_angle: pivot!.pivot_start_angle,
