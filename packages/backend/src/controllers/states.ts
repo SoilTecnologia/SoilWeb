@@ -8,6 +8,7 @@ import { getLastCycleFromPivot } from './cycles';
 
 type StateResponse = {
   pivot_id: Pivot['pivot_id'];
+  pivot_name: Pivot['pivot_name'];
   pivot_lng: Pivot['pivot_lng'];
   pivot_lat: Pivot['pivot_lat'];
   pivot_start_angle: Pivot['pivot_start_angle'];
