@@ -7,7 +7,7 @@ import { last } from 'lodash';
 
 export const getLastCycleFromPivot = async (
   pivot_id: Pivot['pivot_id']
-): Promise<Array<{ angle: number }>> => {
+): Promise<Array<{ angle: number | null, percentimeter: number | null }>> => {
   const lastState = await knex<State>('states')
     .select('power', 'state_id')
     .where('pivot_id', pivot_id)
@@ -29,14 +29,14 @@ export const getLastCycleFromPivot = async (
           'state_variables.state_id',
           'states.state_id'
         )
-        .select('angle')
+        .select('angle', 'percentimeter')
         .where('pivot_id', pivot_id)
         .where('states.timestamp', '>', lastOff!.timestamp);
 
       return beforeThat;
     } else if (lastState.power === false) {
-      return await knex<State>('state_variables')
-        .select('angle')
+      return await knex<StateVariable>('state_variables')
+        .select('angle', 'percentimeter')
         .where('state_id', lastState.state_id);
     }
   }

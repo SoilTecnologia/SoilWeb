@@ -160,7 +160,7 @@ const checkPool = async () => {
       current.attempts++;
       console.log(`[ERROR - RASPBERRY.TEST]: ${err}`);
     } finally {
-      if (current.attempts > 1) {
+      if (current.attempts > 4) {
         console.log("Failing PIVOT")
         await updatePivotController(
           current.action.pivot_id,

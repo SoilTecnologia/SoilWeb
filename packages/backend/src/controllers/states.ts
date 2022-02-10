@@ -17,6 +17,7 @@ type StateResponse = {
   power: State['power'];
   connection: State['connection'];
   water: State['water'];
+  percentimeter: StateVariable['percentimeter'];
   direction: State['direction'];
   start_angle: StateVariable['angle'];
   end_angle: StateVariable['angle'];
@@ -60,6 +61,7 @@ export const readPivotStateController = async (
         water: state.water,
         direction: state.direction,
         connection: state.connection,
+        percentimeter: variables[variables.length-1]!.percentimeter,
         start_angle: variables[0]!.angle,
         end_angle: variables[variables.length - 1]!.angle
       };
@@ -76,6 +78,7 @@ export const readPivotStateController = async (
         water: state.water,
         direction: state.direction,
         connection: state.connection,
+        percentimeter: 0,
         start_angle: null,
         end_angle: null
       };
