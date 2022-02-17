@@ -111,7 +111,7 @@ export const readMapPivotController = async (
 
         const variables = await getLastCycleFromPivot(pivot.pivot_id);
 
-      if (state && variables) {
+      if (state && variables && variables.length > 0) {
         pivotArray.push({
           pivot_id: pivot.pivot_id,
           pivot_lng: pivot.pivot_lng,
