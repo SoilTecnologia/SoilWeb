@@ -109,9 +109,9 @@ export const readMapPivotController = async (
         .orderBy('timestamp', 'desc')
         .first();
 
-      if (state) {
         const variables = await getLastCycleFromPivot(pivot.pivot_id);
 
+      if (state && variables) {
         pivotArray.push({
           pivot_id: pivot.pivot_id,
           pivot_lng: pivot.pivot_lng,
@@ -125,6 +125,21 @@ export const readMapPivotController = async (
           connection: state.connection,
           start_angle: variables[0]!.angle,
           end_angle: variables[variables.length - 1]!.angle
+        });
+      } else {
+        pivotArray.push({
+          pivot_id: pivot.pivot_id,
+          pivot_lng: pivot.pivot_lng,
+          pivot_lat: pivot.pivot_lat,
+          pivot_start_angle: pivot.pivot_start_angle,
+          pivot_end_angle: pivot.pivot_end_angle,
+          pivot_radius: pivot.pivot_radius,
+          power: false,
+          water: false,
+          direction: null,
+          connection: true,
+          start_angle: pivot.pivot_start_angle,
+          end_angle: pivot.pivot_start_angle
         });
       }
     }
