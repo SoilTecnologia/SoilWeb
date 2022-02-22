@@ -17,12 +17,19 @@ export type IoTDeviceType = 'Raspberry' | 'Cloud';
 
 class IoTDevice {
   private type: IoTDeviceType; // Tipo do dispositivo
+
   private qos: mqtt.QoS; // Qualidade do serviço
+
   private pubTopic?: string = ''; // Tópico de publicação
+
   private subTopic: string = ''; // Tópico de subscrição
+
   private clientId: string = ''; // Id do cliente (deve ser unico)
+
   private connection: mqtt.MqttClientConnection; // A conexão com o broker
+
   private ready: boolean = true; // Variavel auxiliar do loop da fila
+
   private queue: Queue<MessageQueue>; // Fila de mensagens à serem enviadas
 
   constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
@@ -108,9 +115,7 @@ class IoTDevice {
         this.connection.publish(finalTopic!, payload, 0, false);
         console.log(`[IOT] Enviando mensagem à um GPRS...`);
       } else {
-        let string = JSON.stringify(payload, function (k, v) {
-          return v === undefined ? null : v;
-        });
+        const string = JSON.stringify(payload, (k, v) => v === undefined ? null : v);
         this.connection.publish(finalTopic!, string, 0, false);
         console.log(`[IOT] Enviando mensagem...`);
       }
@@ -174,8 +179,7 @@ class IoTDevice {
         console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
         this.queue.remove(json);
       }
-    } else {
-      if (json.type === 'status') {
+    } else if (json.type === 'status') {
         console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
         this.queue.remove(json);
       } else if (json.type === 'action') {
@@ -203,7 +207,6 @@ class IoTDevice {
         );
         this.publish(json);
       }
-    }
   };
 
   /*
@@ -267,14 +270,12 @@ class IoTDevice {
       const current = this.queue.peek()!;
 
       if (this.type === 'Raspberry') this.publish(current, this.pubTopic);
-      else {
-        if (typeof current.payload === 'string')
+      else if (typeof current.payload === 'string')
           this.publish(
             current.payload,
             `${current.farm_id}/${current.node_name}`
           );
         else this.publish(current, `${current.farm_id}/${current.node_name}`);
-      }
     }
   };
 }

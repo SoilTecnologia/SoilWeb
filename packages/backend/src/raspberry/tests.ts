@@ -33,8 +33,8 @@ type IdleData = {
   attempts: number;
 };
 
-let activeQueue: Queue<ActionData> = new Queue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
-let idleQueue: Queue<IdleData> = new Queue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
+const activeQueue: Queue<ActionData> = new Queue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
+const idleQueue: Queue<IdleData> = new Queue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
 
 let ready = true;
 
@@ -65,7 +65,7 @@ type RadioResponse = {
 };
 
 const sendData = async (radio_id: number, data: string) => {
-  let bodyFormData = new FormData();
+  const bodyFormData = new FormData();
 
   bodyFormData.set('ID', radio_id);
   // bodyFormData.set('CMD', '40');
@@ -77,7 +77,7 @@ const sendData = async (radio_id: number, data: string) => {
   //   Readable.from(encoder),
   //   { headers: encoder.headers, timeout: TIMEOUT }
   // );
-  let response = await Axios.post<RadioResponse>(
+  const response = await Axios.post<RadioResponse>(
     'http://192.168.100.101:3031/comands',
     Readable.from(encoder),
     { headers: encoder.headers, timeout: TIMEOUT }
@@ -92,7 +92,7 @@ Checa se a resposta da placa é igual à uma action que mandamos à ela
 const checkResponse = (action: Action, payload: StatusObject) => {
   if (payload) {
     if (action.power) {
-      //Se nossa intenção era ligar, checamos todo o payload
+      // Se nossa intenção era ligar, checamos todo o payload
       if (
         payload.power == action.power &&
         payload.water == action.water &&
@@ -123,11 +123,13 @@ const checkPool = async () => {
         direction,
         percentimeter
       );
-      console.log(`Sending Action to radio ${current.action.radio_id}: ${actionString}`);
+      console.log(
+        `Sending Action to radio ${current.action.radio_id}: ${actionString}`
+      );
       const response = await sendData(current.action.radio_id, actionString);
-      const data = response.data;
+      const { data } = response;
 
-      const payload = data.payload;
+      const { payload } = data;
       // const payloadToString = String.fromCharCode(...payload);
       const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
 
@@ -135,7 +137,11 @@ const checkPool = async () => {
         payloadToString.substring(0, payloadToString.indexOf('#'))
       );
 
-      if (payloadObject && current.action.radio_id == data.id && checkResponse(current.action, payloadObject)) {
+      if (
+        payloadObject &&
+        current.action.radio_id == data.id &&
+        checkResponse(current.action, payloadObject)
+      ) {
         await updatePivotController(
           current.action.pivot_id,
           true,
@@ -161,7 +167,7 @@ const checkPool = async () => {
       console.log(`[ERROR - RASPBERRY.TEST]: ${err}`);
     } finally {
       if (current.attempts > 4) {
-        console.log("Failing PIVOT")
+        console.log('Failing PIVOT');
         await updatePivotController(
           current.action.pivot_id,
           false,
@@ -185,9 +191,9 @@ const checkPool = async () => {
     try {
       console.log(`Checking radio ${current.radio_id}`);
       const response = await sendData(current.radio_id, '000000');
-      const data = response.data;
-      
-      const payload = data.payload;
+      const { data } = response;
+
+      const { payload } = data;
       const payloadToString = new TextDecoder().decode(new Uint8Array(payload));
       const payloadObject = statusStringToObject(
         payloadToString.substring(0, payloadToString.indexOf('#'))
@@ -215,7 +221,7 @@ const checkPool = async () => {
       current.attempts++;
     } finally {
       if (current.attempts >= 10) {
-        console.log("Failing PIVOT")
+        console.log('Failing PIVOT');
         await updatePivotController(
           current.pivot_id,
           false,
@@ -240,7 +246,7 @@ const checkPool = async () => {
 export const loadActions = async () => {
   const allActions = await readAllActionsController();
 
-  for (let action of allActions) {
+  for (const action of allActions) {
     activeQueue.enqueue({ action, attempts: 0, timestamp: new Date() });
   }
 };
@@ -248,7 +254,7 @@ export const loadActions = async () => {
 export const loadPivots = async () => {
   const allPivots = await readAllPivotsController2();
 
-  for (let pivot of allPivots) {
+  for (const pivot of allPivots) {
     idleQueue.enqueue({
       pivot_id: pivot.pivot_id,
       radio_id: pivot.radio_id,

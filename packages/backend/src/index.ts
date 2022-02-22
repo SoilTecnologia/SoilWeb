@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* 
 This is the entry point of the application,
 this file is responsible for:
@@ -5,8 +6,6 @@ this file is responsible for:
   - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)
   - Setting up the event emitter to be used on other systems
 */
-
-require('dotenv').config();
 
 import express from 'express';
 import { Server, Socket } from "socket.io";
@@ -16,6 +15,8 @@ import router from './routes';
 import * as raspberry from './raspberry/tests';
 import emitter from './utils/eventBus';
 import IoTDevice from './aws-iot/index';
+
+require('dotenv').config();
 
 
 const PORT = 3308;

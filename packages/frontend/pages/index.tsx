@@ -15,8 +15,8 @@ const index = ({ token }: { token: string }) => {
         }
       });
 
-      let newFarms = [];
-      for (let farmUser of response.data) {
+      const newFarms = [];
+      for (const farmUser of response.data) {
         newFarms.push({
           farm_id: farmUser.farm.farm_id,
           farm_name: farmUser.farm.farm_name,
@@ -37,7 +37,7 @@ const index = ({ token }: { token: string }) => {
       </Header>
 
       {farms.map(({ farm_id, farm_name, city }) => (
-        <Farm farm_id={farm_id} farm_name={farm_name} city={city} />
+        <Farm key={farm_id} farm_id={farm_id} farm_name={farm_name} city={city} />
       ))}
     </div>
   );
@@ -50,9 +50,9 @@ const Farm = ({
   farm_name,
   city
 }: {
-  farm_id: String;
-  farm_name: String;
-  city: String;
+  farm_id: string;
+  farm_name: string;
+  city: string;
 }) => {
   return (
     <div className="bg-primary font-sans rounded-md text-xl text-white flex p-8 m-16">

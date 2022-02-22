@@ -1,0 +1,62 @@
+{
+    "sourceFile": "packages/backend/.eslintrc.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 11,
+            "patches": [
+                {
+                    "date": 1645283864753,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645283890318,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,16 +1,16 @@\n {\n-  env: {\n-    browser: true,\n-    commonjs: true,\n-    es2021: true\n+  \"env\": {\n+    \"browser\": true,\n+    \"commonjs\": true,\n+    \"es2021\": true\n   },\n-  extends: [\n+  \"extends\": \"[\n     'airbnb-base',\n     'plugin:import/recommended',\n     'plugin:import/typescript',\n     'prettier'\n-  ],\n+  ]\",\n   parser: '@typescript-eslint/parser',\n   parserOptions: {\n     ecmaVersion: 12\n   },\n"
+                },
+                {
+                    "date": 1645283975709,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,30 +3,30 @@\n     \"browser\": true,\n     \"commonjs\": true,\n     \"es2021\": true\n   },\n-  \"extends\": \"[\n-    'airbnb-base',\n-    'plugin:import/recommended',\n-    'plugin:import/typescript',\n-    'prettier'\n-  ]\",\n-  parser: '@typescript-eslint/parser',\n-  parserOptions: {\n-    ecmaVersion: 12\n+  \"extends\": [\n+    \"airbnb-base\",\n+    \"plugin:import/recommended\",\n+    \"plugin:import/typescript\",\n+    \"prettier\"\n+  ],\n+  \"parser\": \"@typescript-eslint/parser\",\n+  \"parserOptions\": {\n+    \"ecmaVersion\": 12\n   },\n-  plugins: ['@typescript-eslint'],\n-  rules: {\n-    'import/extensions': ['warn', 'never'],\n-    '@typescript-eslint/explicit-module-boundary-types': 'off',\n-    'camelcase': ['warn'],\n-    'no-console': [\n-      'error',\n-      { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n+  \"plugins\": [\"@typescript-eslint\"],\n+  \"rules\": {\n+    \"import/extensions\": [\"warn\", \"never\"],\n+    \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n+    \"camelcase\": [\"warn\"],\n+    \"no-console\": [\n+      \"error\",\n+      { \"allow\": [\"warn\", \"error\", \"info\", \"debug\", \"dir\"] }\n     ]\n   },\n-  overrides: [\n+  \"overrides\": [\n     {\n-      files: ['src/**/*.s']\n+      \"files\": [\"src/**/*.s\"]\n     }\n   ]\n-};\n+}\n"
+                },
+                {
+                    "date": 1645283999623,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,8 +18,9 @@\n   \"rules\": {\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n     \"camelcase\": [\"warn\"],\n+    \"arrow-body-style\": [\"error\", \"never\"]\n     \"no-console\": [\n       \"error\",\n       { \"allow\": [\"warn\", \"error\", \"info\", \"debug\", \"dir\"] }\n     ]\n"
+                },
+                {
+                    "date": 1645284006408,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n   \"rules\": {\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n     \"camelcase\": [\"warn\"],\n-    \"arrow-body-style\": [\"error\", \"never\"]\n+    \"arrow-body-style\": [\"error\", \"never\"],\n     \"no-console\": [\n       \"error\",\n       { \"allow\": [\"warn\", \"error\", \"info\", \"debug\", \"dir\"] }\n     ]\n"
+                },
+                {
+                    "date": 1645284020722,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n   \"rules\": {\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n     \"camelcase\": [\"warn\"],\n-    \"arrow-body-style\": [\"error\", \"never\"],\n+    \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-console\": [\n       \"error\",\n       { \"allow\": [\"warn\", \"error\", \"info\", \"debug\", \"dir\"] }\n     ]\n"
+                },
+                {
+                    "date": 1645284052093,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,8 +19,9 @@\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n     \"camelcase\": [\"warn\"],\n     \"arrow-body-style\": [\"error\", \"always\"],\n+    \"no-unused-vars\": \"off\",\n     \"no-console\": [\n       \"error\",\n       { \"allow\": [\"warn\", \"error\", \"info\", \"debug\", \"dir\"] }\n     ]\n"
+                },
+                {
+                    "date": 1645284223514,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,8 +20,9 @@\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n     \"camelcase\": [\"warn\"],\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n+    \"consistent-return\": \"off\",\n     \"no-console\": [\n       \"error\",\n       { \"allow\": [\"warn\", \"error\", \"info\", \"debug\", \"dir\"] }\n     ]\n"
+                },
+                {
+                    "date": 1645284257810,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,8 +21,9 @@\n     \"camelcase\": [\"warn\"],\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n     \"consistent-return\": \"off\",\n+    \"no-param-reassign\": \"off\",\n     \"no-console\": [\n       \"error\",\n       { \"allow\": [\"warn\", \"error\", \"info\", \"debug\", \"dir\"] }\n     ]\n"
+                },
+                {
+                    "date": 1645285536025,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n   \"plugins\": [\"@typescript-eslint\"],\n   \"rules\": {\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n-    \"camelcase\": [\"warn\"],\n+    \"camelcase\": \"off\",\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n"
+                },
+                {
+                    "date": 1645285552444,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n   \"plugins\": [\"@typescript-eslint\"],\n   \"rules\": {\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n-    \"camelcase\": \"off\",\n+    \"camelcase\": \"warn\",\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n"
+                },
+                {
+                    "date": 1645285566680,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n   \"plugins\": [\"@typescript-eslint\"],\n   \"rules\": {\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n-    \"camelcase\": \"warn\",\n+    \"camelcase\": \"off\",\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n"
+                }
+            ],
+            "date": 1645283864753,
+            "name": "Commit-0",
+            "content": "{\n  env: {\n    browser: true,\n    commonjs: true,\n    es2021: true\n  },\n  extends: [\n    'airbnb-base',\n    'plugin:import/recommended',\n    'plugin:import/typescript',\n    'prettier'\n  ],\n  parser: '@typescript-eslint/parser',\n  parserOptions: {\n    ecmaVersion: 12\n  },\n  plugins: ['@typescript-eslint'],\n  rules: {\n    'import/extensions': ['warn', 'never'],\n    '@typescript-eslint/explicit-module-boundary-types': 'off',\n    'camelcase': ['warn'],\n    'no-console': [\n      'error',\n      { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n    ]\n  },\n  overrides: [\n    {\n      files: ['src/**/*.s']\n    }\n  ]\n};\n"
+        }
+    ]
+}

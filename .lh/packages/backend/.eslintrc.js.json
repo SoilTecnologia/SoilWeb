@@ -1,0 +1,78 @@
+{
+    "sourceFile": "packages/backend/.eslintrc.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 15,
+            "patches": [
+                {
+                    "date": 1645281991014,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645282000114,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n   rules: {\n     'import/extensions': ['warn', 'never'],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n     'camelcase': 'off',\n-    'no-unused-var': 'off',\n+    'no-unused-vars': 'off',\n     \"arrow-body-style\": [\"error\", \"never\"]\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n"
+                },
+                {
+                    "date": 1645282023937,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,12 +16,11 @@\n   },\n   plugins: ['@typescript-eslint'],\n   rules: {\n     'import/extensions': ['warn', 'never'],\n-    \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n-    'camelcase': 'off',\n+    '@typescript-eslint/explicit-module-boundary-types': 'off',\n+    camelcase: 'off',\n     'no-unused-vars': 'off',\n-    \"arrow-body-style\": [\"error\", \"never\"]\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n@@ -29,7 +28,6 @@\n   overrides: [\n     {\n       files: ['src/**/*.s']\n     }\n-  ],\n-  \n+  ]\n };\n"
+                },
+                {
+                    "date": 1645282056101,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,8 @@\n   rules: {\n     'import/extensions': ['warn', 'never'],\n     '@typescript-eslint/explicit-module-boundary-types': 'off',\n     camelcase: 'off',\n-    'no-unused-vars': 'off',\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n"
+                },
+                {
+                    "date": 1645282124999,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,10 +16,11 @@\n   },\n   plugins: ['@typescript-eslint'],\n   rules: {\n     'import/extensions': ['warn', 'never'],\n-    '@typescript-eslint/explicit-module-boundary-types': 'off',\n-    camelcase: 'off',\n+    \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n+    \"camelcase\": \"off\",\n+  \"@typescript-eslint/camelcase\": [\"warn\"]\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n@@ -27,6 +28,7 @@\n   overrides: [\n     {\n       files: ['src/**/*.s']\n     }\n-  ]\n+  ],\n+  \n };\n"
+                },
+                {
+                    "date": 1645283447937,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,11 +16,11 @@\n   },\n   plugins: ['@typescript-eslint'],\n   rules: {\n     'import/extensions': ['warn', 'never'],\n-    \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n-    \"camelcase\": \"off\",\n-  \"@typescript-eslint/camelcase\": [\"warn\"]\n+    '@typescript-eslint/explicit-module-boundary-types': 'off',\n+    camelcase: 'off',\n+    '@typescript-eslint/camelcase': ['warn'],\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n@@ -28,7 +28,6 @@\n   overrides: [\n     {\n       files: ['src/**/*.s']\n     }\n-  ],\n-  \n+  ]\n };\n"
+                },
+                {
+                    "date": 1645283454468,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,11 +16,11 @@\n   },\n   plugins: ['@typescript-eslint'],\n   rules: {\n     'import/extensions': ['warn', 'never'],\n-    '@typescript-eslint/explicit-module-boundary-types': 'off',\n-    camelcase: 'off',\n-    '@typescript-eslint/camelcase': ['warn'],\n+    \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n+    \"camelcase\": \"off\",\n+  \"@typescript-eslint/camelcase\": [\"warn\"]\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n@@ -28,6 +28,7 @@\n   overrides: [\n     {\n       files: ['src/**/*.s']\n     }\n-  ]\n+  ],\n+  \n };\n"
+                },
+                {
+                    "date": 1645283559732,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -16,11 +16,9 @@\n   },\n   plugins: ['@typescript-eslint'],\n   rules: {\n     'import/extensions': ['warn', 'never'],\n-    \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n-    \"camelcase\": \"off\",\n-  \"@typescript-eslint/camelcase\": [\"warn\"]\n+    '@typescript-eslint/explicit-module-boundary-types': 'off',\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n@@ -28,7 +26,6 @@\n   overrides: [\n     {\n       files: ['src/**/*.s']\n     }\n-  ],\n-  \n+  ]\n };\n"
+                },
+                {
+                    "date": 1645283571474,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,9 +20,11 @@\n     '@typescript-eslint/explicit-module-boundary-types': 'off',\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n-    ]\n+    ],\n+    camelcase: 'off',\n+    '@typescript-eslint/camelcase': ['warn']\n   },\n   overrides: [\n     {\n       files: ['src/**/*.s']\n"
+                },
+                {
+                    "date": 1645283650252,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,9 +21,8 @@\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ],\n-    camelcase: 'off',\n     '@typescript-eslint/camelcase': ['warn']\n   },\n   overrides: [\n     {\n"
+                },
+                {
+                    "date": 1645283667779,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,10 +20,9 @@\n     '@typescript-eslint/explicit-module-boundary-types': 'off',\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n-    ],\n-    '@typescript-eslint/camelcase': ['warn']\n+    ]\n   },\n   overrides: [\n     {\n       files: ['src/**/*.s']\n"
+                },
+                {
+                    "date": 1645283674859,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,8 +17,9 @@\n   plugins: ['@typescript-eslint'],\n   rules: {\n     'import/extensions': ['warn', 'never'],\n     '@typescript-eslint/explicit-module-boundary-types': 'off',\n+    '@typescript-eslint/camelcase': ['warn'],\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n"
+                },
+                {
+                    "date": 1645283696591,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n   plugins: ['@typescript-eslint'],\n   rules: {\n     'import/extensions': ['warn', 'never'],\n     '@typescript-eslint/explicit-module-boundary-types': 'off',\n-    '@typescript-eslint/camelcase': ['warn'],\n+    camelcase: ['warn'],\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n"
+                },
+                {
+                    "date": 1645283713300,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n   plugins: ['@typescript-eslint'],\n   rules: {\n     'import/extensions': ['warn', 'never'],\n     '@typescript-eslint/explicit-module-boundary-types': 'off',\n-    camelcase: ['warn'],\n+    camelcase: 'off',\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n"
+                },
+                {
+                    "date": 1645283757872,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,10 +15,10 @@\n     ecmaVersion: 12\n   },\n   plugins: ['@typescript-eslint'],\n   rules: {\n-    'import/extensions': ['warn', 'never'],\n-    '@typescript-eslint/explicit-module-boundary-types': 'off',\n+    import/extensions: ['warn', 'never'],\n+    @typescript-eslint/explicit-module-boundary-types: 'off',\n     camelcase: 'off',\n     'no-console': [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n"
+                },
+                {
+                    "date": 1645283767385,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,9 +18,9 @@\n   rules: {\n     import/extensions: ['warn', 'never'],\n     @typescript-eslint/explicit-module-boundary-types: 'off',\n     camelcase: 'off',\n-    'no-console': [\n+    no-console: [\n       'error',\n       { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n     ]\n   },\n"
+                }
+            ],
+            "date": 1645281991014,
+            "name": "Commit-0",
+            "content": "module.exports = {\n  env: {\n    browser: true,\n    commonjs: true,\n    es2021: true\n  },\n  extends: [\n    'airbnb-base',\n    'plugin:import/recommended',\n    'plugin:import/typescript',\n    'prettier'\n  ],\n  parser: '@typescript-eslint/parser',\n  parserOptions: {\n    ecmaVersion: 12\n  },\n  plugins: ['@typescript-eslint'],\n  rules: {\n    'import/extensions': ['warn', 'never'],\n    \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n    'camelcase': 'off',\n    'no-unused-var': 'off',\n    \"arrow-body-style\": [\"error\", \"never\"]\n    'no-console': [\n      'error',\n      { allow: ['warn', 'error', 'info', 'debug', 'dir'] }\n    ]\n  },\n  overrides: [\n    {\n      files: ['src/**/*.s']\n    }\n  ],\n  \n};\n"
+        }
+    ]
+}

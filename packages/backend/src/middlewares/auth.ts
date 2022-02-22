@@ -33,13 +33,13 @@ const authMiddleware = (): ((
         jwt.verify(token, process.env.TOKEN_SECRET as jwt.Secret)
       );
 
-      let wrappedRequest = <IUserAuthInfoRequest>req;
+      const wrappedRequest = <IUserAuthInfoRequest>req;
       wrappedRequest.user = decode;
 
       req = wrappedRequest;
       next();
     } catch (err) {
-      res.status(401).send("Invalid Token!")
+      res.status(401).send('Invalid Token!');
     }
   };
 };
