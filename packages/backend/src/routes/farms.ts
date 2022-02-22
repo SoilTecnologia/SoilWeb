@@ -1,7 +1,11 @@
+/* eslint-disable spaced-comment */
 import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
-import { readAllFarmController, readMapFarmControler } from '../controllers/farms';
+import {
+  readAllFarmController,
+  readMapFarmControler
+} from '../controllers/farms';
 import { createNodeController } from '../controllers/nodes';
 import Farm from '../models/farm';
 import Pivot from '../models/pivot';
@@ -41,7 +45,7 @@ router.put(
   )
 );
 
-router.get('/user/:id', function (req: express.Request, res: express.Response) {}    )
+router.get('/user/:id', (req: express.Request, res: express.Response) => {});
 
 router.get(
   '/readAll',
@@ -82,19 +86,23 @@ type FullMapData = {
   pivots: Array<PivotMapData>;
 };
 
-router.get('/map/:farm_id', authMiddleware(), async (req, res, next) /*: Promise<PivotMapData>*/ => {
-  const { farm_id } = req.params;
+router.get(
+  '/map/:farm_id',
+  authMiddleware(),
+  async (req, res, next) /*: Promise<PivotMapData>*/ => {
+    const { farm_id } = req.params;
 
-  try {
-    const result = await readMapFarmControler(farm_id);
+    try {
+      const result = await readMapFarmControler(farm_id);
 
-    res.json(result);
-  } catch (err) {
-        console.log(`[ERROR] Server 500 on /farms/map`);
-        console.log(err);
-    next(err);
+      res.json(result);
+    } catch (err) {
+      console.log(`[ERROR] Server 500 on /farms/map`);
+      console.log(err);
+      next(err);
+    }
   }
-});
+);
 
 // router.get(
 //   '/readAll',

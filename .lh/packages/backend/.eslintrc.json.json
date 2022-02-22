@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 11,
+            "activePatchIndex": 12,
             "patches": [
                 {
                     "date": 1645283864753,
@@ -52,6 +52,10 @@
                 {
                     "date": 1645285566680,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n   \"plugins\": [\"@typescript-eslint\"],\n   \"rules\": {\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n-    \"camelcase\": \"warn\",\n+    \"camelcase\": \"off\",\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n"
+                },
+                {
+                    "date": 1645534326353,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,12 +22,9 @@\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n-    \"no-console\": [\n-      \"error\",\n-      { \"allow\": [\"warn\", \"error\", \"info\", \"debug\", \"dir\"] }\n-    ]\n+    \"no-console\": \"off\"\n   },\n   \"overrides\": [\n     {\n       \"files\": [\"src/**/*.s\"]\n"
                 }
             ],
             "date": 1645283864753,

@@ -10,7 +10,12 @@ router.post('/signup', async (req, res, next) => {
   const { user_id, login, password, user_type } = req.body;
 
   try {
-    const cookieInfo = await signUpController(login, password, user_type, user_id);
+    const cookieInfo = await signUpController(
+      login,
+      password,
+      user_type,
+      user_id
+    );
 
     res.send(cookieInfo);
   } catch (err) {
@@ -48,8 +53,8 @@ router.get(
       res: express.Response,
       next: express.NextFunction
     ) => {
-      const user = req.user;
-      res.json({user_id: user.user_id});
+      const { user } = req;
+      res.json({ user_id: user.user_id });
     }
   )
 );
@@ -63,7 +68,7 @@ router.put(
       res: express.Response,
       next: express.NextFunction
     ) => {
-      const {user_id} = req.user;
+      const { user_id } = req.user;
       const { farm_id, farm_name, farm_city, farm_lng, farm_lat } = req.body;
 
       try {

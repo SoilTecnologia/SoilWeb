@@ -23,10 +23,7 @@
     "no-unused-vars": "off",
     "consistent-return": "off",
     "no-param-reassign": "off",
-    "no-console": [
-      "error",
-      { "allow": ["warn", "error", "info", "debug", "dir"] }
-    ]
+    "no-console": "off"
   },
   "overrides": [
     {
