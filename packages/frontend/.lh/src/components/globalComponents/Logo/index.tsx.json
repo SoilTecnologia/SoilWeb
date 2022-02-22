@@ -1,0 +1,58 @@
+{
+    "sourceFile": "src/components/globalComponents/Logo/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 10,
+            "patches": [
+                {
+                    "date": 1645546435439,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645546453005,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,3 @@\n-export const Logo() => {\n+const Logo = () => {};\n \n-}\n+export default Logo;\n"
+                },
+                {
+                    "date": 1645546458664,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,7 @@\n-const Logo = () => {};\n+const Logo = () => {\n+  <S.ContentLogo>\n+    <Image layout=\"fill\" src={Logo} />\n+  </S.ContentLogo>;\n+};\n \n export default Logo;\n"
+                },
+                {
+                    "date": 1645546477326,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,7 @@\n+import Logo from \"../../../../public/logos/logo.png\";\n+import Image from \"next/image\";\n+\n const Logo = () => {\n   <S.ContentLogo>\n     <Image layout=\"fill\" src={Logo} />\n   </S.ContentLogo>;\n"
+                },
+                {
+                    "date": 1645546551707,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,5 @@\n+import * as S from \"./styles\";\n import Logo from \"../../../../public/logos/logo.png\";\n import Image from \"next/image\";\n \n const Logo = () => {\n"
+                },
+                {
+                    "date": 1645546577470,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,11 @@\n import * as S from \"./styles\";\n-import Logo from \"../../../../public/logos/logo.png\";\n+import LogoImage from \"../../../../public/logos/logo.png\";\n import Image from \"next/image\";\n \n const Logo = () => {\n   <S.ContentLogo>\n-    <Image layout=\"fill\" src={Logo} />\n+    <Image layout=\"fill\" src={LogoImage} alt=\"Logo da empresa SoilTech\" />\n   </S.ContentLogo>;\n };\n \n export default Logo;\n"
+                },
+                {
+                    "date": 1645546620632,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,10 +2,12 @@\n import LogoImage from \"../../../../public/logos/logo.png\";\n import Image from \"next/image\";\n \n const Logo = () => {\n-  <S.ContentLogo>\n-    <Image layout=\"fill\" src={LogoImage} alt=\"Logo da empresa SoilTech\" />\n-  </S.ContentLogo>;\n+  return (\n+    <S.ContentLogo>\n+      <Image layout=\"fill\" src={LogoImage} alt=\"Logo da empresa SoilTech\" />\n+    </S.ContentLogo>\n+  );\n };\n \n export default Logo;\n"
+                },
+                {
+                    "date": 1645546791840,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,14 @@\n \n const Logo = () => {\n   return (\n     <S.ContentLogo>\n-      <Image layout=\"fill\" src={LogoImage} alt=\"Logo da empresa SoilTech\" />\n+      <Image\n+        width={100}\n+        height={100}\n+        src={LogoImage}\n+        alt=\"Logo da empresa SoilTech\"\n+      />\n     </S.ContentLogo>\n   );\n };\n \n"
+                },
+                {
+                    "date": 1645546949137,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,14 +4,9 @@\n \n const Logo = () => {\n   return (\n     <S.ContentLogo>\n-      <Image\n-        width={100}\n-        height={100}\n-        src={LogoImage}\n-        alt=\"Logo da empresa SoilTech\"\n-      />\n+      <Image layout=\"fill\" src={LogoImage} alt=\"Logo da empresa SoilTech\" />\n     </S.ContentLogo>\n   );\n };\n \n"
+                },
+                {
+                    "date": 1645546958405,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,13 @@\n \n const Logo = () => {\n   return (\n     <S.ContentLogo>\n-      <Image layout=\"fill\" src={LogoImage} alt=\"Logo da empresa SoilTech\" />\n+      <Image\n+        layout=\"responsive\"\n+        src={LogoImage}\n+        alt=\"Logo da empresa SoilTech\"\n+      />\n     </S.ContentLogo>\n   );\n };\n \n"
+                },
+                {
+                    "date": 1645547008035,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import * as S from \"./styles\";\n-import LogoImage from \"../../../../public/logos/logo.png\";\n+import LogoImage from \"../../../../public/logos/logo-dark.png\";\n import Image from \"next/image\";\n \n const Logo = () => {\n   return (\n"
+                }
+            ],
+            "date": 1645546435439,
+            "name": "Commit-0",
+            "content": "export const Logo() => {\n\n}\n"
+        }
+    ]
+}

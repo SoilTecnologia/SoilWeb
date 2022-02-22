@@ -1,9 +1,13 @@
-/** @type {import('next').NextConfig} */
-require('dotenv').config();
-module.exports = {
-  reactStrictMode: true,
-  env: {
-    COOKIE_SECRET: process.env.SECRET_COOKIE_PASSWORD,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL
-  }
-};
+/* eslint-disable @typescript-eslint/no-var-requires */
+const withPWA = require("next-pwa");
+const isProd = process.env.NODE_ENV === "production";
+
+module.exports = withPWA({
+  pwa: {
+    dest: "public",
+    disable: !isProd,
+  },
+  images: {
+    domains: ["res.cloudinary.com"],
+  },
+});

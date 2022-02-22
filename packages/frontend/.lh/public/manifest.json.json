@@ -1,0 +1,26 @@
+{
+    "sourceFile": "public/manifest.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1645544360474,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645544378696,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,7 @@\n {\n-  \"name\": \"React Avançado - Boilerplate\",\n-  \"short_name\": \"React Avançado\",\n+  \"name\": \"Soil Tech\",\n+  \"short_name\": \"Soil\",\n   \"icons\": [\n     {\n       \"src\": \"/img/icon-192.png\",\n       \"type\": \"image/png\",\n"
+                },
+                {
+                    "date": 1645544775625,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,16 +2,11 @@\n   \"name\": \"Soil Tech\",\n   \"short_name\": \"Soil\",\n   \"icons\": [\n     {\n-      \"src\": \"/img/icon-192.png\",\n+      \"src\": \"/logos/logo.png\",\n       \"type\": \"image/png\",\n       \"sizes\": \"192x192\"\n-    },\n-    {\n-      \"src\": \"/img/icon-512.png\",\n-      \"type\": \"image/png\",\n-      \"sizes\": \"512x512\"\n     }\n   ],\n   \"background_color\": \"#a2a638\",\n   \"description\": \"Soil Tech\",\n"
+                }
+            ],
+            "date": 1645544360474,
+            "name": "Commit-0",
+            "content": "{\n  \"name\": \"React Avançado - Boilerplate\",\n  \"short_name\": \"React Avançado\",\n  \"icons\": [\n    {\n      \"src\": \"/img/icon-192.png\",\n      \"type\": \"image/png\",\n      \"sizes\": \"192x192\"\n    },\n    {\n      \"src\": \"/img/icon-512.png\",\n      \"type\": \"image/png\",\n      \"sizes\": \"512x512\"\n    }\n  ],\n  \"background_color\": \"#a2a638\",\n  \"description\": \"Soil Tech\",\n  \"display\": \"fullscreen\",\n  \"start_url\": \"/\",\n  \"theme_color\": \"#a2a638\"\n}\n"
+        }
+    ]
+}

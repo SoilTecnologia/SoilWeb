@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/components/globalComponents/InputsLogin/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1645547629540,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645547663244,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,22 @@\n import * as S from \"./styles\";\n \n-const InputsLogin = () => (\n-  <S.Container>\n-    <h1>InputsLogin</h1>\n-  </S.Container>\n-);\n+type props = {\n+  children: React.ReactNode;\n+  error: string | undefined;\n+};\n \n+const InputsLogin = ({ children, error }: props) => {\n+  return (\n+    <S.ContentInputs>\n+      {children}\n+      {error && (\n+        <S.Alert role=\"alert\">\n+          <S.Icon></S.Icon>\n+          <S.TextAlert>{error}</S.TextAlert>\n+        </S.Alert>\n+      )}\n+    </S.ContentInputs>\n+  );\n+};\n+\n export default InputsLogin;\n"
+                }
+            ],
+            "date": 1645547629540,
+            "name": "Commit-0",
+            "content": "import * as S from \"./styles\";\n\nconst InputsLogin = () => (\n  <S.Container>\n    <h1>InputsLogin</h1>\n  </S.Container>\n);\n\nexport default InputsLogin;\n"
+        }
+    ]
+}

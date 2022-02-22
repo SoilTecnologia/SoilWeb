@@ -1,0 +1,54 @@
+{
+    "sourceFile": "src/styles/theme.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 9,
+            "patches": [
+                {
+                    "date": 1645545622541,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645545632136,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,9 +20,8 @@\n   font: {\n     family: {\n       Poppins: \"'Poppins', sans-serif\",\n       Tangerine: \"'Tangerine', cursive\",\n-      GrechenFuemen: '\"Grechen Fuemen\", cursive',\n       Roboto: '\"Roboto\", monospace',\n     },\n     sizes: {\n       xsmall: \"1.2rem\",\n"
+                },
+                {
+                    "date": 1645545654727,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,8 +13,9 @@\n   },\n   colors: {\n     primary: \"#246e4d\",\n     secondary: \"#9cba56\",\n+\n     lightColor: \"#e1e1e1\",\n     darkColor: \"#1e1e1e\",\n   },\n   font: {\n"
+                },
+                {
+                    "date": 1645545718097,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,9 +12,11 @@\n     full: \"1128px\",\n   },\n   colors: {\n     primary: \"#246e4d\",\n+    primaryLight: \"#245e4da1\",\n     secondary: \"#9cba56\",\n+    secondaryLight: \"#9cba56a2\"\n \n     lightColor: \"#e1e1e1\",\n     darkColor: \"#1e1e1e\",\n   },\n"
+                },
+                {
+                    "date": 1645545815348,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,11 +13,14 @@\n   },\n   colors: {\n     primary: \"#246e4d\",\n     primaryLight: \"#245e4da1\",\n+\n     secondary: \"#9cba56\",\n-    secondaryLight: \"#9cba56a2\"\n+    secondaryLight: \"#9cba56a2\",\n \n+    effect: \"#edffcd\",\n+\n     lightColor: \"#e1e1e1\",\n     darkColor: \"#1e1e1e\",\n   },\n   font: {\n"
+                },
+                {
+                    "date": 1645547216558,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,9 +11,9 @@\n     large: \"980px\",\n     full: \"1128px\",\n   },\n   colors: {\n-    primary: \"#246e4d\",\n+    primary: \"##256e4d\",\n     primaryLight: \"#245e4da1\",\n \n     secondary: \"#9cba56\",\n     secondaryLight: \"#9cba56a2\",\n"
+                },
+                {
+                    "date": 1645547261744,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,18 +11,22 @@\n     large: \"980px\",\n     full: \"1128px\",\n   },\n   colors: {\n-    primary: \"##256e4d\",\n-    primaryLight: \"#245e4da1\",\n+    primary: \"#256e4d\",\n+    primary_gradient: \"#1d543e\",\n \n-    secondary: \"#9cba56\",\n-    secondaryLight: \"#9cba56a2\",\n+    secondary: \"#edffcd\",\n \n-    effect: \"#edffcd\",\n+    topbttprimary: \"#758d42\",\n+    topbttprimary_gradient: \"#93b153\",\n \n-    lightColor: \"#e1e1e1\",\n-    darkColor: \"#1e1e1e\",\n+    wet: \"#1E90FF\",\n+    dry: \"#93b153\",\n+    offline: \"#ffbf00\",\n+    off: \"gray\",\n+\n+    cancel: \"red\",\n   },\n   font: {\n     family: {\n       Poppins: \"'Poppins', sans-serif\",\n"
+                },
+                {
+                    "date": 1645547294485,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,11 +22,11 @@\n \n     wet: \"#1E90FF\",\n     dry: \"#93b153\",\n     offline: \"#ffbf00\",\n-    off: \"gray\",\n+    off: \"#4e4e4e\",\n \n-    cancel: \"red\",\n+    cancel: \"#aa0000\",\n   },\n   font: {\n     family: {\n       Poppins: \"'Poppins', sans-serif\",\n"
+                },
+                {
+                    "date": 1645550371641,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,8 +15,9 @@\n     primary: \"#256e4d\",\n     primary_gradient: \"#1d543e\",\n \n     secondary: \"#edffcd\",\n+    light: \"#e1e1e1\"\n \n     topbttprimary: \"#758d42\",\n     topbttprimary_gradient: \"#93b153\",\n \n"
+                },
+                {
+                    "date": 1645550377091,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -15,9 +15,9 @@\n     primary: \"#256e4d\",\n     primary_gradient: \"#1d543e\",\n \n     secondary: \"#edffcd\",\n-    light: \"#e1e1e1\"\n+    light: \"#e1e1e1\",\n \n     topbttprimary: \"#758d42\",\n     topbttprimary_gradient: \"#93b153\",\n \n"
+                }
+            ],
+            "date": 1645545622541,
+            "name": "Commit-0",
+            "content": "export default {\n  grid: {\n    container: \"100vw\",\n    containerContent: \"78rem\",\n  },\n  media: {\n    small: \"376px\",\n    xsmall: \"480px\",\n    medium: \"620px\",\n    xmedium: \"768px\",\n    large: \"980px\",\n    full: \"1128px\",\n  },\n  colors: {\n    primary: \"#246e4d\",\n    secondary: \"#9cba56\",\n    lightColor: \"#e1e1e1\",\n    darkColor: \"#1e1e1e\",\n  },\n  font: {\n    family: {\n      Poppins: \"'Poppins', sans-serif\",\n      Tangerine: \"'Tangerine', cursive\",\n      GrechenFuemen: '\"Grechen Fuemen\", cursive',\n      Roboto: '\"Roboto\", monospace',\n    },\n    sizes: {\n      xsmall: \"1.2rem\",\n      small: \"1.4rem\",\n      medium: \"1.6rem\",\n      large: \"1.8rem\",\n      xlarge: \"2.0rem\",\n      xxlarge: \"2.8rem\",\n      xbiglarge: \"3rem\",\n      xxbiglarge: \"3.4rem\",\n    },\n    light: 300,\n    normal: 500,\n    bold: 700,\n  },\n  spacings: {\n    xxsmall: \"0.8rem\",\n    xsmall: \"1.6rem\",\n    small: \"2.4rem\",\n    medium: \"3.2rem\",\n    large: \"4.0rem\",\n    xlarge: \"4.8rem\",\n    xxlarge: \"5.6rem\",\n  },\n} as const;\n"
+        }
+    ]
+}

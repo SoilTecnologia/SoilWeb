@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/MarkBackend/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1645551389915,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1645551389915,
+            "name": "Commit-0",
+            "content": "import * as S from \"./styles\";\n\nconst MarkBackend = () => (\n  <S.Container>\n    <h1>MarkBackend</h1>\n  </S.Container>\n);\n\nexport default MarkBackend;\n"
+        }
+    ]
+}

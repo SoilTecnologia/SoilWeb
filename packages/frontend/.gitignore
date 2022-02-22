@@ -4,6 +4,10 @@
 /node_modules
 /.pnp
 .pnp.js
+/.history
+.history
+/.vscode
+.vscode
 
 # testing
 /coverage
@@ -17,7 +21,6 @@
 
 # misc
 .DS_Store
-*.pem
 
 # debug
 npm-debug.log*
@@ -29,7 +32,10 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
-.env
 
-# vercel
-.vercel
+# sw stuff
+public/sw.js
+public/workbox-*.js
+
+# storybook
+storybook-static

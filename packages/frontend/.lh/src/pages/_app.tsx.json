@@ -1,0 +1,54 @@
+{
+    "sourceFile": "src/pages/_app.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 9,
+            "patches": [
+                {
+                    "date": 1645544443076,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645544478099,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,12 +12,9 @@\n         <title>SoilTech</title>\n         <link rel=\"shortcut icon\" href=\"\" />\n         <link rel=\"apple-touch-icon\" href=\"../../\" />\n         <link rel=\"manifest\" href=\"/manifest.json\" />\n-        <meta\n-          name=\"description\"\n-          content=\"My Boyllerplate/ Template for Projects React | Next.js\"\n-        />\n+        <meta name=\"description\" content=\"Soil tech Tecnologias de Irrigação\" />\n       </Head>\n       <Component {...pageProps} />\n       <GlobalStyles />\n     </ThemeProvider>\n"
+                },
+                {
+                    "date": 1645544534934,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,14 +4,16 @@\n import { ThemeProvider } from \"styled-components\";\n import theme from \"styles/theme\";\n import React from \"react\";\n \n+import Logo from \"../../public/img/icon-512.png\";\n+\n function App({ Component, pageProps }: AppProps) {\n   return (\n     <ThemeProvider theme={theme}>\n       <Head>\n         <title>SoilTech</title>\n-        <link rel=\"shortcut icon\" href=\"\" />\n+        <link rel=\"shortcut icon\" href=\"./\" />\n         <link rel=\"apple-touch-icon\" href=\"../../\" />\n         <link rel=\"manifest\" href=\"/manifest.json\" />\n         <meta name=\"description\" content=\"Soil tech Tecnologias de Irrigação\" />\n       </Head>\n"
+                },
+                {
+                    "date": 1645544558505,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,10 +11,10 @@\n   return (\n     <ThemeProvider theme={theme}>\n       <Head>\n         <title>SoilTech</title>\n-        <link rel=\"shortcut icon\" href=\"./\" />\n-        <link rel=\"apple-touch-icon\" href=\"../../\" />\n+        <link rel=\"shortcut icon\" href={Logo} />\n+        <link rel=\"apple-touch-icon\" href={Logo} />\n         <link rel=\"manifest\" href=\"/manifest.json\" />\n         <meta name=\"description\" content=\"Soil tech Tecnologias de Irrigação\" />\n       </Head>\n       <Component {...pageProps} />\n"
+                },
+                {
+                    "date": 1645544645337,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n import { ThemeProvider } from \"styled-components\";\n import theme from \"styles/theme\";\n import React from \"react\";\n \n-import Logo from \"../../public/img/icon-512.png\";\n+import Logo from \"../../public/logos/logo.png\";\n \n function App({ Component, pageProps }: AppProps) {\n   return (\n     <ThemeProvider theme={theme}>\n"
+                },
+                {
+                    "date": 1645544677304,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,17 +4,17 @@\n import { ThemeProvider } from \"styled-components\";\n import theme from \"styles/theme\";\n import React from \"react\";\n \n-import Logo from \"../../public/logos/logo.png\";\n+import Logo from \"\";\n \n function App({ Component, pageProps }: AppProps) {\n   return (\n     <ThemeProvider theme={theme}>\n       <Head>\n         <title>SoilTech</title>\n-        <link rel=\"shortcut icon\" href={Logo} />\n-        <link rel=\"apple-touch-icon\" href={Logo} />\n+        <link rel=\"shortcut icon\" href=\"../../public/logos/logo.png\" />\n+        <link rel=\"apple-touch-icon\" href=\"../../public/logos/logo.png\" />\n         <link rel=\"manifest\" href=\"/manifest.json\" />\n         <meta name=\"description\" content=\"Soil tech Tecnologias de Irrigação\" />\n       </Head>\n       <Component {...pageProps} />\n"
+                },
+                {
+                    "date": 1645544698768,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,10 +4,8 @@\n import { ThemeProvider } from \"styled-components\";\n import theme from \"styles/theme\";\n import React from \"react\";\n \n-import Logo from \"\";\n-\n function App({ Component, pageProps }: AppProps) {\n   return (\n     <ThemeProvider theme={theme}>\n       <Head>\n"
+                },
+                {
+                    "date": 1645544838153,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,12 @@\n   return (\n     <ThemeProvider theme={theme}>\n       <Head>\n         <title>SoilTech</title>\n-        <link rel=\"shortcut icon\" href=\"../../public/logos/logo.png\" />\n+        <link\n+          rel=\"shortcut icon\"\n+          href=\"https://images.unsplash.com/photo-1635609164465-80955113c703?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80\"\n+        />\n         <link rel=\"apple-touch-icon\" href=\"../../public/logos/logo.png\" />\n         <link rel=\"manifest\" href=\"/manifest.json\" />\n         <meta name=\"description\" content=\"Soil tech Tecnologias de Irrigação\" />\n       </Head>\n"
+                },
+                {
+                    "date": 1645544864106,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,12 +9,9 @@\n   return (\n     <ThemeProvider theme={theme}>\n       <Head>\n         <title>SoilTech</title>\n-        <link\n-          rel=\"shortcut icon\"\n-          href=\"https://images.unsplash.com/photo-1635609164465-80955113c703?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80\"\n-        />\n+        <link rel=\"shortcut icon\" href=\"/logos/logo.png\" />\n         <link rel=\"apple-touch-icon\" href=\"../../public/logos/logo.png\" />\n         <link rel=\"manifest\" href=\"/manifest.json\" />\n         <meta name=\"description\" content=\"Soil tech Tecnologias de Irrigação\" />\n       </Head>\n"
+                },
+                {
+                    "date": 1645544872659,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,9 +10,9 @@\n     <ThemeProvider theme={theme}>\n       <Head>\n         <title>SoilTech</title>\n         <link rel=\"shortcut icon\" href=\"/logos/logo.png\" />\n-        <link rel=\"apple-touch-icon\" href=\"../../public/logos/logo.png\" />\n+        <link rel=\"apple-touch-icon\" href=\"/logos/logo.png\" />\n         <link rel=\"manifest\" href=\"/manifest.json\" />\n         <meta name=\"description\" content=\"Soil tech Tecnologias de Irrigação\" />\n       </Head>\n       <Component {...pageProps} />\n"
+                }
+            ],
+            "date": 1645544443076,
+            "name": "Commit-0",
+            "content": "import { AppProps } from \"next/app\";\nimport Head from \"next/head\";\nimport GlobalStyles from \"styles/global\";\nimport { ThemeProvider } from \"styled-components\";\nimport theme from \"styles/theme\";\nimport React from \"react\";\n\nfunction App({ Component, pageProps }: AppProps) {\n  return (\n    <ThemeProvider theme={theme}>\n      <Head>\n        <title>SoilTech</title>\n        <link rel=\"shortcut icon\" href=\"\" />\n        <link rel=\"apple-touch-icon\" href=\"../../\" />\n        <link rel=\"manifest\" href=\"/manifest.json\" />\n        <meta\n          name=\"description\"\n          content=\"My Boyllerplate/ Template for Projects React | Next.js\"\n        />\n      </Head>\n      <Component {...pageProps} />\n      <GlobalStyles />\n    </ThemeProvider>\n  );\n}\n\nexport default App;\n"
+        }
+    ]
+}

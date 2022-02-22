@@ -1,0 +1,22 @@
+{
+    "sourceFile": "generators/plopfile.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1645545061464,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645551359031,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,7 +18,12 @@\n         type: \"add\",\n         path: \"../src/components/{{pascalCase name}}/styles.ts\",\n         templateFile: \"templates/styles.ts.hbs\",\n       },\n+      {\n+        type: \"add\",\n+        path: \"../src/components/{{pascalCase name}}/test.ts\",\n+        templateFile: \"templates/test.ts.hbs\",\n+      },\n     ],\n   });\n };\n"
+                }
+            ],
+            "date": 1645545061463,
+            "name": "Commit-0",
+            "content": "module.exports = (plop) => {\n  plop.setGenerator(\"component\", {\n    description: \"Create a component\",\n    prompts: [\n      {\n        type: \"input\",\n        name: \"name\",\n        message: \"What is your component name?\",\n      },\n    ],\n    actions: [\n      {\n        type: \"add\",\n        path: \"../src/components/{{pascalCase name}}/index.tsx\",\n        templateFile: \"templates/Component.tsx.hbs\",\n      },\n      {\n        type: \"add\",\n        path: \"../src/components/{{pascalCase name}}/styles.ts\",\n        templateFile: \"templates/styles.ts.hbs\",\n      },\n    ],\n  });\n};\n"
+        }
+    ]
+}

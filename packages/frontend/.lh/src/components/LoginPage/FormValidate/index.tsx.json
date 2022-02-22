@@ -1,0 +1,62 @@
+{
+    "sourceFile": "src/components/LoginPage/FormValidate/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 11,
+            "patches": [
+                {
+                    "date": 1645549281419,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645549296284,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,12 +22,8 @@\n   password: string;\n };\n \n const FormValidation = () => {\n-  const { verifyDataEquals } = useUserContext();\n-  const [errorUserName, setErrorUserName] = useState<string>(\"\");\n-  const [errorPassword, setErrorPassword] = useState<string>(\"\");\n-\n   const {\n     handleSubmit,\n     register,\n     formState: { errors },\n"
+                },
+                {
+                    "date": 1645549384003,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -43,9 +43,9 @@\n             required: \"Por favor digite seu nome de usuário\",\n           })}\n         />\n       </InputsLogin>\n-      {errorUserName && <S.Error>{errorUserName}</S.Error>}\n+      {errors.user && <S.Error>{errors.user.message}</S.Error>}\n       {}\n \n       <div style={{ margin: \"3rem 0\" }} />\n \n"
+                },
+                {
+                    "date": 1645549404774,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -58,9 +58,9 @@\n             required: \"Por favor digite sua senha\",\n           })}\n         />\n       </InputsLogin>\n-      {errorPassword && <S.Error>{errorPassword}</S.Error>}\n+      {errors.password && <S.Error>{errors.password.message}</S.Error>}\n       <S.Button type=\"submit\" value=\"Enviar\" />\n     </S.Form>\n   );\n };\n"
+                },
+                {
+                    "date": 1645549410914,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,9 +5,8 @@\n \n import { useForm } from \"react-hook-form\";\n import { yupResolver } from \"@hookform/resolvers/yup\";\n import * as Yup from \"yup\";\n-import { useUserContext } from \"hooks/userContext\";\n \n const schema = Yup.object({\n   user: Yup.string()\n     .required(\"Por favor digite um nome de usuário\")\n"
+                },
+                {
+                    "date": 1645549421699,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import * as S from \"./styles\";\n-import { useRef, useState } from \"react\";\n+import { useRef } from \"react\";\n \n import InputsLogin from \"components/globalComponents/InputsLogin\";\n \n import { useForm } from \"react-hook-form\";\n@@ -28,9 +28,9 @@\n     formState: { errors },\n   } = useForm<FormData>({ resolver: yupResolver(schema) });\n   const formRef = useRef<HTMLFormElement>(null);\n \n-  const onSubmit = handleSubmit((user) => console.log(\"\"));\n+  const onSubmit = handleSubmit(() => console.log(\"\"));\n \n   return (\n     <S.Form onSubmit={onSubmit} ref={formRef}>\n       <InputsLogin error={errors.user && errors.user.message}>\n"
+                },
+                {
+                    "date": 1645549507755,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -36,9 +36,9 @@\n       <InputsLogin error={errors.user && errors.user.message}>\n         <S.Inputs\n           id=\"user\"\n           type=\"text\"\n-          placeholder=\"Digite seu nome de usuário\"\n+          placeholder=\"Digite seu usuário\"\n           {...register(\"user\", {\n             required: \"Por favor digite seu nome de usuário\",\n           })}\n         />\n"
+                },
+                {
+                    "date": 1645549668761,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,9 +20,9 @@\n   user: string;\n   password: string;\n };\n \n-const FormValidation = () => {\n+const FormValidate = () => {\n   const {\n     handleSubmit,\n     register,\n     formState: { errors },\n@@ -63,5 +63,5 @@\n     </S.Form>\n   );\n };\n \n-export default FormValidation;\n+export default FormValidate;\n"
+                },
+                {
+                    "date": 1645549923904,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -45,10 +45,8 @@\n       </InputsLogin>\n       {errors.user && <S.Error>{errors.user.message}</S.Error>}\n       {}\n \n-      <div style={{ margin: \"3rem 0\" }} />\n-\n       <InputsLogin error={errors.password && errors.password.message}>\n         <S.Inputs\n           id=\"password\"\n           type=\"password\"\n"
+                },
+                {
+                    "date": 1645549947663,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -43,9 +43,8 @@\n           })}\n         />\n       </InputsLogin>\n       {errors.user && <S.Error>{errors.user.message}</S.Error>}\n-      {}\n \n       <InputsLogin error={errors.password && errors.password.message}>\n         <S.Inputs\n           id=\"password\"\n"
+                },
+                {
+                    "date": 1645550033518,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,8 +32,10 @@\n   const onSubmit = handleSubmit(() => console.log(\"\"));\n \n   return (\n     <S.Form onSubmit={onSubmit} ref={formRef}>\n+      <S.TextTech>TECNOLOGIA PARA IRRIGAÇÃO</S.TextTech>\n+\n       <InputsLogin error={errors.user && errors.user.message}>\n         <S.Inputs\n           id=\"user\"\n           type=\"text\"\n"
+                },
+                {
+                    "date": 1645550855976,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -44,9 +44,8 @@\n             required: \"Por favor digite seu nome de usuário\",\n           })}\n         />\n       </InputsLogin>\n-      {errors.user && <S.Error>{errors.user.message}</S.Error>}\n \n       <InputsLogin error={errors.password && errors.password.message}>\n         <S.Inputs\n           id=\"password\"\n@@ -56,9 +55,8 @@\n             required: \"Por favor digite sua senha\",\n           })}\n         />\n       </InputsLogin>\n-      {errors.password && <S.Error>{errors.password.message}</S.Error>}\n       <S.Button type=\"submit\" value=\"Enviar\" />\n     </S.Form>\n   );\n };\n"
+                }
+            ],
+            "date": 1645549281419,
+            "name": "Commit-0",
+            "content": "import * as S from \"./styles\";\nimport { useRef, useState } from \"react\";\n\nimport InputsLogin from \"components/globalComponents/InputsLogin\";\n\nimport { useForm } from \"react-hook-form\";\nimport { yupResolver } from \"@hookform/resolvers/yup\";\nimport * as Yup from \"yup\";\nimport { useUserContext } from \"hooks/userContext\";\n\nconst schema = Yup.object({\n  user: Yup.string()\n    .required(\"Por favor digite um nome de usuário\")\n    .min(3, \"O nome deve ter mais de 3 letras\"),\n  password: Yup.string()\n    .required(\"Por favor digite uma senha\")\n    .min(6, \"A senha deve ter pelo menos 6 caracteres\"),\n}).required();\n\ntype FormData = {\n  user: string;\n  password: string;\n};\n\nconst FormValidation = () => {\n  const { verifyDataEquals } = useUserContext();\n  const [errorUserName, setErrorUserName] = useState<string>(\"\");\n  const [errorPassword, setErrorPassword] = useState<string>(\"\");\n\n  const {\n    handleSubmit,\n    register,\n    formState: { errors },\n  } = useForm<FormData>({ resolver: yupResolver(schema) });\n  const formRef = useRef<HTMLFormElement>(null);\n\n  const onSubmit = handleSubmit((user) => console.log(\"\"));\n\n  return (\n    <S.Form onSubmit={onSubmit} ref={formRef}>\n      <InputsLogin error={errors.user && errors.user.message}>\n        <S.Inputs\n          id=\"user\"\n          type=\"text\"\n          placeholder=\"Digite seu nome de usuário\"\n          {...register(\"user\", {\n            required: \"Por favor digite seu nome de usuário\",\n          })}\n        />\n      </InputsLogin>\n      {errorUserName && <S.Error>{errorUserName}</S.Error>}\n      {}\n\n      <div style={{ margin: \"3rem 0\" }} />\n\n      <InputsLogin error={errors.password && errors.password.message}>\n        <S.Inputs\n          id=\"password\"\n          type=\"password\"\n          placeholder=\"Digite sua senha\"\n          {...register(\"password\", {\n            required: \"Por favor digite sua senha\",\n          })}\n        />\n      </InputsLogin>\n      {errorPassword && <S.Error>{errorPassword}</S.Error>}\n      <S.Button type=\"submit\" value=\"Enviar\" />\n    </S.Form>\n  );\n};\n\nexport default FormValidation;\n"
+        }
+    ]
+}

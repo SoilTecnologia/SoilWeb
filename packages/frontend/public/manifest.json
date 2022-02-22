@@ -1,0 +1,16 @@
+{
+  "name": "Soil Tech",
+  "short_name": "Soil",
+  "icons": [
+    {
+      "src": "/logos/logo.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "background_color": "#a2a638",
+  "description": "Soil Tech",
+  "display": "fullscreen",
+  "start_url": "/",
+  "theme_color": "#a2a638"
+}

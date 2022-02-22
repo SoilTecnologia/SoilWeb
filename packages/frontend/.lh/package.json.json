@@ -1,0 +1,26 @@
+{
+    "sourceFile": "package.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1645544003630,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645544127066,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n {\n-  \"name\": \"soil \",\n+  \"name\": \"soil\",\n   \"version\": \"1.0.0\",\n   \"private\": true,\n   \"scripts\": {\n     \"dev\": \"next dev\",\n"
+                },
+                {
+                    "date": 1645545003859,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,10 +10,8 @@\n     \"test\": \"jest \",\n     \"test:watch\": \"jest --watch --maxWorkers=25%\",\n     \"test:ci\": \"jest --runInBand\",\n     \"generate\": \"yarn plop --plopfile generators/plopfile.js\",\n-    \"storybook\": \"start-storybook -s ./public -p 6006\",\n-    \"build-storybook\": \"build-storybook -s ./public\",\n     \"postinstall\": \"husky install\",\n     \"prepare\": \"husky install\"\n   },\n   \"lint-staged\": {\n"
+                }
+            ],
+            "date": 1645544003630,
+            "name": "Commit-0",
+            "content": "{\n  \"name\": \"soil \",\n  \"version\": \"1.0.0\",\n  \"private\": true,\n  \"scripts\": {\n    \"dev\": \"next dev\",\n    \"build\": \"next build\",\n    \"start\": \"next start\",\n    \"lint\": \"eslint src --max-warnings=0\",\n    \"test\": \"jest \",\n    \"test:watch\": \"jest --watch --maxWorkers=25%\",\n    \"test:ci\": \"jest --runInBand\",\n    \"generate\": \"yarn plop --plopfile generators/plopfile.js\",\n    \"storybook\": \"start-storybook -s ./public -p 6006\",\n    \"build-storybook\": \"build-storybook -s ./public\",\n    \"postinstall\": \"husky install\",\n    \"prepare\": \"husky install\"\n  },\n  \"lint-staged\": {\n    \"src/**/*\": [\n      \"yarn lint --fix\",\n      \"yarn test --findRelatedTests --bail\"\n    ]\n  },\n  \"dependencies\": {\n    \"fs\": \"^0.0.1-security\",\n    \"next\": \"12.0.3\",\n    \"next-pwa\": \"^5.4.0\",\n    \"react\": \"17.0.2\",\n    \"react-dom\": \"17.0.2\",\n    \"styled-components\": \"5.3.3\",\n    \"styled-media-query\": \"^2.1.2\"\n  },\n  \"devDependencies\": {\n    \"@babel/core\": \"^7.16.0\",\n    \"@babel/preset-env\": \"^7.16.0\",\n    \"@babel/preset-react\": \"^7.16.0\",\n    \"@babel/preset-typescript\": \"^7.16.0\",\n    \"@testing-library/jest-dom\": \"^5.15.0\",\n    \"@testing-library/react\": \"^12.1.2\",\n    \"@types/jest\": \"^27.0.2\",\n    \"@types/node\": \"^16.11.6\",\n    \"@types/react\": \"^17.0.34\",\n    \"@types/styled-components\": \"^5.1.15\",\n    \"@typescript-eslint/eslint-plugin\": \"^5.3.0\",\n    \"@typescript-eslint/parser\": \"^5.3.0\",\n    \"babel-jest\": \"^27.3.1\",\n    \"babel-loader\": \"^8.2.3\",\n    \"babel-plugin-styled-components\": \"^1.13.3\",\n    \"eslint\": \"^8.2.0\",\n    \"eslint-config-next\": \"^12.0.3\",\n    \"eslint-config-prettier\": \"^8.3.0\",\n    \"eslint-plugin-prettier\": \"^4.0.0\",\n    \"eslint-plugin-react\": \"^7.26.1\",\n    \"eslint-plugin-react-hooks\": \"^4.2.0\",\n    \"husky\": \"^7.0.4\",\n    \"jest\": \"^27.3.1\",\n    \"jest-styled-components\": \"^7.0.5\",\n    \"lint-staged\": \"^11.2.6\",\n    \"plop\": \"^2.7.6\",\n    \"prettier\": \"^2.4.1\",\n    \"typescript\": \"^4.4.4\"\n  }\n}\n"
+        }
+    ]
+}
