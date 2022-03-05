@@ -1,6 +1,11 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth';
-import { signUpController, signInController } from '../controllers/users';
+import {
+  signUpController,
+  signInController,
+  deleteUserController,
+  getAllUsersController
+} from '../controllers/users';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import { createFarmController } from '../controllers/farms';
 
@@ -59,6 +64,27 @@ router.get(
   )
 );
 
+router.get(
+  '/allUsers',
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      try {
+        const usersList = await getAllUsersController();
+        console.log(`Em route ${JSON.stringify(usersList)}`);
+        res.send(usersList);
+      } catch (err) {
+        console.log('[ERROR] Error in the server');
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
 router.put(
   '/addFarm',
   authMiddleware(),
@@ -85,6 +111,29 @@ router.put(
       } catch (err) {
         console.log(`[ERROR] Server 500 on /users/addFarm!`);
         console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.delete(
+  '/deleteUser',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { user_id } = req.user;
+      try {
+        const notUser = await deleteUserController(user_id);
+        return notUser;
+      } catch (err) {
+        console.log(`[ERROR] 500 on /users/deleteUser`);
+        console.log(err);
+
         next(err);
       }
     }

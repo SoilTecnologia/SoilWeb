@@ -1,4 +1,5 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { RiErrorWarningLine } from "react-icons/ri";
 
 export const Container = styled.div`
   width: 40vw;
@@ -8,4 +9,45 @@ export const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+`;
+export const WrapperModalAndForm = styled.div`
+  position: relative;
+  width: 100%;
+  height: max-content;
+  background: transparent;
+`;
+export const ContentForm = styled.div`
+  ${({ theme }) => css`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 7rem;
+
+    background: ${theme.colors.secondary};
+    padding: ${theme.spacings.small} ${theme.spacings.xxsmall};
+    border-radius: 2rem;
+  `}
+`;
+export const ContentModal = styled(ContentForm)`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+`;
+export const ContentLogo = styled.div`
+  width: 13rem;
+`;
+export const TextTech = styled.h3`
+  ${({ theme }) => css`
+    color: ${theme.colors.dark};
+  `}
+`;
+
+export const IconAttention = styled(RiErrorWarningLine)`
+  color: ${({ theme }) => theme.colors.cancel};
+  font-size: 4rem;
 `;

@@ -1,0 +1,58 @@
+{
+    "sourceFile": ".eslintrc.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 10,
+            "patches": [
+                {
+                    "date": 1645560306397,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1645560341618,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -11,11 +11,12 @@\n     \"plugin:prettier/recommended\"\n   ],\n   \"parser\": \"@typescript-eslint/parser\",\n   \"parserOptions\": {\n-    \"ecmaVersion\": 12\n+    \"ecmaVersion\": 12,\n+    \"sourceType\": \"module\"\n   },\n-  \"plugins\": [\"@typescript-eslint\"],\n+  \"plugins\": [\"prettier\", \"@typescript-eslint\"],\n   \"rules\": {\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n     \"camelcase\": \"off\",\n"
+                },
+                {
+                    "date": 1645560420573,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -21,8 +21,9 @@\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n     \"camelcase\": \"off\",\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n+    \"no-restricted-syntax\": \"off\",\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n     \"no-console\": \"off\"\n   },\n"
+                },
+                {
+                    "date": 1645560499057,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,10 @@\n {\n   \"env\": {\n     \"browser\": true,\n     \"commonjs\": true,\n-    \"es2021\": true\n+    \"es2021\": true,\n+    \"node\": true\n   },\n   \"extends\": [\n     \"airbnb-base\",\n     \"plugin:@typescript-eslint/recommended\",\n"
+                },
+                {
+                    "date": 1645560527285,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,8 +5,9 @@\n     \"es2021\": true,\n     \"node\": true\n   },\n   \"extends\": [\n+    \"eslint:recommended\",\n     \"airbnb-base\",\n     \"plugin:@typescript-eslint/recommended\",\n     \"prettier/@typescript-eslint\",\n     \"plugin:prettier/recommended\"\n"
+                },
+                {
+                    "date": 1645560556858,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -30,8 +30,8 @@\n     \"no-console\": \"off\"\n   },\n   \"overrides\": [\n     {\n-      \"files\": [\"src/**/*.s\"]\n+      \"files\": [\"src/**/*.ts\"]\n     }\n   ]\n }\n"
+                },
+                {
+                    "date": 1645560607286,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,37 +1,33 @@\n {\n   \"env\": {\n     \"browser\": true,\n     \"commonjs\": true,\n-    \"es2021\": true,\n-    \"node\": true\n+    \"es2021\": true\n   },\n   \"extends\": [\n-    \"eslint:recommended\",\n     \"airbnb-base\",\n-    \"plugin:@typescript-eslint/recommended\",\n-    \"prettier/@typescript-eslint\",\n-    \"plugin:prettier/recommended\"\n+    \"plugin:import/recommended\",\n+    \"plugin:import/typescript\",\n+    \"prettier\"\n   ],\n   \"parser\": \"@typescript-eslint/parser\",\n   \"parserOptions\": {\n-    \"ecmaVersion\": 12,\n-    \"sourceType\": \"module\"\n+    \"ecmaVersion\": 12\n   },\n-  \"plugins\": [\"prettier\", \"@typescript-eslint\"],\n+  \"plugins\": [\"@typescript-eslint\"],\n   \"rules\": {\n     \"import/extensions\": [\"warn\", \"never\"],\n     \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n     \"camelcase\": \"off\",\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n-    \"no-restricted-syntax\": \"off\",\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n     \"no-console\": \"off\"\n   },\n   \"overrides\": [\n     {\n-      \"files\": [\"src/**/*.ts\"]\n+      \"files\": [\"src/**/*.s\"]\n     }\n   ]\n }\n"
+                },
+                {
+                    "date": 1645560665676,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -22,8 +22,9 @@\n     \"arrow-body-style\": [\"error\", \"always\"],\n     \"no-unused-vars\": \"off\",\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n+    \"no-restricted-syntax\": \"off\",\n     \"no-console\": \"off\"\n   },\n   \"overrides\": [\n     {\n"
+                },
+                {
+                    "date": 1645560694624,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,8 +23,9 @@\n     \"no-unused-vars\": \"off\",\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n     \"no-restricted-syntax\": \"off\",\n+    \"no-await-in-loop\": \"off\",\n     \"no-console\": \"off\"\n   },\n   \"overrides\": [\n     {\n"
+                },
+                {
+                    "date": 1645560711156,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,8 +24,9 @@\n     \"consistent-return\": \"off\",\n     \"no-param-reassign\": \"off\",\n     \"no-restricted-syntax\": \"off\",\n     \"no-await-in-loop\": \"off\",\n+    \"prefer-const\": \"off\",\n     \"no-console\": \"off\"\n   },\n   \"overrides\": [\n     {\n"
+                },
+                {
+                    "date": 1645560741830,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,8 +25,9 @@\n     \"no-param-reassign\": \"off\",\n     \"no-restricted-syntax\": \"off\",\n     \"no-await-in-loop\": \"off\",\n     \"prefer-const\": \"off\",\n+    \"prefer-destructuring\": \"off\",\n     \"no-console\": \"off\"\n   },\n   \"overrides\": [\n     {\n"
+                }
+            ],
+            "date": 1645560306397,
+            "name": "Commit-0",
+            "content": "{\n  \"env\": {\n    \"browser\": true,\n    \"commonjs\": true,\n    \"es2021\": true\n  },\n  \"extends\": [\n    \"airbnb-base\",\n    \"plugin:@typescript-eslint/recommended\",\n    \"prettier/@typescript-eslint\",\n    \"plugin:prettier/recommended\"\n  ],\n  \"parser\": \"@typescript-eslint/parser\",\n  \"parserOptions\": {\n    \"ecmaVersion\": 12\n  },\n  \"plugins\": [\"@typescript-eslint\"],\n  \"rules\": {\n    \"import/extensions\": [\"warn\", \"never\"],\n    \"@typescript-eslint/explicit-module-boundary-types\": \"off\",\n    \"camelcase\": \"off\",\n    \"arrow-body-style\": [\"error\", \"always\"],\n    \"no-unused-vars\": \"off\",\n    \"consistent-return\": \"off\",\n    \"no-param-reassign\": \"off\",\n    \"no-console\": \"off\"\n  },\n  \"overrides\": [\n    {\n      \"files\": [\"src/**/*.s\"]\n    }\n  ]\n}\n"
+        }
+    ]
+}

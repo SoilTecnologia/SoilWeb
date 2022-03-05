@@ -1,5 +1,5 @@
 import * as S from "./styles";
-import { useRef } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 
 import InputsLogin from "components/globalComponents/InputsLogin";
 
@@ -20,8 +20,11 @@ type FormData = {
   user: string;
   password: string;
 };
+type FormDataProps = {
+  setErrorAuth: Dispatch<SetStateAction<boolean>>;
+};
 
-const FormValidate = () => {
+const FormValidate = ({ setErrorAuth }: FormDataProps) => {
   const {
     handleSubmit,
     register,
@@ -29,32 +32,36 @@ const FormValidate = () => {
   } = useForm<FormData>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
 
-  const onSubmit = handleSubmit(() => console.log(""));
+  const onSubmit = handleSubmit(() => setErrorAuth(true));
 
   return (
     <S.Form onSubmit={onSubmit} ref={formRef}>
-      <S.TextTech>TECNOLOGIA PARA IRRIGAÇÃO</S.TextTech>
-
       <InputsLogin error={errors.user && errors.user.message}>
-        <S.Inputs
-          id="user"
-          type="text"
-          placeholder="Digite seu usuário"
-          {...register("user", {
-            required: "Por favor digite seu nome de usuário",
-          })}
-        />
+        <S.ContentIconInput>
+          <S.IconUser />
+          <S.Inputs
+            id="user"
+            type="text"
+            placeholder="Digite seu usuário"
+            {...register("user", {
+              required: "Por favor digite seu nome de usuário",
+            })}
+          />
+        </S.ContentIconInput>
       </InputsLogin>
 
       <InputsLogin error={errors.password && errors.password.message}>
-        <S.Inputs
-          id="password"
-          type="password"
-          placeholder="Digite sua senha"
-          {...register("password", {
-            required: "Por favor digite sua senha",
-          })}
-        />
+        <S.ContentIconInput>
+          <S.IconPassword />
+          <S.Inputs
+            id="password"
+            type="password"
+            placeholder="Digite sua senha"
+            {...register("password", {
+              required: "Por favor digite sua senha",
+            })}
+          />
+        </S.ContentIconInput>
       </InputsLogin>
       <S.Button type="submit" value="Enviar" />
     </S.Form>

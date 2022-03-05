@@ -2,12 +2,13 @@ import styled, { css } from "styled-components";
 import { FaExclamationCircle } from "react-icons/fa";
 
 export const ContentInputs = styled.div`
+  width: 80%;
+  padding: 0 ${({ theme }) => theme.spacings.large};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem 0.6rem;
-  margin: 0.6rem 0;
+  margin: 1.4rem 0;
 `;
 
 export const Alert = styled.div`

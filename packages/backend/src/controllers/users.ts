@@ -1,6 +1,6 @@
-import knex from '../database';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import knex from '../database';
 import {
   DuplicateUniqueError,
   InvalidCredentials,
@@ -30,8 +30,8 @@ export const signInController = async (
 
     const token = jwt.sign(
       {
-        user_id: user_id,
-        user_type: user_type
+        user_id,
+        user_type
       },
       process.env.TOKEN_SECRET as jwt.Secret,
       {
@@ -42,13 +42,12 @@ export const signInController = async (
     const response = {
       user_id,
       user_type,
-      token,
+      token
     };
 
     return response;
-  } else {
-    throw new InvalidCredentials();
   }
+  throw new InvalidCredentials();
 };
 
 export const signUpController = async (
@@ -94,10 +93,41 @@ export const signUpController = async (
         token
       };
       return response;
-    } else {
-      throw new Error('Failed to create user');
     }
+    throw new Error('Failed to create user');
   } else {
     throw new InvalidRequestBody();
+  }
+};
+
+export const deleteUserController = async (user_id: User['user_id']) => {
+  try {
+    const user = await knex<User>('users')
+      .select('*')
+      .where({ user_id })
+      .first();
+    if (user) {
+      const del = await knex<User>('users')
+        .delete('*')
+        .where({ user_id })
+        .first();
+
+      if (!del) throw new Error('Não foi possível deletar usúario');
+      else return del;
+    } else {
+      throw new Error('User does not exists');
+    }
+  } catch (err) {
+    throw new InvalidCredentials();
+  }
+};
+export const getAllUsersController = async () => {
+  try {
+    const users = await knex<User>('users').select();
+    if (!users) throw new Error('No user found');
+
+    return users;
+  } catch (err) {
+    throw new InvalidCredentials();
   }
 };
