@@ -6,6 +6,7 @@ import InputsLogin from "components/globalComponents/InputsLogin";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import { useContextAuth } from "hooks/useLoginAuth";
 
 const schema = Yup.object({
   user: Yup.string()
@@ -25,6 +26,9 @@ type FormDataProps = {
 };
 
 const FormValidate = ({ setErrorAuth }: FormDataProps) => {
+  //Contexts
+
+  const { signIn } = useContextAuth();
   const {
     handleSubmit,
     register,
@@ -32,7 +36,10 @@ const FormValidate = ({ setErrorAuth }: FormDataProps) => {
   } = useForm<FormData>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
 
-  const onSubmit = handleSubmit(() => setErrorAuth(true));
+  const onSubmit = handleSubmit(async (data) => {
+    const response = await signIn(data.user, data.password);
+    !response ? setErrorAuth(true) : console.log(response);
+  });
 
   return (
     <S.Form onSubmit={onSubmit} ref={formRef}>

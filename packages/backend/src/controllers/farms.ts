@@ -9,7 +9,7 @@ export const createFarmController = async (
   farm_name: Farm['farm_name'],
   farm_city: Farm['farm_city'],
   farm_lng: Farm['farm_lng'],
-  farm_lat: Farm['farm_lat'],
+  farm_lat: Farm['farm_lat']
 ) => {
   const newFarm = await knex<Farm>('farms').insert({
     farm_id,
@@ -29,6 +29,12 @@ export const readAllFarmController = async (
   const farms = await knex<Farm>('farms')
     .select('farm_name', 'farm_city', 'farm_id')
     .where({ user_id });
+
+  return farms;
+};
+
+export const getAllFarmUser = async (user_id: User['user_id']) => {
+  const farms = await knex<Farm>('farms').select().where({ user_id });
 
   return farms;
 };

@@ -117,8 +117,21 @@ router.put(
   )
 );
 
+router.put(
+  '/putUser/:id',
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { id } = req.params;
+    }
+  )
+);
+
 router.delete(
-  '/deleteUser',
+  '/deleteUser/:id',
   authMiddleware(),
   authHandler(
     async (
@@ -126,9 +139,9 @@ router.delete(
       res: express.Response,
       next: express.NextFunction
     ) => {
-      const { user_id } = req.user;
+      const { id } = req.params;
       try {
-        const notUser = await deleteUserController(user_id);
+        const notUser = await deleteUserController(id);
         return notUser;
       } catch (err) {
         console.log(`[ERROR] 500 on /users/deleteUser`);
@@ -139,5 +152,28 @@ router.delete(
     }
   )
 );
+
+// router.delete(
+//   '/deleteUser',
+//   authMiddleware(),
+//   authHandler(
+//     async (
+//       req: IUserAuthInfoRequest,
+//       res: express.Response,
+//       next: express.NextFunction
+//     ) => {
+//       const { user_id } = req.user;
+//       try {
+//         const notUser = await deleteUserController(user_id);
+//         return notUser;
+//       } catch (err) {
+//         console.log(`[ERROR] 500 on /users/deleteUser`);
+//         console.log(err);
+
+//         next(err);
+//       }
+//     }
+//   )
+// );
 
 export default router;

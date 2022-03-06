@@ -1,22 +1,67 @@
-import { requestUser, UserCreate } from "utils/models/user";
-import api from "./api";
-
+import User, { requestUser, UserCreate } from "utils/models/user";
+import { api } from "./api";
+type Response = {
+  user_type: User["user_type"];
+  user_id: User["user_id"];
+  token: string;
+};
+//User
+export const requestLoginAuth = async (login: string, password: string) => {
+  const bodyReQ = { login, password };
+  return api
+    .post<Promise<Response | null>>("users/signin", bodyReQ)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error login data");
+      console.log(err);
+      return null;
+    });
+};
 export const requestPostUser = async (user: UserCreate) => {
   const sendNewUser = {
     login: user.login,
     password: user.password,
     user_type: user.user_type,
   };
-  try {
-    const userResponse = await api.post(`users/signup`, sendNewUser);
-    const response = userResponse ? true : false;
-    return response;
-  } catch (err) {
-    return false;
-  }
+  return await api
+    .post(`users/signup`, sendNewUser)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+    });
 };
 
 export const requestGetAllUsers = async () => {
-  const { data } = await api.get<requestUser[]>(`users/allUsers`);
-  return data;
+  return await api
+    .get<requestUser[]>(`users/allUsers`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
+};
+
+export const requestDeleteUser = async (id: string) => {
+  return await api
+    .get(`users/deleteUser/${id}`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
+};
+
+//Farms
+export const requestGetAllFarmsUser = async (id: string) => {
+  return await api
+    .get(`farms/farmUser/${id}`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
 };

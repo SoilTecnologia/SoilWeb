@@ -101,25 +101,15 @@ export const signUpController = async (
 };
 
 export const deleteUserController = async (user_id: User['user_id']) => {
-  try {
-    const user = await knex<User>('users')
-      .select('*')
-      .where({ user_id })
-      .first();
-    if (user) {
-      const del = await knex<User>('users')
-        .delete('*')
-        .where({ user_id })
-        .first();
+  const user = await knex<User>('users').select('*').where({ user_id }).first();
+  if (user) {
+    const del = await knex<User>('users').delete().where({ user_id }).first();
 
-      if (!del) throw new Error('Não foi possível deletar usúario');
-      else return del;
-    } else {
-      throw new Error('User does not exists');
-    }
-  } catch (err) {
-    throw new InvalidCredentials();
+    if (!del) throw new Error('Não foi possível deletar usúario');
+    return del;
   }
+
+  throw new Error('User does not exists');
 };
 export const getAllUsersController = async () => {
   try {

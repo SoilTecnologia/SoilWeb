@@ -3,6 +3,7 @@ import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
+  getAllFarmUser,
   readAllFarmController,
   readMapFarmControler
 } from '../controllers/farms';
@@ -45,7 +46,28 @@ router.put(
   )
 );
 
-router.get('/user/:id', (req: express.Request, res: express.Response) => {});
+router.get(
+  '/farmUser/:id',
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { id } = req.params;
+
+      try {
+        const allFarmsFromUser = await getAllFarmUser(id);
+
+        res.send(allFarmsFromUser);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /farms/readAll`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
 
 router.get(
   '/readAll',

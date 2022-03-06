@@ -45,7 +45,7 @@ const CreateNewUser = () => {
   //Functions
   const onSubmit = handleSubmit((data) => {
     const newDataUser: UserCreate = {
-      user_name: data.user_name,
+      // user_name: data.user_name,
       login: data.login ? data.login : undefined,
       password: data.password ? data.password : undefined,
       user_type: data.user_type,
@@ -55,14 +55,14 @@ const CreateNewUser = () => {
   return (
     <S.Container>
       <S.Form onSubmit={onSubmit} ref={formRef}>
-        <ContentInputs
+        {/* <ContentInputs
           errorUserName={errors.user_name}
           label="USUARIO"
           id="user_name"
           type="text"
           placeholder="USERNAME"
           register={register}
-        />
+        /> */}
         <ContentInputs
           errorUserName={errors.login}
           label="LOGIN"

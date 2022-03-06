@@ -6,13 +6,15 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { users } from "utils/mockFarms/users";
+
 import Farm from "utils/models/farm";
 import Node from "utils/models/node";
 import Pivot from "utils/models/pivot";
 import User, { requestUser } from "utils/models/user";
 
 export type stateContentProps = {
+  userLogged: requestUser | null;
+
   showIsListUser: boolean;
   optionUser: "create" | "list";
 
@@ -32,6 +34,8 @@ type dataContextProps = {
   setData: Dispatch<SetStateAction<stateContentProps>>;
   setUsersList: Dispatch<SetStateAction<requestUser[]>>;
   usersList: requestUser[];
+  farmList: Farm[];
+  setFarmList: Dispatch<SetStateAction<Farm[]>>;
   setNodeList: Dispatch<SetStateAction<Node[]>>;
   setPivotList: Dispatch<SetStateAction<Pivot[]>>;
   pivotList: Pivot[];
@@ -46,6 +50,7 @@ const UserDataContext = createContext({} as dataContextProps);
 
 function UseContextProvider({ children }: UserProviderProps) {
   const stateContent: stateContentProps = {
+    userLogged: null,
     showIsListUser: true,
     updateUser: null,
     optionUser: "list",
@@ -60,6 +65,7 @@ function UseContextProvider({ children }: UserProviderProps) {
   const [usersList, setUsersList] = useState<requestUser[]>(
     [] as requestUser[]
   );
+  const [farmList, setFarmList] = useState<Farm[]>([] as Farm[]);
   const [nodeList, setNodeList] = useState<Node[]>([] as Node[]);
   const [pivotList, setPivotList] = useState<Pivot[]>([] as Pivot[]);
 
@@ -75,6 +81,8 @@ function UseContextProvider({ children }: UserProviderProps) {
         setPivotList,
         nodeList,
         pivotList,
+        farmList,
+        setFarmList,
       }}
     >
       {children}

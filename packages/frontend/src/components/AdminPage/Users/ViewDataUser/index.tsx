@@ -1,13 +1,15 @@
 import UpdateFarmSelected from "components/AdminPage/Farms/UpdateFarmSelected";
 import ModalUpdateData from "components/globalComponents/ModalUpdateData";
+import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useContextData } from "hooks/useContextData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoxFarm from "../../Farms/BoxFarm";
 import * as S from "./styles";
 
 const ViewDataUser = () => {
   const [farmsUser, setFarmsUser] = useState(false);
-  const { stateAdmin, setData, stateDefault } = useContextData();
+  const { getAllFarmsUser } = useContextActionCrud();
+  const { stateAdmin, setData, stateDefault, farmList } = useContextData();
   const [modalVisible, setModalVisible] = useState(false);
 
   const closeModal = () => {
@@ -19,11 +21,21 @@ const ViewDataUser = () => {
     setData({ ...stateAdmin, createFarm: true });
   };
 
+  const handleAllFarmsUser = async () => {
+    if (stateAdmin.dataUserSelected) {
+      await getAllFarmsUser(stateAdmin.dataUserSelected.user_id);
+    }
+  };
+
+  useEffect(() => {
+    handleAllFarmsUser();
+  }, []);
+
   return (
     <S.ContentDataUser>
       <S.Container>
         <S.DataUser>
-          <S.Name>{stateAdmin.dataUserSelected?.user_name}</S.Name>
+          <S.Name>{stateAdmin.dataUserSelected?.login}</S.Name>
           <S.Farms onClick={() => setFarmsUser(!farmsUser)}>
             <S.ContentFarm_Add>
               <S.TabName>FAZENDAS: </S.TabName>
@@ -32,8 +44,8 @@ const ViewDataUser = () => {
               </S.AddFarm>
             </S.ContentFarm_Add>
 
-            {stateAdmin.dataUserSelected && stateAdmin.dataUserSelected.farm ? (
-              stateAdmin.dataUserSelected.farm.map((farm, index) => (
+            {stateAdmin.dataUserSelected && farmList ? (
+              farmList.map((farm, index) => (
                 <BoxFarm key={index} farmProps={farm} />
               ))
             ) : (

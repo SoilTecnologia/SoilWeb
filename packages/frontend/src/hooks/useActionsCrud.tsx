@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react";
 import Farm, { FarmCreate } from "utils/models/farm";
 import Pivot from "utils/models/pivot";
-import User, { UserCreate } from "utils/models/user";
+import User, { requestUser, UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 
 import {
@@ -13,7 +13,12 @@ import {
   handleUpdateUser,
 } from "utils/handleDataCruds";
 import Node, { NodeCreate } from "utils/models/node";
-import { requestGetAllUsers, requestPostUser } from "api/requestApi";
+import {
+  requestDeleteUser,
+  requestGetAllFarmsUser,
+  requestGetAllUsers,
+  requestPostUser,
+} from "api/requestApi";
 
 interface UserProviderProps {
   children: React.ReactNode;
@@ -24,6 +29,7 @@ interface actionCrudProps {
   createUser: (user: UserCreate) => void;
   updateUser: (user: User) => void;
   deleteUser: (id: string) => void;
+  getAllFarmsUser: (id: string) => void;
   createFarm: (farm: FarmCreate, user_id: string) => void;
   updateFarm: (farm: Farm) => void;
   deleteFarm: (id: string) => void;
@@ -44,6 +50,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     stateDefault,
     usersList,
     setUsersList,
+    setFarmList,
     setNodeList,
     setPivotList,
     nodeList,
@@ -52,26 +59,32 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   //CRUD USER
   const getAllUser = async () => {
     const response = await requestGetAllUsers();
-    setUsersList(response);
+    response && setUsersList(response);
   };
 
   const createUser = async (user: UserCreate) => {
     const result = await requestPostUser(user);
-    result && getAllUser();
-    setData(stateDefault);
+    if (result) {
+      getAllUser();
+      setData(stateDefault);
+    }
+    return;
   };
   const updateUser = (user: User) => {
     setData(stateDefault);
     const newUserList = handleUpdateUser(user, usersList);
     setUsersList(newUserList);
   };
-  const deleteUser = (id: string) => {
-    setData(stateDefault);
-    const newUsersList = handleDeleteUser(id, usersList);
-    setUsersList(newUsersList);
+  const deleteUser = async (id: string) => {
+    const response = await requestDeleteUser(id);
+    getAllUser();
   };
 
   //CRUD FARMS
+  const getAllFarmsUser = async (id: string) => {
+    const response = await requestGetAllFarmsUser(id);
+    setFarmList(response);
+  };
   const createFarm = (farm: FarmCreate, user_id: string) => {
     const farm_id = Number(user_id + 1).toString();
     const user = stateAdmin.dataUserSelected;
@@ -167,6 +180,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         createUser,
         updateUser,
         deleteUser,
+        getAllFarmsUser,
         createFarm,
         updateFarm,
         deleteFarm,
