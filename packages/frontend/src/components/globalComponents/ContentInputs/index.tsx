@@ -6,6 +6,7 @@ import * as S from "./styles";
 type contentInputProps = {
   errorUserName: FieldError | undefined;
   label: string;
+  colorLabel?: string;
   id: string;
   type: string;
   placeholder: string;
@@ -15,6 +16,7 @@ type contentInputProps = {
 const ContentInputs = ({
   errorUserName,
   label,
+  colorLabel,
   id,
   type,
   placeholder,
@@ -22,7 +24,7 @@ const ContentInputs = ({
 }: contentInputProps) => (
   <InputsLogin error={errorUserName && errorUserName.message}>
     <S.ContentIconInput>
-      <S.Label>{label}</S.Label>
+      <S.Label colorLabel={colorLabel}>{label}</S.Label>
       <S.Inputs
         id={id}
         type={type}

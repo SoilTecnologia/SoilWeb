@@ -12,8 +12,7 @@
     "test:ci": "jest --runInBand",
     "generate": "yarn plop --plopfile generators/plopfile.js",
     "postinstall": "husky install",
-    "prepare": "husky install",
-    "server": "json-server -d 1250 -w -p 3333 ./server.js"
+    "prepare": "husky install"
   },
   "lint-staged": {
     "src/**/*": [

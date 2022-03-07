@@ -1,22 +1,18 @@
 import Node from "./node";
 import Pivot from "./pivot";
 
-type Farm = {
-  farm_id: string;
-  user_id: string;
+export interface FarmFormResponse {
   farm_name: string;
   farm_city: string;
   farm_lng: number;
   farm_lat: number;
+}
+export interface FarmCreate extends FarmFormResponse {
+  user_id: string;
+}
+interface Farm extends FarmCreate {
+  farm_id: string;
   pivots: Pivot[] | null;
   node: Node[] | null;
-};
-
+}
 export default Farm;
-
-export type FarmCreate = {
-  farm_name: string;
-  farm_city: string;
-  farm_lng: number;
-  farm_lat: number;
-};

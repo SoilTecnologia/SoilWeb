@@ -16,7 +16,7 @@ export const AddNode = styled.button`
   color: ${({ theme }) => theme.colors.secondary};
   font-size: 1.6rem;
   &:hover {
-    background: rgba(0, 0, 0, 0.2);
+    background: ${({ theme }) => theme.colors.primary_gradient};
     cursor: pointer;
   }
 `;
@@ -24,7 +24,7 @@ export const IconAdd = styled(GrAdd)``;
 export const ContentAddNode = styled.div`
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.9);
+  background: ${({ theme }) => theme.colors.primary};
   position: absolute;
   top: 0;
   left: 0;

@@ -38,7 +38,7 @@ const FormValidate = ({ setErrorAuth }: FormDataProps) => {
 
   const onSubmit = handleSubmit(async (data) => {
     const response = await signIn(data.user, data.password);
-    !response ? setErrorAuth(true) : console.log(response);
+    !response && setErrorAuth(true);
   });
 
   return (

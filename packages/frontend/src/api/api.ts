@@ -7,6 +7,12 @@ export const api = axios.create({
   baseURL: `http://192.168.0.5:3308/`,
 });
 
+// api.interceptors.request.use((config) => {
+//   console.log(config);
+
+//   return config;
+// });
+
 if (token) {
-  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  api.defaults.headers.common["Authorization"] = `${token}`;
 }

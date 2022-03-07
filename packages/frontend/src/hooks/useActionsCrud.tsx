@@ -1,24 +1,21 @@
 import React, { createContext, useContext } from "react";
 import Farm, { FarmCreate } from "utils/models/farm";
 import Pivot from "utils/models/pivot";
-import User, { requestUser, UserCreate } from "utils/models/user";
+import User, { UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 
-import {
-  handleDeleteFarm,
-  handleDeletePivot,
-  handleDeleteUser,
-  handleUpdateFarm,
-  handleUpdatePivot,
-  handleUpdateUser,
-} from "utils/handleDataCruds";
+import { handleUpdateUser } from "utils/handleDataCruds";
 import Node, { NodeCreate } from "utils/models/node";
 import {
+  requestCreateFarm,
+  requestDeleteFarm,
   requestDeleteUser,
   requestGetAllFarmsUser,
   requestGetAllUsers,
   requestPostUser,
 } from "api/requestApi";
+import Router from "next/router";
+import { parseCookies } from "nookies";
 
 interface UserProviderProps {
   children: React.ReactNode;
@@ -30,7 +27,7 @@ interface actionCrudProps {
   updateUser: (user: User) => void;
   deleteUser: (id: string) => void;
   getAllFarmsUser: (id: string) => void;
-  createFarm: (farm: FarmCreate, user_id: string) => void;
+  createFarm: (farm: FarmCreate) => void;
   updateFarm: (farm: Farm) => void;
   deleteFarm: (id: string) => void;
   createNode: (node: NodeCreate, farm: Farm) => void;
@@ -44,6 +41,7 @@ interface actionCrudProps {
 const ActionCrudContext = createContext({} as actionCrudProps);
 
 function UseCrudContextProvider({ children }: UserProviderProps) {
+  //Contexts
   const {
     stateAdmin,
     setData,
@@ -58,17 +56,24 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
 
   //CRUD USER
   const getAllUser = async () => {
-    const response = await requestGetAllUsers();
-    response && setUsersList(response);
+    const { "soilauth-token": token } = parseCookies();
+
+    if (token) {
+      const response = await requestGetAllUsers();
+      response && setUsersList(response);
+    } else {
+      Router.push("/");
+    }
   };
 
   const createUser = async (user: UserCreate) => {
     const result = await requestPostUser(user);
+
     if (result) {
       getAllUser();
       setData(stateDefault);
     }
-    return;
+    return result;
   };
   const updateUser = (user: User) => {
     setData(stateDefault);
@@ -85,63 +90,41 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const response = await requestGetAllFarmsUser(id);
     setFarmList(response);
   };
-  const createFarm = (farm: FarmCreate, user_id: string) => {
-    const farm_id = Number(user_id + 1).toString();
-    const user = stateAdmin.dataUserSelected;
-    const newFarm: Farm = {
-      farm_id,
-      user_id,
-      ...farm,
-      pivots: null,
-      node: null,
-    };
-    if (user) {
-      user.farm?.push(newFarm);
-      user.farm?.sort((a, b) => Number(a.farm_id) - Number(b.farm_id));
-    }
+  const createFarm = async (farm: FarmCreate) => {
+    const farms = await requestCreateFarm(farm);
+    console.log(farms);
     setData({ ...stateAdmin, createFarm: false });
   };
   const updateFarm = (farm: Farm) => {
-    if (stateAdmin.dataUserSelected) {
-      const user = stateAdmin.dataUserSelected;
-      if (user.farm) {
-        const newArray = handleUpdateFarm(farm, user.farm);
-
-        setData({
-          ...stateDefault,
-          showIsListUser: false,
-          dataUserSelected: { ...stateAdmin.dataUserSelected, farm: newArray },
-        });
-      }
-    }
+    // if (stateAdmin.dataUserSelected) {
+    //   const user = stateAdmin.dataUserSelected;
+    //   if (user.farm) {
+    //     const newArray = handleUpdateFarm(farm, user.farm);
+    //     setData({
+    //       ...stateDefault,
+    //       showIsListUser: false,
+    //       dataUserSelected: { ...stateAdmin.dataUserSelected, farm: newArray },
+    //     });
+    //   }
+    // }
   };
   const deleteFarm = (id: string) => {
-    const user = stateAdmin.dataUserSelected;
-    if (user && user.farm) {
-      const newFarmList = handleDeleteFarm(id, user.farm);
-      setData({
-        ...stateAdmin,
-        showIsListUser: false,
-        dataUserSelected: { ...user, farm: newFarmList },
-      });
-    }
+    const result = requestDeleteFarm(id);
+    setData({ ...stateAdmin });
   };
 
   //NODES
   const createNode = (node: NodeCreate, farm: Farm) => {
-    const user = stateAdmin.dataUserSelected;
-    const newNode: Node = { ...node, pivots: null, node_id: "123" };
-
-    if (farm.node) {
-      const farmSelected: Farm = { ...farm, node: [...farm.node, newNode] };
-
-      if (user && user.farm) {
-        user.farm.push(farmSelected);
-        const newDataUser: User = { ...user, farm: [...user.farm] };
-
-        setData({ ...stateAdmin, dataUserSelected: newDataUser });
-      }
-    }
+    // const user = stateAdmin.dataUserSelected;
+    // const newNode: Node = { ...node, pivots: null, node_id: "123" };
+    // if (farm.node) {
+    //   const farmSelected: Farm = { ...farm, node: [...farm.node, newNode] };
+    //   if (user && user.farm) {
+    //     user.farm.push(farmSelected);
+    //     const newDataUser: User = { ...user, farm: [...user.farm] };
+    //     setData({ ...stateAdmin, dataUserSelected: newDataUser });
+    //   }
+    // }
   };
   const updateNode = (node: Node, farmRelation: Farm) => {};
   const deleteNode = (id: string, farmRelation: Farm) => {};
@@ -149,28 +132,26 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   //CRUD PIVOT
   const createPivot = () => {};
   const updatePivot = (pivot: Pivot, farmRelation: Farm) => {
-    const user = stateAdmin.dataUserSelected;
-    if (user && user.farm) {
-      const newArrayFarms = handleUpdatePivot(pivot, farmRelation, user.farm);
-
-      setData({
-        ...stateDefault,
-        showIsListUser: false,
-        dataUserSelected: { ...user, farm: newArrayFarms },
-      });
-    }
+    // const user = stateAdmin.dataUserSelected;
+    // if (user && user.farm) {
+    //   const newArrayFarms = handleUpdatePivot(pivot, farmRelation, user.farm);
+    //   setData({
+    //     ...stateDefault,
+    //     showIsListUser: false,
+    //     dataUserSelected: { ...user, farm: newArrayFarms },
+    //   });
+    // }
   };
   const deletePivot = (id: string, farmRelation: Farm) => {
-    const user = stateAdmin.dataUserSelected;
-    if (user && user.farm) {
-      const newArrayFarms = handleDeletePivot(id, farmRelation, user.farm);
-
-      setData({
-        ...stateDefault,
-        showIsListUser: false,
-        dataUserSelected: { ...user, farm: newArrayFarms },
-      });
-    }
+    // const user = stateAdmin.dataUserSelected;
+    // if (user && user.farm) {
+    //   const newArrayFarms = handleDeletePivot(id, farmRelation, user.farm);
+    //   setData({
+    //     ...stateDefault,
+    //     showIsListUser: false,
+    //     dataUserSelected: { ...user, farm: newArrayFarms },
+    //   });
+    // }
   };
 
   return (

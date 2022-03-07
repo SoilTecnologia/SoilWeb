@@ -1,4 +1,7 @@
 import styled from "styled-components";
+type colorLabelProps = {
+  colorLabel?: string;
+};
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -10,8 +13,9 @@ export const Select = styled.select`
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
 `;
-export const Label = styled.label`
+export const Label = styled.label<colorLabelProps>`
   font-size: 1.2rem;
   margin: 0 0 0.5rem 0.5rem;
-  color: ${({ theme }) => theme.colors.primary_gradient};
+  color: ${({ theme, colorLabel }) =>
+    colorLabel ? colorLabel : theme.colors.primary_gradient};
 `;

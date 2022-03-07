@@ -1,18 +1,22 @@
 import { useContextData } from "hooks/useContextData";
 import { useState } from "react";
+import CreateNewUser from "../Users/CreateNewUser";
 
-import HandleUsers from "../Users/HandleUsers";
+import SwitchStateUser from "../Users/SwitchStateUser";
 import * as S from "./styles";
 
 export type userOptions = "create" | "list" | null;
 
 const MainAdmin = () => {
-  const { setData, stateDefault } = useContextData();
+  const {
+    setData,
+    stateDefault,
+    stateAdmin: { optionUser },
+  } = useContextData();
   const [isOptionUser, setIsOptionUser] = useState(false);
 
   const handleClickListUser = () => {
     setData(stateDefault);
-    console.log("hANDLE" + stateDefault);
   };
   const handleClickCreateUser = () => {
     setData({
@@ -42,7 +46,9 @@ const MainAdmin = () => {
         </S.OptionUser>
       </S.ContentTittle>
       <S.TabSelect>
-        <HandleUsers />
+        <S.ContentOption>
+          {optionUser === "create" ? <CreateNewUser /> : <SwitchStateUser />}
+        </S.ContentOption>
       </S.TabSelect>
     </S.Container>
   );

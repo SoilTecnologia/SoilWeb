@@ -4,7 +4,7 @@ import User from '../models/user';
 import knex from '../database';
 
 export const createFarmController = async (
-  farm_id: Farm['farm_id'],
+  // farm_id: Farm['farm_id'],
   user_id: Farm['user_id'],
   farm_name: Farm['farm_name'],
   farm_city: Farm['farm_city'],
@@ -12,7 +12,7 @@ export const createFarmController = async (
   farm_lat: Farm['farm_lat']
 ) => {
   const newFarm = await knex<Farm>('farms').insert({
-    farm_id,
+    // farm_id,
     user_id,
     farm_name,
     farm_city,
@@ -45,4 +45,13 @@ export const readMapFarmControler = async (farm_id: Farm['farm_id']) => {
     .select('*');
 
   return result;
+};
+
+export const deleteFarmController = async (farm_id: Farm['farm_id']) => {
+  const farm = await knex<Farm>('farms').select().where({ farm_id }).first();
+
+  if (farm) await knex<Farm>('farms').where({ farm_id }).forNoKeyUpdate().del();
+  else throw new Error('User does not exists');
+
+  return farm;
 };

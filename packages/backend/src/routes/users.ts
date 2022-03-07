@@ -66,6 +66,7 @@ router.get(
 
 router.get(
   '/allUsers',
+  authMiddleware(),
   authHandler(
     async (
       req: IUserAuthInfoRequest,
@@ -74,7 +75,6 @@ router.get(
     ) => {
       try {
         const usersList = await getAllUsersController();
-        console.log(`Em route ${JSON.stringify(usersList)}`);
         res.send(usersList);
       } catch (err) {
         console.log('[ERROR] Error in the server');
@@ -85,40 +85,41 @@ router.get(
   )
 );
 
-router.put(
-  '/addFarm',
-  authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { user_id } = req.user;
-      const { farm_id, farm_name, farm_city, farm_lng, farm_lat } = req.body;
+// router.put(
+//   '/addFarm',
+//   authMiddleware(),
+//   authHandler(
+//     async (
+//       req: IUserAuthInfoRequest,
+//       res: express.Response,
+//       next: express.NextFunction
+//     ) => {
+//       const { user_id } = req.user;
+//       const { farm_id, farm_name, farm_city, farm_lng, farm_lat } = req.body;
 
-      try {
-        const newFarm = await createFarmController(
-          farm_id,
-          user_id,
-          farm_name,
-          farm_city,
-          farm_lng,
-          farm_lat
-        );
+//       try {
+//         const newFarm = await createFarmController(
+//           farm_id,
+//           user_id,
+//           farm_name,
+//           farm_city,
+//           farm_lng,
+//           farm_lat
+//         );
 
-        res.send(newFarm);
-      } catch (err) {
-        console.log(`[ERROR] Server 500 on /users/addFarm!`);
-        console.log(err);
-        next(err);
-      }
-    }
-  )
-);
+//         res.send(newFarm);
+//       } catch (err) {
+//         console.log(`[ERROR] Server 500 on /users/addFarm!`);
+//         console.log(err);
+//         next(err);
+//       }
+//     }
+//   )
+// );
 
 router.put(
   '/putUser/:id',
+  authMiddleware(),
   authHandler(
     async (
       req: IUserAuthInfoRequest,
@@ -131,7 +132,7 @@ router.put(
 );
 
 router.delete(
-  '/deleteUser/:id',
+  '/delUser/:id',
   authMiddleware(),
   authHandler(
     async (

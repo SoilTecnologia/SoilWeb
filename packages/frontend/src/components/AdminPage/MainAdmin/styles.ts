@@ -79,3 +79,11 @@ export const OptionCreateUser = styled.button`
 export const ListUser = styled(OptionCreateUser)`
   margin-top: 2rem;
 `;
+export const ContentOption = styled.div`
+  width: inherit;
+  min-height: 87vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;

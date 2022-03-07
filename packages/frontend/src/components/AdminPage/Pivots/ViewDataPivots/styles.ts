@@ -16,8 +16,20 @@ export const AddNode = styled.button`
   color: ${({ theme }) => theme.colors.secondary};
   font-size: 1.6rem;
   &:hover {
-    background: rgba(0, 0, 0, 0.2);
+    background: ${({ theme }) => theme.colors.primary_gradient};
     cursor: pointer;
   }
 `;
 export const IconAdd = styled(GrAdd)``;
+export const ContentAddNode = styled.div`
+  width: 100vw;
+  min-height: 100vh;
+  background: ${({ theme }) => theme.colors.primary};
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;

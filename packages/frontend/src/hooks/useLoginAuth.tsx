@@ -1,7 +1,14 @@
 import { requestLoginAuth } from "api/requestApi";
 import Router from "next/router";
 import { setCookie, parseCookies } from "nookies";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 interface UserProviderProps {
   children: React.ReactNode;
@@ -16,6 +23,7 @@ type dataContextAuth = {
   signIn: (login: string, password: string) => Promise<any | null>;
   isAuthenticated: boolean;
   user: ResponseUser | null;
+  setUser: Dispatch<SetStateAction<ResponseUser | null>>;
 };
 
 const UserLoginData = createContext({} as dataContextAuth);
@@ -33,7 +41,7 @@ function UseLoginProvider({ children }: UserProviderProps) {
     if (role === "SUDO") {
       Router.push("/adm");
     } else if (role === "USER") {
-      Router.push("/user");
+      Router.push("/farms");
     } else {
       Router.back();
     }
@@ -56,29 +64,23 @@ function UseLoginProvider({ children }: UserProviderProps) {
   const signIn = async (login: string, password: string) => {
     const response = await requestLoginAuth(login, password);
     if (response) {
+      const { token, user_id, user_type } = response;
       const propsCookie = { maxAge: 60 * 60 * 2 }; //2hours
 
-      setCookie(undefined, "soilauth-token", response.token, propsCookie);
-      setCookie(undefined, "soilauth-userid", response.user_id, propsCookie);
-      setCookie(
-        undefined,
-        "soilauth-usertype",
-        response.user_type,
-        propsCookie
-      );
+      setCookie(undefined, "soilauth-token", token, propsCookie);
+      setCookie(undefined, "soilauth-userid", user_id, propsCookie);
+      setCookie(undefined, "soilauth-usertype", user_type, propsCookie);
 
-      setUser({ user_type: response.user_type, user_id: response.user_id });
+      setUser({ user_type, user_id });
 
-      response.user_type === "SUDO"
-        ? Router.push("/adm")
-        : Router.push("/user");
+      user_type === "SUDO" ? Router.push("/adm") : Router.push("/farms");
     }
 
     return response;
   };
 
   return (
-    <UserLoginData.Provider value={{ signIn, user, isAuthenticated }}>
+    <UserLoginData.Provider value={{ signIn, user, isAuthenticated, setUser }}>
       {children}
     </UserLoginData.Provider>
   );

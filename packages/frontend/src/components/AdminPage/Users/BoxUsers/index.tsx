@@ -58,6 +58,7 @@ const BoxUsersComponents = ({ dataUser, callbackUpdateUser }: userProps) => {
   };
 
   const callbackViewDataUser = (user: requestUser) => {
+    console.log("chame data user");
     setData({
       ...stateDefault,
       dataUserSelected: user,

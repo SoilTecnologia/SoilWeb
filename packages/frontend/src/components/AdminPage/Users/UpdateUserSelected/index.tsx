@@ -37,25 +37,27 @@ const UpdateUserSelected = ({ updateUser, updateUserData }: FormDataProps) => {
   const formRef = useRef<HTMLFormElement>(null);
 
   const onSubmit = handleSubmit((data) => {
+    console.log(data);
+
     const newDataUser: User = {
       user_id: updateUser.user_id,
-      user_name: data.user_name ? data.user_name : updateUser.user_name,
-      farm: data.farm ? data.farm : updateUser.farm,
+      // user_name: data.user_name ? data.user_name : updateUser.user_name,
+      // farm: data.farm ? data.farm : updateUser.farm,
       user_type: data.user_type ? data.user_type : updateUser.user_type,
     };
-    updateUserData(newDataUser);
+    // updateUserData(newDataUser);
   });
 
   return (
     <S.Form onSubmit={onSubmit} ref={formRef}>
-      <ContentInputs
+      {/* <ContentInputs
         errorUserName={errors.user_name}
         label="USUARIO"
         id="user_name"
         type="text"
         placeholder={updateUser.user_name}
         register={register}
-      />
+      /> */}
 
       <SelectOptionsComponent
         label="FUNÇÂO"

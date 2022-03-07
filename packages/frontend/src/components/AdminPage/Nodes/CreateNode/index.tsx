@@ -9,6 +9,7 @@ import * as S from "./styles";
 import * as Yup from "yup";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import Farm from "utils/models/farm";
+import theme from "styles/theme";
 
 type createNodeProps = {
   farm: Farm;
@@ -59,6 +60,7 @@ const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
         <ContentInputs
           errorUserName={errors.node_name}
           label="NODE"
+          colorLabel={theme.colors.secondary}
           id="node_name"
           type="text"
           placeholder="NODE"
@@ -67,12 +69,14 @@ const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
         <ContentInputs
           errorUserName={errors.gateway}
           label="GATEWAY"
+          colorLabel={theme.colors.secondary}
           id="gateway"
           type="text"
           placeholder="GATEWAY"
           register={register}
         />
         <SelectOptionsComponent
+          colorLabel={theme.colors.secondary}
           label="GPRS"
           id="is_gprs"
           register={register}

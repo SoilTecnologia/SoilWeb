@@ -12,9 +12,6 @@ import ContentInputs from "components/globalComponents/ContentInputs";
 import User, { UserCreate } from "utils/models/user";
 
 const schema = Yup.object({
-  user_name: Yup.string()
-    .required("Digite um nome de usuario")
-    .min(3, "Minimo de 3 caractéres"),
   login: Yup.string(),
   password: Yup.string(),
   user_type: Yup.string().required("Escolha um função"),
@@ -40,17 +37,16 @@ const CreateNewUser = () => {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<User>({ resolver: yupResolver(schema) });
+  } = useForm<UserCreate>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
   //Functions
-  const onSubmit = handleSubmit((data) => {
-    const newDataUser: UserCreate = {
-      // user_name: data.user_name,
-      login: data.login ? data.login : undefined,
-      password: data.password ? data.password : undefined,
-      user_type: data.user_type,
+  const onSubmit = handleSubmit(({ user_type, login, password }) => {
+    const newUser: UserCreate = {
+      user_type,
+      login,
+      password,
     };
-    createUser(newDataUser);
+    createUser(newUser);
   });
   return (
     <S.Container>
@@ -67,7 +63,7 @@ const CreateNewUser = () => {
           errorUserName={errors.login}
           label="LOGIN"
           id="login"
-          type="email"
+          type="text"
           placeholder="LOGIN"
           register={register}
         />

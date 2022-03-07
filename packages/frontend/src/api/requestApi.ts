@@ -1,10 +1,13 @@
+import { FarmCreate } from "utils/models/farm";
 import User, { requestUser, UserCreate } from "utils/models/user";
 import { api } from "./api";
+
 type Response = {
   user_type: User["user_type"];
   user_id: User["user_id"];
   token: string;
 };
+
 //User
 export const requestLoginAuth = async (login: string, password: string) => {
   const bodyReQ = { login, password };
@@ -17,6 +20,7 @@ export const requestLoginAuth = async (login: string, password: string) => {
       return null;
     });
 };
+
 export const requestPostUser = async (user: UserCreate) => {
   const sendNewUser = {
     login: user.login,
@@ -24,8 +28,11 @@ export const requestPostUser = async (user: UserCreate) => {
     user_type: user.user_type,
   };
   return await api
-    .post(`users/signup`, sendNewUser)
-    .then((response) => response.data)
+    .post<Response | null>(`users/signup`, sendNewUser)
+    .then((response) => {
+      console.log("response " + response.data);
+      return response.data;
+    })
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
       console.log(err);
@@ -45,7 +52,7 @@ export const requestGetAllUsers = async () => {
 
 export const requestDeleteUser = async (id: string) => {
   return await api
-    .get(`users/deleteUser/${id}`)
+    .delete(`users/delUser/${id}`)
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
@@ -61,6 +68,27 @@ export const requestGetAllFarmsUser = async (id: string) => {
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
+};
+
+export const requestCreateFarm = async (farm: FarmCreate) => {
+  return await api
+    .post("farms/addFarm", farm)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
+
+export const requestDeleteFarm = async (farm_id: string) => {
+  return await api
+    .delete(`farms/deleteFarm/${farm_id}`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Erro ao deletar usúario ");
       console.log(err);
       return null;
     });

@@ -9,23 +9,19 @@ import User from "utils/models/user";
 import BoxUsers from "../BoxUsers";
 import UpdateUserSelected from "../UpdateUserSelected";
 import ModalUpdateData from "components/globalComponents/ModalUpdateData";
+import { parseCookies } from "nookies";
+import Router from "next/router";
 
 const ListUsers = () => {
   //Contexts
-  const { setData, stateDefault, stateAdmin, usersList, setUsersList } =
-    useContextData();
+  const { setData, stateDefault, stateAdmin, usersList } = useContextData();
   const { updateUser, getAllUser } = useContextActionCrud();
 
   //States
   const [modalVisible, setModalVisible] = useState(false);
-  const getAllUserApi = async () => {
-    const user = await getAllUser();
-    console.log(user);
-  };
 
   useEffect(() => {
-    getAllUserApi();
-    console.log("To em list users");
+    getAllUser();
   }, []);
 
   //Functions

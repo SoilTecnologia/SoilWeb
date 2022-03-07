@@ -29,14 +29,16 @@ const CreateNewFarm = () => {
   } = useForm<FarmCreate>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
   const onSubmit = handleSubmit((data) => {
-    const newFarmUser: FarmCreate = {
-      farm_name: data.farm_name,
-      farm_city: data.farm_city,
-      farm_lat: data.farm_lat,
-      farm_lng: data.farm_lng,
-    };
-    if (stateAdmin.dataUserSelected) {
-      createFarm(newFarmUser, stateAdmin.dataUserSelected.user_id);
+    const user = stateAdmin.dataUserSelected;
+    if (user) {
+      const newFarmUser: FarmCreate = {
+        user_id: user.user_id,
+        farm_name: data.farm_name,
+        farm_city: data.farm_city,
+        farm_lat: data.farm_lat,
+        farm_lng: data.farm_lng,
+      };
+      createFarm(newFarmUser);
     }
   });
   return (

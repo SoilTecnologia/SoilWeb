@@ -1,4 +1,8 @@
 import styled, { css } from "styled-components";
+
+type colorLabelProps = {
+  colorLabel?: string;
+};
 export const Container = styled.div``;
 export const Inputs = styled.input`
   ${({ theme }) => css`
@@ -26,8 +30,9 @@ export const ContentIconInput = styled.div`
   align-items: flex-start;
   justify-content: center;
 `;
-export const Label = styled.label`
+export const Label = styled.label<colorLabelProps>`
   font-size: 1.2rem;
   margin: 0 0 0.5rem 0.5rem;
-  color: ${({ theme }) => theme.colors.primary_gradient};
+  color: ${({ theme, colorLabel }) =>
+    colorLabel ? colorLabel : theme.colors.primary_gradient};
 `;

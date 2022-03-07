@@ -101,9 +101,12 @@ export const signUpController = async (
 };
 
 export const deleteUserController = async (user_id: User['user_id']) => {
-  const user = await knex<User>('users').select('*').where({ user_id }).first();
+  const user = await knex<User>('users').select().where({ user_id }).first();
   if (user) {
-    const del = await knex<User>('users').delete().where({ user_id }).first();
+    const del = await knex<User>('users')
+      .where({ user_id })
+      .forNoKeyUpdate()
+      .del('*');
 
     if (!del) throw new Error('Não foi possível deletar usúario');
     return del;

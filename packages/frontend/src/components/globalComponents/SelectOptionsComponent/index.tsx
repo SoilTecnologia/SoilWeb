@@ -9,18 +9,21 @@ type itensOptionSelect = {
 type selectOptionsProps = {
   label: string;
   id: string;
+  colorLabel?: string;
+
   register: UseFormRegister<any>;
   options: itensOptionSelect[];
 };
 
 const SelectOptionsComponent = ({
   label,
+  colorLabel,
   id,
   register,
   options,
 }: selectOptionsProps) => (
   <S.Container>
-    <S.Label>{label}</S.Label>
+    <S.Label colorLabel={colorLabel}>{label}</S.Label>
     <S.Select {...register(id)}>
       {options.map((opt, index) => (
         <option key={index} value={opt.value}>

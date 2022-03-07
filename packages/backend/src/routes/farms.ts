@@ -3,6 +3,8 @@ import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
+  createFarmController,
+  deleteFarmController,
   getAllFarmUser,
   readAllFarmController,
   readMapFarmControler
@@ -14,6 +16,34 @@ import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 
 const router = express.Router();
+
+router.post(
+  '/addFarm',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { user_id, farm_name, farm_city, farm_lng, farm_lat } = req.body;
+      try {
+        const farm = await createFarmController(
+          user_id,
+          farm_name,
+          farm_city,
+          farm_lng,
+          farm_lat
+        );
+        res.send(farm);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /users/addFarm!`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
 
 router.put(
   '/addNode/:farm_id',
@@ -177,17 +207,23 @@ router.get(
 //   )
 // );
 
-// router.delete('/:farm_id', authMiddleware(['SUDO']), async (req, res, next) => {
-//   const farm_id = req.params.farm_id;
+router.delete(
+  'deleteFarm/:farm_id',
+  authMiddleware(),
+  async (req, res, next) => {
+    const { farm_id } = req.params;
 
-//   try {
-//     const deletedFarm = await deleteFarmController(farm_id);
+    try {
+      const deletedFarm = await deleteFarmController(farm_id);
 
-//     res.send(deletedFarm);
-//   } catch (err) {
-//     next(err);
-//   }
-// });
+      res.send(deletedFarm);
+    } catch (err) {
+      console.log('[ERROR] 500 Internal server error');
+      console.log(err);
+      next(err);
+    }
+  }
+);
 
 // router.put(
 //   '/addAdmin/:target_farm_id',
