@@ -1,5 +1,5 @@
 import * as S from "./styles";
-import { useRef } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import ContentInputs from "components/globalComponents/ContentInputs";
 import SelectOptionsComponent from "components/globalComponents/SelectOptionsComponent";
 import User from "utils/models/user";
+import { useContextActionCrud } from "hooks/useActionsCrud";
 
 const schema = Yup.object({
   userName: Yup.string(),
@@ -15,8 +16,8 @@ const schema = Yup.object({
 }).required();
 
 type FormDataProps = {
-  updateUser: User;
-  updateUserData: (user: User) => void;
+  dataUser: User;
+  closeModal: () => void;
 };
 const optionsSelect = [
   {
@@ -28,7 +29,11 @@ const optionsSelect = [
     value: "USER",
   },
 ];
-const UpdateUserSelected = ({ updateUser, updateUserData }: FormDataProps) => {
+const UpdateUserSelected = ({ dataUser, closeModal }: FormDataProps) => {
+  //Contexts
+
+  const { updateUser } = useContextActionCrud();
+
   const {
     handleSubmit,
     register,
@@ -36,28 +41,35 @@ const UpdateUserSelected = ({ updateUser, updateUserData }: FormDataProps) => {
   } = useForm<User>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
-
+  const onSubmit = handleSubmit(async (data) => {
     const newDataUser: User = {
-      user_id: updateUser.user_id,
-      // user_name: data.user_name ? data.user_name : updateUser.user_name,
-      // farm: data.farm ? data.farm : updateUser.farm,
-      user_type: data.user_type ? data.user_type : updateUser.user_type,
+      user_id: dataUser.user_id,
+      password: dataUser.password,
+      login: data.login ? data.login : dataUser.login,
+      user_type: data.user_type ? data.user_type : dataUser.user_type,
     };
-    // updateUserData(newDataUser);
+    closeModal();
+    updateUser(newDataUser);
   });
 
   return (
     <S.Form onSubmit={onSubmit} ref={formRef}>
-      {/* <ContentInputs
-        errorUserName={errors.user_name}
+      <ContentInputs
+        errorUserName={errors.login}
         label="USUARIO"
-        id="user_name"
+        id="login"
         type="text"
-        placeholder={updateUser.user_name}
+        placeholder={dataUser.login ? dataUser.login : "USER"}
         register={register}
-      /> */}
+      />
+      <ContentInputs
+        errorUserName={errors.password}
+        label="SENHA"
+        id="password"
+        type="text"
+        placeholder={"..."}
+        register={register}
+      />
 
       <SelectOptionsComponent
         label="FUNÇÂO"

@@ -4,7 +4,8 @@ import {
   signUpController,
   signInController,
   deleteUserController,
-  getAllUsersController
+  getAllUsersController,
+  putUserController
 } from '../controllers/users';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import { createFarmController } from '../controllers/farms';
@@ -118,7 +119,7 @@ router.get(
 // );
 
 router.put(
-  '/putUser/:id',
+  '/putUser',
   authMiddleware(),
   authHandler(
     async (
@@ -126,7 +127,22 @@ router.put(
       res: express.Response,
       next: express.NextFunction
     ) => {
-      const { id } = req.params;
+      const { user_id, login, password, user_type } = req.body;
+
+      try {
+        const putUser = await putUserController({
+          user_id,
+          login,
+          password,
+          user_type
+        });
+
+        res.send(putUser);
+      } catch (err) {
+        console.log('[ERROR] Internal Server error');
+        console.log(err);
+        next(err);
+      }
     }
   )
 );

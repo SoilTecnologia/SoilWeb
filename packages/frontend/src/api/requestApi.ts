@@ -29,13 +29,21 @@ export const requestPostUser = async (user: UserCreate) => {
   };
   return await api
     .post<Response | null>(`users/signup`, sendNewUser)
-    .then((response) => {
-      console.log("response " + response.data);
-      return response.data;
-    })
+    .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
       console.log(err);
+    });
+};
+
+export const requestUpdateUser = async (user: User) => {
+  return await api
+    .put<User[]>(`users/putUser`, user)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error user update");
+      console.log(err);
+      return null;
     });
 };
 

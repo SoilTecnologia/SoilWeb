@@ -13,6 +13,7 @@ import {
   requestGetAllFarmsUser,
   requestGetAllUsers,
   requestPostUser,
+  requestUpdateUser,
 } from "api/requestApi";
 import Router from "next/router";
 import { parseCookies } from "nookies";
@@ -75,10 +76,11 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     }
     return result;
   };
-  const updateUser = (user: User) => {
-    setData(stateDefault);
-    const newUserList = handleUpdateUser(user, usersList);
-    setUsersList(newUserList);
+  const updateUser = async (user: User) => {
+    const teste = await requestUpdateUser(user);
+    if (teste) {
+      await getAllUser();
+    }
   };
   const deleteUser = async (id: string) => {
     const response = await requestDeleteUser(id);

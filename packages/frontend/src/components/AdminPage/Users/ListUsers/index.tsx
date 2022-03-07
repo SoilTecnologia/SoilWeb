@@ -9,13 +9,11 @@ import User from "utils/models/user";
 import BoxUsers from "../BoxUsers";
 import UpdateUserSelected from "../UpdateUserSelected";
 import ModalUpdateData from "components/globalComponents/ModalUpdateData";
-import { parseCookies } from "nookies";
-import Router from "next/router";
 
 const ListUsers = () => {
   //Contexts
   const { setData, stateDefault, stateAdmin, usersList } = useContextData();
-  const { updateUser, getAllUser } = useContextActionCrud();
+  const { getAllUser } = useContextActionCrud();
 
   //States
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,6 +21,8 @@ const ListUsers = () => {
   useEffect(() => {
     getAllUser();
   }, []);
+
+  useEffect(() => {}, [usersList]);
 
   //Functions
 
@@ -32,11 +32,6 @@ const ListUsers = () => {
       ...stateDefault,
       updateUser: user,
     });
-  };
-
-  const updateUserData = (user: User) => {
-    setModalVisible(false);
-    updateUser(user);
   };
 
   const closeModal = () => {
@@ -59,8 +54,8 @@ const ListUsers = () => {
         <ModalUpdateData closeModal={closeModal}>
           {stateAdmin.updateUser && (
             <UpdateUserSelected
-              updateUser={stateAdmin.updateUser}
-              updateUserData={updateUserData}
+              dataUser={stateAdmin.updateUser}
+              closeModal={closeModal}
             />
           )}
         </ModalUpdateData>

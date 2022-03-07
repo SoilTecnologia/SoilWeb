@@ -50,7 +50,7 @@ export const readMapFarmControler = async (farm_id: Farm['farm_id']) => {
 export const deleteFarmController = async (farm_id: Farm['farm_id']) => {
   const farm = await knex<Farm>('farms').select().where({ farm_id }).first();
 
-  if (farm) await knex<Farm>('farms').where({ farm_id }).forNoKeyUpdate().del();
+  if (farm) await knex<Farm>('farms').where({ farm_id }).del();
   else throw new Error('User does not exists');
 
   return farm;

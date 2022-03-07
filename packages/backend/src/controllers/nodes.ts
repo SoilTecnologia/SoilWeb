@@ -9,7 +9,6 @@ export const createNodeController = async (
   is_gprs: Node['is_gprs'],
   gateway: Node['gateway']
 ) => {
-  
   const newNode = await knex<Node>('nodes').insert({
     node_id,
     farm_id,
@@ -21,8 +20,10 @@ export const createNodeController = async (
   return newNode;
 };
 
-export const readAllNodeController = async(farm_id: Node['farm_id']) => {
-  const allNodesFromFarm = await knex<Node>('nodes').select("*").where({farm_id});
+export const readAllNodeController = async (farm_id: Node['farm_id']) => {
+  const allNodesFromFarm = await knex<Node>('nodes')
+    .select('*')
+    .where({ farm_id });
 
   return allNodesFromFarm;
-}
+};
