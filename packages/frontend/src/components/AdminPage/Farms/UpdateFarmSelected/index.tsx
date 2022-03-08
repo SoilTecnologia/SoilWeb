@@ -1,5 +1,5 @@
 import * as S from "./styles";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { useRef } from "react";
 
 import { useForm } from "react-hook-form";
 
@@ -9,7 +9,6 @@ import { useContextActionCrud } from "hooks/useActionsCrud";
 
 type updateFarmProps = {
   farmSelected: Farm;
-  handleState: Dispatch<SetStateAction<boolean>>;
 };
 
 const UpdateFarmSelected = ({ farmSelected }: updateFarmProps) => {

@@ -99,8 +99,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   };
   const updateFarm = async (farm: Farm) => {
     const newFarm = await requestUpdateFarm(farm);
-    console.log(newFarm);
-
+    setData({ ...stateAdmin, updateFarm: null });
     newFarm && (await getAllFarmsUser(farm.user_id));
   };
   const deleteFarm = async (
