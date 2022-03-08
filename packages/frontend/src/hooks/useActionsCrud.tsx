@@ -13,6 +13,7 @@ import {
   requestGetAllFarmsUser,
   requestGetAllUsers,
   requestPostUser,
+  requestUpdateFarm,
   requestUpdateUser,
 } from "api/requestApi";
 import Router from "next/router";
@@ -30,7 +31,7 @@ interface actionCrudProps {
   getAllFarmsUser: (id: string) => void;
   createFarm: (farm: FarmCreate) => void;
   updateFarm: (farm: Farm) => void;
-  deleteFarm: (id: string) => void;
+  deleteFarm: (farm_id: Farm["farm_id"], user_id: User["user_id"]) => void;
   createNode: (node: NodeCreate, farm: Farm) => void;
   updateNode: (node: Node, farmRelation: Farm) => void;
   deleteNode: (id: string, farmRelation: Farm) => void;
@@ -77,14 +78,14 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     return result;
   };
   const updateUser = async (user: User) => {
-    const teste = await requestUpdateUser(user);
-    if (teste) {
+    const newUser = await requestUpdateUser(user);
+    if (newUser) {
       await getAllUser();
     }
   };
   const deleteUser = async (id: string) => {
-    const response = await requestDeleteUser(id);
-    getAllUser();
+    await requestDeleteUser(id);
+    await getAllUser();
   };
 
   //CRUD FARMS
@@ -93,25 +94,21 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     setFarmList(response);
   };
   const createFarm = async (farm: FarmCreate) => {
-    const farms = await requestCreateFarm(farm);
-    console.log(farms);
+    await requestCreateFarm(farm);
     setData({ ...stateAdmin, createFarm: false });
   };
-  const updateFarm = (farm: Farm) => {
-    // if (stateAdmin.dataUserSelected) {
-    //   const user = stateAdmin.dataUserSelected;
-    //   if (user.farm) {
-    //     const newArray = handleUpdateFarm(farm, user.farm);
-    //     setData({
-    //       ...stateDefault,
-    //       showIsListUser: false,
-    //       dataUserSelected: { ...stateAdmin.dataUserSelected, farm: newArray },
-    //     });
-    //   }
-    // }
+  const updateFarm = async (farm: Farm) => {
+    const newFarm = await requestUpdateFarm(farm);
+    console.log(newFarm);
+
+    newFarm && (await getAllFarmsUser(farm.user_id));
   };
-  const deleteFarm = (id: string) => {
-    const result = requestDeleteFarm(id);
+  const deleteFarm = async (
+    farm_id: Farm["farm_id"],
+    user_id: User["user_id"]
+  ) => {
+    await requestDeleteFarm(farm_id);
+    await getAllFarmsUser(user_id);
     setData({ ...stateAdmin });
   };
 

@@ -1,4 +1,4 @@
-import { FarmCreate } from "utils/models/farm";
+import Farm, { FarmCreate } from "utils/models/farm";
 import User, { requestUser, UserCreate } from "utils/models/user";
 import { api } from "./api";
 
@@ -88,6 +88,17 @@ export const requestCreateFarm = async (farm: FarmCreate) => {
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
       console.log(err);
+    });
+};
+
+export const requestUpdateFarm = async (farm: Farm) => {
+  return await api
+    .put("farms/updateFarm", farm)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Erro ao deletar usúario ");
+      console.log(err);
+      return null;
     });
 };
 

@@ -2,6 +2,7 @@ import Farm from '../models/farm';
 import User from '../models/user';
 
 import knex from '../database';
+import { deleteFarm } from '../utils/deleteCascade';
 
 export const createFarmController = async (
   // farm_id: Farm['farm_id'],
@@ -48,10 +49,37 @@ export const readMapFarmControler = async (farm_id: Farm['farm_id']) => {
 };
 
 export const deleteFarmController = async (farm_id: Farm['farm_id']) => {
-  const farm = await knex<Farm>('farms').select().where({ farm_id }).first();
+  try {
+    await deleteFarm('farm', farm_id);
+  } catch (err) {
+    console.log('[ERROR] Internal Server Error');
+    console.log(err);
+  }
+};
 
-  if (farm) await knex<Farm>('farms').where({ farm_id }).del();
-  else throw new Error('User does not exists');
+export const putFarmController = async (farm: Farm) => {
+  const getFarm = await knex<Farm>('farms')
+    .select()
+    .where({ farm_id: farm.farm_id })
+    .first();
 
-  return farm;
+  if (getFarm) {
+    await knex<Farm>('farms')
+      .where({ farm_id: farm.farm_id })
+      .update({
+        ...getFarm,
+        farm_name: farm.farm_name ? farm.farm_name : getFarm.farm_name,
+        farm_city: farm.farm_city ? farm.farm_city : getFarm.farm_city,
+        farm_lng: farm.farm_lng ? farm.farm_lng : getFarm.farm_lng,
+        farm_lat: farm.farm_lat ? farm.farm_lat : getFarm.farm_lat
+      });
+
+    const newFarm = await knex<Farm>('farms')
+      .select()
+      .where({ farm_id: farm.farm_id })
+      .first();
+
+    return newFarm;
+  }
+  throw new Error('[ERROR] Farm not find');
 };

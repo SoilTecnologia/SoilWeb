@@ -12,19 +12,18 @@ const ViewDataUser = () => {
   const { stateAdmin, setData, stateDefault, farmList } = useContextData();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const closeModal = () => {
-    setData(stateDefault);
-    setModalVisible(false);
-  };
-
   const handleNewFarm = () => {
     setData({ ...stateAdmin, createFarm: true });
   };
 
   const handleAllFarmsUser = async () => {
     if (stateAdmin.dataUserSelected) {
-      await getAllFarmsUser(stateAdmin.dataUserSelected.user_id);
+      getAllFarmsUser(stateAdmin.dataUserSelected.user_id);
     }
+  };
+  const closeModal = () => {
+    setData(stateDefault);
+    setModalVisible(false);
   };
 
   useEffect(() => {
@@ -57,7 +56,10 @@ const ViewDataUser = () => {
       {modalVisible && (
         <ModalUpdateData closeModal={closeModal}>
           {stateAdmin.updateFarm && (
-            <UpdateFarmSelected farmSelected={stateAdmin.updateFarm} />
+            <UpdateFarmSelected
+              farmSelected={stateAdmin.updateFarm}
+              handleState={setModalVisible}
+            />
           )}
         </ModalUpdateData>
       )}

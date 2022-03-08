@@ -1,8 +1,6 @@
 import * as S from "./styles";
-import { useRef } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 
-import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 
 import ContentInputs from "components/globalComponents/ContentInputs";
@@ -11,12 +9,8 @@ import { useContextActionCrud } from "hooks/useActionsCrud";
 
 type updateFarmProps = {
   farmSelected: Farm;
+  handleState: Dispatch<SetStateAction<boolean>>;
 };
-
-const schema = Yup.object({
-  farm_name: Yup.string(),
-  farm_city: Yup.string(),
-}).required();
 
 const UpdateFarmSelected = ({ farmSelected }: updateFarmProps) => {
   //Contexts
@@ -26,7 +20,7 @@ const UpdateFarmSelected = ({ farmSelected }: updateFarmProps) => {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<Farm>({ resolver: yupResolver(schema) });
+  } = useForm<Farm>();
   const formRef = useRef<HTMLFormElement>(null);
   //Functions
   const onSubmit = handleSubmit((data) => {
@@ -37,6 +31,7 @@ const UpdateFarmSelected = ({ farmSelected }: updateFarmProps) => {
       farm_lat: data.farm_lat ? data.farm_lat : farmSelected.farm_lat,
       farm_lng: data.farm_lng ? data.farm_lng : farmSelected.farm_lng,
     };
+
     updateFarm(newFarm);
   });
 

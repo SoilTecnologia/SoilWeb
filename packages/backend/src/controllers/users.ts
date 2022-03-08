@@ -8,6 +8,7 @@ import {
 } from '../types/errors';
 
 import User from '../models/user';
+import { deleteUser } from '../utils/deleteCascade';
 
 type Response = {
   user_type: User['user_type'];
@@ -101,15 +102,12 @@ export const signUpController = async (
 };
 
 export const deleteUserController = async (user_id: User['user_id']) => {
-  const user = await knex<User>('users').select().where({ user_id }).first();
-  if (user) {
-    const del = await knex<User>('users').where({ user_id }).del();
-
-    if (!del) throw new Error('Não foi possível deletar usúario');
-    return del;
+  try {
+    await deleteUser(user_id);
+  } catch (err) {
+    console.log('[ERROR] INTERNAL SERVER ERROR');
+    console.log(err);
   }
-
-  throw new Error('User does not exists');
 };
 
 export const putUserController = async (user: User) => {
@@ -137,6 +135,7 @@ export const putUserController = async (user: User) => {
   }
   throw new Error('[ERROR] User not find');
 };
+
 export const getAllUsersController = async () => {
   try {
     const users = await knex<User>('users').select();

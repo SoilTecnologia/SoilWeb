@@ -37,7 +37,7 @@ const BoxFarmComponent = ({ farmProps }: BoxFarmsProps) => {
 
   const okDeleteFarm = () => {
     setIsDeletedUser(false);
-    deleteFarm(farmProps.farm_id);
+    deleteFarm(farmProps.farm_id, farmProps.user_id);
   };
 
   const notDeleteFarm = () => {
