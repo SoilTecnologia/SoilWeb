@@ -93,3 +93,15 @@ export const requestDeleteFarm = async (farm_id: string) => {
       return null;
     });
 };
+
+//Pivots
+export const requestGetAllFarmsPivots = async (id:string)=>{
+  return await api
+    .get(`/pivots/readAll/${id}`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
+}

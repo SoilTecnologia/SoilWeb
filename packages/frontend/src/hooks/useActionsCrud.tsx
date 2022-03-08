@@ -13,6 +13,7 @@ import {
   requestGetAllFarmsUser,
   requestGetAllUsers,
   requestPostUser,
+  requestGetAllFarmsPivots,
 } from "api/requestApi";
 import Router from "next/router";
 import { parseCookies } from "nookies";
@@ -36,6 +37,7 @@ interface actionCrudProps {
   createPivot: () => void;
   updatePivot: (pivot: Pivot, farmRelation: Farm) => void;
   deletePivot: (id: string, farmRelation: Farm) => void;
+  getAllFarmPivots: (id:string)=>void;
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -130,6 +132,10 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   const deleteNode = (id: string, farmRelation: Farm) => {};
 
   //CRUD PIVOT
+  const getAllFarmPivots = async (id:string)=>{
+    const response = await requestGetAllFarmsPivots(id);
+    setPivotList(response);
+  }
   const createPivot = () => {};
   const updatePivot = (pivot: Pivot, farmRelation: Farm) => {
     // const user = stateAdmin.dataUserSelected;
@@ -171,6 +177,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         createNode,
         updateNode,
         deleteNode,
+        getAllFarmPivots,
       }}
     >
       {children}
