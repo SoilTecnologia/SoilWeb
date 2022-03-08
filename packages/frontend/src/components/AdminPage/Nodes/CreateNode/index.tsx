@@ -16,11 +16,9 @@ type createNodeProps = {
   setAddNode: Dispatch<SetStateAction<boolean>>;
 };
 const schema = Yup.object({
-  node_name: Yup.string()
-    .required("Digite um nome de usuario")
-    .min(3, "Minimo de 3 caractéres"),
+  node_name: Yup.string().required("Digite um nome de usuario"),
   gateway: Yup.string(),
-  is_gprs: Yup.string(),
+  is_gprs: Yup.string().required("Define se o tipo de comunicação é gprs"),
 }).required();
 const optionsSelect = [
   {
@@ -47,7 +45,6 @@ const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
       is_gprs: data.is_gprs,
       farm_id: farm.farm_id,
       gateway: data.gateway,
-      pivots: null,
     };
     setAddNode(false);
     createNode(newNode, farm);

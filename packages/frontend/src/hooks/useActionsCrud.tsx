@@ -8,9 +8,12 @@ import { handleUpdateUser } from "utils/handleDataCruds";
 import Node, { NodeCreate } from "utils/models/node";
 import {
   requestCreateFarm,
+  requestCreateNode,
   requestDeleteFarm,
+  requestDeleteNode,
   requestDeleteUser,
   requestGetAllFarmsUser,
+  requestGetAllNodes,
   requestGetAllUsers,
   requestPostUser,
   requestUpdateFarm,
@@ -32,9 +35,11 @@ interface actionCrudProps {
   createFarm: (farm: FarmCreate) => void;
   updateFarm: (farm: Farm) => void;
   deleteFarm: (farm_id: Farm["farm_id"], user_id: User["user_id"]) => void;
+  getAllNodes: (farm_id: Farm["farm_id"]) => void;
   createNode: (node: NodeCreate, farm: Farm) => void;
   updateNode: (node: Node, farmRelation: Farm) => void;
   deleteNode: (id: string, farmRelation: Farm) => void;
+  getAllPivots: (node_id: Node["node_id"]) => void;
   createPivot: () => void;
   updatePivot: (pivot: Pivot, farmRelation: Farm) => void;
   deletePivot: (id: string, farmRelation: Farm) => void;
@@ -91,7 +96,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   //CRUD FARMS
   const getAllFarmsUser = async (id: string) => {
     const response = await requestGetAllFarmsUser(id);
-    setFarmList(response);
+    response && setFarmList(response);
   };
   const createFarm = async (farm: FarmCreate) => {
     await requestCreateFarm(farm);
@@ -112,22 +117,23 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   };
 
   //NODES
-  const createNode = (node: NodeCreate, farm: Farm) => {
-    // const user = stateAdmin.dataUserSelected;
-    // const newNode: Node = { ...node, pivots: null, node_id: "123" };
-    // if (farm.node) {
-    //   const farmSelected: Farm = { ...farm, node: [...farm.node, newNode] };
-    //   if (user && user.farm) {
-    //     user.farm.push(farmSelected);
-    //     const newDataUser: User = { ...user, farm: [...user.farm] };
-    //     setData({ ...stateAdmin, dataUserSelected: newDataUser });
-    //   }
-    // }
+  const getAllNodes = async (farm_id: Farm["farm_id"]) => {
+    const response = await requestGetAllNodes(farm_id);
+    response && setNodeList(response);
+  };
+  const createNode = async (node: NodeCreate) => {
+    await requestCreateNode(node);
+    await getAllNodes(node.farm_id);
   };
   const updateNode = (node: Node, farmRelation: Farm) => {};
-  const deleteNode = (id: string, farmRelation: Farm) => {};
+  const deleteNode = async (id: string, farmRelation: Farm) => {
+    console.log("estou no contexto, " + id);
+    await requestDeleteNode(id);
+    getAllNodes(farmRelation.farm_id);
+  };
 
   //CRUD PIVOT
+  const getAllPivots = (node_id: Node["node_id"]) => {};
   const createPivot = () => {};
   const updatePivot = (pivot: Pivot, farmRelation: Farm) => {
     // const user = stateAdmin.dataUserSelected;
@@ -166,6 +172,8 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         createPivot,
         updatePivot,
         deletePivot,
+        getAllNodes,
+        getAllPivots,
         createNode,
         updateNode,
         deleteNode,

@@ -4,13 +4,32 @@ import { useState } from "react";
 import ViewDataNode from "components/AdminPage/Nodes/ViewDataNode";
 import Farm from "utils/models/farm";
 import ViewDataPivots from "components/AdminPage/Pivots/ViewDataPivots";
+import { useContextActionCrud } from "hooks/useActionsCrud";
 
 type FarmProps = {
   farmData: Farm;
 };
 const ViewDataFarms = ({ farmData }: FarmProps) => {
+  //Contexts
+  const { getAllNodes, getAllPivots } = useContextActionCrud();
+
+  //States
   const [nodesVisible, setNodesVisible] = useState(false);
-  const [pivotsVisible, setPivotsVisible] = useState(false);
+
+  const viewDataNodes = () => {
+    if (!nodesVisible) {
+      getAllNodes(farmData.farm_id);
+      setNodesVisible(true);
+    } else {
+      setNodesVisible(false);
+    }
+  };
+
+  const viewDataPivots = async () => {
+    // if (!pivotsVisible) {
+    //   await getAllPivots();
+    // }
+  };
 
   return (
     <S.Container>
@@ -33,16 +52,10 @@ const ViewDataFarms = ({ farmData }: FarmProps) => {
       </S.ContentData>
 
       <S.ContentPivotsNodes>
-        <S.NodeName onClick={() => setNodesVisible(!nodesVisible)}>
+        <S.NodeName onClick={viewDataNodes}>
           Nodes <S.IconDown />
         </S.NodeName>
         {nodesVisible && <ViewDataNode farmData={farmData} />}
-      </S.ContentPivotsNodes>
-      <S.ContentPivotsNodes>
-        <S.NodeName onClick={() => setPivotsVisible(!pivotsVisible)}>
-          Pivots <S.IconDown />
-        </S.NodeName>
-        {pivotsVisible && <ViewDataPivots farmData={farmData} />}
       </S.ContentPivotsNodes>
     </S.Container>
   );

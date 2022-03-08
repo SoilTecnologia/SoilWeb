@@ -60,21 +60,58 @@ export const deleteState = async (pivot_id: Pivot['pivot_id']) => {
   }
 };
 
-export const deletePivot = async (node_id: Node['node_id']) => {
-  const pivot = await knex<Pivot>('pivots').select().where({ node_id }).first();
-  if (pivot) {
-    await deleteState(pivot.pivot_id);
-    await deleteRadioVariables('pivot', pivot.pivot_id);
-    await deleteActions('pivot', pivot.pivot_id);
-    await knex<Pivot>('pivots').where({ node_id }).del();
+export const deletePivot = async (
+  typeRequest: 'node' | 'pivot',
+  id: string
+) => {
+  if (typeRequest === 'node') {
+    const pivots = await knex<Pivot>('pivots').select().where({ node_id: id });
+    if (pivots) {
+      pivots.forEach(async (pivot) => {
+        await deleteState(pivot.pivot_id);
+        await deleteRadioVariables('pivot', pivot.pivot_id);
+        await deleteActions('pivot', pivot.pivot_id);
+      });
+    }
+    await knex<Pivot>('pivots').where({ node_id: id }).del();
+  } else {
+    const pivot = await knex<Pivot>('pivots')
+      .select()
+      .where({ pivot_id: id })
+      .first();
+    if (pivot) {
+      await deleteState(pivot.pivot_id);
+      await deleteRadioVariables('pivot', pivot.pivot_id);
+      await deleteActions('pivot', pivot.pivot_id);
+      await knex<Pivot>('pivots').where({ pivot_id: id }).del();
+    }
   }
+
+  // if (pivot) {
+  //   await deleteState(pivot.pivot_id);
+  //   await deleteRadioVariables('pivot', pivot.pivot_id);
+  //   await deleteActions('pivot', pivot.pivot_id);
+  //   await knex<Pivot>('pivots').where({ node_id }).del();
+  // }
 };
 
-export const deleteNode = async (farm_id: Farm['farm_id']) => {
-  const node = await knex<Node>('nodes').select().where({ farm_id }).first();
-  if (node) {
-    await deletePivot(node.node_id);
-    await knex<Node>('nodes').where({ farm_id }).del();
+export const deleteNode = async (typeRequest: 'node' | 'farm', id: string) => {
+  if (typeRequest === 'farm') {
+    const nodes = await knex<Node>('nodes').select().where({ farm_id: id });
+    if (nodes) {
+      if (nodes && nodes.length > 0) {
+        nodes.forEach(async (node) => {
+          if (node.node_id) await deletePivot('node', node.node_id);
+        });
+      }
+      await knex<Node>('nodes').where({ farm_id: id }).del();
+    }
+  } else {
+    const node = await knex<Node>('nodes').where({ node_id: id });
+    if (node) {
+      await deletePivot('node', id);
+      await knex<Node>('nodes').where({ node_id: id }).del();
+    }
   }
 };
 
@@ -83,7 +120,7 @@ export const deleteFarm = async (typeRequest: 'user' | 'farm', id: string) => {
     const farms = await knex<Farm>('farms').select().where({ user_id: id });
     if (farms && farms.length > 0) {
       farms.forEach(async (farm) => {
-        await deleteNode(farm.farm_id);
+        await deleteNode('farm', farm.farm_id);
       });
       await knex<Farm>('farms').where({ user_id: id }).del();
     }
@@ -93,7 +130,7 @@ export const deleteFarm = async (typeRequest: 'user' | 'farm', id: string) => {
       .where({ farm_id: id })
       .first();
     if (farm) {
-      await deleteNode(farm.farm_id);
+      await deleteNode('farm', farm.farm_id);
       await knex<Farm>('farms').where({ farm_id: id }).del();
     }
   }

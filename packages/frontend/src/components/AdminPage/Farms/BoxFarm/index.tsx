@@ -64,8 +64,7 @@ const BoxFarmComponent = ({ farmProps }: BoxFarmsProps) => {
       <S.ContentFarmInfo onClick={setFarmSelected}>
         <S.Farm>Fazenda: {`  ${farmProps.farm_name}`}</S.Farm>
         <S.ContentLocaleFarm>
-          <S.City>Cidade: {`  ${farmProps.farm_city}  -`}</S.City>
-          <S.State>{farmProps.farm_name}</S.State>
+          <S.City>Cidade: {`  ${farmProps.farm_city} `}</S.City>
         </S.ContentLocaleFarm>
       </S.ContentFarmInfo>
 

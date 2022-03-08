@@ -1,4 +1,5 @@
 import Farm, { FarmCreate } from "utils/models/farm";
+import Node, { NodeCreate } from "utils/models/node";
 import User, { requestUser, UserCreate } from "utils/models/user";
 import { api } from "./api";
 
@@ -110,5 +111,37 @@ export const requestDeleteFarm = async (farm_id: string) => {
       console.log("[ERROR] Erro ao deletar usúario ");
       console.log(err);
       return null;
+    });
+};
+
+//Nodes
+
+export const requestCreateNode = async (node: NodeCreate) => {
+  return await api
+    .post("nodes/addNode", node)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
+export const requestGetAllNodes = async (farm_id: Farm["farm_id"]) => {
+  return await api
+    .get<Node[]>(`nodes/readAll/${farm_id}`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
+};
+
+export const requestDeleteNode = async (node_id: Node["node_id"]) => {
+  return await api
+    .delete(`nodes/deleteNode/${node_id}`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
     });
 };

@@ -61,37 +61,6 @@ router.post(
   )
 );
 
-router.put(
-  '/addNode/:farm_id',
-  authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { farm_id } = req.params;
-      const { node_name, gateway, is_gprs, node_id } = req.body;
-
-      try {
-        const newNode = await createNodeController(
-          node_id,
-          farm_id,
-          node_name,
-          is_gprs,
-          gateway
-        );
-
-        res.send(newNode);
-      } catch (err) {
-        console.log(`[ERROR] Server 500 on /farms/addNode`);
-        console.log(err);
-        next(err);
-      }
-    }
-  )
-);
-
 router.get(
   '/farmUser/:id',
   authHandler(
