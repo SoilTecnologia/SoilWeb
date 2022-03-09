@@ -1,5 +1,6 @@
 export type PivotCreate = {
-  pivot_name: string;
+  node_id: string;
+  pivot_name: number;
   pivot_lng: number;
   pivot_lat: number;
   pivot_start_angle: number;
@@ -10,7 +11,6 @@ export type PivotCreate = {
 
 interface Pivot extends PivotCreate {
   pivot_id: string;
-  node_id: string;
   last_communication: Date | string;
 }
 

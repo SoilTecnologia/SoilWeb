@@ -9,22 +9,39 @@ import { useContextActionCrud } from "hooks/useActionsCrud";
 import Farm from "utils/models/farm";
 import { PivotCreate } from "utils/models/pivot";
 import theme from "styles/theme";
+import { useContextData } from "hooks/useContextData";
 
 type createPivotProps = {
-  farm: Farm;
   setAddNode: Dispatch<SetStateAction<boolean>>;
 };
 
-const CreateNode = ({ farm, setAddNode }: createPivotProps) => {
+const CreateNode = ({ setAddNode }: createPivotProps) => {
   //Contexts
-  const { createNode } = useContextActionCrud();
+  const { stateAdmin } = useContextData();
+  const { createPivot } = useContextActionCrud();
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm<PivotCreate>();
   const formRef = useRef<HTMLFormElement>(null);
-  const onSubmit = handleSubmit((data) => console.log(data));
+  const onSubmit = handleSubmit((data) => {
+    const nodeId = stateAdmin.dataNodeSelected?.node_id
+      ? stateAdmin.dataNodeSelected.node_id
+      : "1234";
+    const newPivot: PivotCreate = {
+      node_id: nodeId,
+      pivot_name: data.pivot_name,
+      pivot_lng: data.pivot_lng,
+      pivot_lat: data.pivot_lat,
+      pivot_start_angle: data.pivot_start_angle,
+      pivot_end_angle: data.pivot_end_angle,
+      pivot_radius: data.pivot_radius,
+      radio_id: data.radio_id,
+    };
+    createPivot(newPivot);
+    setAddNode(false);
+  });
 
   return (
     <S.Container>

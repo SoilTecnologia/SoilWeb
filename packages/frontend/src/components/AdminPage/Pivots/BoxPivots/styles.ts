@@ -4,8 +4,9 @@ import { FaEllipsisV } from "react-icons/fa";
 export const Container = styled.div`
   ${({ theme }) => css`
     position: relative;
+    min-width: 55rem;
     margin: 1rem 0;
-    padding: 1rem 1.4rem;
+    padding: 1rem 3rem;
     background: ${theme.colors.primary_gradient};
     border-radius: 1rem;
 

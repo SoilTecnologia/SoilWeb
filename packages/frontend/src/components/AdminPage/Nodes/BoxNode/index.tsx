@@ -15,11 +15,9 @@ type boxNodeprops = {
 };
 const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
   //Contexts
-
   const { getAllPivots, deleteNode } = useContextActionCrud();
 
   //States
-  const [pivotsVisible, setPivotVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [isDeletedNode, setIsDeletedNode] = useState(false);
   const [modalUpdateVisible, setModalUpdateVisible] = useState(false);
@@ -47,12 +45,7 @@ const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
   };
 
   const viewDataPivots = () => {
-    if (!pivotsVisible) {
-      getAllPivots(nodeData.node_id);
-      setPivotVisible(true);
-    } else {
-      setPivotVisible(false);
-    }
+    getAllPivots(nodeData);
   };
   return (
     <>

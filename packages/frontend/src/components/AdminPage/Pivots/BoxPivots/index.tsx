@@ -13,10 +13,9 @@ import DeleteDataComponent from "components/globalComponents/DeleteDataComponent
 
 type boxPivotProps = {
   pivotData: Pivot;
-  farmRelation: Farm;
 };
 
-const BoxPivots = ({ pivotData, farmRelation }: boxPivotProps) => {
+const BoxPivots = ({ pivotData }: boxPivotProps) => {
   //Contexts
   const { deletePivot } = useContextActionCrud();
   const { setData, stateDefault, stateAdmin } = useContextData();
@@ -43,12 +42,12 @@ const BoxPivots = ({ pivotData, farmRelation }: boxPivotProps) => {
   const handleDeletePivot = () => {
     setModalOption(false);
     setIsDeletePivot(true);
-    console.log(farmRelation);
+    // console.log(farmRelation);
   };
 
   const okDeletePivot = () => {
     setIsDeletePivot(false);
-    deletePivot(pivotData.pivot_id, farmRelation);
+    // deletePivot(pivotData.pivot_id, farmRelation);
   };
   const notDeletePivot = () => {
     setIsDeletePivot(false);
@@ -75,10 +74,10 @@ const BoxPivots = ({ pivotData, farmRelation }: boxPivotProps) => {
       <S.Radius>
         Raio: <span>{pivotData.pivot_radius}</span>
       </S.Radius>
-      <S.LastCommunication>
+      {/* <S.LastCommunication>
         Ultima Comunicação:{" "}
         <span>{pivotData.last_communication.toString()}</span>
-      </S.LastCommunication>
+      </S.LastCommunication> */}
       <S.Radio>
         Radio: <span>{pivotData.radio_id}</span>
       </S.Radio>

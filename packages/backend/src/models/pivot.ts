@@ -1,5 +1,4 @@
-type Pivot = {
-  pivot_id: string;
+export type pivotCreate = {
   node_id: string;
   pivot_name: string;
   pivot_lng: number;
@@ -7,16 +6,20 @@ type Pivot = {
   pivot_start_angle: number;
   pivot_end_angle: number;
   pivot_radius: number;
-  last_communication: Date;
   radio_id: number;
 };
 
+interface Pivot extends pivotCreate {
+  pivot_id: string;
+  last_communication: Date;
+}
+
 export type PivotUpdate = {
   pivot_id: string;
-  connection: "ONLINE" | "OFFLINE";
-  power: "ON" | "OFF" | "NULL";
-  water: "WET" | "DRY";
-  direction: "CLOCKWISE" | "ANTI_CLOCKWISE";
+  connection: 'ONLINE' | 'OFFLINE';
+  power: 'ON' | 'OFF' | 'NULL';
+  water: 'WET' | 'DRY';
+  direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE';
   percentimeter: number;
   angle: number;
   timestamp: Date;

@@ -1,6 +1,6 @@
 import Farm from '../models/farm';
 import User from '../models/user';
-import Pivot from '../models/pivot';
+import Pivot, { pivotCreate } from '../models/pivot';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 import RadioVariable from '../models/radioVariable';
@@ -14,6 +14,7 @@ import {
 import knex from '../database';
 import emitter from '../utils/eventBus';
 import { getLastCycleFromPivot } from './cycles';
+import Node from '../models/node';
 
 export const createPivotController = async (
   pivot_id: Pivot['pivot_id'],
@@ -383,4 +384,16 @@ export const updatePivotController = async (
       });
     }
   }
+};
+
+// Admin
+export const getAllPivotController = async (node_id: Node['node_id']) => {
+  const pivots = await knex<Pivot>('pivots').select().where({ node_id });
+  console.log(`Pivots data ${JSON.stringify(pivots)}`);
+  return pivots;
+};
+
+export const createPivotControllerAdm = async (pivot: pivotCreate) => {
+  const pivots = await knex<Pivot>('pivots').insert(pivot);
+  return pivots;
 };

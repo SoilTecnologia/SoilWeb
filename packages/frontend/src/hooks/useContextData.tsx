@@ -23,6 +23,8 @@ export type stateContentProps = {
   createFarm: boolean;
   updateFarm: Farm | null;
   dataFarmSelected: Farm | null;
+
+  dataNodeSelected: Node | null;
   updatePivot: Pivot | null;
 
   nodeList: Node[];
@@ -57,6 +59,7 @@ function UseContextProvider({ children }: UserProviderProps) {
     createFarm: false,
     updateFarm: null,
     dataFarmSelected: null,
+    dataNodeSelected: null,
     updatePivot: null,
     nodeList: [] as Node[],
   };

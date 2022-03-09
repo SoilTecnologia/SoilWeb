@@ -6,6 +6,7 @@ import ViewDataUser from "../ViewDataUser";
 import ViewDataFarms from "components/AdminPage/Farms/ViewDataFarms";
 import UpdatePivotData from "components/AdminPage/Pivots/UpdatePivotData";
 import CreateNewFarm from "components/AdminPage/Farms/CreateNewFarm";
+import ViewDataPivots from "components/AdminPage/Pivots/ViewDataPivots";
 
 const SwitchStateUser = () => {
   const { stateAdmin } = useContextData();
@@ -18,6 +19,8 @@ const SwitchStateUser = () => {
     return <CreateNewFarm />;
   } else if (stateAdmin.updatePivot) {
     return <UpdatePivotData pivotData={stateAdmin.updatePivot} />;
+  } else if (stateAdmin.dataNodeSelected) {
+    return <ViewDataPivots nodeData={stateAdmin.dataNodeSelected} />;
   } else if (stateAdmin.dataFarmSelected) {
     return <ViewDataFarms farmData={stateAdmin.dataFarmSelected} />;
   } else if (stateAdmin.dataUserSelected) {
