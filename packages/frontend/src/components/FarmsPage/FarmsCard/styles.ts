@@ -31,6 +31,7 @@ export const ContentData = styled.div`
 `;
 export const UserName = styled.h4`
   color: ${({ theme }) => theme.colors.secondary};
+  margin: 0.5rem 0;
 `;
 
 

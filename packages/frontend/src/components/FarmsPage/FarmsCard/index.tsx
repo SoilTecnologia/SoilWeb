@@ -27,6 +27,10 @@ const FarmsContainer = ({ farm }: FarmProps) => {
             Localização: {farm_city}
           </S.UserName>
 
+          <S.UserName>
+            Clique aqui para acessar a fazenda
+          </S.UserName>
+
         </S.ContentData>
       </S.Box>
     </S.Container>

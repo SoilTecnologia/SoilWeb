@@ -1,13 +1,18 @@
 import * as S from "./styles";
 import FarmsContainer from "../FarmsCard";
 import Header from "components/globalComponents/Header";
-const MainFarm = (props) => {
-  const { farmList } = props
+import Farm from "utils/models/farm";
+
+type FarmListProps={
+  farmList:Farm[]
+}
+
+const MainFarm = ({ farmList }: FarmListProps) => {
   return (
     <>
-      <Header Text={'Fazendas'}/>
+      <Header Text={'Fazendas'} />
       <S.Container>
-        {farmList.map((farm) => (
+        {farmList.map((farm: Farm) => (
           <FarmsContainer key={farm.farm_id} farm={farm} />
         ))}
 

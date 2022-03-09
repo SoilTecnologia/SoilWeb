@@ -16,9 +16,10 @@ const UserPivots = () => {
 
   return (
     <>
-      {pivotList.map((pivot) => {
-        console.log(pivot)
-      })
+      {
+        pivotList.map((pivot) => {
+          console.log(pivot)
+        })
       }
     </>
   )
