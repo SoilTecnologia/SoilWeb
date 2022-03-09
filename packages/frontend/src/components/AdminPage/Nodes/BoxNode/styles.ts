@@ -38,3 +38,17 @@ export const IconMenu = styled(FaEllipsisV)`
   top: 10px;
   right: 10px;
 `;
+export const ContentAddNode = styled.div`
+  width: 100vw;
+  min-height: 100vh;
+  z-index: 10;
+
+  background: rgba(0, 0, 0, 0.4);
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;

@@ -6,6 +6,7 @@ import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useState } from "react";
 import Farm from "utils/models/farm";
 import Node from "utils/models/node";
+import UpdateNode from "../UpdateNode";
 import * as S from "./styles";
 
 type boxNodeprops = {
@@ -21,13 +22,14 @@ const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
   const [pivotsVisible, setPivotVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [isDeletedNode, setIsDeletedNode] = useState(false);
+  const [modalUpdateVisible, setModalUpdateVisible] = useState(false);
 
   const handleSetModalVisible = () => {
     setModalVisible(false);
   };
 
   const callbackPut = () => {
-    console.log("");
+    setModalUpdateVisible(true);
   };
 
   const okDeleteNode = () => {
@@ -44,46 +46,57 @@ const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
     setIsDeletedNode(true);
   };
 
-  const viewDataPivots = async () => {
+  const viewDataPivots = () => {
     if (!pivotsVisible) {
-      await getAllPivots(nodeData.node_id);
+      getAllPivots(nodeData.node_id);
       setPivotVisible(true);
     } else {
       setPivotVisible(false);
     }
   };
   return (
-    <S.Container onClick={viewDataPivots}>
-      <S.IconMenu onClick={() => setModalVisible(true)} />
-      <S.NodeName>
-        NODE: <span>{nodeData.node_name}</span>
-      </S.NodeName>
-      <S.IsGprs>
-        GRPS: <span>{` ${nodeData.is_gprs ? "SIM" : "NÃO"}`}</span>
-      </S.IsGprs>
-      {nodeData.gateway && (
-        <S.Gateway>
-          Gateway: <span>{nodeData.gateway}</span>{" "}
-        </S.Gateway>
-      )}
-      {modalVisible && (
-        <BoxOptions
-          modalVisible={modalVisible}
-          setModalVisible={handleSetModalVisible}
-          callbackUpdate={callbackPut}
-          handleDelete={handleDeleteNode}
-        />
-      )}
-      {isDeletedNode && (
-        <ContentModalOptionUser modalOptionUser={modalVisible}>
-          <DeleteDataComponent
-            okDelete={okDeleteNode}
-            notDelete={notDeleteNode}
-            label="USUARIO"
+    <>
+      <S.Container onClick={viewDataPivots}>
+        <S.IconMenu onClick={() => setModalVisible(true)} />
+        <S.NodeName>
+          NODE: <span>{nodeData.node_name}</span>
+        </S.NodeName>
+        <S.IsGprs>
+          GRPS: <span>{` ${nodeData.is_gprs ? "SIM" : "NÃO"}`}</span>
+        </S.IsGprs>
+        {nodeData.gateway && (
+          <S.Gateway>
+            Gateway: <span>{nodeData.gateway}</span>{" "}
+          </S.Gateway>
+        )}
+        {modalVisible && (
+          <BoxOptions
+            modalVisible={modalVisible}
+            setModalVisible={handleSetModalVisible}
+            callbackUpdate={callbackPut}
+            handleDelete={handleDeleteNode}
           />
-        </ContentModalOptionUser>
+        )}
+        {isDeletedNode && (
+          <ContentModalOptionUser modalOptionUser={modalVisible}>
+            <DeleteDataComponent
+              okDelete={okDeleteNode}
+              notDelete={notDeleteNode}
+              label="USUARIO"
+            />
+          </ContentModalOptionUser>
+        )}
+      </S.Container>
+
+      {modalUpdateVisible && (
+        <S.ContentAddNode>
+          <UpdateNode
+            nodeData={nodeData}
+            closeModal={() => setModalUpdateVisible(false)}
+          />
+        </S.ContentAddNode>
       )}
-    </S.Container>
+    </>
   );
 };
 

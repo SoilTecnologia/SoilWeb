@@ -1,30 +1,27 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import ContentInputs from "components/globalComponents/ContentInputs";
 import SelectOptionsComponent from "components/globalComponents/SelectOptionsComponent";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { useContextActionCrud } from "hooks/useActionsCrud";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { NodeCreate } from "utils/models/node";
+import theme from "styles/theme";
+import Node from "utils/models/node";
+import * as Yup from "yup";
+
+import { NodeForm } from "../CreateNode";
 import * as S from "./styles";
 
-import * as Yup from "yup";
-import { useContextActionCrud } from "hooks/useActionsCrud";
-import Farm from "utils/models/farm";
-import theme from "styles/theme";
+type updateNodeProps = {
+  nodeData: Node;
+  closeModal: () => void;
+};
 
-type createNodeProps = {
-  farm: Farm;
-  setAddNode: Dispatch<SetStateAction<boolean>>;
-};
-export type NodeForm = {
-  node_name: string;
-  gateway: string;
-  is_gprs: string;
-};
 const schema = Yup.object({
   node_name: Yup.string().required("Digite um nome de usuario"),
   gateway: Yup.string(),
   is_gprs: Yup.string().required("Define se o tipo de comunicação é gprs"),
 }).required();
+
 const optionsSelect = [
   {
     label: "SIM",
@@ -35,9 +32,9 @@ const optionsSelect = [
     value: "not",
   },
 ];
-const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
-  //Contexts
-  const { createNode } = useContextActionCrud();
+
+const UpdateNode = ({ nodeData, closeModal }: updateNodeProps) => {
+  const { updateNode } = useContextActionCrud();
   const {
     handleSubmit,
     register,
@@ -45,20 +42,20 @@ const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
   } = useForm<NodeForm>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
   const onSubmit = handleSubmit((data) => {
-    const newNode: NodeCreate = {
-      node_name: data.node_name,
-      is_gprs: data.is_gprs === "yes" ? true : false,
-      farm_id: farm.farm_id,
-      gateway: data.gateway,
+    const verifyGrps = data.is_gprs === "yes" ? true : false;
+    const newNode: Node = {
+      ...nodeData,
+      node_name: data.node_name ? data.node_name : nodeData.node_name,
+      is_gprs: data.is_gprs ? verifyGrps : nodeData.is_gprs,
+      farm_id: nodeData.farm_id,
+      gateway: data.gateway ? data.gateway : nodeData.gateway,
     };
-    console.log(newNode);
-    setAddNode(false);
-    createNode(newNode, farm);
+    closeModal();
+    updateNode(newNode);
   });
-
   return (
     <S.Container>
-      <S.IconClose onClick={() => setAddNode(false)} />
+      <S.IconClosed onClick={closeModal} />
       <S.Form onSubmit={onSubmit} ref={formRef}>
         <ContentInputs
           errorUserName={errors.node_name}
@@ -91,4 +88,4 @@ const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
   );
 };
 
-export default CreateNode;
+export default UpdateNode;

@@ -27,3 +27,30 @@ export const deleteNodeController = async (node_id: Node['node_id']) => {
     }
   }
 };
+
+export const putNodeController = async (node: Node) => {
+  const getNode = await knex<Node>('nodes')
+    .select()
+    .where({ node_id: node.node_id })
+    .first();
+
+  if (getNode) {
+    await knex<Node>('nodes')
+      .where({ node_id: node.node_id })
+      .update({
+        ...getNode,
+        node_name: node.node_name ? node.node_name : getNode.node_name,
+        is_gprs: node.is_gprs ? node.is_gprs : getNode.is_gprs,
+        gateway: node.gateway ? node.gateway : getNode.gateway
+      });
+
+    const newNode = await knex<Node>('nodes')
+      .where({ node_id: node.node_id })
+      .select()
+      .first();
+
+    return newNode;
+  }
+
+  throw new Error('[ERROR] Node not find');
+};

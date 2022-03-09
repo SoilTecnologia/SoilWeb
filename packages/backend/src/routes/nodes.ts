@@ -5,6 +5,7 @@ import { createPivotController } from '../controllers/pivots';
 import {
   createNodeController,
   deleteNodeController,
+  putNodeController,
   readAllNodeController
 } from '../controllers/nodes';
 import Node from '../models/node';
@@ -25,39 +26,29 @@ router.get('/readAll/:farm_id', authMiddleware(), async (req, res, next) => {
   }
 });
 
-router.put('/addPivot/:node_id', authMiddleware(), async (req, res, next) => {
-  const { node_id } = req.params;
-  const {
-    pivot_id,
-    pivot_name,
-    radio_id,
-    pivot_lng,
-    pivot_lat,
-    pivot_start_angle,
-    pivot_end_angle,
-    pivot_radius
-  } = req.body;
+router.put(
+  '/updateNode',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const node: Node = req.body;
 
-  try {
-    const newPivot = await createPivotController(
-      pivot_id,
-      node_id,
-      radio_id,
-      pivot_name,
-      pivot_lng,
-      pivot_lat,
-      pivot_start_angle,
-      pivot_end_angle,
-      pivot_radius
-    );
+      try {
+        const newNode = await putNodeController(node);
 
-    res.send(newPivot);
-  } catch (err) {
-    console.log(`[ERROR] Server 500 on /nodes/addPivot`);
-    console.log(err);
-    next(err);
-  }
-});
+        res.send(newNode);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /nodes/addNode`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
 
 router.post(
   '/addNode',

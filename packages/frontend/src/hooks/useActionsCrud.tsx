@@ -17,6 +17,7 @@ import {
   requestGetAllUsers,
   requestPostUser,
   requestUpdateFarm,
+  requestUpdateNode,
   requestUpdateUser,
 } from "api/requestApi";
 import Router from "next/router";
@@ -37,7 +38,7 @@ interface actionCrudProps {
   deleteFarm: (farm_id: Farm["farm_id"], user_id: User["user_id"]) => void;
   getAllNodes: (farm_id: Farm["farm_id"]) => void;
   createNode: (node: NodeCreate, farm: Farm) => void;
-  updateNode: (node: Node, farmRelation: Farm) => void;
+  updateNode: (node: Node) => void;
   deleteNode: (id: string, farmRelation: Farm) => void;
   getAllPivots: (node_id: Node["node_id"]) => void;
   createPivot: () => void;
@@ -125,9 +126,12 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     await requestCreateNode(node);
     await getAllNodes(node.farm_id);
   };
-  const updateNode = (node: Node, farmRelation: Farm) => {};
+  const updateNode = async (node: Node) => {
+    const newNode = await requestUpdateNode(node);
+    setData(stateAdmin);
+    newNode && (await getAllNodes(node.farm_id));
+  };
   const deleteNode = async (id: string, farmRelation: Farm) => {
-    console.log("estou no contexto, " + id);
     await requestDeleteNode(id);
     getAllNodes(farmRelation.farm_id);
   };

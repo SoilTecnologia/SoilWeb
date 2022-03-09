@@ -145,3 +145,13 @@ export const requestDeleteNode = async (node_id: Node["node_id"]) => {
       console.log(err);
     });
 };
+
+export const requestUpdateNode = async (node: Node) => {
+  return await api
+    .put("/nodes/updateNode", node)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
