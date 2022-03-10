@@ -40,3 +40,8 @@ export const IconOption = styled(FaEllipsisV)`
     cursor: pointer;
   }
 `;
+export const ContentData = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;

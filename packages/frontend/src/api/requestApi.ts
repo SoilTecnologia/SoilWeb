@@ -161,7 +161,11 @@ export const requestUpdateNode = async (node: Node) => {
 export const requestGetAllPivots = async (node_id: Node["node_id"]) => {
   return await api
     .get(`pivots/getPivots/${node_id}`)
-    .then((response) => response.data)
+    .then((response) => {
+      console.log("RESPONSE");
+      console.log(response.data);
+      return response.data;
+    })
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
       console.log(err);
@@ -171,6 +175,24 @@ export const requestGetAllPivots = async (node_id: Node["node_id"]) => {
 export const requestCreateNewPivot = async (pivot: PivotCreate) => {
   return await api
     .post(`pivots/addPivot`, pivot)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
+export const requestDeletePivot = async (pivot_id: Pivot["pivot_id"]) => {
+  return await api
+    .delete(`pivots/deletePivot/${pivot_id}`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
+export const requestUpdatePivot = async (newPivot: Pivot) => {
+  return await api
+    .put(`pivots/putPivot`, newPivot)
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");

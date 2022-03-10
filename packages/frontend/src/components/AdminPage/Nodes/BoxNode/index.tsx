@@ -49,19 +49,22 @@ const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
   };
   return (
     <>
-      <S.Container onClick={viewDataPivots}>
+      <S.Container>
         <S.IconMenu onClick={() => setModalVisible(true)} />
-        <S.NodeName>
-          NODE: <span>{nodeData.node_name}</span>
-        </S.NodeName>
-        <S.IsGprs>
-          GRPS: <span>{` ${nodeData.is_gprs ? "SIM" : "NÃO"}`}</span>
-        </S.IsGprs>
-        {nodeData.gateway && (
-          <S.Gateway>
-            Gateway: <span>{nodeData.gateway}</span>{" "}
-          </S.Gateway>
-        )}
+        <S.ContentData onClick={viewDataPivots}>
+          <S.NodeName>
+            NODE: <span>{nodeData.node_name}</span>
+          </S.NodeName>
+          <S.IsGprs>
+            GRPS: <span>{` ${nodeData.is_gprs ? "SIM" : "NÃO"}`}</span>
+          </S.IsGprs>
+          {nodeData.gateway && (
+            <S.Gateway>
+              Gateway: <span>{nodeData.gateway}</span>{" "}
+            </S.Gateway>
+          )}
+        </S.ContentData>
+
         {modalVisible && (
           <BoxOptions
             modalVisible={modalVisible}

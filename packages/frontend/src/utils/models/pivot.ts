@@ -11,7 +11,7 @@ export type PivotCreate = {
 
 interface Pivot extends PivotCreate {
   pivot_id: string;
-  last_communication: Date | string;
+  // last_communication: Date | string;
 }
 
 export type PivotUpdate = {

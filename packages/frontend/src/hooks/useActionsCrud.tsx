@@ -4,7 +4,6 @@ import Pivot, { PivotCreate } from "utils/models/pivot";
 import User, { UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 
-import { handleUpdateUser } from "utils/handleDataCruds";
 import Node, { NodeCreate } from "utils/models/node";
 import {
   requestCreateFarm,
@@ -12,6 +11,7 @@ import {
   requestCreateNode,
   requestDeleteFarm,
   requestDeleteNode,
+  requestDeletePivot,
   requestDeleteUser,
   requestGetAllFarmsUser,
   requestGetAllNodes,
@@ -20,6 +20,7 @@ import {
   requestPostUser,
   requestUpdateFarm,
   requestUpdateNode,
+  requestUpdatePivot,
   requestUpdateUser,
 } from "api/requestApi";
 import Router from "next/router";
@@ -44,8 +45,8 @@ interface actionCrudProps {
   deleteNode: (id: string, farmRelation: Farm) => void;
   getAllPivots: (node: Node) => void;
   createPivot: (pivot: PivotCreate) => void;
-  updatePivot: (pivot: Pivot, farmRelation: Farm) => void;
-  deletePivot: (id: string, farmRelation: Farm) => void;
+  updatePivot: (pivot: Pivot, node: Node) => void;
+  deletePivot: (id: string, node: Node) => void;
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -56,12 +57,11 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     stateAdmin,
     setData,
     stateDefault,
-    usersList,
+
     setUsersList,
     setFarmList,
     setNodeList,
     setPivotList,
-    nodeList,
   } = useContextData();
 
   //CRUD USER
@@ -141,8 +141,6 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   //CRUD PIVOT
   const getAllPivots = async (node: Node) => {
     const result = await requestGetAllPivots(node.node_id);
-    console.log("Result");
-    console.log(result);
     result && setPivotList(result);
     setData({
       ...stateDefault,
@@ -152,31 +150,15 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   };
   const createPivot = async (pivot: PivotCreate) => {
     await requestCreateNewPivot(pivot);
-    console.log(stateAdmin.dataNodeSelected);
-
     stateAdmin.dataNodeSelected && getAllPivots(stateAdmin.dataNodeSelected);
   };
-  const updatePivot = (pivot: Pivot, farmRelation: Farm) => {
-    // const user = stateAdmin.dataUserSelected;
-    // if (user && user.farm) {
-    //   const newArrayFarms = handleUpdatePivot(pivot, farmRelation, user.farm);
-    //   setData({
-    //     ...stateDefault,
-    //     showIsListUser: false,
-    //     dataUserSelected: { ...user, farm: newArrayFarms },
-    //   });
-    // }
+  const updatePivot = async (pivot: Pivot, node: Node) => {
+    const newPivot = await requestUpdatePivot(pivot);
+    newPivot && (await getAllPivots(node));
   };
-  const deletePivot = (id: string, farmRelation: Farm) => {
-    // const user = stateAdmin.dataUserSelected;
-    // if (user && user.farm) {
-    //   const newArrayFarms = handleDeletePivot(id, farmRelation, user.farm);
-    //   setData({
-    //     ...stateDefault,
-    //     showIsListUser: false,
-    //     dataUserSelected: { ...user, farm: newArrayFarms },
-    //   });
-    // }
+  const deletePivot = async (id: Pivot["pivot_id"], node: Node) => {
+    await requestDeletePivot(id);
+    await getAllPivots(node);
   };
 
   return (

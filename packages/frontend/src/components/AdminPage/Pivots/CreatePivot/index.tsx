@@ -1,12 +1,9 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import ContentInputs from "components/globalComponents/ContentInputs";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as S from "./styles";
 
-import * as Yup from "yup";
 import { useContextActionCrud } from "hooks/useActionsCrud";
-import Farm from "utils/models/farm";
 import { PivotCreate } from "utils/models/pivot";
 import theme from "styles/theme";
 import { useContextData } from "hooks/useContextData";
@@ -19,6 +16,9 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
   //Contexts
   const { stateAdmin } = useContextData();
   const { createPivot } = useContextActionCrud();
+
+  //States
+  const [addIdNode, setAddIdNode] = useState(false);
   const {
     handleSubmit,
     register,
@@ -52,7 +52,7 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
           label="PIVOT"
           colorLabel={theme.colors.secondary}
           id="pivot_name"
-          type="text"
+          type="number"
           placeholder="PIVOT"
           register={register}
         />
@@ -79,7 +79,7 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
           label="ANGULO INICIAL"
           colorLabel={theme.colors.secondary}
           id="pivot_start_angle"
-          type="text"
+          type="number"
           placeholder="ANGULO INICIAL"
           register={register}
         />
@@ -88,7 +88,7 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
           label="ANGULO FINAL"
           colorLabel={theme.colors.secondary}
           id="pivot_end_angle"
-          type="text"
+          type="number"
           placeholder="ANGULO FINAL"
           register={register}
         />
@@ -97,7 +97,7 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
           label="RAIO"
           colorLabel={theme.colors.secondary}
           id="pivot_radius"
-          type="text"
+          type="number"
           placeholder="RAIO"
           register={register}
         />
@@ -107,10 +107,26 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
           label="RADIO"
           colorLabel={theme.colors.secondary}
           id="radio_id"
-          type="text"
+          type="number"
           placeholder="RADIO"
           register={register}
         />
+
+        <S.ButtonAddNodeId onClick={() => setAddIdNode(!addIdNode)}>
+          Adicionar Node Id?{" "}
+        </S.ButtonAddNodeId>
+
+        {addIdNode && (
+          <ContentInputs
+            errorUserName={errors.node_id}
+            label="ID NODE"
+            colorLabel={theme.colors.secondary}
+            id="node_id"
+            type="text"
+            placeholder="ID NODE"
+            register={register}
+          />
+        )}
 
         <S.Button type="submit" value="Enviar" />
       </S.Form>

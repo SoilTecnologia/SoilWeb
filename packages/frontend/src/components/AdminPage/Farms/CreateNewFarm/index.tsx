@@ -54,7 +54,7 @@ const CreateNewFarm = () => {
         />
         <ContentInputs
           errorUserName={errors.farm_city}
-          label="FAZENDA"
+          label="CIDADE"
           id="farm_city"
           type="text"
           placeholder="CIDADE"
@@ -62,7 +62,7 @@ const CreateNewFarm = () => {
         />
         <ContentInputs
           errorUserName={errors.farm_lat}
-          label="FAZENDA"
+          label="LATITUDE"
           id="farm_lat"
           type="text"
           placeholder="LATITUDE"
@@ -70,7 +70,7 @@ const CreateNewFarm = () => {
         />
         <ContentInputs
           errorUserName={errors.farm_lng}
-          label="FAZENDA"
+          label="LONGITUDE"
           id="farm_lng"
           type="text"
           placeholder="LONGITUDE"

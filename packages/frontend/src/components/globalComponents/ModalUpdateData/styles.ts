@@ -5,14 +5,15 @@ export const Container = styled.div`
   ${({ theme }) => css`
     position: absolute;
     top: 0;
-    right: 0;
-    bottom: 0;
     left: 0;
+    width: 100vw;
+    min-height: 100vh;
 
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 10;
   `}
 `;
 export const ContentDataUser = styled.div`

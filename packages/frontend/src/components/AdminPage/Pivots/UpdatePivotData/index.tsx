@@ -6,16 +6,22 @@ import { useForm } from "react-hook-form";
 import ContentInputs from "components/globalComponents/ContentInputs";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import Pivot from "utils/models/pivot";
-import { useContextData } from "hooks/useContextData";
+
+import Node from "utils/models/node";
 
 type updateFarmProps = {
   pivotData: Pivot;
+  nodeData: Node;
+  closeModal: () => void;
 };
 
-const UpdatePivotData = ({ pivotData }: updateFarmProps) => {
+const UpdatePivotData = ({
+  pivotData,
+  nodeData,
+  closeModal,
+}: updateFarmProps) => {
   //Contexts
   const { updatePivot } = useContextActionCrud();
-  const { stateAdmin } = useContextData();
   //States
   const {
     handleSubmit,
@@ -28,7 +34,6 @@ const UpdatePivotData = ({ pivotData }: updateFarmProps) => {
     const newPivot: Pivot = {
       ...pivotData,
       pivot_name: data.pivot_name ? data.pivot_name : pivotData.pivot_name,
-      pivot_id: data.pivot_id ? data.pivot_id : pivotData.pivot_id,
       pivot_lat: data.pivot_lat ? data.pivot_lat : pivotData.pivot_lat,
       pivot_lng: data.pivot_lng ? data.pivot_lng : pivotData.pivot_lng,
       pivot_start_angle: data.pivot_start_angle
@@ -40,12 +45,10 @@ const UpdatePivotData = ({ pivotData }: updateFarmProps) => {
       pivot_radius: data.pivot_radius
         ? data.pivot_radius
         : pivotData.pivot_radius,
+      radio_id: data.radio_id ? data.radio_id : pivotData.radio_id,
     };
-    if (stateAdmin.dataFarmSelected) {
-      updatePivot(newPivot, stateAdmin.dataFarmSelected);
-    } else {
-      console.log("NÂO EXISTE NENHUMA FAZENDA SELECIONADA");
-    }
+    closeModal();
+    updatePivot(newPivot, nodeData);
   });
 
   return (
@@ -55,15 +58,7 @@ const UpdatePivotData = ({ pivotData }: updateFarmProps) => {
         label="PIVOT"
         id="pivot_name"
         type="text"
-        placeholder={pivotData.pivot_name}
-        register={register}
-      />
-      <ContentInputs
-        errorUserName={errors.pivot_id}
-        label="ID"
-        id="pivot_id"
-        type="text"
-        placeholder={pivotData.pivot_id}
+        placeholder={pivotData.pivot_name.toString()}
         register={register}
       />
       <ContentInputs
@@ -104,6 +99,14 @@ const UpdatePivotData = ({ pivotData }: updateFarmProps) => {
         id="pivot_radius"
         type="text"
         placeholder={pivotData.pivot_radius.toString()}
+        register={register}
+      />
+      <ContentInputs
+        errorUserName={errors.radio_id}
+        label="RADIO"
+        id="radio_id"
+        type="text"
+        placeholder={pivotData.radio_id.toString()}
         register={register}
       />
 

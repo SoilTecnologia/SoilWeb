@@ -52,3 +52,4 @@ export const ContentAddNode = styled.div`
   align-items: center;
   justify-content: center;
 `;
+export const ContentData = styled.div``;

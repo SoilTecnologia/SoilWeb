@@ -1,12 +1,14 @@
 import styled, { css } from "styled-components";
-
+export const ContentForm = styled.div`
+  margin-top: 2rem;
+`;
 export const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem 22rem;
+  padding: 1rem 2rem;
 `;
 
 export const Button = styled.input`

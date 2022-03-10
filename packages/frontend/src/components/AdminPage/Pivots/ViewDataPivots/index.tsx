@@ -20,7 +20,11 @@ const ViewDataPivots = ({ nodeData }: vewDataPivotsProps) => {
       </S.AddNode>
       {pivotList.length > 0 ? (
         pivotList.map((pivot) => (
-          <BoxPivots key={pivot.pivot_id} pivotData={pivot} />
+          <BoxPivots
+            key={pivot.pivot_id}
+            pivotData={pivot}
+            nodeData={nodeData}
+          />
         ))
       ) : (
         <p>Nenhum Pivô cadastrado</p>
