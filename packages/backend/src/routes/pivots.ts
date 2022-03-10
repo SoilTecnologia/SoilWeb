@@ -7,7 +7,8 @@ import {
   readListPivotController,
   readMapPivotController,
   createPivotControllerAdm,
-  getAllPivotController
+  getAllPivotController,
+  deletePivotController
 } from '../controllers/pivots';
 import {
   getCyclesFromPivot,
@@ -214,6 +215,30 @@ router.post(
 
       try {
         const allPivotsFromNode = await createPivotControllerAdm(node);
+
+        res.send(allPivotsFromNode);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /pivots/readAll`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.delete(
+  '/deletePivot/:id',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { id } = req.params;
+
+      try {
+        const allPivotsFromNode = await deletePivotController(id);
 
         res.send(allPivotsFromNode);
       } catch (err) {
