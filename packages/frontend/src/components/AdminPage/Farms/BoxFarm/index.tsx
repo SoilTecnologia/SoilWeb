@@ -6,9 +6,7 @@ import { useContextActionCrud } from "hooks/useActionsCrud";
 
 import BoxOptions from "components/globalComponents/BoxOptions";
 import Farm from "utils/models/farm";
-import DeleteDataComponent from "components/globalComponents/DeleteDataComponent";
-import { ContentModalOptionUser } from "components/AdminPage/Users/BoxUsers/styles";
-import ModalMessage from "components/globalComponents/ModalMessage";
+
 import ModalDeleteData from "components/globalComponents/ModalDeleteData";
 
 export type BoxFarmsProps = {
@@ -20,9 +18,6 @@ const BoxFarmComponent = ({ farmProps }: BoxFarmsProps) => {
   const { deleteFarm } = useContextActionCrud();
   const [modalVisible, setModalVisible] = useState(false);
   const [isDeletedUser, setIsDeletedUser] = useState(false);
-
-  const [messageDelete, setMessageDelete] = useState(false);
-
   const { setData, stateAdmin, stateDefault } = useContextData();
 
   const handleSetModalVisible = () => {

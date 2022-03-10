@@ -1,6 +1,5 @@
 import { useContextData } from "hooks/useContextData";
 import { useState } from "react";
-import Farm from "utils/models/farm";
 import Node from "utils/models/node";
 import BoxPivots from "../BoxPivots";
 import CreatePivot from "../CreatePivot";

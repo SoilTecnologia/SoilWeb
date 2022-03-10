@@ -1,8 +1,6 @@
-import ViewDataPivots from "components/AdminPage/Pivots/ViewDataPivots";
 import { useContextData } from "hooks/useContextData";
 import { useState } from "react";
 import Farm from "utils/models/farm";
-import Node from "utils/models/node";
 import BoxNode from "../BoxNode";
 import CreateNode from "../CreateNode";
 import * as S from "./styles";

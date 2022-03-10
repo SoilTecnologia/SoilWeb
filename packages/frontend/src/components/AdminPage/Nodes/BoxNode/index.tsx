@@ -1,7 +1,5 @@
-import ViewDataPivots from "components/AdminPage/Pivots/ViewDataPivots";
 import BoxOptions from "components/globalComponents/BoxOptions";
-import { ContentModalOptionUser } from "components/globalComponents/BoxOptions/styles";
-import DeleteDataComponent from "components/globalComponents/DeleteDataComponent";
+
 import ModalDeleteData from "components/globalComponents/ModalDeleteData";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useState } from "react";

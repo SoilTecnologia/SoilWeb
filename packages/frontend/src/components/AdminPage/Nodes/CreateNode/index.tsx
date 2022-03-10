@@ -51,7 +51,6 @@ const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
       farm_id: farm.farm_id,
       gateway: data.gateway,
     };
-    console.log(newNode);
     setAddNode(false);
     createNode(newNode, farm);
   });

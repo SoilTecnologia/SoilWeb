@@ -199,3 +199,15 @@ export const requestUpdatePivot = async (newPivot: Pivot) => {
       console.log(err);
     });
 };
+
+export const requestGetAllPivotsWithFarmId = async (
+  farm_id: Farm["farm_id"]
+) => {
+  return await api
+    .get(`pivots/readAll/${farm_id}`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
