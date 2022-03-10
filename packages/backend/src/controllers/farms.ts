@@ -50,7 +50,14 @@ export const readMapFarmControler = async (farm_id: Farm['farm_id']) => {
 
 export const deleteFarmController = async (farm_id: Farm['farm_id']) => {
   try {
-    await deleteFarm('farm', farm_id);
+    const farm = await knex<Farm>('farms').select().where({ farm_id }).first();
+    if (farm) {
+      const delResult = await knex<Farm>('farms')
+        .select()
+        .where({ farm_id })
+        .del();
+      return delResult;
+    }
   } catch (err) {
     console.log('[ERROR] Internal Server Error');
     console.log(err);

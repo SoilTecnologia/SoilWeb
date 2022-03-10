@@ -397,3 +397,21 @@ export const createPivotControllerAdm = async (pivot: pivotCreate) => {
   const pivots = await knex<Pivot>('pivots').insert(pivot);
   return pivots;
 };
+export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
+  try {
+    const farm = await knex<Pivot>('pivots')
+      .select()
+      .where({ pivot_id })
+      .first();
+    if (farm) {
+      const delResult = await knex<Pivot>('pivots')
+        .select()
+        .where({ pivot_id })
+        .del();
+      return delResult;
+    }
+  } catch (err) {
+    console.log('[ERROR] Internal Server Error');
+    console.log(err);
+  }
+};

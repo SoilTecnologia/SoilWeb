@@ -103,7 +103,11 @@ export const signUpController = async (
 
 export const deleteUserController = async (user_id: User['user_id']) => {
   try {
-    await deleteUser(user_id);
+    const user = await knex<User>('users').select().where({ user_id }).first();
+    if (user) {
+      const del = await knex<User>('users').select().where({ user_id }).del();
+      return del;
+    }
   } catch (err) {
     console.log('[ERROR] INTERNAL SERVER ERROR');
     console.log(err);

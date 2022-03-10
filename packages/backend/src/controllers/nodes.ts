@@ -20,7 +20,17 @@ export const readAllNodeController = async (farm_id: Node['farm_id']) => {
 export const deleteNodeController = async (node_id: Node['node_id']) => {
   if (node_id) {
     try {
-      await deleteNode('node', node_id);
+      const farm = await knex<Node>('nodes')
+        .select()
+        .where({ node_id })
+        .first();
+      if (farm) {
+        const delResult = await knex<Node>('nodes')
+          .select()
+          .where({ node_id })
+          .del();
+        return delResult;
+      }
     } catch (err) {
       console.log('[ERROR] Internal Server Error');
       console.log(err);
