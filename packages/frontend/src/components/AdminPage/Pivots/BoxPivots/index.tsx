@@ -11,6 +11,7 @@ import DeleteDataComponent from "components/globalComponents/DeleteDataComponent
 import Node from "utils/models/node";
 import ModalUpdateData from "components/globalComponents/ModalUpdateData";
 import UpdatePivotData from "../UpdatePivotData";
+import ModalDeleteData from "components/globalComponents/ModalDeleteData";
 
 type boxPivotProps = {
   pivotData: Pivot;
@@ -86,16 +87,14 @@ const BoxPivots = ({ pivotData, nodeData }: boxPivotProps) => {
             handleDelete={handleDeletePivot}
           />
         )}
-        {isDeletePivot && (
-          <ContentModalOptionUser modalOptionUser={modalOption}>
-            <DeleteDataComponent
-              okDelete={okDeletePivot}
-              notDelete={notDeletePivot}
-              label="USUARIO"
-            />
-          </ContentModalOptionUser>
-        )}
       </S.Container>
+      {isDeletePivot && (
+        <ModalDeleteData
+          alertLabel="Essa ação irá deletar o Pivô e todos os radios e estados atrelados a ele"
+          callbackNotDelete={notDeletePivot}
+          callbackDelete={okDeletePivot}
+        />
+      )}
       {updatePivot && (
         <ModalUpdateData closeModal={closeModalUpdate}>
           <UpdatePivotData

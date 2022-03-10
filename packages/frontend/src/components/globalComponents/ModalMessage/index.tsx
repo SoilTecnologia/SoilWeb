@@ -8,6 +8,7 @@ type ModalProps = {
   subAlert: string;
   txtButton: string;
   callbackButtonClick: Dispatch<SetStateAction<boolean>>;
+  callbackOkDelete?: Dispatch<SetStateAction<boolean>>;
 };
 
 const ModalMessage = ({
@@ -16,6 +17,7 @@ const ModalMessage = ({
   subAlert,
   txtButton,
   callbackButtonClick,
+  callbackOkDelete,
 }: ModalProps) => {
   const handleEventButtonClick = () => callbackButtonClick(false);
 
@@ -27,7 +29,15 @@ const ModalMessage = ({
         <S.SubAlert>{subAlert}</S.SubAlert>
       </S.ContentTextModalInfo>
 
-      <Buttons text={txtButton} callbackSendEvent={handleEventButtonClick} />
+      <S.ContentButtons>
+        <Buttons text={txtButton} callbackSendEvent={handleEventButtonClick} />
+        {callbackOkDelete && (
+          <Buttons
+            text="OK DELETAR"
+            callbackSendEvent={() => callbackOkDelete(false)}
+          />
+        )}
+      </S.ContentButtons>
     </S.Container>
   );
 };

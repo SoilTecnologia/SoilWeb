@@ -6,6 +6,8 @@ import { useContextData } from "hooks/useContextData";
 import User, { requestUser, UserType } from "utils/models/user";
 import BoxOptions from "components/globalComponents/BoxOptions";
 import DeleteDataComponent from "components/globalComponents/DeleteDataComponent";
+import ModalMessage from "components/globalComponents/ModalMessage";
+import ModalDeleteData from "components/globalComponents/ModalDeleteData";
 
 type userProps = {
   dataUser: requestUser;
@@ -58,7 +60,6 @@ const BoxUsersComponents = ({ dataUser, callbackUpdateUser }: userProps) => {
   };
 
   const callbackViewDataUser = (user: requestUser) => {
-    console.log("chame data user");
     setData({
       ...stateDefault,
       dataUserSelected: user,
@@ -67,35 +68,35 @@ const BoxUsersComponents = ({ dataUser, callbackUpdateUser }: userProps) => {
   };
 
   return (
-    <S.Container modalOptionUser={modalOptionUser}>
-      <S.IconMenu onClick={() => setModalOptionUser(true)} />
-      <S.ContentData onClick={() => callbackViewDataUser(dataUser)}>
-        <S.UserName>{`NOME:      ${dataUser.login}`}</S.UserName>
-        <S.RoleUser>{`Função:   ${handleRoleUser(
-          dataUser.user_type
-        )}`}</S.RoleUser>
-        {/* {dataUser.farm && (
+    <>
+      <S.Container modalOptionUser={modalOptionUser}>
+        <S.IconMenu onClick={() => setModalOptionUser(true)} />
+        <S.ContentData onClick={() => callbackViewDataUser(dataUser)}>
+          <S.UserName>{`NOME:      ${dataUser.login}`}</S.UserName>
+          <S.RoleUser>{`Função:   ${handleRoleUser(
+            dataUser.user_type
+          )}`}</S.RoleUser>
+          {/* {dataUser.farm && (
           <S.FarmUser>{`FAZENDA:    ${dataUser.login}`}</S.FarmUser>
         )} */}
-      </S.ContentData>
-      {modalOptionUser && (
-        <BoxOptions
-          modalVisible={modalOptionUser}
-          setModalVisible={setModalVisible}
-          callbackUpdate={callbackPut}
-          handleDelete={handleDeleteUser}
+        </S.ContentData>
+        {modalOptionUser && (
+          <BoxOptions
+            modalVisible={modalOptionUser}
+            setModalVisible={setModalVisible}
+            callbackUpdate={callbackPut}
+            handleDelete={handleDeleteUser}
+          />
+        )}
+      </S.Container>
+      {isDeletedUser && (
+        <ModalDeleteData
+          alertLabel="Essa Ação irá deletar o Usuario e todas as fazendas e pivês atrelados a ele"
+          callbackNotDelete={notDeleteUser}
+          callbackDelete={okdeleteUser}
         />
       )}
-      {isDeletedUser && (
-        <S.ContentModalOptionUser modalOptionUser={modalOptionUser}>
-          <DeleteDataComponent
-            okDelete={okdeleteUser}
-            notDelete={notDeleteUser}
-            label="USUARIO"
-          />
-        </S.ContentModalOptionUser>
-      )}
-    </S.Container>
+    </>
   );
 };
 

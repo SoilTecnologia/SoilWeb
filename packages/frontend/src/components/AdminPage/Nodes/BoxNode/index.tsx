@@ -2,6 +2,7 @@ import ViewDataPivots from "components/AdminPage/Pivots/ViewDataPivots";
 import BoxOptions from "components/globalComponents/BoxOptions";
 import { ContentModalOptionUser } from "components/globalComponents/BoxOptions/styles";
 import DeleteDataComponent from "components/globalComponents/DeleteDataComponent";
+import ModalDeleteData from "components/globalComponents/ModalDeleteData";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useState } from "react";
 import Farm from "utils/models/farm";
@@ -73,17 +74,14 @@ const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
             handleDelete={handleDeleteNode}
           />
         )}
-        {isDeletedNode && (
-          <ContentModalOptionUser modalOptionUser={modalVisible}>
-            <DeleteDataComponent
-              okDelete={okDeleteNode}
-              notDelete={notDeleteNode}
-              label="USUARIO"
-            />
-          </ContentModalOptionUser>
-        )}
       </S.Container>
-
+      {isDeletedNode && (
+        <ModalDeleteData
+          alertLabel="Essa ação irá deletar o Node e todos os pivôs atrelados a ele"
+          callbackNotDelete={notDeleteNode}
+          callbackDelete={okDeleteNode}
+        />
+      )}
       {modalUpdateVisible && (
         <S.ContentAddNode>
           <UpdateNode

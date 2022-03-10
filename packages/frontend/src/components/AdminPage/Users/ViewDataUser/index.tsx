@@ -31,36 +31,38 @@ const ViewDataUser = () => {
   }, []);
 
   return (
-    <S.ContentDataUser>
-      <S.Container>
-        <S.DataUser>
-          <S.Name>{stateAdmin.dataUserSelected?.login}</S.Name>
-          <S.Farms onClick={() => setFarmsUser(!farmsUser)}>
-            <S.ContentFarm_Add>
-              <S.TabName>FAZENDAS: </S.TabName>
-              <S.AddFarm onClick={handleNewFarm}>
-                Nova Fazenda <S.IconAdd />
-              </S.AddFarm>
-            </S.ContentFarm_Add>
+    <>
+      <S.ContentDataUser>
+        <S.Container>
+          <S.DataUser>
+            <S.Name>{stateAdmin.dataUserSelected?.login}</S.Name>
+            <S.Farms onClick={() => setFarmsUser(!farmsUser)}>
+              <S.ContentFarm_Add>
+                <S.TabName>FAZENDAS: </S.TabName>
+                <S.AddFarm onClick={handleNewFarm}>
+                  Nova Fazenda <S.IconAdd />
+                </S.AddFarm>
+              </S.ContentFarm_Add>
 
-            {stateAdmin.dataUserSelected && farmList ? (
-              farmList.map((farm, index) => (
-                <BoxFarm key={index} farmProps={farm} />
-              ))
-            ) : (
-              <S.NotItemFind>NENHUMA FAZENDA ENCONTRADA</S.NotItemFind>
+              {stateAdmin.dataUserSelected && farmList ? (
+                farmList.map((farm, index) => (
+                  <BoxFarm key={index} farmProps={farm} />
+                ))
+              ) : (
+                <S.NotItemFind>NENHUMA FAZENDA ENCONTRADA</S.NotItemFind>
+              )}
+            </S.Farms>
+          </S.DataUser>
+        </S.Container>
+        {modalVisible && (
+          <ModalUpdateData closeModal={closeModal}>
+            {stateAdmin.updateFarm && (
+              <UpdateFarmSelected farmSelected={stateAdmin.updateFarm} />
             )}
-          </S.Farms>
-        </S.DataUser>
-      </S.Container>
-      {modalVisible && (
-        <ModalUpdateData closeModal={closeModal}>
-          {stateAdmin.updateFarm && (
-            <UpdateFarmSelected farmSelected={stateAdmin.updateFarm} />
-          )}
-        </ModalUpdateData>
-      )}
-    </S.ContentDataUser>
+          </ModalUpdateData>
+        )}
+      </S.ContentDataUser>
+    </>
   );
 };
 

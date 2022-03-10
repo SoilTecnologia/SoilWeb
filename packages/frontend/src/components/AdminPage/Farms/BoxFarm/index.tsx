@@ -8,6 +8,8 @@ import BoxOptions from "components/globalComponents/BoxOptions";
 import Farm from "utils/models/farm";
 import DeleteDataComponent from "components/globalComponents/DeleteDataComponent";
 import { ContentModalOptionUser } from "components/AdminPage/Users/BoxUsers/styles";
+import ModalMessage from "components/globalComponents/ModalMessage";
+import ModalDeleteData from "components/globalComponents/ModalDeleteData";
 
 export type BoxFarmsProps = {
   farmProps: Farm;
@@ -18,6 +20,8 @@ const BoxFarmComponent = ({ farmProps }: BoxFarmsProps) => {
   const { deleteFarm } = useContextActionCrud();
   const [modalVisible, setModalVisible] = useState(false);
   const [isDeletedUser, setIsDeletedUser] = useState(false);
+
+  const [messageDelete, setMessageDelete] = useState(false);
 
   const { setData, stateAdmin, stateDefault } = useContextData();
 
@@ -58,34 +62,34 @@ const BoxFarmComponent = ({ farmProps }: BoxFarmsProps) => {
     });
   };
   return (
-    <S.Container>
-      <S.IconMenu onClick={() => setModalVisible(true)} />
+    <S.ContentFull>
+      <S.Container>
+        <S.IconMenu onClick={() => setModalVisible(true)} />
 
-      <S.ContentFarmInfo onClick={setFarmSelected}>
-        <S.Farm>Fazenda: {`  ${farmProps.farm_name}`}</S.Farm>
-        <S.ContentLocaleFarm>
-          <S.City>Cidade: {`  ${farmProps.farm_city} `}</S.City>
-        </S.ContentLocaleFarm>
-      </S.ContentFarmInfo>
+        <S.ContentFarmInfo onClick={setFarmSelected}>
+          <S.Farm>Fazenda: {`  ${farmProps.farm_name}`}</S.Farm>
+          <S.ContentLocaleFarm>
+            <S.City>Cidade: {`  ${farmProps.farm_city} `}</S.City>
+          </S.ContentLocaleFarm>
+        </S.ContentFarmInfo>
 
-      {modalVisible && (
-        <BoxOptions
-          modalVisible={modalVisible}
-          setModalVisible={handleSetModalVisible}
-          callbackUpdate={callbackPut}
-          handleDelete={handleDeleteFarm}
+        {modalVisible && (
+          <BoxOptions
+            modalVisible={modalVisible}
+            setModalVisible={handleSetModalVisible}
+            callbackUpdate={callbackPut}
+            handleDelete={handleDeleteFarm}
+          />
+        )}
+      </S.Container>
+      {isDeletedUser && (
+        <ModalDeleteData
+          alertLabel="Essa Ação irá deletar a Fazenda e todos os pivôs atrelados a ela"
+          callbackNotDelete={notDeleteFarm}
+          callbackDelete={okDeleteFarm}
         />
       )}
-      {isDeletedUser && (
-        <ContentModalOptionUser modalOptionUser={modalVisible}>
-          <DeleteDataComponent
-            okDelete={okDeleteFarm}
-            notDelete={notDeleteFarm}
-            label="USUARIO"
-          />
-        </ContentModalOptionUser>
-      )}
-    </S.Container>
+    </S.ContentFull>
   );
 };
 

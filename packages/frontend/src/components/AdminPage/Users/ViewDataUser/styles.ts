@@ -36,7 +36,6 @@ export const TabName = styled.p`
 export const NotItemFind = styled.p``;
 export const ContentDataUser = styled.div`
   ${({ theme }) => css`
-    position: relative;
     min-width: 50vw;
     min-height: 87vh;
     display: flex;
