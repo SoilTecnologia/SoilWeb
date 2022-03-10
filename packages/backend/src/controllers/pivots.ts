@@ -389,7 +389,6 @@ export const updatePivotController = async (
 // Admin
 export const getAllPivotController = async (node_id: Node['node_id']) => {
   const pivots = await knex<Pivot>('pivots').select().where({ node_id });
-  console.log(`Pivots data ${JSON.stringify(pivots)}`);
   return pivots;
 };
 
@@ -414,4 +413,40 @@ export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
     console.log('[ERROR] Internal Server Error');
     console.log(err);
   }
+};
+
+export const putPivotController = async (pivot: Pivot) => {
+  const getPivot = await knex<Pivot>('pivots')
+    .select()
+    .where({ pivot_id: pivot.pivot_id })
+    .first();
+
+  if (getPivot) {
+    await knex<Pivot>('pivots')
+      .where({ pivot_id: pivot.pivot_id })
+      .update({
+        ...getPivot,
+        pivot_lat: pivot.pivot_lat ? pivot.pivot_lat : getPivot.pivot_lat,
+        pivot_lng: pivot.pivot_lng ? pivot.pivot_lng : getPivot.pivot_lng,
+        pivot_name: pivot.pivot_name ? pivot.pivot_name : getPivot.pivot_name,
+        pivot_radius: pivot.pivot_radius
+          ? pivot.pivot_radius
+          : getPivot.pivot_radius,
+        pivot_start_angle: pivot.pivot_start_angle
+          ? pivot.pivot_start_angle
+          : getPivot.pivot_start_angle,
+        pivot_end_angle: pivot.pivot_end_angle
+          ? pivot.pivot_end_angle
+          : getPivot.pivot_end_angle,
+        radio_id: pivot.radio_id ? pivot.radio_id : getPivot.radio_id
+      });
+
+    const newFarm = await knex<Pivot>('pivots')
+      .select()
+      .where({ pivot_id: pivot.pivot_id })
+      .first();
+
+    return newFarm;
+  }
+  throw new Error('Não fooi possivel atualizar Pivot');
 };

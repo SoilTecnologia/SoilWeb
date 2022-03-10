@@ -1,7 +1,6 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
-import { createPivotController } from '../controllers/pivots';
 import {
   createNodeController,
   deleteNodeController,

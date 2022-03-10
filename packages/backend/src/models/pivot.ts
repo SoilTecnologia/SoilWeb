@@ -1,5 +1,4 @@
-export type pivotCreate = {
-  node_id: string;
+export type pivotPut = {
   pivot_name: string;
   pivot_lng: number;
   pivot_lat: number;
@@ -8,10 +7,13 @@ export type pivotCreate = {
   pivot_radius: number;
   radio_id: number;
 };
+export interface pivotCreate extends pivotPut {
+  node_id: string;
+}
 
 interface Pivot extends pivotCreate {
   pivot_id: string;
-  last_communication: Date;
+  // last_communication: Date;
 }
 
 export type PivotUpdate = {

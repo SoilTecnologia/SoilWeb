@@ -8,13 +8,15 @@ import {
   readMapPivotController,
   createPivotControllerAdm,
   getAllPivotController,
-  deletePivotController
+  deletePivotController,
+  putPivotController
 } from '../controllers/pivots';
 import {
   getCyclesFromPivot,
   getLastCycleFromPivot
 } from '../controllers/cycles';
 import { readPivotStateController } from '../controllers/states';
+import Pivot from '../models/pivot';
 
 const router = express.Router();
 
@@ -186,15 +188,16 @@ router.get(
       next: express.NextFunction
     ) => {
       const { id } = req.params;
-
       try {
-        const allPivotsFromNode = await getAllPivotController(id);
-        console.log('lista de pivots');
-        console.log(allPivotsFromNode);
+        if (id) {
+          const allPivotsFromNode = await getAllPivotController(id);
 
-        res.send(allPivotsFromNode);
+          res.send(allPivotsFromNode);
+        } else {
+          res.status(201).send('Id not identifier');
+        }
       } catch (err) {
-        console.log(`[ERROR] Server 500 on /pivots/readAll`);
+        console.log(`[ERROR] Server 500 on pivots`);
         console.log(err);
         next(err);
       }
@@ -241,6 +244,52 @@ router.delete(
         const allPivotsFromNode = await deletePivotController(id);
 
         res.send(allPivotsFromNode);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /pivots/readAll`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.put(
+  '/putPivot',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const {
+        pivot_name,
+        pivot_lng,
+        pivot_lat,
+        pivot_start_angle,
+        pivot_end_angle,
+        pivot_radius,
+        radio_id,
+        node_id,
+        pivot_id
+      }: Pivot = req.body;
+
+      const newPivot = {
+        pivot_name,
+        pivot_lng,
+        pivot_lat,
+        pivot_start_angle,
+        pivot_end_angle,
+        pivot_radius,
+        radio_id,
+        node_id,
+        pivot_id
+      };
+
+      try {
+        const pivotNew = await putPivotController(newPivot);
+
+        res.send(pivotNew);
       } catch (err) {
         console.log(`[ERROR] Server 500 on /pivots/readAll`);
         console.log(err);
