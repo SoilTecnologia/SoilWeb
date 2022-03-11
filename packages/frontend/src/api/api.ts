@@ -1,5 +1,5 @@
-import axios from "axios";
-import { parseCookies } from "nookies";
+import axios from 'axios';
+import { parseCookies } from 'nookies';
 
 const { "soilauth-token": token } = parseCookies();
 

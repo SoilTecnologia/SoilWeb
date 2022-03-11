@@ -11,7 +11,7 @@ export const Container = styled.div<modalVisible>`
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: ${theme.spacings.xxsmall} 0};
+    margin: ${theme.spacings.xxsmall} 0;
     background: ${theme.colors.primary};
     padding: ${theme.spacings.small} ;
 
