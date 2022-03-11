@@ -1,18 +1,15 @@
-import axios from 'axios';
-import { parseCookies } from 'nookies';
-
-const { "soilauth-token": token } = parseCookies();
+import axios from "axios";
 
 export const api = axios.create({
   baseURL: `http://localhost:3308/`,
 });
 
-api.interceptors.request.use((config) => {
-  console.log(token);
+// api.interceptors.request.use((config) => {
+//   console.log(token);
 
-  return config;
-});
+//   return config;
+// });
 
-if (token) {
-  api.defaults.headers.common["Authorization"] = `${token}`;
-}
+// if (token) {
+//   api.defaults.headers.common["Authorization"] = `${token}`;
+// }

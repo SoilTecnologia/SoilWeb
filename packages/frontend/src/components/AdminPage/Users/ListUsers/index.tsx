@@ -22,9 +22,7 @@ const ListUsers = () => {
 
   useEffect(() => {
     async function catchUsers() {
-      const users = await getAllUser(user?.token);
-      console.log("+++++++++++++LIST USERS++++++++++++");
-      console.log(users);
+      await getAllUser(user?.token);
     }
 
     catchUsers();

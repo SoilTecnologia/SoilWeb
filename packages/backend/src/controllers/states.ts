@@ -50,7 +50,7 @@ export const readPivotStateController = async (
 
     if (variables && variables.length > 0) {
       return {
-        pivot_id: pivot_id,
+        pivot_id,
         pivot_name: pivot!.pivot_name,
         pivot_lng: pivot!.pivot_lng,
         pivot_lat: pivot!.pivot_lat,
@@ -61,46 +61,42 @@ export const readPivotStateController = async (
         water: state.water,
         direction: state.direction,
         connection: state.connection,
-        percentimeter: variables[variables.length-1]!.percentimeter,
+        percentimeter: variables[variables.length - 1]!.percentimeter,
         start_angle: variables[0]!.angle,
         end_angle: variables[variables.length - 1]!.angle
       };
-    } else {
-      return {
-        pivot_id: pivot_id,
-        pivot_name: pivot!.pivot_name,
-        pivot_lng: pivot!.pivot_lng,
-        pivot_lat: pivot!.pivot_lat,
-        pivot_start_angle: pivot!.pivot_start_angle,
-        pivot_end_angle: pivot!.pivot_end_angle,
-        pivot_radius: pivot!.pivot_radius,
-        power: state.power,
-        water: state.water,
-        direction: state.direction,
-        connection: state.connection,
-        percentimeter: 0,
-        start_angle: null,
-        end_angle: null
-      };
     }
-  } else {
     return {
-        pivot_id: pivot_id,
-        pivot_name: pivot!.pivot_name,
-        pivot_lng: pivot!.pivot_lng,
-        pivot_lat: pivot!.pivot_lat,
-        pivot_start_angle: pivot!.pivot_start_angle,
-        pivot_end_angle: pivot!.pivot_end_angle,
-        pivot_radius: pivot!.pivot_radius,
-        power: false,
-        water: false,
-        direction: null,
-        connection: true,
-        percentimeter: 0,
-        start_angle: null,
-        end_angle: null
-    }
+      pivot_id,
+      pivot_name: pivot!.pivot_name,
+      pivot_lng: pivot!.pivot_lng,
+      pivot_lat: pivot!.pivot_lat,
+      pivot_start_angle: pivot!.pivot_start_angle,
+      pivot_end_angle: pivot!.pivot_end_angle,
+      pivot_radius: pivot!.pivot_radius,
+      power: state.power,
+      water: state.water,
+      direction: state.direction,
+      connection: state.connection,
+      percentimeter: 0,
+      start_angle: null,
+      end_angle: null
+    };
   }
-
-  return null;
+  return {
+    pivot_id,
+    pivot_name: pivot!.pivot_name,
+    pivot_lng: pivot!.pivot_lng,
+    pivot_lat: pivot!.pivot_lat,
+    pivot_start_angle: pivot!.pivot_start_angle,
+    pivot_end_angle: pivot!.pivot_end_angle,
+    pivot_radius: pivot!.pivot_radius,
+    power: false,
+    water: false,
+    direction: null,
+    connection: true,
+    percentimeter: 0,
+    start_angle: null,
+    end_angle: null
+  };
 };

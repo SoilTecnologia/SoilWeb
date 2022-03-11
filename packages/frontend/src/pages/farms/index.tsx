@@ -5,20 +5,17 @@ import { useEffect } from "react";
 import MainFarm from "components/FarmsPage/MainFarm";
 import { useContextUserData } from "hooks/useContextUserData";
 
-
 const UserFarms = () => {
   const { user } = useContextAuth();
-  const { getAllFarmsUser } = useContextActionCrud()
-  const { farmList } = useContextData()
+  const { getAllFarmsUser } = useContextActionCrud();
+  const { farmList } = useContextData();
   useEffect(() => {
     if (user) {
-      getAllFarmsUser(user.user_id)
+      getAllFarmsUser(user.user_id);
     }
-  }, [])
+  }, []);
 
-  return <MainFarm farmList={farmList} />
+  return <MainFarm farmList={farmList} />;
 };
 
 export default UserFarms;
-
-

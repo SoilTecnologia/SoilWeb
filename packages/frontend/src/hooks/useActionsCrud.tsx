@@ -92,27 +92,27 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     return result;
   };
   const updateUser = async (updatedUser: User) => {
-    const newUser = await requestUpdateUser(updatedUser);
+    const newUser = await requestUpdateUser(updatedUser, user?.token);
     if (newUser) {
       await getAllUser(user?.token);
     }
   };
   const deleteUser = async (id: string) => {
-    await requestDeleteUser(id);
+    await requestDeleteUser(id, user?.token);
     await getAllUser(user?.token);
   };
 
   //CRUD FARMS
   const getAllFarmsUser = async (id: string) => {
-    const response = await requestGetAllFarmsUser(id);
+    const response = await requestGetAllFarmsUser(id, user?.token);
     response && setFarmList(response);
   };
   const createFarm = async (farm: FarmCreate) => {
-    await requestCreateFarm(farm);
+    await requestCreateFarm(farm, user?.token);
     setData({ ...stateAdmin, createFarm: false });
   };
   const updateFarm = async (farm: Farm) => {
-    const newFarm = await requestUpdateFarm(farm);
+    const newFarm = await requestUpdateFarm(farm, user?.token);
     setData({ ...stateAdmin, updateFarm: null });
     newFarm && (await getAllFarmsUser(farm.user_id));
   };
@@ -120,33 +120,33 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     farm_id: Farm["farm_id"],
     user_id: User["user_id"]
   ) => {
-    await requestDeleteFarm(farm_id);
+    await requestDeleteFarm(farm_id, user?.token);
     await getAllFarmsUser(user_id);
     setData({ ...stateAdmin });
   };
 
   //NODES
   const getAllNodes = async (farm_id: Farm["farm_id"]) => {
-    const response = await requestGetAllNodes(farm_id);
+    const response = await requestGetAllNodes(farm_id, user?.token);
     response && setNodeList(response);
   };
   const createNode = async (node: NodeCreate) => {
-    await requestCreateNode(node);
+    await requestCreateNode(node, user?.token);
     await getAllNodes(node.farm_id);
   };
   const updateNode = async (node: Node) => {
-    const newNode = await requestUpdateNode(node);
+    const newNode = await requestUpdateNode(node, user?.token);
     setData(stateAdmin);
     newNode && (await getAllNodes(node.farm_id));
   };
   const deleteNode = async (id: string, farmRelation: Farm) => {
-    await requestDeleteNode(id);
+    await requestDeleteNode(id, user?.token);
     getAllNodes(farmRelation.farm_id);
   };
 
   //CRUD PIVOT
   const getAllPivots = async (node: Node) => {
-    const result = await requestGetAllPivots(node.node_id);
+    const result = await requestGetAllPivots(node.node_id, user?.token);
     result && setPivotList(result);
     setData({
       ...stateDefault,
@@ -155,23 +155,21 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     });
   };
   const createPivot = async (pivot: PivotCreate) => {
-    await requestCreateNewPivot(pivot);
+    await requestCreateNewPivot(pivot, user?.token);
     stateAdmin.dataNodeSelected && getAllPivots(stateAdmin.dataNodeSelected);
   };
   const updatePivot = async (pivot: Pivot, node: Node) => {
-    const newPivot = await requestUpdatePivot(pivot);
+    const newPivot = await requestUpdatePivot(pivot, user?.token);
     newPivot && (await getAllPivots(node));
   };
   const deletePivot = async (id: Pivot["pivot_id"], node: Node) => {
-    await requestDeletePivot(id);
+    await requestDeletePivot(id, user?.token);
     await getAllPivots(node);
   };
   //Rota page user
   const getAllPivotWithFarmId = async (farm_id: Farm["farm_id"]) => {
-    const result = await requestGetAllPivotsWithFarmId(farm_id);
-    console.log("Todas os Pivos da fazenda");
-    console.log(result);
-     result&&setPivotList(result);
+    const result = await requestGetAllPivotsWithFarmId(farm_id, user?.token);
+    result && setPivotList(result);
   };
 
   return (
