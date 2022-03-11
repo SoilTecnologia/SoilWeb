@@ -6,8 +6,6 @@ import { useContextActionCrud } from "hooks/useActionsCrud";
 import Pivot from "utils/models/pivot";
 
 import BoxOptions from "components/globalComponents/BoxOptions";
-import { ContentModalOptionUser } from "components/AdminPage/Users/BoxUsers/styles";
-import DeleteDataComponent from "components/globalComponents/DeleteDataComponent";
 import Node from "utils/models/node";
 import ModalUpdateData from "components/globalComponents/ModalUpdateData";
 import UpdatePivotData from "../UpdatePivotData";

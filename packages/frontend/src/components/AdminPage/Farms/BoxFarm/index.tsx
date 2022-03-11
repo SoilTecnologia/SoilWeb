@@ -8,6 +8,8 @@ import BoxOptions from "components/globalComponents/BoxOptions";
 import Farm from "utils/models/farm";
 
 import ModalDeleteData from "components/globalComponents/ModalDeleteData";
+import ModalUpdateData from "components/globalComponents/ModalUpdateData";
+import UpdateFarmSelected from "../UpdateFarmSelected";
 
 export type BoxFarmsProps = {
   farmProps: Farm;
@@ -18,6 +20,7 @@ const BoxFarmComponent = ({ farmProps }: BoxFarmsProps) => {
   const { deleteFarm } = useContextActionCrud();
   const [modalVisible, setModalVisible] = useState(false);
   const [isDeletedUser, setIsDeletedUser] = useState(false);
+  const [updateFarm, setUpdateFarm] = useState(false);
   const { setData, stateAdmin, stateDefault } = useContextData();
 
   const handleSetModalVisible = () => {
@@ -26,12 +29,7 @@ const BoxFarmComponent = ({ farmProps }: BoxFarmsProps) => {
 
   const callbackPut = () => {
     setModalVisible(false);
-    setData({
-      ...stateDefault,
-      dataUserSelected: stateAdmin.dataUserSelected,
-      showIsListUser: false,
-      updateFarm: farmProps,
-    });
+    setUpdateFarm(true);
   };
 
   const okDeleteFarm = () => {
@@ -55,6 +53,9 @@ const BoxFarmComponent = ({ farmProps }: BoxFarmsProps) => {
       showIsListUser: false,
       dataFarmSelected: farmProps,
     });
+  };
+  const closeModal = () => {
+    setUpdateFarm(false);
   };
   return (
     <S.ContentFull>
@@ -83,6 +84,14 @@ const BoxFarmComponent = ({ farmProps }: BoxFarmsProps) => {
           callbackNotDelete={notDeleteFarm}
           callbackDelete={okDeleteFarm}
         />
+      )}
+      {updateFarm && (
+        <ModalUpdateData closeModal={closeModal}>
+          <UpdateFarmSelected
+            farmSelected={farmProps}
+            closeModal={closeModal}
+          />
+        </ModalUpdateData>
       )}
     </S.ContentFull>
   );

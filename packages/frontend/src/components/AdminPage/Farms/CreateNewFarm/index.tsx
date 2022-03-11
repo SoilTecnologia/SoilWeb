@@ -56,6 +56,9 @@ const CreateNewFarm = () => {
     dataForm: FarmFormCreate,
     user_id: User["user_id"]
   ) => {
+    console.log("CHEGOU DATA");
+    console.log(dataForm);
+
     const latForNumber = formatLatAndLong("lat", dataForm.farm_lat);
     const longForNumber = formatLatAndLong("lng", dataForm.farm_lng);
 
@@ -67,6 +70,8 @@ const CreateNewFarm = () => {
         farm_lat: latForNumber,
         farm_lng: longForNumber,
       };
+      console.log("SAIU DATA");
+      console.log(newFarmUser);
       return newFarmUser;
     }
   };

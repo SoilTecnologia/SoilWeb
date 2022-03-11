@@ -3,7 +3,6 @@ import { useState } from "react";
 
 import ViewDataNode from "components/AdminPage/Nodes/ViewDataNode";
 import Farm from "utils/models/farm";
-import ViewDataPivots from "components/AdminPage/Pivots/ViewDataPivots";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 
 type FarmProps = {
@@ -11,7 +10,7 @@ type FarmProps = {
 };
 const ViewDataFarms = ({ farmData }: FarmProps) => {
   //Contexts
-  const { getAllNodes, getAllPivots } = useContextActionCrud();
+  const { getAllNodes } = useContextActionCrud();
 
   //States
   const [nodesVisible, setNodesVisible] = useState(false);
@@ -23,12 +22,6 @@ const ViewDataFarms = ({ farmData }: FarmProps) => {
     } else {
       setNodesVisible(false);
     }
-  };
-
-  const viewDataPivots = async () => {
-    // if (!pivotsVisible) {
-    //   await getAllPivots();
-    // }
   };
 
   return (
@@ -43,12 +36,12 @@ const ViewDataFarms = ({ farmData }: FarmProps) => {
       </S.ContentData>
 
       <S.ContentData>
-        <S.Longitude>
-          Longitude: <span>{farmData.farm_lng}</span>
-        </S.Longitude>
         <S.Latitude>
-          Latitude: <span>{farmData.farm_lng}</span>
+          Latitude: <span>{farmData.farm_lat.toString()}</span>
         </S.Latitude>
+        <S.Longitude>
+          Longitude: <span>{farmData.farm_lng.toString()}</span>
+        </S.Longitude>
       </S.ContentData>
 
       <S.ContentPivotsNodes>
