@@ -17,6 +17,7 @@ export default {
 
     secondary: "#edffcd",
     light: "#e1e1e1",
+    dark: "#1e1e1e",
 
     topbttprimary: "#758d42",
     topbttprimary_gradient: "#93b153",

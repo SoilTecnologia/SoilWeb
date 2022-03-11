@@ -1,3 +1,5 @@
+import User from './user';
+
 type Action = {
   action_id: string;
   power: boolean;
@@ -9,6 +11,7 @@ type Action = {
   timestamp_success: Date;
   author: string;
   pivot_id: string;
+  user_id: User['user_id'];
   radio_id: number;
 };
 

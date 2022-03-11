@@ -1,6 +1,6 @@
 import Farm from '../models/farm';
 import User from '../models/user';
-import Pivot from '../models/pivot';
+import Pivot, { pivotCreate } from '../models/pivot';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 import RadioVariable from '../models/radioVariable';
@@ -14,6 +14,7 @@ import {
 import knex from '../database';
 import emitter from '../utils/eventBus';
 import { getLastCycleFromPivot } from './cycles';
+import Node from '../models/node';
 
 export const createPivotController = async (
   pivot_id: Pivot['pivot_id'],
@@ -83,7 +84,7 @@ type PartialMapResponse = {
 type MapResponse = {
   farm_lng: Farm['farm_lng'];
   farm_lat: Farm['farm_lat'];
-  pivots: Array<PartialMapResponse>
+  pivots: Array<PartialMapResponse>;
 };
 
 export const readMapPivotController = async (
@@ -92,7 +93,10 @@ export const readMapPivotController = async (
 ): Promise<MapResponse> => {
   let pivotArray: Array<PartialMapResponse> = [];
 
-  const farm = await knex<Farm>('farms').select('farm_lng', 'farm_lat').where('farm_id', farm_id).first();
+  const farm = await knex<Farm>('farms')
+    .select('farm_lng', 'farm_lat')
+    .where('farm_id', farm_id)
+    .first();
 
   const nodes = await knex<Node>('nodes')
     .select('node_id')
@@ -100,7 +104,15 @@ export const readMapPivotController = async (
 
   for (let node of nodes) {
     const pivots = await knex<Pivot>('pivots')
-      .select('pivot_id', 'pivot_name', 'pivot_lng', 'pivot_lat','pivot_start_angle', 'pivot_end_angle', 'pivot_radius')
+      .select(
+        'pivot_id',
+        'pivot_name',
+        'pivot_lng',
+        'pivot_lat',
+        'pivot_start_angle',
+        'pivot_end_angle',
+        'pivot_radius'
+      )
       .where('node_id', node.node_id);
 
     for (let pivot of pivots) {
@@ -110,7 +122,7 @@ export const readMapPivotController = async (
         .orderBy('timestamp', 'desc')
         .first();
 
-        const variables = await getLastCycleFromPivot(pivot.pivot_id);
+      const variables = await getLastCycleFromPivot(pivot.pivot_id);
 
       if (state && variables && variables.length > 0) {
         pivotArray.push({
@@ -243,19 +255,28 @@ export const updatePivotController = async (
   let shouldNotifyState = false;
   let state: State | undefined;
 
-  let pivot = await knex<Pivot>('pivots').select('node_id', 'pivot_name').where('pivot_id', pivot_id).first();
-  const {node_id, pivot_name} = pivot!;
-  let node = await knex<Node>('nodes').select('farm_id').where('node_id', node_id).first();
-  const {farm_id} = node!;
-  let farm = await knex<Node>('farms').select('user_id', 'farm_name').where('farm_id', farm_id).first();
-  const {user_id, farm_name} = farm!;
+  let pivot = await knex<Pivot>('pivots')
+    .select('node_id', 'pivot_name')
+    .where('pivot_id', pivot_id)
+    .first();
+  const { node_id, pivot_name } = pivot!;
+  let node = await knex<Node>('nodes')
+    .select('farm_id')
+    .where('node_id', node_id)
+    .first();
+  const { farm_id } = node!;
+  let farm = await knex<Node>('farms')
+    .select('user_id', 'farm_name')
+    .where('farm_id', farm_id)
+    .first();
+  const { user_id, farm_name } = farm!;
 
   let oldState = await knex<State>('states')
     .where('pivot_id', pivot_id)
     .orderBy('timestamp', 'desc')
     .first();
 
-    state = oldState;
+  state = oldState;
 
   if (
     !oldState ||
@@ -263,14 +284,16 @@ export const updatePivotController = async (
   ) {
     shouldNotifyUpdate = true;
     shouldNotifyState = true;
-    const newState = await knex<State>('states').insert({
-      pivot_id,
-      connection,
-      power,
-      water,
-      direction,
-      timestamp: new Date(timestamp),
-    }).returning('*');
+    const newState = await knex<State>('states')
+      .insert({
+        pivot_id,
+        connection,
+        power,
+        water,
+        direction,
+        timestamp: new Date(timestamp)
+      })
+      .returning('*');
 
     state = newState[0];
   }
@@ -291,7 +314,7 @@ export const updatePivotController = async (
           state_id: state.state_id,
           angle,
           percentimeter,
-      timestamp: new Date(timestamp),
+          timestamp: new Date(timestamp)
         });
       }
     }
@@ -312,12 +335,12 @@ export const updatePivotController = async (
         state_id: state!.state_id,
         father,
         rssi,
-      timestamp: new Date(timestamp),
+        timestamp: new Date(timestamp)
       });
     }
   }
 
-  //teste
+  // teste
 
   if (shouldNotifyUpdate) {
     const pivot = await knex('pivots').select('*').where({ pivot_id }).first();
@@ -343,7 +366,7 @@ export const updatePivotController = async (
       }
     });
 
-    if(shouldNotifyState) {
+    if (shouldNotifyState) {
       emitter.emit('state-change', {
         user_id,
         pivot_id,
@@ -364,6 +387,69 @@ export const updatePivotController = async (
       });
     }
   }
+};
 
-  return;
+// Admin
+export const getAllPivotController = async (node_id: Node['node_id']) => {
+  const pivots = await knex<Pivot>('pivots').select().where({ node_id });
+  return pivots;
+};
+
+export const createPivotControllerAdm = async (pivot: pivotCreate) => {
+  const pivots = await knex<Pivot>('pivots').insert(pivot);
+  return pivots;
+};
+export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
+  try {
+    const farm = await knex<Pivot>('pivots')
+      .select()
+      .where({ pivot_id })
+      .first();
+    if (farm) {
+      const delResult = await knex<Pivot>('pivots')
+        .select()
+        .where({ pivot_id })
+        .del();
+      return delResult;
+    }
+  } catch (err) {
+    console.log('[ERROR] Internal Server Error');
+    console.log(err);
+  }
+};
+
+export const putPivotController = async (pivot: Pivot) => {
+  const getPivot = await knex<Pivot>('pivots')
+    .select()
+    .where({ pivot_id: pivot.pivot_id })
+    .first();
+
+  if (getPivot) {
+    await knex<Pivot>('pivots')
+      .where({ pivot_id: pivot.pivot_id })
+      .update({
+        ...getPivot,
+        pivot_lat: pivot.pivot_lat ? pivot.pivot_lat : getPivot.pivot_lat,
+        pivot_lng: pivot.pivot_lng ? pivot.pivot_lng : getPivot.pivot_lng,
+        pivot_name: pivot.pivot_name ? pivot.pivot_name : getPivot.pivot_name,
+        pivot_radius: pivot.pivot_radius
+          ? pivot.pivot_radius
+          : getPivot.pivot_radius,
+        pivot_start_angle: pivot.pivot_start_angle
+          ? pivot.pivot_start_angle
+          : getPivot.pivot_start_angle,
+        pivot_end_angle: pivot.pivot_end_angle
+          ? pivot.pivot_end_angle
+          : getPivot.pivot_end_angle,
+        radio_id: pivot.radio_id ? pivot.radio_id : getPivot.radio_id
+      });
+
+    const newFarm = await knex<Pivot>('pivots')
+      .select()
+      .where({ pivot_id: pivot.pivot_id })
+      .first();
+
+    return newFarm;
+  }
+  throw new Error('Não fooi possivel atualizar Pivot');
 };
