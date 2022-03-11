@@ -69,6 +69,7 @@ type PartialMapResponse = {
   pivot_id: Pivot['pivot_id'];
   pivot_lng: Pivot['pivot_lng'];
   pivot_lat: Pivot['pivot_lat'];
+  pivot_name: Pivot['pivot_name'];
   pivot_start_angle: Pivot['pivot_start_angle'];
   pivot_end_angle: Pivot['pivot_end_angle'];
   pivot_radius: Pivot['pivot_radius'];
@@ -116,6 +117,7 @@ export const readMapPivotController = async (
           pivot_id: pivot.pivot_id,
           pivot_lng: pivot.pivot_lng,
           pivot_lat: pivot.pivot_lat,
+          pivot_name: pivot.pivot_name,
           pivot_start_angle: pivot.pivot_start_angle,
           pivot_end_angle: pivot.pivot_end_angle,
           pivot_radius: pivot.pivot_radius,
@@ -131,6 +133,7 @@ export const readMapPivotController = async (
           pivot_id: pivot.pivot_id,
           pivot_lng: pivot.pivot_lng,
           pivot_lat: pivot.pivot_lat,
+          pivot_name: pivot.pivot_name,
           pivot_start_angle: pivot.pivot_start_angle,
           pivot_end_angle: pivot.pivot_end_angle,
           pivot_radius: pivot.pivot_radius,

@@ -83,6 +83,23 @@ export const readPivotStateController = async (
         end_angle: null
       };
     }
+  } else {
+    return {
+        pivot_id: pivot_id,
+        pivot_name: pivot!.pivot_name,
+        pivot_lng: pivot!.pivot_lng,
+        pivot_lat: pivot!.pivot_lat,
+        pivot_start_angle: pivot!.pivot_start_angle,
+        pivot_end_angle: pivot!.pivot_end_angle,
+        pivot_radius: pivot!.pivot_radius,
+        power: false,
+        water: false,
+        direction: null,
+        connection: true,
+        percentimeter: 0,
+        start_angle: null,
+        end_angle: null
+    }
   }
 
   return null;
