@@ -49,7 +49,7 @@ export const putNodeController = async (node: Node) => {
       .update({
         ...getNode,
         node_name: node.node_name ? node.node_name : getNode.node_name,
-        is_gprs: node.is_gprs ? node.is_gprs : getNode.is_gprs,
+        is_gprs: node.is_gprs,
         gateway: node.gateway ? node.gateway : getNode.gateway
       });
 

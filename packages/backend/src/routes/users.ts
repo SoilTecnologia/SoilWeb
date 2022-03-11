@@ -127,15 +127,16 @@ router.delete(
       const { id } = req.params;
       try {
         const notUser = await deleteUserController(id);
-        res.send(notUser);
+        res.sendStatus(200).send(notUser);
       } catch (err) {
         console.log(`[ERROR] 500 on /users/deleteUser`);
         console.log(err);
-        return err;
+        next(err);
       }
     }
   )
 );
+export default router;
 
 // router.put(
 //   '/addFarm',
@@ -191,5 +192,3 @@ router.delete(
 //     }
 //   )
 // );
-
-export default router;
