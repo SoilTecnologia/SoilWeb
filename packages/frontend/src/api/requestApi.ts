@@ -211,3 +211,15 @@ export const requestGetAllPivotsWithFarmId = async (
       console.log(err);
     });
 };
+
+/// WEB CRUD
+//  export const requestPivotStatus = async (pivo_id:string) => {
+//    return await api
+//    .get(``)
+//    .then((response) => response.data)
+//    .catch((err) => {
+//      console.log("[ERROR] Falha ao salvar fazenda");
+//      console.log(err);
+//    });
+
+//  }
