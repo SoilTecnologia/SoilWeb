@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import * as S from "./styles";
 
 import { useContextActionCrud } from "hooks/useActionsCrud";
-import { PivotCreate } from "utils/models/pivot";
+import { PivotCreate, PivotForm } from "utils/models/pivot";
 import theme from "styles/theme";
 import { useContextData } from "hooks/useContextData";
 
@@ -12,19 +12,13 @@ type createPivotProps = {
   setAddNode: Dispatch<SetStateAction<boolean>>;
 };
 
-type PivotForm = {
-  node_id: string;
-  pivot_name: number;
-  pivot_lng: string;
-  pivot_lat: string;
-  pivot_start_angle: number;
-  pivot_end_angle: number;
-  pivot_radius: number;
-  radio_id: number;
-};
 type errorProps = {
   type: null | "lat" | "lng";
   error: string | null;
+};
+export const defaultError = {
+  type: null,
+  error: null,
 };
 const CreateNode = ({ setAddNode }: createPivotProps) => {
   //Contexts
@@ -32,10 +26,6 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
   const { createPivot } = useContextActionCrud();
 
   //States
-  const defaultError = {
-    type: null,
-    error: null,
-  };
   const [addIdNode, setAddIdNode] = useState(false);
   const [error, setError] = useState<errorProps>(defaultError);
   const {
@@ -57,27 +47,34 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
       setError(catchError);
     }
   };
+
+  const handleDataForm = (dataForm: PivotForm) => {
+    if (stateAdmin.dataNodeSelected && stateAdmin.dataNodeSelected?.node_id) {
+      const latForNumber = formatLatAndLong("lat", dataForm.pivot_lat);
+      const longForNumber = formatLatAndLong("lng", dataForm.pivot_lng);
+
+      if (latForNumber && longForNumber) {
+        const newPivot: PivotCreate = {
+          node_id: stateAdmin.dataNodeSelected.node_id,
+          pivot_name: dataForm.pivot_name,
+          pivot_lng: latForNumber,
+          pivot_lat: longForNumber,
+          pivot_start_angle: dataForm.pivot_start_angle,
+          pivot_end_angle: dataForm.pivot_end_angle,
+          pivot_radius: dataForm.pivot_radius,
+          radio_id: dataForm.radio_id,
+        };
+        return newPivot;
+      }
+    }
+  };
+
   const onSubmit = handleSubmit((data) => {
-    setError(defaultError);
-    const nodeId = stateAdmin.dataNodeSelected?.node_id
-      ? stateAdmin.dataNodeSelected.node_id
-      : "1234";
+    error.error && setError(defaultError);
 
-    const latForNumber = formatLatAndLong("lat", data.pivot_lat);
-    const longForNumber = formatLatAndLong("lng", data.pivot_lng);
-
-    if (latForNumber && longForNumber) {
-      const newPivot: PivotCreate = {
-        node_id: nodeId,
-        pivot_name: data.pivot_name,
-        pivot_lng: latForNumber,
-        pivot_lat: longForNumber,
-        pivot_start_angle: data.pivot_start_angle,
-        pivot_end_angle: data.pivot_end_angle,
-        pivot_radius: data.pivot_radius,
-        radio_id: data.radio_id,
-      };
-      createPivot(newPivot);
+    const addPivot = handleDataForm(data);
+    if (addPivot) {
+      createPivot(addPivot);
       setAddNode(false);
     }
   });

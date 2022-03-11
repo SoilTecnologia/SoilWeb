@@ -1,18 +1,24 @@
 import * as S from "./styles";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { useForm } from "react-hook-form";
 
 import ContentInputs from "components/globalComponents/ContentInputs";
 import { useContextActionCrud } from "hooks/useActionsCrud";
-import Pivot from "utils/models/pivot";
+import Pivot, { PivotFormUpdate } from "utils/models/pivot";
 
 import Node from "utils/models/node";
+import { defaultError } from "../CreatePivot";
+import { MessageError } from "../CreatePivot/styles";
 
 type updateFarmProps = {
   pivotData: Pivot;
   nodeData: Node;
   closeModal: () => void;
+};
+type errorProps = {
+  type: null | "lat" | "lng";
+  error: string | null;
 };
 
 const UpdatePivotData = ({
@@ -23,32 +29,63 @@ const UpdatePivotData = ({
   //Contexts
   const { updatePivot } = useContextActionCrud();
   //States
+  const [error, setError] = useState<errorProps>(defaultError);
+
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<Pivot>();
+  } = useForm<PivotFormUpdate>();
+  //Ref
   const formRef = useRef<HTMLFormElement>(null);
   //Functions
+  const formatLatAndLong = (type: "lat" | "lng", latLong: string) => {
+    const number = Number(latLong);
+    if (number) {
+      return number;
+    } else {
+      const catchError = {
+        type: type,
+        error: "Digite somente numeros inteiro ou decimais usando o ponto .",
+      };
+      setError(catchError);
+    }
+  };
+
+  const handleDataForm = (formData: PivotFormUpdate) => {
+    const latForNumber = formatLatAndLong("lat", formData.pivot_lat);
+    const longForNumber = formatLatAndLong("lng", formData.pivot_lng);
+    if (latForNumber && longForNumber) {
+      const newPivot: Pivot = {
+        ...pivotData,
+        pivot_name: formData.pivot_name
+          ? formData.pivot_name
+          : pivotData.pivot_name,
+        pivot_lat: latForNumber ? latForNumber : pivotData.pivot_lat,
+        pivot_lng: longForNumber ? longForNumber : pivotData.pivot_lng,
+        pivot_start_angle: formData.pivot_start_angle
+          ? formData.pivot_start_angle
+          : pivotData.pivot_start_angle,
+        pivot_end_angle: formData.pivot_end_angle
+          ? formData.pivot_end_angle
+          : pivotData.pivot_end_angle,
+        pivot_radius: formData.pivot_radius
+          ? formData.pivot_radius
+          : pivotData.pivot_radius,
+        radio_id: formData.radio_id ? formData.radio_id : pivotData.radio_id,
+      };
+
+      return newPivot;
+    }
+  };
+
   const onSubmit = handleSubmit((data) => {
-    const newPivot: Pivot = {
-      ...pivotData,
-      pivot_name: data.pivot_name ? data.pivot_name : pivotData.pivot_name,
-      pivot_lat: data.pivot_lat ? data.pivot_lat : pivotData.pivot_lat,
-      pivot_lng: data.pivot_lng ? data.pivot_lng : pivotData.pivot_lng,
-      pivot_start_angle: data.pivot_start_angle
-        ? data.pivot_start_angle
-        : pivotData.pivot_start_angle,
-      pivot_end_angle: data.pivot_end_angle
-        ? data.pivot_end_angle
-        : pivotData.pivot_end_angle,
-      pivot_radius: data.pivot_radius
-        ? data.pivot_radius
-        : pivotData.pivot_radius,
-      radio_id: data.radio_id ? data.radio_id : pivotData.radio_id,
-    };
-    closeModal();
-    updatePivot(newPivot, nodeData);
+    error.error && setError(defaultError);
+    const addPivot = handleDataForm(data);
+    if (addPivot) {
+      closeModal();
+      updatePivot(addPivot, nodeData);
+    }
   });
 
   return (
@@ -69,6 +106,9 @@ const UpdatePivotData = ({
         placeholder={pivotData.pivot_lat.toString()}
         register={register}
       />
+      {error && error.type === "lat" && (
+        <MessageError>{error.error}</MessageError>
+      )}
       <ContentInputs
         errorUserName={errors.pivot_lng}
         label="LONGITUDE"
@@ -77,6 +117,9 @@ const UpdatePivotData = ({
         placeholder={pivotData.pivot_lng.toString()}
         register={register}
       />
+      {error && error.type === "lng" && (
+        <MessageError>{error.error}</MessageError>
+      )}
       <ContentInputs
         errorUserName={errors.pivot_start_angle}
         label="ANGULO INICIAL"
