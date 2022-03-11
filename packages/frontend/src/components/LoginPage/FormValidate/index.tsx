@@ -14,7 +14,7 @@ const schema = Yup.object({
     .min(3, "O nome deve ter mais de 3 letras"),
   password: Yup.string()
     .required("Por favor digite uma senha")
-    .min(6, "A senha deve ter pelo menos 6 caracteres"),
+    .min(3, "A senha deve ter pelo menos 3 caracteres"),
 }).required();
 
 type FormData = {

@@ -131,8 +131,7 @@ router.delete(
       } catch (err) {
         console.log(`[ERROR] 500 on /users/deleteUser`);
         console.log(err);
-
-        next(err);
+        return err;
       }
     }
   )

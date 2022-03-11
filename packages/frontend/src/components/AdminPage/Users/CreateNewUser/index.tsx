@@ -9,11 +9,11 @@ import { useForm } from "react-hook-form";
 
 import SelectOptionsComponent from "components/globalComponents/SelectOptionsComponent";
 import ContentInputs from "components/globalComponents/ContentInputs";
-import User, { UserCreate } from "utils/models/user";
+import { UserCreate } from "utils/models/user";
 
 const schema = Yup.object({
-  login: Yup.string(),
-  password: Yup.string(),
+  login: Yup.string().required("Digite seu login"),
+  password: Yup.string().required("Digite uma senha"),
   user_type: Yup.string().required("Escolha um função"),
 }).required();
 
@@ -51,14 +51,6 @@ const CreateNewUser = () => {
   return (
     <S.Container>
       <S.Form onSubmit={onSubmit} ref={formRef}>
-        {/* <ContentInputs
-          errorUserName={errors.user_name}
-          label="USUARIO"
-          id="user_name"
-          type="text"
-          placeholder="USERNAME"
-          register={register}
-        /> */}
         <ContentInputs
           errorUserName={errors.login}
           label="LOGIN"

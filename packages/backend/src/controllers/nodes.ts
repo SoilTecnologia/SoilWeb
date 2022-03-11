@@ -1,7 +1,6 @@
 import Node from '../models/node';
 
 import knex from '../database';
-import { deleteNode } from '../utils/deleteCascade';
 
 export const createNodeController = async (node: Node) => {
   const newNode = await knex<Node>('nodes').insert({ ...node });

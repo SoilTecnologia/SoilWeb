@@ -162,8 +162,6 @@ export const requestGetAllPivots = async (node_id: Node["node_id"]) => {
   return await api
     .get(`pivots/getPivots/${node_id}`)
     .then((response) => {
-      console.log("RESPONSE");
-      console.log(response.data);
       return response.data;
     })
     .catch((err) => {

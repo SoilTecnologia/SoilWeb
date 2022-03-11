@@ -2,7 +2,6 @@ import Farm from '../models/farm';
 import User from '../models/user';
 
 import knex from '../database';
-import { deleteFarm } from '../utils/deleteCascade';
 
 export const createFarmController = async (
   // farm_id: Farm['farm_id'],

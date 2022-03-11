@@ -8,7 +8,6 @@ import {
 } from '../types/errors';
 
 import User from '../models/user';
-import { deleteUser } from '../utils/deleteCascade';
 
 type Response = {
   user_type: User['user_type'];

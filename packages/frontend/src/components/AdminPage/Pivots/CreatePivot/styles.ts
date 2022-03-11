@@ -59,3 +59,7 @@ export const ButtonAddNodeId = styled.div`
     opacity: 0.7;
   }
 `;
+export const MessageError = styled.p`
+  font-size: 1.2rem;
+  color: ${({ theme }) => theme.colors.cancel};
+`;

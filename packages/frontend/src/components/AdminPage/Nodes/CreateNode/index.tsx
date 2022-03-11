@@ -25,6 +25,7 @@ const schema = Yup.object({
   gateway: Yup.string(),
   is_gprs: Yup.string().required("Define se o tipo de comunicação é gprs"),
 }).required();
+
 const optionsSelect = [
   {
     label: "SIM",

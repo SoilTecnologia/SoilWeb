@@ -17,9 +17,9 @@ type updateNodeProps = {
 };
 
 const schema = Yup.object({
-  node_name: Yup.string().required("Digite um nome de usuario"),
+  node_name: Yup.string(),
   gateway: Yup.string(),
-  is_gprs: Yup.string().required("Define se o tipo de comunicação é gprs"),
+  is_gprs: Yup.string(),
 }).required();
 
 const optionsSelect = [

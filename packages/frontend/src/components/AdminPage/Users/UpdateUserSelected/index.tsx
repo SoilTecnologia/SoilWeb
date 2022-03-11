@@ -1,5 +1,5 @@
 import * as S from "./styles";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { useRef } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -44,7 +44,7 @@ const UpdateUserSelected = ({ dataUser, closeModal }: FormDataProps) => {
   const onSubmit = handleSubmit(async (data) => {
     const newDataUser: User = {
       user_id: dataUser.user_id,
-      password: dataUser.password,
+      password: data.password ? data.password : dataUser.password,
       login: data.login ? data.login : dataUser.login,
       user_type: data.user_type ? data.user_type : dataUser.user_type,
     };

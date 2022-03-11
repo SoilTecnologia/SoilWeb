@@ -1,16 +1,23 @@
 import * as S from "./styles";
 import { useRef } from "react";
+import * as Yup from "yup";
 
 import { useForm } from "react-hook-form";
 
 import ContentInputs from "components/globalComponents/ContentInputs";
 import Farm from "utils/models/farm";
 import { useContextActionCrud } from "hooks/useActionsCrud";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type updateFarmProps = {
   farmSelected: Farm;
 };
-
+const schema = Yup.object({
+  farm_name: Yup.string(),
+  farm_city: Yup.string(),
+  farm_lat: Yup.number(),
+  farm_lng: Yup.number(),
+}).required();
 const UpdateFarmSelected = ({ farmSelected }: updateFarmProps) => {
   //Contexts
   const { updateFarm } = useContextActionCrud();
@@ -19,7 +26,7 @@ const UpdateFarmSelected = ({ farmSelected }: updateFarmProps) => {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<Farm>();
+  } = useForm<Farm>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
   //Functions
   const onSubmit = handleSubmit((data) => {

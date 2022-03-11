@@ -12,35 +12,74 @@ type createPivotProps = {
   setAddNode: Dispatch<SetStateAction<boolean>>;
 };
 
+type PivotForm = {
+  node_id: string;
+  pivot_name: number;
+  pivot_lng: string;
+  pivot_lat: string;
+  pivot_start_angle: number;
+  pivot_end_angle: number;
+  pivot_radius: number;
+  radio_id: number;
+};
+type errorProps = {
+  type: null | "lat" | "lng";
+  error: string | null;
+};
 const CreateNode = ({ setAddNode }: createPivotProps) => {
   //Contexts
   const { stateAdmin } = useContextData();
   const { createPivot } = useContextActionCrud();
 
   //States
+  const defaultError = {
+    type: null,
+    error: null,
+  };
   const [addIdNode, setAddIdNode] = useState(false);
+  const [error, setError] = useState<errorProps>(defaultError);
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<PivotCreate>();
+  } = useForm<PivotForm>();
   const formRef = useRef<HTMLFormElement>(null);
+
+  const formatLatAndLong = (type: "lat" | "lng", latLong: string) => {
+    const number = Number(latLong);
+    if (number) {
+      return number;
+    } else {
+      const catchError = {
+        type: type,
+        error: "Digite somente numeros inteiro ou decimais usando o ponto .",
+      };
+      setError(catchError);
+    }
+  };
   const onSubmit = handleSubmit((data) => {
+    setError(defaultError);
     const nodeId = stateAdmin.dataNodeSelected?.node_id
       ? stateAdmin.dataNodeSelected.node_id
       : "1234";
-    const newPivot: PivotCreate = {
-      node_id: nodeId,
-      pivot_name: data.pivot_name,
-      pivot_lng: data.pivot_lng,
-      pivot_lat: data.pivot_lat,
-      pivot_start_angle: data.pivot_start_angle,
-      pivot_end_angle: data.pivot_end_angle,
-      pivot_radius: data.pivot_radius,
-      radio_id: data.radio_id,
-    };
-    createPivot(newPivot);
-    setAddNode(false);
+
+    const latForNumber = formatLatAndLong("lat", data.pivot_lat);
+    const longForNumber = formatLatAndLong("lng", data.pivot_lng);
+
+    if (latForNumber && longForNumber) {
+      const newPivot: PivotCreate = {
+        node_id: nodeId,
+        pivot_name: data.pivot_name,
+        pivot_lng: latForNumber,
+        pivot_lat: longForNumber,
+        pivot_start_angle: data.pivot_start_angle,
+        pivot_end_angle: data.pivot_end_angle,
+        pivot_radius: data.pivot_radius,
+        radio_id: data.radio_id,
+      };
+      createPivot(newPivot);
+      setAddNode(false);
+    }
   });
 
   return (
@@ -65,6 +104,9 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
           placeholder="LATITUDE"
           register={register}
         />
+        {error && error.type === "lat" && (
+          <S.MessageError>{error.error}</S.MessageError>
+        )}
         <ContentInputs
           errorUserName={errors.pivot_lng}
           label="LONGITUDE"
@@ -74,6 +116,9 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
           placeholder="LONGITUDE"
           register={register}
         />
+        {error && error.type === "lng" && (
+          <S.MessageError>{error.error}</S.MessageError>
+        )}
         <ContentInputs
           errorUserName={errors.pivot_start_angle}
           label="ANGULO INICIAL"
