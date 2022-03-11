@@ -9,20 +9,26 @@ import User from "utils/models/user";
 import BoxUsers from "../BoxUsers";
 import UpdateUserSelected from "../UpdateUserSelected";
 import ModalUpdateData from "components/globalComponents/ModalUpdateData";
+import { useContextAuth } from "hooks/useLoginAuth";
 
 const ListUsers = () => {
   //Contexts
   const { setData, stateDefault, stateAdmin, usersList } = useContextData();
   const { getAllUser } = useContextActionCrud();
+  const { user } = useContextAuth();
 
   //States
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    getAllUser();
-  }, []);
+    async function catchUsers() {
+      const users = await getAllUser(user?.token);
+      console.log("+++++++++++++LIST USERS++++++++++++");
+      console.log(users);
+    }
 
-  useEffect(() => {}, [usersList]);
+    catchUsers();
+  }, []);
 
   //Functions
 

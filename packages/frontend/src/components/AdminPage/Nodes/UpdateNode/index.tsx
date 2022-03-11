@@ -43,10 +43,12 @@ const UpdateNode = ({ nodeData, closeModal }: updateNodeProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const onSubmit = handleSubmit((data) => {
     const verifyGrps = data.is_gprs === "yes" ? true : false;
+    console.log("========Node Update =============");
+    console.log(verifyGrps);
     const newNode: Node = {
       ...nodeData,
       node_name: data.node_name ? data.node_name : nodeData.node_name,
-      is_gprs: data.is_gprs ? verifyGrps : nodeData.is_gprs,
+      is_gprs: verifyGrps,
       farm_id: nodeData.farm_id,
       gateway: data.gateway ? data.gateway : nodeData.gateway,
     };

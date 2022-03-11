@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from "react";
 import Farm, { FarmCreate } from "utils/models/farm";
 import Pivot, { PivotCreate } from "utils/models/pivot";
-import User, { UserCreate } from "utils/models/user";
+import User, { requestUser, UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 
 import Node, { NodeCreate } from "utils/models/node";
@@ -24,15 +24,15 @@ import {
   requestUpdatePivot,
   requestUpdateUser,
 } from "api/requestApi";
-import Router from "next/router";
 import { parseCookies } from "nookies";
+import { useContextAuth } from "./useLoginAuth";
 
 interface UserProviderProps {
   children: React.ReactNode;
 }
 
 interface actionCrudProps {
-  getAllUser: () => void;
+  getAllUser: (token?: string) => Promise<requestUser[] | null>;
   createUser: (user: UserCreate) => void;
   updateUser: (user: User) => void;
   deleteUser: (id: string) => void;
@@ -66,37 +66,40 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     setNodeList,
     setPivotList,
   } = useContextData();
+  const { user } = useContextAuth();
 
   //CRUD USER
-  const getAllUser = async () => {
+  const getAllUser = async (
+    tokenState?: string
+  ): Promise<requestUser[] | null> => {
     const { "soilauth-token": token } = parseCookies();
 
-    if (token) {
-      const response = await requestGetAllUsers();
-      response && setUsersList(response);
-    } else {
-      Router.push("/");
-    }
+    const TokenId = tokenState ? tokenState : token;
+
+    const response = await requestGetAllUsers(TokenId);
+
+    response && setUsersList(response);
+    return response;
   };
 
-  const createUser = async (user: UserCreate) => {
-    const result = await requestPostUser(user);
+  const createUser = async (newUser: UserCreate) => {
+    const result = await requestPostUser(newUser);
 
     if (result) {
-      getAllUser();
+      await getAllUser(user?.token);
       setData(stateDefault);
     }
     return result;
   };
-  const updateUser = async (user: User) => {
-    const newUser = await requestUpdateUser(user);
+  const updateUser = async (updatedUser: User) => {
+    const newUser = await requestUpdateUser(updatedUser);
     if (newUser) {
-      await getAllUser();
+      await getAllUser(user?.token);
     }
   };
   const deleteUser = async (id: string) => {
     await requestDeleteUser(id);
-    await getAllUser();
+    await getAllUser(user?.token);
   };
 
   //CRUD FARMS

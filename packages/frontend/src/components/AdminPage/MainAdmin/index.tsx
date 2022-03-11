@@ -1,5 +1,6 @@
+import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useContextData } from "hooks/useContextData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateNewUser from "../Users/CreateNewUser";
 
 import SwitchStateUser from "../Users/SwitchStateUser";
@@ -12,7 +13,10 @@ const MainAdmin = () => {
     setData,
     stateDefault,
     stateAdmin: { optionUser },
+    usersList,
   } = useContextData();
+  const { getAllUser } = useContextActionCrud();
+
   const [isOptionUser, setIsOptionUser] = useState(false);
 
   const handleClickListUser = () => {
@@ -24,6 +28,10 @@ const MainAdmin = () => {
       optionUser: "create",
     });
   };
+
+  useEffect(() => {
+    getAllUser();
+  }, []);
 
   return (
     <S.Container>

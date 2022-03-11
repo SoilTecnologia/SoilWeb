@@ -4,7 +4,7 @@ import Pivot, { PivotCreate } from "utils/models/pivot";
 import User, { requestUser, UserCreate } from "utils/models/user";
 import { api } from "./api";
 
-type Response = {
+export type Response = {
   user_type: User["user_type"];
   user_id: User["user_id"];
   token: string;
@@ -49,9 +49,11 @@ export const requestUpdateUser = async (user: User) => {
     });
 };
 
-export const requestGetAllUsers = async () => {
+export const requestGetAllUsers = async (tokenId: string) => {
   return await api
-    .get<requestUser[]>(`users/allUsers`)
+    .get(`users/allUsers`, {
+      headers: { Authorization: tokenId },
+    })
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");

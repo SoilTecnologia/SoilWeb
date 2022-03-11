@@ -55,7 +55,7 @@ const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
             NODE: <span>{nodeData.node_name}</span>
           </S.NodeName>
           <S.IsGprs>
-            GRPS: <span>{` ${nodeData.is_gprs ? "SIM" : "NÃO"}`}</span>
+            GRPS: <span>{` ${nodeData.is_gprs === true ? "SIM" : "NÃO"}`}</span>
           </S.IsGprs>
           {nodeData.gateway && (
             <S.Gateway>

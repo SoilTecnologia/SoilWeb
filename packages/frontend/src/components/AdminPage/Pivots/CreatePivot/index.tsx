@@ -1,12 +1,14 @@
 import ContentInputs from "components/globalComponents/ContentInputs";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import * as Yup from "yup";
 import * as S from "./styles";
 
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { PivotCreate, PivotForm } from "utils/models/pivot";
 import theme from "styles/theme";
 import { useContextData } from "hooks/useContextData";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type createPivotProps = {
   setAddNode: Dispatch<SetStateAction<boolean>>;
@@ -20,6 +22,16 @@ export const defaultError = {
   type: null,
   error: null,
 };
+const schema = Yup.object({
+  pivot_name: Yup.string().required("Digite o numero do Pivo"),
+  pivot_lat: Yup.string().required("Digite a Latitude"),
+  pivot_lng: Yup.string().required("Digite a Longitude"),
+  pivot_start_angle: Yup.number().required("Digite um angulo inicial"),
+  pivot_end_angle: Yup.number().required("Digite um angulo final"),
+  pivot_radius: Yup.number().required("Digite um raio"),
+  radio_id: Yup.number().required("Digite um radio"),
+}).required();
+
 const CreateNode = ({ setAddNode }: createPivotProps) => {
   //Contexts
   const { stateAdmin } = useContextData();
@@ -32,7 +44,7 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<PivotForm>();
+  } = useForm<PivotForm>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
 
   const formatLatAndLong = (type: "lat" | "lng", latLong: string) => {

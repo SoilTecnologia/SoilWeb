@@ -2,14 +2,16 @@ import * as S from "./styles";
 import { useRef, useState } from "react";
 
 import { useForm } from "react-hook-form";
+import * as Yup from "yup";
 
 import ContentInputs from "components/globalComponents/ContentInputs";
 import { useContextActionCrud } from "hooks/useActionsCrud";
-import Pivot, { PivotFormUpdate } from "utils/models/pivot";
+import Pivot, { PivotForm, PivotFormUpdate } from "utils/models/pivot";
 
 import Node from "utils/models/node";
 import { defaultError } from "../CreatePivot";
 import { MessageError } from "../CreatePivot/styles";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type updateFarmProps = {
   pivotData: Pivot;
@@ -35,7 +37,7 @@ const UpdatePivotData = ({
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<PivotFormUpdate>();
+  } = useForm<PivotForm>();
   //Ref
   const formRef = useRef<HTMLFormElement>(null);
   //Functions
@@ -52,9 +54,15 @@ const UpdatePivotData = ({
     }
   };
 
-  const handleDataForm = (formData: PivotFormUpdate) => {
-    const latForNumber = formatLatAndLong("lat", formData.pivot_lat);
-    const longForNumber = formatLatAndLong("lng", formData.pivot_lng);
+  const handleDataForm = (formData: PivotForm) => {
+    const latNotNull = formData.pivot_lat
+      ? formData.pivot_lat
+      : pivotData.pivot_lat;
+    const lngNotNull = formData.pivot_lng
+      ? formData.pivot_lng
+      : pivotData.pivot_lng;
+    const latForNumber = formatLatAndLong("lat", latNotNull.toString());
+    const longForNumber = formatLatAndLong("lng", lngNotNull.toString());
     if (latForNumber && longForNumber) {
       const newPivot: Pivot = {
         ...pivotData,
