@@ -16,3 +16,9 @@ interface Farm extends FarmCreate {
   node: Node[] | null;
 }
 export default Farm;
+export interface FarmFormCreate {
+  farm_name: string;
+  farm_city: string;
+  farm_lng: string;
+  farm_lat: string;
+}

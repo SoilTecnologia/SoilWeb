@@ -1,4 +1,4 @@
-import { requestLoginAuth } from "api/requestApi";
+import { requestLoginAuth, Response } from "api/requestApi";
 import Router from "next/router";
 import { setCookie, parseCookies } from "nookies";
 import React, {
@@ -9,6 +9,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { useContextActionCrud } from "./useActionsCrud";
 
 interface UserProviderProps {
   children: React.ReactNode;
@@ -17,11 +18,11 @@ interface UserProviderProps {
 type ResponseUser = {
   user_type: string;
   user_id: string;
+  token: string;
 };
 
 type dataContextAuth = {
-  signIn: (login: string, password: string) => Promise<any | null>;
-  isAuthenticated: boolean;
+  signIn: (login: string, password: string) => Promise<Response | null>;
   user: ResponseUser | null;
   setUser: Dispatch<SetStateAction<ResponseUser | null>>;
 };
@@ -30,8 +31,6 @@ const UserLoginData = createContext({} as dataContextAuth);
 
 function UseLoginProvider({ children }: UserProviderProps) {
   const [user, setUser] = useState<ResponseUser | null>(null);
-
-  const isAuthenticated = !!user;
 
   useEffect(() => {
     verifyUserCookie();
@@ -54,7 +53,7 @@ function UseLoginProvider({ children }: UserProviderProps) {
       "soilauth-userid": user_id,
     } = parseCookies();
 
-    setUser({ user_id, user_type });
+    setUser({ user_id, user_type, token });
 
     if (token) {
       redirectForPageWithRole(user_type);
@@ -65,22 +64,24 @@ function UseLoginProvider({ children }: UserProviderProps) {
     const response = await requestLoginAuth(login, password);
     if (response) {
       const { token, user_id, user_type } = response;
-      const propsCookie = { maxAge: 60 * 60 * 2 }; //2hours
+      if (token) {
+        const propsCookie = { maxAge: 60 * 60 * 2 }; //2hours
 
-      setCookie(undefined, "soilauth-token", token, propsCookie);
-      setCookie(undefined, "soilauth-userid", user_id, propsCookie);
-      setCookie(undefined, "soilauth-usertype", user_type, propsCookie);
+        setCookie(undefined, "soilauth-token", token, propsCookie);
+        setCookie(undefined, "soilauth-userid", user_id, propsCookie);
+        setCookie(undefined, "soilauth-usertype", user_type, propsCookie);
 
-      setUser({ user_type, user_id });
+        setUser({ user_id, user_type, token });
 
-      user_type === "SUDO" ? Router.push("/adm") : Router.push("/farms");
+        user_type === "SUDO" ? Router.push("/adm") : Router.push("/farms");
+      }
     }
 
     return response;
   };
 
   return (
-    <UserLoginData.Provider value={{ signIn, user, isAuthenticated, setUser }}>
+    <UserLoginData.Provider value={{ signIn, user, setUser }}>
       {children}
     </UserLoginData.Provider>
   );

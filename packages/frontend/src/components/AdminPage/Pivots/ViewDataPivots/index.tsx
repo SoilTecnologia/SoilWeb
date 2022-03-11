@@ -1,27 +1,28 @@
+import { useContextData } from "hooks/useContextData";
 import { useState } from "react";
-import Farm from "utils/models/farm";
 import Node from "utils/models/node";
 import BoxPivots from "../BoxPivots";
 import CreatePivot from "../CreatePivot";
 import * as S from "./styles";
 
 type vewDataPivotsProps = {
-  farmData: Farm;
-  // nodeData: Node;
+  nodeData: Node;
 };
-const ViewDataPivots = ({ farmData }: vewDataPivotsProps) => {
+const ViewDataPivots = ({ nodeData }: vewDataPivotsProps) => {
   const [addPivot, setAddPivot] = useState(false);
+
+  const { pivotList } = useContextData();
   return (
     <S.Container>
       <S.AddNode onClick={() => setAddPivot(true)}>
         Adicionar Pivot <S.IconAdd />
       </S.AddNode>
-      {farmData.pivots ? (
-        farmData.pivots.map((pivot) => (
+      {pivotList.length > 0 ? (
+        pivotList.map((pivot) => (
           <BoxPivots
             key={pivot.pivot_id}
             pivotData={pivot}
-            farmRelation={farmData}
+            nodeData={nodeData}
           />
         ))
       ) : (
@@ -29,7 +30,7 @@ const ViewDataPivots = ({ farmData }: vewDataPivotsProps) => {
       )}
       {addPivot && (
         <S.ContentAddNode>
-          <CreatePivot farm={farmData} setAddNode={setAddPivot} />
+          <CreatePivot setAddNode={setAddPivot} />
         </S.ContentAddNode>
       )}
     </S.Container>

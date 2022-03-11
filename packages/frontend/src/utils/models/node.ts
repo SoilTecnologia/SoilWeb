@@ -15,5 +15,4 @@ export type NodeCreate = {
   farm_id: string;
   is_gprs: boolean;
   gateway?: string;
-  pivots: Pivot[] | null;
 };

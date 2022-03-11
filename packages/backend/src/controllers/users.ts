@@ -101,19 +101,44 @@ export const signUpController = async (
 };
 
 export const deleteUserController = async (user_id: User['user_id']) => {
-  const user = await knex<User>('users').select().where({ user_id }).first();
-  if (user) {
-    const del = await knex<User>('users')
-      .where({ user_id })
-      .forNoKeyUpdate()
-      .del('*');
-
-    if (!del) throw new Error('Não foi possível deletar usúario');
-    return del;
+  try {
+    const user = await knex<User>('users').select().where({ user_id }).first();
+    if (user) {
+      const del = await knex<User>('users').select().where({ user_id }).del();
+      return del;
+    }
+  } catch (err) {
+    console.log('[ERROR] INTERNAL SERVER ERROR');
+    console.log(err);
   }
-
-  throw new Error('User does not exists');
 };
+
+export const putUserController = async (user: User) => {
+  const selectUser = await knex<User>('users')
+    .select()
+    .where({ user_id: user.user_id })
+    .first();
+
+  if (selectUser) {
+    await knex<User>('users')
+      .where({ user_id: user.user_id })
+      .update({
+        user_id: user.user_id ? user.user_id : selectUser.user_id,
+        login: user.login ? user.login : selectUser.login,
+        password: user.password ? user.password : selectUser.password,
+        user_type: user.user_type ? user.user_type : selectUser.user_type
+      });
+
+    const newUser = await knex<User>('users')
+      .select()
+      .where({ user_id: user.user_id })
+      .first();
+
+    return newUser;
+  }
+  throw new Error('[ERROR] User not find');
+};
+
 export const getAllUsersController = async () => {
   try {
     const users = await knex<User>('users').select();

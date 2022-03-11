@@ -48,7 +48,6 @@ interface actionCrudProps {
   createPivot: (pivot: PivotCreate) => void;
   updatePivot: (pivot: Pivot, node: Node) => void;
   deletePivot: (id: string, node: Node) => void;
-
   getAllPivotWithFarmId: (farm_id: Farm["farm_id"]) => void;
 }
 
@@ -60,7 +59,6 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     stateAdmin,
     setData,
     stateDefault,
-
     setUsersList,
     setFarmList,
     setNodeList,

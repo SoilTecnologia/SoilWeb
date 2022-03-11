@@ -1,30 +1,95 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import ContentInputs from "components/globalComponents/ContentInputs";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import * as Yup from "yup";
 import * as S from "./styles";
 
-import * as Yup from "yup";
 import { useContextActionCrud } from "hooks/useActionsCrud";
-import Farm from "utils/models/farm";
-import { PivotCreate } from "utils/models/pivot";
+import { PivotCreate, PivotForm } from "utils/models/pivot";
 import theme from "styles/theme";
+import { useContextData } from "hooks/useContextData";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type createPivotProps = {
-  farm: Farm;
   setAddNode: Dispatch<SetStateAction<boolean>>;
 };
 
-const CreateNode = ({ farm, setAddNode }: createPivotProps) => {
+type errorProps = {
+  type: null | "lat" | "lng";
+  error: string | null;
+};
+export const defaultError = {
+  type: null,
+  error: null,
+};
+const schema = Yup.object({
+  pivot_name: Yup.string().required("Digite o numero do Pivo"),
+  pivot_lat: Yup.string().required("Digite a Latitude"),
+  pivot_lng: Yup.string().required("Digite a Longitude"),
+  pivot_start_angle: Yup.number().required("Digite um angulo inicial"),
+  pivot_end_angle: Yup.number().required("Digite um angulo final"),
+  pivot_radius: Yup.number().required("Digite um raio"),
+  radio_id: Yup.number().required("Digite um radio"),
+}).required();
+
+const CreateNode = ({ setAddNode }: createPivotProps) => {
   //Contexts
-  const { createNode } = useContextActionCrud();
+  const { stateAdmin } = useContextData();
+  const { createPivot } = useContextActionCrud();
+
+  //States
+  const [addIdNode, setAddIdNode] = useState(false);
+  const [error, setError] = useState<errorProps>(defaultError);
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<PivotCreate>();
+  } = useForm<PivotForm>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
-  const onSubmit = handleSubmit((data) => console.log(data));
+
+  const formatLatAndLong = (type: "lat" | "lng", latLong: string) => {
+    const number = Number(latLong);
+    if (number) {
+      return number;
+    } else {
+      const catchError = {
+        type: type,
+        error: "Digite somente numeros inteiro ou decimais usando o ponto .",
+      };
+      setError(catchError);
+    }
+  };
+
+  const handleDataForm = (dataForm: PivotForm) => {
+    if (stateAdmin.dataNodeSelected && stateAdmin.dataNodeSelected?.node_id) {
+      const latForNumber = formatLatAndLong("lat", dataForm.pivot_lat);
+      const longForNumber = formatLatAndLong("lng", dataForm.pivot_lng);
+
+      if (latForNumber && longForNumber) {
+        const newPivot: PivotCreate = {
+          node_id: stateAdmin.dataNodeSelected.node_id,
+          pivot_name: dataForm.pivot_name,
+          pivot_lng: latForNumber,
+          pivot_lat: longForNumber,
+          pivot_start_angle: dataForm.pivot_start_angle,
+          pivot_end_angle: dataForm.pivot_end_angle,
+          pivot_radius: dataForm.pivot_radius,
+          radio_id: dataForm.radio_id,
+        };
+        return newPivot;
+      }
+    }
+  };
+
+  const onSubmit = handleSubmit((data) => {
+    error.error && setError(defaultError);
+
+    const addPivot = handleDataForm(data);
+    if (addPivot) {
+      createPivot(addPivot);
+      setAddNode(false);
+    }
+  });
 
   return (
     <S.Container>
@@ -35,7 +100,7 @@ const CreateNode = ({ farm, setAddNode }: createPivotProps) => {
           label="PIVOT"
           colorLabel={theme.colors.secondary}
           id="pivot_name"
-          type="text"
+          type="number"
           placeholder="PIVOT"
           register={register}
         />
@@ -48,6 +113,9 @@ const CreateNode = ({ farm, setAddNode }: createPivotProps) => {
           placeholder="LATITUDE"
           register={register}
         />
+        {error && error.type === "lat" && (
+          <S.MessageError>{error.error}</S.MessageError>
+        )}
         <ContentInputs
           errorUserName={errors.pivot_lng}
           label="LONGITUDE"
@@ -57,12 +125,15 @@ const CreateNode = ({ farm, setAddNode }: createPivotProps) => {
           placeholder="LONGITUDE"
           register={register}
         />
+        {error && error.type === "lng" && (
+          <S.MessageError>{error.error}</S.MessageError>
+        )}
         <ContentInputs
           errorUserName={errors.pivot_start_angle}
           label="ANGULO INICIAL"
           colorLabel={theme.colors.secondary}
           id="pivot_start_angle"
-          type="text"
+          type="number"
           placeholder="ANGULO INICIAL"
           register={register}
         />
@@ -71,7 +142,7 @@ const CreateNode = ({ farm, setAddNode }: createPivotProps) => {
           label="ANGULO FINAL"
           colorLabel={theme.colors.secondary}
           id="pivot_end_angle"
-          type="text"
+          type="number"
           placeholder="ANGULO FINAL"
           register={register}
         />
@@ -80,7 +151,7 @@ const CreateNode = ({ farm, setAddNode }: createPivotProps) => {
           label="RAIO"
           colorLabel={theme.colors.secondary}
           id="pivot_radius"
-          type="text"
+          type="number"
           placeholder="RAIO"
           register={register}
         />
@@ -90,10 +161,26 @@ const CreateNode = ({ farm, setAddNode }: createPivotProps) => {
           label="RADIO"
           colorLabel={theme.colors.secondary}
           id="radio_id"
-          type="text"
+          type="number"
           placeholder="RADIO"
           register={register}
         />
+
+        <S.ButtonAddNodeId onClick={() => setAddIdNode(!addIdNode)}>
+          Adicionar Node Id?{" "}
+        </S.ButtonAddNodeId>
+
+        {addIdNode && (
+          <ContentInputs
+            errorUserName={errors.node_id}
+            label="ID NODE"
+            colorLabel={theme.colors.secondary}
+            id="node_id"
+            type="text"
+            placeholder="ID NODE"
+            register={register}
+          />
+        )}
 
         <S.Button type="submit" value="Enviar" />
       </S.Form>

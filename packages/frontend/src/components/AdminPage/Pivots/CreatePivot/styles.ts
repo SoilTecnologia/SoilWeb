@@ -46,3 +46,20 @@ export const IconClose = styled(FaRegTimesCircle)`
     opacity: 0.7;
   }
 `;
+export const ButtonAddNodeId = styled.div`
+  background: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.primary};
+  border-radius: 0.6rem;
+  padding: 0.7rem 1.4rem;
+  transition: all 0.7s linear;
+  font-size: 1.4rem;
+
+  margin-bottom: 1.3rem;
+  &:hover {
+    opacity: 0.7;
+  }
+`;
+export const MessageError = styled.p`
+  font-size: 1.2rem;
+  color: ${({ theme }) => theme.colors.cancel};
+`;

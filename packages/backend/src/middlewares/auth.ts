@@ -37,7 +37,6 @@ const authMiddleware = (): ((
       wrappedRequest.user = decode;
 
       req = wrappedRequest;
-      console.log(req);
       next();
     } catch (err) {
       res.status(401).send('Invalid Token!');

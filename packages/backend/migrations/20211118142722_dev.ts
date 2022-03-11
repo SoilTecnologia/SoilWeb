@@ -26,7 +26,8 @@ export async function up(knex: Knex): Promise<void> {
         .inTable('users')
         .index()
         .notNullable()
-        .onDelete('cascade');
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
     })
     .createTable('nodes', (table) => {
       table
@@ -37,7 +38,13 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('is_gprs').notNullable();
       table.string('gateway');
 
-      table.uuid('farm_id').references('farm_id').inTable('farms').index();
+      table
+        .uuid('farm_id')
+        .references('farm_id')
+        .inTable('farms')
+        .index()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
     })
     .createTable('pivots', (table) => {
       table
@@ -58,7 +65,8 @@ export async function up(knex: Knex): Promise<void> {
         .inTable('nodes')
         .index()
         .notNullable()
-        .onDelete('cascade');
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
     })
     .createTable('states', (table) => {
       table
@@ -77,7 +85,8 @@ export async function up(knex: Knex): Promise<void> {
         .inTable('pivots')
         .index()
         .notNullable()
-        .onDelete('cascade');
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
     })
     .createTable('state_variables', (table) => {
       table
@@ -94,7 +103,8 @@ export async function up(knex: Knex): Promise<void> {
         .inTable('states')
         .index()
         .notNullable()
-        .onDelete('cascade');
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
     })
     .createTable('radio_variables', (table) => {
       table
@@ -111,14 +121,17 @@ export async function up(knex: Knex): Promise<void> {
         .inTable('pivots')
         .index()
         .notNullable()
-        .onDelete('cascade');
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+
       table
         .uuid('state_id')
         .references('state_id')
         .inTable('states')
         .index()
         .notNullable()
-        .onDelete('cascade');
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
     })
     .createTable('actions', (table) => {
       table
@@ -139,20 +152,57 @@ export async function up(knex: Knex): Promise<void> {
         .inTable('users')
         .index()
         .notNullable()
-        .onDelete('cascade');
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+
       table
         .uuid('pivot_id')
         .references('pivot_id')
         .inTable('pivots')
         .index()
         .notNullable()
-        .onDelete('cascade');
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
     });
 }
 
 export async function down(knex: Knex): Promise<void> {
   return knex.schema
+    .alterTable('actions', (table) => {
+      table.dropPrimary();
+      table.dropForeign('author');
+      table.dropForeign('pivot_id');
+    })
+    .alterTable('radio_variables', (table) => {
+      table.dropPrimary();
+      table.dropForeign('state_id');
+      table.dropForeign('pivot_id');
+    })
+    .alterTable('state_variables', (table) => {
+      table.dropPrimary();
+      table.dropForeign('state_id');
+    })
+    .alterTable('states', (table) => {
+      table.dropPrimary();
+      table.dropForeign('pivot_id');
+    })
+    .alterTable('pivots', (table) => {
+      table.dropPrimary();
+      table.dropForeign('node_id');
+    })
+    .alterTable('nodes', (table) => {
+      table.dropPrimary();
+      table.dropForeign('farm_id');
+    })
+    .alterTable('farms', (table) => {
+      table.dropPrimary();
+      table.dropForeign('user_id');
+    })
+    .alterTable('users', (table) => {
+      table.dropPrimary();
+    })
     .dropTable('actions')
+    .dropTable('radio_variables')
     .dropTable('states')
     .dropTable('state_variables')
     .dropTable('pivots')

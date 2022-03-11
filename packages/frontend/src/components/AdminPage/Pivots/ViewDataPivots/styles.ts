@@ -2,11 +2,16 @@ import styled from "styled-components";
 import { GrAdd } from "react-icons/gr";
 
 export const Container = styled.div`
-  width: 100%;
+  width: max-content;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  padding: 3rem;
+  border-radius: 1rem;
+  background: ${({ theme }) => theme.colors.primary};
+  margin-top: 2rem;
 `;
 export const AddNode = styled.button`
   background: transparent;

@@ -1,6 +1,18 @@
 import styled, { css } from "styled-components";
-export const ContentForm = styled.div`
-  margin-top: 2rem;
+import { FaRegTimesCircle } from "react-icons/fa";
+
+export const Container = styled.div`
+  ${({ theme }) => css`
+    min-width: 50rem;
+    background: ${theme.colors.primary_gradient};
+    padding: 2rem 1rem;
+    border-radius: 1rem;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `}
 `;
 export const Form = styled.form`
   width: 100%;
@@ -8,7 +20,6 @@ export const Form = styled.form`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem 2rem;
 `;
 
 export const Button = styled.input`
@@ -28,4 +39,15 @@ export const Button = styled.input`
       opacity: 0.8;
     }
   `}
+`;
+export const IconClosed = styled(FaRegTimesCircle)`
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-size: 3.4rem;
+  color: ${({ theme }) => theme.colors.cancel};
+
+  &:hover {
+    opacity: 0.7;
+  }
 `;

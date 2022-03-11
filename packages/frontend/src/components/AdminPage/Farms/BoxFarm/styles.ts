@@ -1,5 +1,6 @@
 import styled, { css } from "styled-components";
 import { FaEllipsisV } from "react-icons/fa";
+import { RiErrorWarningLine } from "react-icons/ri";
 
 export const Container = styled.div`
   position: relative;
@@ -72,3 +73,4 @@ export const IconMenu = styled(FaEllipsisV)`
   right: 10px;
 `;
 export const ContentFarmUpdate = styled.div``;
+export const ContentFull = styled.div``;

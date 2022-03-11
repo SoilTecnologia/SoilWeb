@@ -4,10 +4,10 @@ import {
   signUpController,
   signInController,
   deleteUserController,
-  getAllUsersController
+  getAllUsersController,
+  putUserController
 } from '../controllers/users';
 import { IUserAuthInfoRequest, authHandler } from '../types/express';
-import { createFarmController } from '../controllers/farms';
 
 const router = express.Router();
 
@@ -49,6 +49,7 @@ it has saved is still valid.
   - If it is valid, it returns the user id
   - If it isn't, it will return a 401 on the auth middleware
 */
+
 router.get(
   '/auth',
   authMiddleware(),
@@ -85,6 +86,58 @@ router.get(
   )
 );
 
+router.put(
+  '/putUser',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { user_id, login, password, user_type } = req.body;
+
+      try {
+        const putUser = await putUserController({
+          user_id,
+          login,
+          password,
+          user_type
+        });
+
+        res.send(putUser);
+      } catch (err) {
+        console.log('[ERROR] Internal Server error');
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.delete(
+  '/delUser/:id',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { id } = req.params;
+      try {
+        const notUser = await deleteUserController(id);
+        res.sendStatus(200).send(notUser);
+      } catch (err) {
+        console.log(`[ERROR] 500 on /users/deleteUser`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+export default router;
+
 // router.put(
 //   '/addFarm',
 //   authMiddleware(),
@@ -117,43 +170,6 @@ router.get(
 //   )
 // );
 
-router.put(
-  '/putUser/:id',
-  authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { id } = req.params;
-    }
-  )
-);
-
-router.delete(
-  '/delUser/:id',
-  authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { id } = req.params;
-      try {
-        const notUser = await deleteUserController(id);
-        return notUser;
-      } catch (err) {
-        console.log(`[ERROR] 500 on /users/deleteUser`);
-        console.log(err);
-
-        next(err);
-      }
-    }
-  )
-);
-
 // router.delete(
 //   '/deleteUser',
 //   authMiddleware(),
@@ -176,5 +192,3 @@ router.delete(
 //     }
 //   )
 // );
-
-export default router;

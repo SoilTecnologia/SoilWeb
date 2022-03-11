@@ -1,6 +1,6 @@
 import Farm from '../models/farm';
 import User from '../models/user';
-import Pivot from '../models/pivot';
+import Pivot, { pivotCreate } from '../models/pivot';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 import RadioVariable from '../models/radioVariable';
@@ -14,6 +14,7 @@ import {
 import knex from '../database';
 import emitter from '../utils/eventBus';
 import { getLastCycleFromPivot } from './cycles';
+import Node from '../models/node';
 
 export const createPivotController = async (
   pivot_id: Pivot['pivot_id'],
@@ -383,4 +384,69 @@ export const updatePivotController = async (
       });
     }
   }
+};
+
+// Admin
+export const getAllPivotController = async (node_id: Node['node_id']) => {
+  const pivots = await knex<Pivot>('pivots').select().where({ node_id });
+  return pivots;
+};
+
+export const createPivotControllerAdm = async (pivot: pivotCreate) => {
+  const pivots = await knex<Pivot>('pivots').insert(pivot);
+  return pivots;
+};
+export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
+  try {
+    const farm = await knex<Pivot>('pivots')
+      .select()
+      .where({ pivot_id })
+      .first();
+    if (farm) {
+      const delResult = await knex<Pivot>('pivots')
+        .select()
+        .where({ pivot_id })
+        .del();
+      return delResult;
+    }
+  } catch (err) {
+    console.log('[ERROR] Internal Server Error');
+    console.log(err);
+  }
+};
+
+export const putPivotController = async (pivot: Pivot) => {
+  const getPivot = await knex<Pivot>('pivots')
+    .select()
+    .where({ pivot_id: pivot.pivot_id })
+    .first();
+
+  if (getPivot) {
+    await knex<Pivot>('pivots')
+      .where({ pivot_id: pivot.pivot_id })
+      .update({
+        ...getPivot,
+        pivot_lat: pivot.pivot_lat ? pivot.pivot_lat : getPivot.pivot_lat,
+        pivot_lng: pivot.pivot_lng ? pivot.pivot_lng : getPivot.pivot_lng,
+        pivot_name: pivot.pivot_name ? pivot.pivot_name : getPivot.pivot_name,
+        pivot_radius: pivot.pivot_radius
+          ? pivot.pivot_radius
+          : getPivot.pivot_radius,
+        pivot_start_angle: pivot.pivot_start_angle
+          ? pivot.pivot_start_angle
+          : getPivot.pivot_start_angle,
+        pivot_end_angle: pivot.pivot_end_angle
+          ? pivot.pivot_end_angle
+          : getPivot.pivot_end_angle,
+        radio_id: pivot.radio_id ? pivot.radio_id : getPivot.radio_id
+      });
+
+    const newFarm = await knex<Pivot>('pivots')
+      .select()
+      .where({ pivot_id: pivot.pivot_id })
+      .first();
+
+    return newFarm;
+  }
+  throw new Error('Não fooi possivel atualizar Pivot');
 };

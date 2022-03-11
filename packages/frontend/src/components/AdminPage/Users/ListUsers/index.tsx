@@ -9,19 +9,25 @@ import User from "utils/models/user";
 import BoxUsers from "../BoxUsers";
 import UpdateUserSelected from "../UpdateUserSelected";
 import ModalUpdateData from "components/globalComponents/ModalUpdateData";
-import { parseCookies } from "nookies";
-import Router from "next/router";
+import { useContextAuth } from "hooks/useLoginAuth";
 
 const ListUsers = () => {
   //Contexts
   const { setData, stateDefault, stateAdmin, usersList } = useContextData();
-  const { updateUser, getAllUser } = useContextActionCrud();
+  const { getAllUser } = useContextActionCrud();
+  const { user } = useContextAuth();
 
   //States
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    getAllUser();
+    async function catchUsers() {
+      const users = await getAllUser(user?.token);
+      console.log("+++++++++++++LIST USERS++++++++++++");
+      console.log(users);
+    }
+
+    catchUsers();
   }, []);
 
   //Functions
@@ -32,11 +38,6 @@ const ListUsers = () => {
       ...stateDefault,
       updateUser: user,
     });
-  };
-
-  const updateUserData = (user: User) => {
-    setModalVisible(false);
-    updateUser(user);
   };
 
   const closeModal = () => {
@@ -59,8 +60,8 @@ const ListUsers = () => {
         <ModalUpdateData closeModal={closeModal}>
           {stateAdmin.updateUser && (
             <UpdateUserSelected
-              updateUser={stateAdmin.updateUser}
-              updateUserData={updateUserData}
+              dataUser={stateAdmin.updateUser}
+              closeModal={closeModal}
             />
           )}
         </ModalUpdateData>
