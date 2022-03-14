@@ -93,6 +93,29 @@ const GlobalStyles = createGlobalStyle`
   src: url('/fonts/grechen-fuemen-v1-latin-regular.eot'); /* IE9 Compat Modes */
   src: local(''),url('/fonts/grechen-fuemen-v1-latin-regular.woff2') format('woff2')
 }
+// Montserrat
+@font-face {
+  font-family: "Montserrat-Bold";
+  font-style: bold;
+  src: local(''),url('/fonts/Montserrat-Bold.ttf') format('truetype')
+}
+
+@font-face {
+  font-family: "Montserrat-Light";
+  font-style: normal;
+  src: local(''),url('/fonts/Montserrat-Light.ttf') format('truetype')
+}
+@font-face{
+  font-family: "Syncopate-Bold";
+  font-style: normal;
+  src: local(''),url('/fonts/Syncopate-Bold.ttf') format('truetype')
+}
+@font-face{
+  font-family: "Syncopate-Regular";
+  font-style: normal;
+  src: local(''),url('/fonts/Syncopate-Regular.ttf') format('truetype')
+}
+
 
   * {
     -webkit-font-smoothing: antialiased;

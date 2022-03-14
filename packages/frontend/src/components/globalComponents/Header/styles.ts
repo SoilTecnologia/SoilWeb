@@ -14,7 +14,7 @@ export const TextContainer=styled.div`
   justify-content:center;
 `;
 export const Text = styled.h1`
-  font-size: ${({theme})=>theme.font.sizes.xxlarge};
+  font-size: ${({theme})=>theme.font.sizes.xxbiglarge};
   color: ${({theme})=>theme.colors.secondary};
   font-family: ${({theme})=>theme.font.family.Poppins};
   letter-spacing: 0.3rem;

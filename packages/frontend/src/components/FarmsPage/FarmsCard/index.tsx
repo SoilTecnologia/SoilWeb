@@ -19,18 +19,19 @@ const FarmsContainer = ({ farm }: FarmProps) => {
       <S.Box onClick={handlePivotsPage}>
         <S.ContentData>
 
-          <S.UserName>
+          <S.Text>
             Fazenda: {farm_name}
-          </S.UserName>
+          </S.Text>
 
-          <S.UserName>
-            Localização: {farm_city}
-          </S.UserName>
+          <S.Text>
+            Cidade: {farm_city}
+          </S.Text>
 
-          <S.UserName>
-            Clique aqui para acessar a fazenda
-          </S.UserName>
-
+        </S.ContentData>
+        <S.ContentData>
+          <S.Text>
+            ENTRAR
+          </S.Text>
         </S.ContentData>
       </S.Box>
     </S.Container>

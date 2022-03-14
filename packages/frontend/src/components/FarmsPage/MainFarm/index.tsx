@@ -10,7 +10,7 @@ type FarmListProps={
 const MainFarm = ({ farmList }: FarmListProps) => {
   return (
     <>
-      <Header Text={'Fazendas'} />
+      <Header text={'Fazendas'} />
       <S.Container>
         {farmList.map((farm: Farm) => (
           <FarmsContainer key={farm.farm_id} farm={farm} />

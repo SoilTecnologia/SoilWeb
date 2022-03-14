@@ -7,13 +7,15 @@ export const Container=styled.div`
   align-items:center;
 `;
 export const Box = styled.button`
-  position: relative;
-  width: 68rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: ${({theme})=>theme.spacings.xxsmall};
-  background: linear-gradient( ${({theme})=>theme.colors.primary} 90%, ${({theme})=>theme.colors.primary_gradient} 100% );
+  flex-direction:row;
+  justify-content:space-between;
+  align-items:center;
+  position: relative;
+  width: 60%;
+  margin: ${({theme})=>theme.spacings.xsmall};
+  background: linear-gradient( ${({theme})=>theme.colors.primary} 80%, ${({theme})=>theme.colors.primary_gradient} 100% );
+  box-shadow: 5px 5px 15px gray;
   padding: ${({theme})=>theme.spacings.small};
   border-radius: 0.9rem;
   transition: all .3s linear;
@@ -23,15 +25,17 @@ export const Box = styled.button`
       opacity: 0.85;
     }
 `;
+
 export const ContentData = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  padding: ${({theme})=>theme.spacings.xxsmall};
 `;
-export const UserName = styled.h4`
+export const Text = styled.h4`
   color: ${({ theme }) => theme.colors.secondary};
   margin: 0.5rem 0;
+  font-size:${({theme})=>theme.font.sizes.xxlarge};
 `;
 
 

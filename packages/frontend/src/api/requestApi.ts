@@ -211,6 +211,17 @@ export const requestGetAllPivotsWithFarmId = async (
       console.log(err);
     });
 };
+export const requestGetPivotsListWithFarmId = async (
+  farm_id: Farm["farm_id"]
+) => {
+  return await api
+    .get(`pivots/list/${farm_id}`)
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
 
 /// WEB CRUD
 //  export const requestPivotStatus = async (pivo_id:string) => {
