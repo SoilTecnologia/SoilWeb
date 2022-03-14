@@ -4,7 +4,10 @@ import Queue from '../utils/queue';
 import emitter from '../utils/eventBus';
 import { updatePivotController } from '../controllers/pivots';
 import { createActionController } from '../controllers/actions';
-import { objectToActionString } from '../utils/conversions';
+import {
+  objectToActionString,
+  statusPayloadStringToObject
+} from '../utils/conversions';
 
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
@@ -66,8 +69,8 @@ class IoTDevice {
       configBuilder.with_clean_session(false);
       configBuilder.with_client_id(this.clientId);
       configBuilder.with_endpoint(endpoint);
-     // configBuilder.with_keep_alive_seconds(10);
-     // configBuilder.with_ping_timeout_ms(1000);
+      // configBuilder.with_keep_alive_seconds(10);
+      // configBuilder.with_ping_timeout_ms(1000);
 
       const config = configBuilder.build();
       const client = new mqtt.MqttClient();
@@ -115,7 +118,9 @@ class IoTDevice {
         this.connection.publish(finalTopic!, payload, 0, false);
         console.log(`[IOT] Enviando mensagem à um GPRS...`);
       } else {
-        const string = JSON.stringify(payload, (k, v) => v === undefined ? null : v);
+        const string = JSON.stringify(payload, (k, v) =>
+          v === undefined ? null : v
+        );
         this.connection.publish(finalTopic!, string, 0, false);
         console.log(`[IOT] Enviando mensagem...`);
       }
@@ -134,58 +139,96 @@ class IoTDevice {
 
   processMessage = async (
     topic: string,
-    payload: ArrayBuffer,
+    message: ArrayBuffer,
     dup: boolean,
     qos: mqtt.QoS,
     retain: boolean
   ) => {
     const decoder = new TextDecoder('utf8');
-    const json = JSON.parse(decoder.decode(payload));
+    const json = JSON.parse(decoder.decode(message));
+    const {
+      type,
+      id,
+      pivot_num,
+      payload
+    }: {
+      type: 'status' | 'action';
+      id: string;
+      pivot_num: number;
+      payload: any;
+    } = json;
 
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
-        const {
-          pivot_id,
-          connection,
-          power,
-          water,
-          direction,
-          angle,
-          percentimeter,
-          timestamp,
-          father,
-          rssi
-        } = json.payload;
-        await updatePivotController(
-          pivot_id,
-          connection,
-          power,
-          water,
-          direction,
-          angle,
-          percentimeter,
-          timestamp,
-          father,
-          rssi
-        );
+        const [farm_id, node_num] = id.split('_');
+        // Se possui um pivot_num, é um concentrador
+        // Caso contrário podemos assumir que é um GPRS
+        if (pivot_num) {
+          //Concentrador
+          const {
+            pivot_id,
+            connection,
+            power,
+            water,
+            direction,
+            angle,
+            percentimeter,
+            timestamp,
+            father,
+            rssi
+          } = payload;
 
-        /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
-        const { farm_id, node_name } = json;
-        this.publish(json, `${farm_id}/${node_name}`);
-        console.log(
-          `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
-        );
+          await updatePivotController(
+            pivot_id,
+            connection,
+            power,
+            water,
+            direction,
+            angle,
+            percentimeter,
+            timestamp,
+            father,
+            rssi
+          );
+
+          /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
+          this.publish(json, `${farm_id}/${node_num}`);
+          console.log(
+            `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
+          );
+        } else {
+          //GPRS
+
+          console.log('Received status from GPRS');
+          const statusObject = statusPayloadStringToObject(payload);
+
+          if (statusObject) {
+            const { power, direction, water, percentimeter, angle, timestamp } =
+              statusObject;
+            await updatePivotController(
+              `${farm_id}_${node_num}_${pivot_num}`,
+              true,
+              power,
+              water,
+              direction,
+              angle,
+              percentimeter,
+              timestamp,
+              null,
+              null
+            );
+          }
+        }
       } else if (json.type === 'action') {
         console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
         this.queue.remove(json);
       }
-    } else if (json.type === 'status') {
+    } else if (this.type === 'Raspberry') {
+      if (json.type === 'status') {
         console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
         this.queue.remove(json);
       } else if (json.type === 'action') {
         const {
-          pivot_id,
-          radio_id,
           author,
           power,
           water,
@@ -193,8 +236,11 @@ class IoTDevice {
           percentimeter,
           timestamp
         } = json.payload;
+        const {
+          farm_id, node_num, pivot_num
+        } = json;
         await createActionController(
-          pivot_id,
+          `${farm_id}_${node_num}_${pivot_num}`,
           author,
           power,
           water,
@@ -207,6 +253,7 @@ class IoTDevice {
         );
         this.publish(json);
       }
+    }
   };
 
   /*
@@ -220,7 +267,9 @@ class IoTDevice {
         this.queue.enqueue({
           type: 'status',
           farm_id: status.farm_id,
-          node_name: status.node_name,
+          node_num: status.node_num,
+          pivot_num: null,
+          is_gprs: false,
           payload: {
             ...status.payload,
             timestamp: status.payload.timestamp.toString()
@@ -236,7 +285,9 @@ class IoTDevice {
           this.queue.enqueue({
             type: 'action',
             farm_id: action.farm_id,
-            node_name: action.node_name,
+            node_num: action.node_num,
+            pivot_num: null,
+            is_gprs: true,
             payload: objectToActionString(
               action.power,
               action.water,
@@ -244,21 +295,19 @@ class IoTDevice {
               action.percentimeter
             )
           });
+        } else {
+          this.queue.enqueue({
+            type: 'action',
+            farm_id: action.farm_id,
+            node_num: action.node_num,
+            pivot_num: action.pivot_num,
+            is_gprs: false,
+            payload: {
+              ...action.payload,
+              timestamp: action.payload.timestamp.toString()
+            }
+          });
         }
-
-        this.queue.enqueue(
-          
-          {
-          type: 'action',
-          farm_id: action.farm_id,
-          node_name: action.node_name,
-          payload: {
-            ...action.payload,
-            timestamp: action.payload.timestamp.toString()
-          }
-        }
-        
-        );
       });
 
       console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
@@ -270,12 +319,9 @@ class IoTDevice {
       const current = this.queue.peek()!;
 
       if (this.type === 'Raspberry') this.publish(current, this.pubTopic);
-      else if (typeof current.payload === 'string')
-          this.publish(
-            current.payload,
-            `${current.farm_id}/${current.node_name}`
-          );
-        else this.publish(current, `${current.farm_id}/${current.node_name}`);
+      else if (current.is_gprs)
+        this.publish(current.payload, `${current.farm_id}_${current.node_num}`);
+      else this.publish(current, `${current.farm_id}_${current.node_num}`);
     }
   };
 }
@@ -283,7 +329,9 @@ class IoTDevice {
 type MessageQueue = {
   type: 'action' | 'status';
   farm_id: string;
-  node_name: number;
+  node_num: number;
+  pivot_num: number | null;
+  is_gprs: boolean | null;
   payload: any;
 };
 
