@@ -29,9 +29,11 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
               Voltar
             </S.Text>
           </S.Button>
-          <S.Button>
+          <S.Button
+            onClick={handleMapa}
+          >
 
-            <S.Text onClick={handleMapa}>
+            <S.Text >
               Mapa
             </S.Text>
           </S.Button>
