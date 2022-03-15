@@ -6,14 +6,14 @@ import { useEffect } from "react";
 
 const UserPivots = () => {
   const { farm } = useContextUserData();
-  const { getAllPivotWithFarmId } = useContextActionCrud();
-  const { pivotList } = useContextData();
+  const { getGetPivotsListWithFarmId } = useContextActionCrud()
+  const { pivotList} = useContextData()
 
   useEffect(() => {
     if (farm) {
-      getAllPivotWithFarmId(farm.farm_id);
+      getGetPivotsListWithFarmId(farm.farm_id)
     }
-  }, []);
+  }, [farm])
 
   return <MainPivot pivotList={pivotList} />;
 };

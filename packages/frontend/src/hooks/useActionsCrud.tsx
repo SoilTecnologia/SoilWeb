@@ -11,6 +11,7 @@ import {
   requestGetAllPivots,
   requestGetAllPivotsWithFarmId,
   requestGetAllUsers,
+  requestGetPivotsListWithFarmId,
   requestOneFarm,
   requestPostUser,
   requestUpdateFarm,
@@ -49,7 +50,7 @@ interface actionCrudProps {
   createPivot: (pivot: PivotCreate) => void;
   updatePivot: (pivot: Pivot) => void;
   deletePivot: (pivot: Pivot) => void;
-
+  getGetPivotsListWithFarmId: (farm_id: Farm["farm_id"]) => void;
   getAllPivotWithFarmId: (farm_id: Farm["farm_id"]) => void;
 }
 
@@ -177,6 +178,13 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     result && setPivotList(result);
   };
 
+  const getGetPivotsListWithFarmId = async (farm_id: Farm["farm_id"]) => {
+    const result = await requestGetPivotsListWithFarmId(farm_id, user?.token);
+    console.log("Todas os Pivos da fazenda");
+    console.log(result);
+    result && setPivotList(result);
+  };
+
   return (
     <ActionCrudContext.Provider
       value={{
@@ -197,8 +205,8 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         createNode,
         updateNode,
         deleteNode,
-
         getAllPivotWithFarmId,
+        getGetPivotsListWithFarmId,
       }}
     >
       {children}
