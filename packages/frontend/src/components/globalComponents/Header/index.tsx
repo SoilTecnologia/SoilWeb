@@ -1,13 +1,16 @@
 import * as S from "./styles";
 
-const Header = (props) => {
-  const { Text } = props;
+type HeaderProps={
+  text:string
+}
 
+const Header = (props:HeaderProps) => {
+  const {text} = props
   return (
     <S.Container>
       <S.TextContainer>
         <S.Text>
-          {Text}
+          {text}
         </S.Text>
       </S.TextContainer>
     </S.Container>

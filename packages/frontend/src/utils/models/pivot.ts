@@ -12,6 +12,14 @@ export type PivotCreate = {
 
 interface Pivot extends PivotCreate {
   pivot_id: string;
+  pivot_name?:string;
+  state_id?: string;
+	connection?: boolean;
+  power?: boolean | null;
+  water?: boolean | null;
+  direction?: 'CLOCKWISE' | 'ANTI_CLOCKWISE' | null;
+	timestamp?: Date;
+  percentimeter?: number |null
   // last_communication: Date | string;
 }
 

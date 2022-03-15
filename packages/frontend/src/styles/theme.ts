@@ -34,7 +34,11 @@ export default {
       Poppins: "'Poppins', sans-serif",
       Tangerine: "'Tangerine', cursive",
       Roboto: '"Roboto", monospace',
-      MontSerrat: "'Montserrat', 'cursive'",
+      Montserrat_bold:"Montserrat-Bold",
+      Montserrat_light:"Montserrat-Light",
+      Syncopate_bold:"Syncopate-Bold",
+      Syncopate_regular:"Syncopate-Regular",
+
     },
     sizes: {
       xsmall: "1.2rem",

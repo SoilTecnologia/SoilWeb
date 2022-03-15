@@ -274,7 +274,21 @@ export const requestGetAllPivotsWithFarmId = async (
     })
     .then((response) => response.data)
     .catch((err) => {
-      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log("[ERROR] Falha ao salvar pivos");
+      console.log(err);
+    });
+};
+export const requestGetPivotsListWithFarmId = async (
+  farm_id: Farm["farm_id"],
+  tokenId: tokenState
+) => {
+  return await api
+    .get(`pivots/list/${farm_id}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar pivos");
       console.log(err);
     });
 };

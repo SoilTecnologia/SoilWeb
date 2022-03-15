@@ -6,6 +6,7 @@ type State = {
   water: boolean | null;
   direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE' | null;
 	timestamp: Date;
+  percentimeter: number |null
 };
 
 export default State;

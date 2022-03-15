@@ -1,39 +1,46 @@
 import * as S from "./styles";
 import Router from "next/router";
-import { useContextUserData } from "hooks/useContextUserData";
 import Pivot from "utils/models/pivot";
+import PivotStatusComponent from "../PivotStatusComponent";
 
-type PivotProps = {
-  pivot:Pivot
+
+interface PivotProps {
+  pivot: Pivot
+
 }
-const PivotsContainer = ({pivot}: PivotProps) => {
-  const { pivot_name,pivot_id } = pivot
 
-  //const { setFarm } = useContextUserData()
 
-  // const handlePivotsPage = () => {
-  //   setFarm(farm)
-  //   Router.push("/pivots",);
-  // }
+const PivotsContainer = ({ pivot }: PivotProps) => {
+  const { pivot_num } = pivot
+
+  function pivotStateSelector() {
+    if (pivot.connection === true) {
+      if (pivot.power === true) {
+        return 'Ligado'
+      }
+      return "Delisgado"
+    }
+  }
+  const handleIntent =()=>{
+    Router.push("/intent")
+  }
 
   return (
-    <S.Container>
-      <S.Box
-      //onClick={handlePivotsPage}
-      >
+    <S.Container >
+      <S.Box onClick={handleIntent}>
         <S.ContentData>
 
-          <S.UserName>
-            Pivo: {pivot_name}
-          </S.UserName>
+          <S.PivotNameWrapper>
+            <S.PivotName>
+              PIVÔ {pivot_num}
+            </S.PivotName>
+          </S.PivotNameWrapper>
 
-          <S.UserName>
-            Localização:
-          </S.UserName>
+          <S.PivotState>
+            {pivotStateSelector()}
+          </S.PivotState>
 
-          <S.UserName>
-            Clique aqui para acessar a fazenda
-          </S.UserName>
+          <PivotStatusComponent pivot={pivot} />
 
         </S.ContentData>
       </S.Box>
