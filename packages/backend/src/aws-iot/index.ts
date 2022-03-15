@@ -41,11 +41,11 @@ class IoTDevice {
     this.queue = new Queue<MessageQueue>();
     if (type == 'Raspberry' && topic) {
       this.subTopic = `${topic}`;
-      this.pubTopic = `cloud2`;
+      this.pubTopic = `cloud3`;
       this.clientId = topic;
     } else {
-      this.subTopic = 'cloud2';
-      this.clientId = 'cloud2';
+      this.subTopic = 'cloud3';
+      this.clientId = 'cloud3';
     }
   }
 
@@ -114,16 +114,13 @@ class IoTDevice {
     else finalTopic = this.pubTopic;
 
     try {
-      if (typeof payload === 'string') {
-        this.connection.publish(finalTopic!, payload, 0, false);
-        console.log(`[IOT] Enviando mensagem à um GPRS...`);
-      } else {
         const string = JSON.stringify(payload, (k, v) =>
           v === undefined ? null : v
         );
+
+      
         this.connection.publish(finalTopic!, string, 0, false);
-        console.log(`[IOT] Enviando mensagem...`);
-      }
+        console.log(`[IOT] ${finalTopic} Enviando mensagem... ${string}`);
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -206,7 +203,7 @@ class IoTDevice {
             const { power, direction, water, percentimeter, angle, timestamp } =
               statusObject;
             await updatePivotController(
-              `${farm_id}_${node_num}}`, //Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
+              `${farm_id}_${node_num}`, //Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
               true,
               power,
               water,
@@ -266,10 +263,8 @@ class IoTDevice {
       emitter.on('status', (status) => {
         this.queue.enqueue({
           type: 'status',
-          farm_id: status.farm_id,
-          node_num: status.node_num,
+          id: `${status.farm_id}_${status.node_num}`, //TODO status ta vindo node_num?
           pivot_num: null,
-          is_gprs: false,
           payload: {
             ...status.payload,
             timestamp: status.payload.timestamp.toString()
@@ -284,10 +279,8 @@ class IoTDevice {
         if (action.is_gprs) {
           this.queue.enqueue({
             type: 'action',
-            farm_id: action.farm_id,
-            node_num: action.node_num,
+            id: `${action.farm_id}_${action.node_num}`,
             pivot_num: null,
-            is_gprs: true,
             payload: objectToActionString(
               action.power,
               action.water,
@@ -296,42 +289,40 @@ class IoTDevice {
             )
           });
         } else {
-          this.queue.enqueue({
-            type: 'action',
-            farm_id: action.farm_id,
-            node_num: action.node_num,
-            pivot_num: action.pivot_num,
-            is_gprs: false,
-            payload: {
-              ...action.payload,
-              timestamp: action.payload.timestamp.toString()
-            }
-          });
+          // this.queue.enqueue({
+          //   type: 'action',
+          //   farm_id: action.farm_id,
+          //   node_num: action.node_num,
+          //   pivot_num: action.pivot_num,
+          //   is_gprs: false,
+          //   payload: {
+          //     ...action.payload,
+          //     timestamp: action.payload.timestamp.toString()
+          //   }
+          // });
         }
-      });
 
       console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
+      });
+
     }
   };
 
   processQueue = () => {
     if (!this.queue.isEmpty()) {
       const current = this.queue.peek()!;
+      const [farm_id, node_num] = current.id.split('_');
 
       if (this.type === 'Raspberry') this.publish(current, this.pubTopic);
-      else if (current.is_gprs)
-        this.publish(current.payload, `${current.farm_id}_${current.node_num}`);
-      else this.publish(current, `${current.farm_id}_${current.node_num}`);
+      else this.publish(current, `${farm_id}_${node_num}`);
     }
   };
 }
 
 type MessageQueue = {
   type: 'action' | 'status';
-  farm_id: string;
-  node_num: number;
+  id: string;
   pivot_num: number | null;
-  is_gprs: boolean | null;
   payload: any;
 };
 

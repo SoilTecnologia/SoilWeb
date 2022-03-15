@@ -77,7 +77,7 @@ export const objectToActionString = (power: Action['power'], water: Action['wate
 
 export const statusPayloadStringToObject = (payload: string) => {
   let [match, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})(\d{1})(\d{1})-(\d+)-(\d+)-(\d+)/.exec(`${status}`) || [];
+    /(\d{1})(\d{1})(\d{1})-(\d+)-(\d+)-(\d+)/.exec(`${payload}`) || [];
 
     let response: StatusObject = {
       power: null,

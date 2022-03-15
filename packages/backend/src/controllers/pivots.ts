@@ -245,22 +245,6 @@ export const updatePivotController = async (
   let shouldNotifyState = false;
   let state: State | undefined;
 
-  let pivot = await knex<Pivot>('pivots')
-    .select('node_id', 'pivot_num')
-    .where('pivot_id', pivot_id)
-    .first();
-  const { node_id, pivot_num } = pivot!;
-  let node = await knex<Node>('nodes')
-    .select('farm_id')
-    .where('node_id', node_id)
-    .first();
-  const { farm_id } = node!;
-  let farm = await knex<Node>('farms')
-    .select('user_id', 'farm_name')
-    .where('farm_id', farm_id)
-    .first();
-  const { user_id, farm_name } = farm!;
-
   let oldState = await knex<State>('states')
     .where('pivot_id', pivot_id)
     .orderBy('timestamp', 'desc')
@@ -334,14 +318,18 @@ export const updatePivotController = async (
 
   if (shouldNotifyUpdate) {
     const pivot = await knex('pivots').select('*').where({ pivot_id }).first();
-    const { node_id } = pivot;
+    const { farm_id, node_id, pivot_num } = pivot;
 
     const node = await knex('nodes').select('*').where({ node_id }).first();
-    const { farm_id, node_name } = node;
+    const {node_num} = node;
+
+    const farm = await knex('farms').select('*').where({ farm_id }).first();
+    const {user_id, farm_name} = farm;
+
 
     emitter.emit('status', {
       farm_id,
-      node_name,
+      node_num,
       payload: {
         pivot_id,
         connection,
@@ -357,6 +345,7 @@ export const updatePivotController = async (
     });
 
     if (shouldNotifyState) {
+
       emitter.emit('state-change', {
         user_id,
         pivot_id,
