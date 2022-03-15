@@ -1,15 +1,12 @@
-import * as S from "./styles";
-import { useState } from "react";
-
-import { useContextActionCrud } from "hooks/useActionsCrud";
-
-import Pivot from "utils/models/pivot";
-
 import BoxOptions from "components/globalComponents/BoxOptions";
-import Node from "utils/models/node";
-import ModalUpdateData from "components/globalComponents/ModalUpdateData";
-import UpdatePivotData from "../UpdatePivotData";
 import ModalDeleteData from "components/globalComponents/ModalDeleteData";
+import ModalUpdateData from "components/globalComponents/ModalUpdateData";
+import { useContextActionCrud } from "hooks/useActionsCrud";
+import { useState } from "react";
+import Node from "utils/models/node";
+import Pivot from "utils/models/pivot";
+import UpdatePivotData from "../UpdatePivotData";
+import * as S from "./styles";
 
 type boxPivotProps = {
   pivotData: Pivot;
@@ -56,7 +53,7 @@ const BoxPivots = ({ pivotData, nodeData }: boxPivotProps) => {
       <S.Container>
         <S.IconOption onClick={() => setModalOption(true)} />
         <S.Name>
-          Nome: <span>{pivotData.pivot_name}</span>
+          Nome: <span>{pivotData.pivot_num}</span>
         </S.Name>
         <S.Latitude>
           Latitude: <span>{pivotData.pivot_lat}</span>

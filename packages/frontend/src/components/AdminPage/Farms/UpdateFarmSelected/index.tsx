@@ -1,15 +1,13 @@
-import * as S from "./styles";
-import { useRef, useState } from "react";
-import * as Yup from "yup";
-
-import { useForm } from "react-hook-form";
-
-import ContentInputs from "components/globalComponents/ContentInputs";
-import Farm, { FarmFormCreate } from "utils/models/farm";
-import { useContextActionCrud } from "hooks/useActionsCrud";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { defaultError } from "components/AdminPage/Pivots/CreatePivot";
 import { MessageError } from "components/AdminPage/Pivots/CreatePivot/styles";
+import ContentInputs from "components/globalComponents/ContentInputs";
+import { useContextActionCrud } from "hooks/useActionsCrud";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import Farm, { FarmFormCreate } from "utils/models/farm";
+import * as Yup from "yup";
+import * as S from "./styles";
 
 type updateFarmProps = {
   farmSelected: Farm;
@@ -95,6 +93,7 @@ const UpdateFarmSelected = ({ farmSelected, closeModal }: updateFarmProps) => {
         placeholder={farmSelected.farm_name}
         register={register}
       />
+
       <ContentInputs
         errorUserName={errors.farm_city}
         label="CIDADE"

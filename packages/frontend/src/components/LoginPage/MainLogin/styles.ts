@@ -1,5 +1,5 @@
-import styled, { css } from "styled-components";
 import { RiErrorWarningLine } from "react-icons/ri";
+import styled, { css } from "styled-components";
 
 export const Container = styled.div`
   width: 40vw;
@@ -44,6 +44,8 @@ export const ContentLogo = styled.div`
 export const TextTech = styled.h3`
   ${({ theme }) => css`
     color: ${theme.colors.dark};
+    font-family: ${theme.font.family.MontSerrat};
+    font-style: bold;
   `}
 `;
 

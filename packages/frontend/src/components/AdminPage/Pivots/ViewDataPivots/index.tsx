@@ -30,7 +30,7 @@ const ViewDataPivots = ({ nodeData }: vewDataPivotsProps) => {
       )}
       {addPivot && (
         <S.ContentAddNode>
-          <CreatePivot setAddNode={setAddPivot} />
+          <CreatePivot setAddNode={setAddPivot} node={nodeData} />
         </S.ContentAddNode>
       )}
     </S.Container>

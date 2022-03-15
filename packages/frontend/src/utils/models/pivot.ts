@@ -1,6 +1,7 @@
 export type PivotCreate = {
   node_id: string;
-  pivot_name: number;
+  farm_id: string;
+  pivot_num: number;
   pivot_lng: number;
   pivot_lat: number;
   pivot_start_angle: number;
@@ -28,7 +29,7 @@ export type PivotUpdate = {
 export default Pivot;
 export type PivotForm = {
   node_id: string;
-  pivot_name: number;
+  pivot_num: number;
   pivot_lng: string;
   pivot_lat: string;
   pivot_start_angle: number;

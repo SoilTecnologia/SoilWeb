@@ -1,22 +1,22 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { defaultError } from "components/AdminPage/Pivots/CreatePivot";
+import { MessageError } from "components/AdminPage/Pivots/CreatePivot/styles";
 import ContentInputs from "components/globalComponents/ContentInputs";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useContextData } from "hooks/useContextData";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FarmCreate, FarmFormCreate } from "utils/models/farm";
-import * as S from "./styles";
-
-import * as Yup from "yup";
 import User from "utils/models/user";
-import { defaultError } from "components/AdminPage/Pivots/CreatePivot";
-import { MessageError } from "components/AdminPage/Pivots/CreatePivot/styles";
+import * as Yup from "yup";
+import * as S from "./styles";
 
 type errorProps = {
   type: null | "lat" | "lng";
   error: string | null;
 };
 const schema = Yup.object({
+  farm_id: Yup.string().required(),
   farm_name: Yup.string()
     .required("Digite um nome de usuario")
     .min(3, "Minimo de 3 caractéres"),
@@ -56,22 +56,19 @@ const CreateNewFarm = () => {
     dataForm: FarmFormCreate,
     user_id: User["user_id"]
   ) => {
-    console.log("CHEGOU DATA");
-    console.log(dataForm);
-
     const latForNumber = formatLatAndLong("lat", dataForm.farm_lat);
     const longForNumber = formatLatAndLong("lng", dataForm.farm_lng);
 
     if (latForNumber && longForNumber) {
       const newFarmUser: FarmCreate = {
+        farm_id: dataForm.farm_id,
         user_id: user_id,
         farm_name: dataForm.farm_name,
         farm_city: dataForm.farm_city,
         farm_lat: latForNumber,
         farm_lng: longForNumber,
       };
-      console.log("SAIU DATA");
-      console.log(newFarmUser);
+
       return newFarmUser;
     }
   };
@@ -93,10 +90,18 @@ const CreateNewFarm = () => {
       <S.Form onSubmit={onSubmit} ref={formRef}>
         <ContentInputs
           errorUserName={errors.farm_name}
-          label="FAZENDA"
+          label="NOME DA FAZENDA"
           id="farm_name"
           type="text"
-          placeholder="FAZENDA"
+          placeholder="NOME DA FAZENDA"
+          register={register}
+        />
+        <ContentInputs
+          errorUserName={errors.farm_id}
+          label="ID DA FAZENDA"
+          id="farm_id"
+          type="text"
+          placeholder="ID DA FAZENDA"
           register={register}
         />
         <ContentInputs

@@ -1,17 +1,18 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import ContentInputs from "components/globalComponents/ContentInputs";
+import { useContextActionCrud } from "hooks/useActionsCrud";
+import { useContextData } from "hooks/useContextData";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import theme from "styles/theme";
+import Node from "utils/models/node";
+import { PivotCreate, PivotForm } from "utils/models/pivot";
 import * as Yup from "yup";
 import * as S from "./styles";
 
-import { useContextActionCrud } from "hooks/useActionsCrud";
-import { PivotCreate, PivotForm } from "utils/models/pivot";
-import theme from "styles/theme";
-import { useContextData } from "hooks/useContextData";
-import { yupResolver } from "@hookform/resolvers/yup";
-
 type createPivotProps = {
   setAddNode: Dispatch<SetStateAction<boolean>>;
+  node: Node;
 };
 
 type errorProps = {
@@ -23,7 +24,7 @@ export const defaultError = {
   error: null,
 };
 const schema = Yup.object({
-  pivot_name: Yup.string().required("Digite o numero do Pivo"),
+  pivot_num: Yup.number().required("Digite o numero do Pivo"),
   pivot_lat: Yup.string().required("Digite a Latitude"),
   pivot_lng: Yup.string().required("Digite a Longitude"),
   pivot_start_angle: Yup.number().required("Digite um angulo inicial"),
@@ -32,7 +33,7 @@ const schema = Yup.object({
   radio_id: Yup.number().required("Digite um radio"),
 }).required();
 
-const CreateNode = ({ setAddNode }: createPivotProps) => {
+const CreatePivot = ({ setAddNode, node }: createPivotProps) => {
   //Contexts
   const { stateAdmin } = useContextData();
   const { createPivot } = useContextActionCrud();
@@ -67,8 +68,9 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
 
       if (latForNumber && longForNumber) {
         const newPivot: PivotCreate = {
+          farm_id: node.farm_id,
           node_id: stateAdmin.dataNodeSelected.node_id,
-          pivot_name: dataForm.pivot_name,
+          pivot_num: dataForm.pivot_num,
           pivot_lng: latForNumber,
           pivot_lat: longForNumber,
           pivot_start_angle: dataForm.pivot_start_angle,
@@ -86,7 +88,7 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
 
     const addPivot = handleDataForm(data);
     if (addPivot) {
-      createPivot(addPivot);
+      createPivot(addPivot, node.node_num);
       setAddNode(false);
     }
   });
@@ -96,10 +98,10 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
       <S.IconClose onClick={() => setAddNode(false)} />
       <S.Form onSubmit={onSubmit} ref={formRef}>
         <ContentInputs
-          errorUserName={errors.pivot_name}
+          errorUserName={errors.pivot_num}
           label="PIVOT"
           colorLabel={theme.colors.secondary}
-          id="pivot_name"
+          id="pivot_num"
           type="number"
           placeholder="PIVOT"
           register={register}
@@ -188,4 +190,4 @@ const CreateNode = ({ setAddNode }: createPivotProps) => {
   );
 };
 
-export default CreateNode;
+export default CreatePivot;

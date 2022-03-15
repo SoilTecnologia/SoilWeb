@@ -12,11 +12,8 @@ export async function up(knex: Knex): Promise<void> {
       table.enum('user_type', ['SUDO', 'USER']).defaultTo('USER');
     })
     .createTable('farms', (table) => {
-      table
-        .uuid('farm_id')
-        .primary()
-        .defaultTo(knex.raw('(uuid_generate_v4())'));
-      table.string('farm_name').notNullable();
+      table.string('farm_id').unique().primary().notNullable();
+      table.string('farm_name').notNullable().unique();
       table.string('farm_city').notNullable();
       table.float('farm_lng').notNullable();
       table.float('farm_lat').notNullable();
@@ -34,12 +31,12 @@ export async function up(knex: Knex): Promise<void> {
         .uuid('node_id')
         .primary()
         .defaultTo(knex.raw('(uuid_generate_v4())'));
-      table.string('node_name').notNullable();
+      table.integer('node_num').notNullable();
       table.boolean('is_gprs').notNullable();
       table.string('gateway');
 
       table
-        .uuid('farm_id')
+        .string('farm_id')
         .references('farm_id')
         .inTable('farms')
         .index()
@@ -47,11 +44,9 @@ export async function up(knex: Knex): Promise<void> {
         .onDelete('CASCADE');
     })
     .createTable('pivots', (table) => {
-      table
-        .uuid('pivot_id')
-        .primary()
-        .defaultTo(knex.raw('(uuid_generate_v4())'));
-      table.integer('pivot_name').notNullable();
+      table.string('pivot_id').unique().primary().notNullable();
+
+      table.integer('pivot_num').notNullable();
       table.float('pivot_lng').notNullable();
       table.float('pivot_lat').notNullable();
       table.float('pivot_start_angle').notNullable();
@@ -63,6 +58,15 @@ export async function up(knex: Knex): Promise<void> {
         .uuid('node_id')
         .references('node_id')
         .inTable('nodes')
+        .index()
+        .notNullable()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+
+      table
+        .string('farm_id')
+        .references('farm_id')
+        .inTable('farms')
         .index()
         .notNullable()
         .onUpdate('CASCADE')
@@ -80,7 +84,7 @@ export async function up(knex: Knex): Promise<void> {
       table.datetime('timestamp').notNullable();
 
       table
-        .uuid('pivot_id')
+        .string('pivot_id')
         .references('pivot_id')
         .inTable('pivots')
         .index()
@@ -116,7 +120,7 @@ export async function up(knex: Knex): Promise<void> {
       table.datetime('timestamp').notNullable();
 
       table
-        .uuid('pivot_id')
+        .string('pivot_id')
         .references('pivot_id')
         .inTable('pivots')
         .index()
@@ -156,7 +160,7 @@ export async function up(knex: Knex): Promise<void> {
         .onDelete('CASCADE');
 
       table
-        .uuid('pivot_id')
+        .string('pivot_id')
         .references('pivot_id')
         .inTable('pivots')
         .index()

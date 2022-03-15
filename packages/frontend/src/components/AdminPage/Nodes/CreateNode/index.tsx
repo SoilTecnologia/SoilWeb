@@ -1,27 +1,26 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import ContentInputs from "components/globalComponents/ContentInputs";
 import SelectOptionsComponent from "components/globalComponents/SelectOptionsComponent";
+import { useContextActionCrud } from "hooks/useActionsCrud";
 import { Dispatch, SetStateAction, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { NodeCreate } from "utils/models/node";
-import * as S from "./styles";
-
-import * as Yup from "yup";
-import { useContextActionCrud } from "hooks/useActionsCrud";
-import Farm from "utils/models/farm";
 import theme from "styles/theme";
+import Farm from "utils/models/farm";
+import { NodeCreate } from "utils/models/node";
+import * as Yup from "yup";
+import * as S from "./styles";
 
 type createNodeProps = {
   farm: Farm;
   setAddNode: Dispatch<SetStateAction<boolean>>;
 };
 export type NodeForm = {
-  node_name: string;
+  node_num: number;
   gateway: string;
   is_gprs: string;
 };
 const schema = Yup.object({
-  node_name: Yup.string().required("Digite um nome de usuario"),
+  node_num: Yup.number().required("Digite um nome de usuario"),
   gateway: Yup.string(),
   is_gprs: Yup.string().required("Define se o tipo de comunicação é gprs"),
 }).required();
@@ -47,7 +46,7 @@ const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const onSubmit = handleSubmit((data) => {
     const newNode: NodeCreate = {
-      node_name: data.node_name,
+      node_num: data.node_num,
       is_gprs: data.is_gprs === "yes" ? true : false,
       farm_id: farm.farm_id,
       gateway: data.gateway,
@@ -61,11 +60,11 @@ const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
       <S.IconClose onClick={() => setAddNode(false)} />
       <S.Form onSubmit={onSubmit} ref={formRef}>
         <ContentInputs
-          errorUserName={errors.node_name}
+          errorUserName={errors.node_num}
           label="NODE"
           colorLabel={theme.colors.secondary}
-          id="node_name"
-          type="text"
+          id="node_num"
+          type="number"
           placeholder="NODE"
           register={register}
         />

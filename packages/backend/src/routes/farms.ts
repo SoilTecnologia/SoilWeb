@@ -1,7 +1,5 @@
 /* eslint-disable spaced-comment */
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
-import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
   createFarmController,
   deleteFarmController,
@@ -10,11 +8,12 @@ import {
   readAllFarmController,
   readMapFarmControler
 } from '../controllers/farms';
-import { createNodeController } from '../controllers/nodes';
+import authMiddleware from '../middlewares/auth';
 import Farm from '../models/farm';
 import Pivot from '../models/pivot';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
+import { authHandler, IUserAuthInfoRequest } from '../types/express';
 
 type PivotMapData = {
   pivot_position: { lng: Pivot['pivot_lng']; lat: Pivot['pivot_lat'] };
@@ -42,9 +41,17 @@ router.post(
       res: express.Response,
       next: express.NextFunction
     ) => {
-      const { user_id, farm_name, farm_city, farm_lng, farm_lat } = req.body;
+      const {
+        user_id,
+        farm_name,
+        farm_city,
+        farm_lng,
+        farm_lat,
+        farm_id
+      }: Farm = req.body;
       try {
         const farm = await createFarmController(
+          farm_id,
           user_id,
           farm_name,
           farm_city,

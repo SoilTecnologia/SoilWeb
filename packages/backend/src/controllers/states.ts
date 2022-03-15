@@ -1,14 +1,12 @@
 import knex from '../database';
-
+import Pivot from '../models/pivot';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
-import Pivot from '../models/pivot';
-
 import { getLastCycleFromPivot } from './cycles';
 
 type StateResponse = {
   pivot_id: Pivot['pivot_id'];
-  pivot_name: Pivot['pivot_name'];
+  pivot_num: Pivot['pivot_num'];
   pivot_lng: Pivot['pivot_lng'];
   pivot_lat: Pivot['pivot_lat'];
   pivot_start_angle: Pivot['pivot_start_angle'];
@@ -29,7 +27,7 @@ export const readPivotStateController = async (
   const pivot = await knex<Pivot>('pivots')
     .select(
       'pivot_id',
-      'pivot_name',
+      'pivot_num',
       'pivot_lng',
       'pivot_lat',
       'pivot_start_angle',
@@ -51,7 +49,7 @@ export const readPivotStateController = async (
     if (variables && variables.length > 0) {
       return {
         pivot_id,
-        pivot_name: pivot!.pivot_name,
+        pivot_num: pivot!.pivot_num,
         pivot_lng: pivot!.pivot_lng,
         pivot_lat: pivot!.pivot_lat,
         pivot_start_angle: pivot!.pivot_start_angle,
@@ -68,7 +66,7 @@ export const readPivotStateController = async (
     }
     return {
       pivot_id,
-      pivot_name: pivot!.pivot_name,
+      pivot_num: pivot!.pivot_num,
       pivot_lng: pivot!.pivot_lng,
       pivot_lat: pivot!.pivot_lat,
       pivot_start_angle: pivot!.pivot_start_angle,
@@ -85,7 +83,7 @@ export const readPivotStateController = async (
   }
   return {
     pivot_id,
-    pivot_name: pivot!.pivot_name,
+    pivot_num: pivot!.pivot_num,
     pivot_lng: pivot!.pivot_lng,
     pivot_lat: pivot!.pivot_lat,
     pivot_start_angle: pivot!.pivot_start_angle,

@@ -1,10 +1,3 @@
-import React, { createContext, useContext } from "react";
-import Farm, { FarmCreate } from "utils/models/farm";
-import Pivot, { PivotCreate } from "utils/models/pivot";
-import User, { requestUser, UserCreate } from "utils/models/user";
-import { useContextData } from "./useContextData";
-
-import Node, { NodeCreate } from "utils/models/node";
 import {
   requestCreateFarm,
   requestCreateNewPivot,
@@ -25,6 +18,12 @@ import {
   requestUpdateUser,
 } from "api/requestApi";
 import { parseCookies } from "nookies";
+import React, { createContext, useContext } from "react";
+import Farm, { FarmCreate } from "utils/models/farm";
+import Node, { NodeCreate } from "utils/models/node";
+import Pivot, { PivotCreate } from "utils/models/pivot";
+import User, { requestUser, UserCreate } from "utils/models/user";
+import { useContextData } from "./useContextData";
 import { useContextAuth } from "./useLoginAuth";
 
 interface UserProviderProps {
@@ -45,7 +44,7 @@ interface actionCrudProps {
   updateNode: (node: Node) => void;
   deleteNode: (id: string, farmRelation: Farm) => void;
   getAllPivots: (node: Node) => void;
-  createPivot: (pivot: PivotCreate) => void;
+  createPivot: (pivot: PivotCreate, nodeNum: Node["node_num"]) => void;
   updatePivot: (pivot: Pivot, node: Node) => void;
   deletePivot: (id: string, node: Node) => void;
 
@@ -154,12 +153,16 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
       dataNodeSelected: node,
     });
   };
-  const createPivot = async (pivot: PivotCreate) => {
-    await requestCreateNewPivot(pivot, user?.token);
+  const createPivot = async (pivot: PivotCreate, nodeNum: Node["node_num"]) => {
+    await requestCreateNewPivot(pivot, nodeNum, user?.token);
     stateAdmin.dataNodeSelected && getAllPivots(stateAdmin.dataNodeSelected);
   };
   const updatePivot = async (pivot: Pivot, node: Node) => {
-    const newPivot = await requestUpdatePivot(pivot, user?.token);
+    const newPivot = await requestUpdatePivot(
+      pivot,
+      node.node_num,
+      user?.token
+    );
     newPivot && (await getAllPivots(node));
   };
   const deletePivot = async (id: Pivot["pivot_id"], node: Node) => {

@@ -1,6 +1,5 @@
-import Node from '../models/node';
-
 import knex from '../database';
+import Node from '../models/node';
 
 export const createNodeController = async (node: Node) => {
   const newNode = await knex<Node>('nodes').insert({ ...node });
@@ -48,7 +47,7 @@ export const putNodeController = async (node: Node) => {
       .where({ node_id: node.node_id })
       .update({
         ...getNode,
-        node_name: node.node_name ? node.node_name : getNode.node_name,
+        node_num: node.node_num ? node.node_num : getNode.node_num,
         is_gprs: node.is_gprs,
         gateway: node.gateway ? node.gateway : getNode.gateway
       });

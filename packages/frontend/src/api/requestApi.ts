@@ -1,9 +1,9 @@
+import { parseCookies } from "nookies";
 import Farm, { FarmCreate } from "utils/models/farm";
 import Node, { NodeCreate } from "utils/models/node";
 import Pivot, { PivotCreate } from "utils/models/pivot";
 import User, { UserCreate } from "utils/models/user";
 import { api } from "./api";
-import { parseCookies } from "nookies";
 
 const { "soilauth-token": token } = parseCookies();
 export type Response = {
@@ -221,10 +221,11 @@ export const requestGetAllPivots = async (
 
 export const requestCreateNewPivot = async (
   pivot: PivotCreate,
+  nodeNum: Node["node_num"],
   tokenId: tokenState
 ) => {
   return await api
-    .post(`pivots/addPivot`, pivot, {
+    .post(`pivots/addPivot/${nodeNum}`, pivot, {
       headers: { Authorization: tokenId ? tokenId : token },
     })
     .then((response) => response.data)
@@ -249,10 +250,11 @@ export const requestDeletePivot = async (
 };
 export const requestUpdatePivot = async (
   newPivot: Pivot,
+  nodeNum: Node["node_num"],
   tokenId: tokenState
 ) => {
   return await api
-    .put(`pivots/putPivot`, newPivot, {
+    .put(`pivots/putPivot/${nodeNum}`, newPivot, {
       headers: { Authorization: tokenId ? tokenId : token },
     })
     .then((response) => response.data)

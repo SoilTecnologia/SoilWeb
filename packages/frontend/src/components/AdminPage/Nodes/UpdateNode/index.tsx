@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import theme from "styles/theme";
 import Node from "utils/models/node";
 import * as Yup from "yup";
-
 import { NodeForm } from "../CreateNode";
 import * as S from "./styles";
 
@@ -17,7 +16,7 @@ type updateNodeProps = {
 };
 
 const schema = Yup.object({
-  node_name: Yup.string(),
+  node_num: Yup.number(),
   gateway: Yup.string(),
   is_gprs: Yup.string(),
 }).required();
@@ -47,7 +46,7 @@ const UpdateNode = ({ nodeData, closeModal }: updateNodeProps) => {
     console.log(verifyGrps);
     const newNode: Node = {
       ...nodeData,
-      node_name: data.node_name ? data.node_name : nodeData.node_name,
+      node_num: data.node_num ? data.node_num : nodeData.node_num,
       is_gprs: verifyGrps,
       farm_id: nodeData.farm_id,
       gateway: data.gateway ? data.gateway : nodeData.gateway,
@@ -60,11 +59,11 @@ const UpdateNode = ({ nodeData, closeModal }: updateNodeProps) => {
       <S.IconClosed onClick={closeModal} />
       <S.Form onSubmit={onSubmit} ref={formRef}>
         <ContentInputs
-          errorUserName={errors.node_name}
+          errorUserName={errors.node_num}
           label="NODE"
           colorLabel={theme.colors.secondary}
-          id="node_name"
-          type="text"
+          id="node_num"
+          type="number"
           placeholder="NODE"
           register={register}
         />

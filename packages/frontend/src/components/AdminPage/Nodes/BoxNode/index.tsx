@@ -1,5 +1,4 @@
 import BoxOptions from "components/globalComponents/BoxOptions";
-
 import ModalDeleteData from "components/globalComponents/ModalDeleteData";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useState } from "react";
@@ -52,7 +51,7 @@ const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
         <S.IconMenu onClick={() => setModalVisible(true)} />
         <S.ContentData onClick={viewDataPivots}>
           <S.NodeName>
-            NODE: <span>{nodeData.node_name}</span>
+            NODE: <span>{nodeData.node_num}</span>
           </S.NodeName>
           <S.IsGprs>
             GRPS: <span>{` ${nodeData.is_gprs === true ? "SIM" : "NÃO"}`}</span>

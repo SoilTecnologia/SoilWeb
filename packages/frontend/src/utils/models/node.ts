@@ -2,7 +2,7 @@ import Pivot from "./pivot";
 
 type Node = {
   node_id: string;
-  node_name: string;
+  node_num: number;
   farm_id: string;
   is_gprs: boolean;
   gateway?: string;
@@ -11,7 +11,7 @@ type Node = {
 
 export default Node;
 export type NodeCreate = {
-  node_name: string;
+  node_num: number;
   farm_id: string;
   is_gprs: boolean;
   gateway?: string;

@@ -1,5 +1,8 @@
+import Farm from './farm';
+import Node from './node';
+
 export type pivotPut = {
-  pivot_name: string;
+  pivot_num: number;
   pivot_lng: number;
   pivot_lat: number;
   pivot_start_angle: number;
@@ -8,7 +11,8 @@ export type pivotPut = {
   radio_id: number;
 };
 export interface pivotCreate extends pivotPut {
-  node_id: string;
+  node_id: Node['node_id'];
+  farm_id: Farm['farm_id'];
 }
 
 interface Pivot extends pivotCreate {

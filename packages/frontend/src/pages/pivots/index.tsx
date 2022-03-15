@@ -1,22 +1,21 @@
-import { useEffect } from "react";
+import MainPivot from "components/PivotsPage/MainPivot";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useContextData } from "hooks/useContextData";
 import { useContextUserData } from "hooks/useContextUserData";
-import MainPivot from "components/PivotsPage/MainPivot";
+import { useEffect } from "react";
 
 const UserPivots = () => {
   const { farm } = useContextUserData();
-  const { getAllPivotWithFarmId } = useContextActionCrud()
-  const { pivotList} = useContextData()
+  const { getAllPivotWithFarmId } = useContextActionCrud();
+  const { pivotList } = useContextData();
 
   useEffect(() => {
     if (farm) {
-      getAllPivotWithFarmId(farm.farm_id)
+      getAllPivotWithFarmId(farm.farm_id);
     }
-  }, [])
+  }, []);
 
-  return <MainPivot pivotList={pivotList}/>
+  return <MainPivot pivotList={pivotList} />;
 };
 
 export default UserPivots;
-

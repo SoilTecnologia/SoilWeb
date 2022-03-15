@@ -1,22 +1,22 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
-import { IUserAuthInfoRequest, authHandler } from '../types/express';
-import {
-  readAllPivotController,
-  updatePivotController,
-  readListPivotController,
-  readMapPivotController,
-  createPivotControllerAdm,
-  getAllPivotController,
-  deletePivotController,
-  putPivotController
-} from '../controllers/pivots';
 import {
   getCyclesFromPivot,
   getLastCycleFromPivot
 } from '../controllers/cycles';
+import {
+  createPivotControllerAdm,
+  deletePivotController,
+  getAllPivotController,
+  putPivotController,
+  readAllPivotController,
+  readListPivotController,
+  readMapPivotController,
+  updatePivotController
+} from '../controllers/pivots';
 import { readPivotStateController } from '../controllers/states';
+import authMiddleware from '../middlewares/auth';
 import Pivot from '../models/pivot';
+import { authHandler, IUserAuthInfoRequest } from '../types/express';
 
 const router = express.Router();
 
@@ -206,7 +206,7 @@ router.get(
 );
 
 router.post(
-  '/addPivot',
+  '/addPivot/:nodeNum',
   authMiddleware(),
   authHandler(
     async (
@@ -214,10 +214,35 @@ router.post(
       res: express.Response,
       next: express.NextFunction
     ) => {
-      const node = req.body;
+      const { nodeNum } = req.params;
+      const {
+        pivot_num,
+        pivot_lng,
+        pivot_lat,
+        pivot_start_angle,
+        pivot_end_angle,
+        pivot_radius,
+        radio_id,
+        node_id,
+        farm_id
+      } = req.body;
 
+      const newPivot = {
+        pivot_num,
+        pivot_lng,
+        pivot_lat,
+        pivot_start_angle,
+        pivot_end_angle,
+        pivot_radius,
+        radio_id,
+        node_id,
+        farm_id
+      };
       try {
-        const allPivotsFromNode = await createPivotControllerAdm(node);
+        const allPivotsFromNode = await createPivotControllerAdm(
+          newPivot,
+          Number(nodeNum)
+        );
 
         res.send(allPivotsFromNode);
       } catch (err) {
@@ -254,7 +279,7 @@ router.delete(
 );
 
 router.put(
-  '/putPivot',
+  '/putPivot/:nodeNum',
   authMiddleware(),
   authHandler(
     async (
@@ -262,8 +287,9 @@ router.put(
       res: express.Response,
       next: express.NextFunction
     ) => {
+      const { nodeNum } = req.params;
       const {
-        pivot_name,
+        pivot_num,
         pivot_lng,
         pivot_lat,
         pivot_start_angle,
@@ -271,11 +297,12 @@ router.put(
         pivot_radius,
         radio_id,
         node_id,
+        farm_id,
         pivot_id
       }: Pivot = req.body;
 
       const newPivot = {
-        pivot_name,
+        pivot_num,
         pivot_lng,
         pivot_lat,
         pivot_start_angle,
@@ -283,11 +310,12 @@ router.put(
         pivot_radius,
         radio_id,
         node_id,
+        farm_id,
         pivot_id
       };
 
       try {
-        const pivotNew = await putPivotController(newPivot);
+        const pivotNew = await putPivotController(newPivot, Number(nodeNum));
 
         res.send(pivotNew);
       } catch (err) {

@@ -1,26 +1,24 @@
+import knex from '../database';
 import Farm from '../models/farm';
-import User from '../models/user';
+import Node from '../models/node';
 import Pivot, { pivotCreate } from '../models/pivot';
+import RadioVariable from '../models/radioVariable';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
-import RadioVariable from '../models/radioVariable';
-
-import {
-  isStateDifferent,
-  isStateVariableDifferent,
-  isRadioVariableDifferent
-} from '../utils/isDifferent';
-
-import knex from '../database';
+import User from '../models/user';
 import emitter from '../utils/eventBus';
+import {
+  isRadioVariableDifferent,
+  isStateDifferent,
+  isStateVariableDifferent
+} from '../utils/isDifferent';
 import { getLastCycleFromPivot } from './cycles';
-import Node from '../models/node';
 
 export const createPivotController = async (
   pivot_id: Pivot['pivot_id'],
   node_id: Pivot['node_id'],
   radio_id: Pivot['radio_id'],
-  pivot_name: Pivot['pivot_name'],
+  pivot_num: Pivot['pivot_num'],
   pivot_lng: Pivot['pivot_lng'],
   pivot_lat: Pivot['pivot_lat'],
   pivot_start_angle: Pivot['pivot_start_angle'],
@@ -31,7 +29,7 @@ export const createPivotController = async (
     pivot_id,
     node_id,
     radio_id,
-    pivot_name,
+    pivot_num,
     pivot_lng,
     pivot_lat,
     pivot_start_angle,
@@ -70,7 +68,7 @@ type PartialMapResponse = {
   pivot_id: Pivot['pivot_id'];
   pivot_lng: Pivot['pivot_lng'];
   pivot_lat: Pivot['pivot_lat'];
-  pivot_name: Pivot['pivot_name'];
+  pivot_num: Pivot['pivot_num'];
   pivot_start_angle: Pivot['pivot_start_angle'];
   pivot_end_angle: Pivot['pivot_end_angle'];
   pivot_radius: Pivot['pivot_radius'];
@@ -106,7 +104,7 @@ export const readMapPivotController = async (
     const pivots = await knex<Pivot>('pivots')
       .select(
         'pivot_id',
-        'pivot_name',
+        'pivot_num',
         'pivot_lng',
         'pivot_lat',
         'pivot_start_angle',
@@ -129,7 +127,7 @@ export const readMapPivotController = async (
           pivot_id: pivot.pivot_id,
           pivot_lng: pivot.pivot_lng,
           pivot_lat: pivot.pivot_lat,
-          pivot_name: pivot.pivot_name,
+          pivot_num: pivot.pivot_num,
           pivot_start_angle: pivot.pivot_start_angle,
           pivot_end_angle: pivot.pivot_end_angle,
           pivot_radius: pivot.pivot_radius,
@@ -145,7 +143,7 @@ export const readMapPivotController = async (
           pivot_id: pivot.pivot_id,
           pivot_lng: pivot.pivot_lng,
           pivot_lat: pivot.pivot_lat,
-          pivot_name: pivot.pivot_name,
+          pivot_num: pivot.pivot_num,
           pivot_start_angle: pivot.pivot_start_angle,
           pivot_end_angle: pivot.pivot_end_angle,
           pivot_radius: pivot.pivot_radius,
@@ -169,7 +167,7 @@ export const readMapPivotController = async (
 
 type PartialListResponse = {
   pivot_id: Pivot['pivot_id'];
-  pivot_name: Pivot['pivot_name'];
+  pivot_num: Pivot['pivot_num'];
   power: State['power'];
   water: State['water'];
   direction: State['direction'];
@@ -186,53 +184,45 @@ export const readListPivotController = async (
 ) => {
   let response: ListResponse = [];
 
-  const nodes = await knex<Node>('nodes')
-    .select('node_id')
-    .where('farm_id', farm_id);
+  const pivots = await knex<Pivot>('pivots').select().where({ farm_id });
 
-  for (let node of nodes) {
-    const pivots = await knex<Pivot>('pivots')
-      .select('pivot_id', 'pivot_name')
-      .where('node_id', node.node_id);
+  for (let pivot of pivots) {
+    const state = await knex<State>('states')
+      .select('state_id', 'power', 'water', 'direction')
+      .where('pivot_id', pivot.pivot_id)
+      .orderBy('timestamp', 'desc')
+      .first();
 
-    for (let pivot of pivots) {
-      const state = await knex<State>('states')
-        .select('state_id', 'power', 'water', 'direction')
-        .where('pivot_id', pivot.pivot_id)
+    if (state) {
+      const variable = await knex<StateVariable>('state_variables')
+        .select('percentimeter', 'timestamp')
+        .where('state_id', state.state_id)
         .orderBy('timestamp', 'desc')
         .first();
 
-      if (state) {
-        const variable = await knex<StateVariable>('state_variables')
-          .select('percentimeter', 'timestamp')
-          .where('state_id', state.state_id)
-          .orderBy('timestamp', 'desc')
-          .first();
-
-        response.push({
-          pivot_id: pivot.pivot_id,
-          pivot_name: pivot.pivot_name,
-          power: state.power,
-          water: state.water,
-          direction: state.direction,
-          percentimeter: variable ? variable.percentimeter : null,
-          rssi: null,
-          father: null,
-          timestamp: variable ? new Date(variable.timestamp) : null
-        });
-      } else {
-        response.push({
-          pivot_id: pivot.pivot_id,
-          pivot_name: pivot.pivot_name,
-          power: false,
-          water: false,
-          direction: null,
-          percentimeter: 0,
-          rssi: null,
-          father: null,
-          timestamp: null
-        });
-      }
+      response.push({
+        pivot_id: pivot.pivot_id,
+        pivot_num: pivot.pivot_num,
+        power: state.power,
+        water: state.water,
+        direction: state.direction,
+        percentimeter: variable ? variable.percentimeter : null,
+        rssi: null,
+        father: null,
+        timestamp: variable ? new Date(variable.timestamp) : null
+      });
+    } else {
+      response.push({
+        pivot_id: pivot.pivot_id,
+        pivot_num: pivot.pivot_num,
+        power: false,
+        water: false,
+        direction: null,
+        percentimeter: 0,
+        rssi: null,
+        father: null,
+        timestamp: null
+      });
     }
   }
 
@@ -256,10 +246,10 @@ export const updatePivotController = async (
   let state: State | undefined;
 
   let pivot = await knex<Pivot>('pivots')
-    .select('node_id', 'pivot_name')
+    .select('node_id', 'pivot_num')
     .where('pivot_id', pivot_id)
     .first();
-  const { node_id, pivot_name } = pivot!;
+  const { node_id, pivot_num } = pivot!;
   let node = await knex<Node>('nodes')
     .select('farm_id')
     .where('node_id', node_id)
@@ -298,7 +288,7 @@ export const updatePivotController = async (
     state = newState[0];
   }
 
-  if (angle != undefined && percentimeter != undefined) {
+  if (angle !== undefined && percentimeter !== undefined) {
     if (state) {
       const oldStateVariable = await knex<StateVariable>('state_variables')
         .where('state_id', state.state_id)
@@ -320,7 +310,7 @@ export const updatePivotController = async (
     }
   }
 
-  if (father != undefined && rssi != undefined) {
+  if (father !== undefined && rssi !== undefined) {
     const oldRadioVariable = await knex<RadioVariable>('radio_variables')
       .where('pivot_id', pivot_id)
       .orderBy('timestamp', 'desc')
@@ -370,7 +360,7 @@ export const updatePivotController = async (
       emitter.emit('state-change', {
         user_id,
         pivot_id,
-        pivot_name,
+        pivot_num,
         farm_name,
         power,
         water,
@@ -395,8 +385,14 @@ export const getAllPivotController = async (node_id: Node['node_id']) => {
   return pivots;
 };
 
-export const createPivotControllerAdm = async (pivot: pivotCreate) => {
-  const pivots = await knex<Pivot>('pivots').insert(pivot);
+export const createPivotControllerAdm = async (
+  pivot: pivotCreate,
+  node_num: Node['node_num']
+) => {
+  const pivot_id = `${pivot.farm_id}_${node_num}_${pivot.pivot_num}`;
+  const newPivot = { ...pivot, pivot_id };
+
+  const pivots = await knex<Pivot>('pivots').insert(newPivot);
   return pivots;
 };
 export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
@@ -418,7 +414,11 @@ export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
   }
 };
 
-export const putPivotController = async (pivot: Pivot) => {
+export const putPivotController = async (
+  pivot: Pivot,
+  node_num: Node['node_num']
+) => {
+  const pivot_id = `${pivot.farm_id}_${node_num}_${pivot.pivot_num}`;
   const getPivot = await knex<Pivot>('pivots')
     .select()
     .where({ pivot_id: pivot.pivot_id })
@@ -429,9 +429,10 @@ export const putPivotController = async (pivot: Pivot) => {
       .where({ pivot_id: pivot.pivot_id })
       .update({
         ...getPivot,
+        pivot_id,
         pivot_lat: pivot.pivot_lat ? pivot.pivot_lat : getPivot.pivot_lat,
         pivot_lng: pivot.pivot_lng ? pivot.pivot_lng : getPivot.pivot_lng,
-        pivot_name: pivot.pivot_name ? pivot.pivot_name : getPivot.pivot_name,
+        pivot_num: pivot.pivot_num ? pivot.pivot_num : getPivot.pivot_num,
         pivot_radius: pivot.pivot_radius
           ? pivot.pivot_radius
           : getPivot.pivot_radius,

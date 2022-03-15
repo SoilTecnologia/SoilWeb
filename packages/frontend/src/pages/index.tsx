@@ -1,7 +1,4 @@
 import MainLogin from "components/LoginPage/MainLogin";
-import Router from "next/router";
-import { parseCookies } from "nookies";
-import { useEffect } from "react";
 
 export default function Home() {
   // useEffect(() => {

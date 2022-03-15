@@ -1,17 +1,12 @@
-import * as S from "./styles";
-import { useRef, useState } from "react";
-
-import { useForm } from "react-hook-form";
-import * as Yup from "yup";
-
 import ContentInputs from "components/globalComponents/ContentInputs";
 import { useContextActionCrud } from "hooks/useActionsCrud";
-import Pivot, { PivotForm, PivotFormUpdate } from "utils/models/pivot";
-
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import Node from "utils/models/node";
+import Pivot, { PivotForm } from "utils/models/pivot";
 import { defaultError } from "../CreatePivot";
 import { MessageError } from "../CreatePivot/styles";
-import { yupResolver } from "@hookform/resolvers/yup";
+import * as S from "./styles";
 
 type updateFarmProps = {
   pivotData: Pivot;
@@ -63,12 +58,13 @@ const UpdatePivotData = ({
       : pivotData.pivot_lng;
     const latForNumber = formatLatAndLong("lat", latNotNull.toString());
     const longForNumber = formatLatAndLong("lng", lngNotNull.toString());
+
     if (latForNumber && longForNumber) {
       const newPivot: Pivot = {
         ...pivotData,
-        pivot_name: formData.pivot_name
-          ? formData.pivot_name
-          : pivotData.pivot_name,
+        pivot_num: formData.pivot_num
+          ? formData.pivot_num
+          : pivotData.pivot_num,
         pivot_lat: latForNumber ? latForNumber : pivotData.pivot_lat,
         pivot_lng: longForNumber ? longForNumber : pivotData.pivot_lng,
         pivot_start_angle: formData.pivot_start_angle
@@ -99,11 +95,11 @@ const UpdatePivotData = ({
   return (
     <S.Form onSubmit={onSubmit} ref={formRef}>
       <ContentInputs
-        errorUserName={errors.pivot_name}
+        errorUserName={errors.pivot_num}
         label="PIVOT"
-        id="pivot_name"
-        type="text"
-        placeholder={pivotData.pivot_name.toString()}
+        id="pivot_num"
+        type="number"
+        placeholder={pivotData.pivot_num.toString()}
         register={register}
       />
       <ContentInputs

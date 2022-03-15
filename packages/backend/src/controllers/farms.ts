@@ -1,10 +1,9 @@
+import knex from '../database';
 import Farm from '../models/farm';
 import User from '../models/user';
 
-import knex from '../database';
-
 export const createFarmController = async (
-  // farm_id: Farm['farm_id'],
+  farm_id: Farm['farm_id'],
   user_id: Farm['user_id'],
   farm_name: Farm['farm_name'],
   farm_city: Farm['farm_city'],
@@ -12,7 +11,7 @@ export const createFarmController = async (
   farm_lat: Farm['farm_lat']
 ) => {
   const newFarm = await knex<Farm>('farms').insert({
-    // farm_id,
+    farm_id,
     user_id,
     farm_name,
     farm_city,
