@@ -385,6 +385,17 @@ export const getAllPivotController = async (farm_id: Node['farm_id']) => {
   return pivots;
 };
 
+export const getOnePivotController = async (
+  pivot_num: Pivot['pivot_num'],
+  farm_id: Pivot['farm_id']
+) => {
+  const pivots = await knex<Pivot>('pivots')
+    .select()
+    .where({ farm_id, pivot_num })
+    .first();
+  return pivots;
+};
+
 export const createPivotControllerAdm = async (pivot: pivotCreate) => {
   const pivot_id = `${pivot.farm_id}_${pivot.pivot_num}`;
   const newPivot = { ...pivot, pivot_id };

@@ -302,6 +302,21 @@ export const requestGetAllPivotsWithFarmId = async (
       console.log(err);
     });
 };
+
+export const requestOnePivot = async (
+  pivot: PivotCreate,
+  tokenId: tokenState
+) => {
+  return await api
+    .get(`pivots/getOnePivot/${pivot.pivot_num}/${pivot.farm_id}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar pivos");
+      console.log(err);
+    });
+};
 export const requestGetPivotsListWithFarmId = async (
   farm_id: Farm["farm_id"],
   tokenId: tokenState

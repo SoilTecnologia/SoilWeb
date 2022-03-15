@@ -7,6 +7,7 @@ import {
   createPivotControllerAdm,
   deletePivotController,
   getAllPivotController,
+  getOnePivotController,
   putPivotController,
   readAllPivotController,
   readListPivotController,
@@ -196,6 +197,32 @@ router.get(
         } else {
           res.status(201).send('Id not identifier');
         }
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on pivots`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.get(
+  '/getOnePivot/:pivot_num/:farm_id',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { pivot_num, farm_id } = req.params;
+      try {
+        const pivotResult = await getOnePivotController(
+          Number(pivot_num),
+          farm_id
+        );
+
+        res.send(pivotResult);
       } catch (err) {
         console.log(`[ERROR] Server 500 on pivots`);
         console.log(err);

@@ -1,5 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import ContentInputs from "components/globalComponents/ContentInputs";
+import ModalWarningAlreadEists from "components/globalComponents/ModalWarningAlreadEists";
 import SelectOptionsComponent from "components/globalComponents/SelectOptionsComponent";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { Dispatch, FormEvent, SetStateAction, useRef, useState } from "react";
@@ -49,12 +50,14 @@ const optionsSelect = [
 
 const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
   //Contexts
-  const { createPivot, createNode } = useContextActionCrud();
+  const { createPivot, createNode, getOnePivot } = useContextActionCrud();
 
   //States
   // const [addIdNode, setAddIdNode] = useState(false);
   const [error, setError] = useState<errorProps>(defaultError);
   const [gatewayVisible, setGatewayVisible] = useState(false);
+  const [pivotAlreadyExists, setPivotAlreadyExists] = useState(false);
+
   const {
     handleSubmit,
     register,
@@ -62,6 +65,16 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
   } = useForm<PivotForm>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
 
+  const verifyPivotAlreadyExists = async (pivot: PivotCreate) => {
+    const pivotExists = await getOnePivot(pivot);
+    if (pivotExists) {
+      console.log("Existe vou chamar o estado de waarning");
+      setPivotAlreadyExists(true);
+    } else {
+      createPivot(pivot);
+      setAddNode(false);
+    }
+  };
   const createNewNode = async (pivotData: PivotForm) => {
     const isGrpsValid = pivotData.is_gprs === "yes" ? true : false;
     const newNode: NodeCreate = {
@@ -106,9 +119,10 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
     }
   };
   const checkIsGprsTrue = (e: FormEvent<HTMLFormElement>) => {
-    if (e.target.value === "not") {
+    const target = e.target as HTMLTextAreaElement;
+    if (target.value === "not") {
       setGatewayVisible(true);
-    } else if (e.target.value === "yes") {
+    } else if (target.value === "yes") {
       setGatewayVisible(false);
     }
   };
@@ -117,110 +131,110 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
     const nodeCreated = await createNewNode(data);
     const addPivot = handleDataForm(data, nodeCreated.node_id);
     if (addPivot) {
-      createPivot(addPivot);
-      setAddNode(false);
+      verifyPivotAlreadyExists(addPivot);
     }
   });
 
   return (
-    <S.Container>
-      <S.IconClose onClick={() => setAddNode(false)} />
-      <S.Form onSubmit={onSubmit} ref={formRef} onChange={checkIsGprsTrue}>
-        <SelectOptionsComponent
-          colorLabel={theme.colors.secondary}
-          label="GPRS"
-          id="is_gprs"
-          register={register}
-          options={optionsSelect}
-        />
-        {gatewayVisible && (
-          <ContentInputs
-            errorUserName={errors.gatewayNode}
-            label="GATEWAY"
+    <>
+      <S.Container>
+        <S.IconClose onClick={() => setAddNode(false)} />
+        <S.Form onSubmit={onSubmit} ref={formRef} onChange={checkIsGprsTrue}>
+          <SelectOptionsComponent
             colorLabel={theme.colors.secondary}
-            id="gatewayNode"
-            type="string"
-            placeholder="GATEWAY"
+            label="GPRS"
+            id="is_gprs"
+            register={register}
+            options={optionsSelect}
+          />
+          {gatewayVisible && (
+            <ContentInputs
+              errorUserName={errors.gatewayNode}
+              label="GATEWAY"
+              colorLabel={theme.colors.secondary}
+              id="gatewayNode"
+              type="string"
+              placeholder="GATEWAY"
+              register={register}
+            />
+          )}
+
+          <ContentInputs
+            errorUserName={errors.pivot_num}
+            label="PIVOT"
+            colorLabel={theme.colors.secondary}
+            id="pivot_num"
+            type="number"
+            placeholder="PIVOT"
             register={register}
           />
-        )}
+          <ContentInputs
+            errorUserName={errors.pivot_lat}
+            label="LATITUDE"
+            colorLabel={theme.colors.secondary}
+            id="pivot_lat"
+            type="text"
+            placeholder="LATITUDE"
+            register={register}
+          />
+          {error && error.type === "lat" && (
+            <S.MessageError>{error.error}</S.MessageError>
+          )}
+          <ContentInputs
+            errorUserName={errors.pivot_lng}
+            label="LONGITUDE"
+            colorLabel={theme.colors.secondary}
+            id="pivot_lng"
+            type="text"
+            placeholder="LONGITUDE"
+            register={register}
+          />
+          {error && error.type === "lng" && (
+            <S.MessageError>{error.error}</S.MessageError>
+          )}
+          <ContentInputs
+            errorUserName={errors.pivot_start_angle}
+            label="ANGULO INICIAL"
+            colorLabel={theme.colors.secondary}
+            id="pivot_start_angle"
+            type="number"
+            placeholder="ANGULO INICIAL"
+            register={register}
+          />
+          <ContentInputs
+            errorUserName={errors.pivot_end_angle}
+            label="ANGULO FINAL"
+            colorLabel={theme.colors.secondary}
+            id="pivot_end_angle"
+            type="number"
+            placeholder="ANGULO FINAL"
+            register={register}
+          />
+          <ContentInputs
+            errorUserName={errors.pivot_radius}
+            label="RAIO"
+            colorLabel={theme.colors.secondary}
+            id="pivot_radius"
+            type="number"
+            placeholder="RAIO"
+            register={register}
+          />
 
-        <ContentInputs
-          errorUserName={errors.pivot_num}
-          label="PIVOT"
-          colorLabel={theme.colors.secondary}
-          id="pivot_num"
-          type="number"
-          placeholder="PIVOT"
-          register={register}
-        />
-        <ContentInputs
-          errorUserName={errors.pivot_lat}
-          label="LATITUDE"
-          colorLabel={theme.colors.secondary}
-          id="pivot_lat"
-          type="text"
-          placeholder="LATITUDE"
-          register={register}
-        />
-        {error && error.type === "lat" && (
-          <S.MessageError>{error.error}</S.MessageError>
-        )}
-        <ContentInputs
-          errorUserName={errors.pivot_lng}
-          label="LONGITUDE"
-          colorLabel={theme.colors.secondary}
-          id="pivot_lng"
-          type="text"
-          placeholder="LONGITUDE"
-          register={register}
-        />
-        {error && error.type === "lng" && (
-          <S.MessageError>{error.error}</S.MessageError>
-        )}
-        <ContentInputs
-          errorUserName={errors.pivot_start_angle}
-          label="ANGULO INICIAL"
-          colorLabel={theme.colors.secondary}
-          id="pivot_start_angle"
-          type="number"
-          placeholder="ANGULO INICIAL"
-          register={register}
-        />
-        <ContentInputs
-          errorUserName={errors.pivot_end_angle}
-          label="ANGULO FINAL"
-          colorLabel={theme.colors.secondary}
-          id="pivot_end_angle"
-          type="number"
-          placeholder="ANGULO FINAL"
-          register={register}
-        />
-        <ContentInputs
-          errorUserName={errors.pivot_radius}
-          label="RAIO"
-          colorLabel={theme.colors.secondary}
-          id="pivot_radius"
-          type="number"
-          placeholder="RAIO"
-          register={register}
-        />
+          <ContentInputs
+            errorUserName={errors.radio_id}
+            label="RADIO"
+            colorLabel={theme.colors.secondary}
+            id="radio_id"
+            type="number"
+            placeholder="RADIO"
+            register={register}
+          />
 
-        <ContentInputs
-          errorUserName={errors.radio_id}
-          label="RADIO"
-          colorLabel={theme.colors.secondary}
-          id="radio_id"
-          type="number"
-          placeholder="RADIO"
-          register={register}
-        />
-
-        {/* <S.ButtonAddNodeId onClick={() => setAddIdNode(!addIdNode)}>
+          {/* <S.ButtonAddNodeId onClick={() => setAddIdNode(!addIdNode)}>
           Adicionar Node Id?{" "}
         </S.ButtonAddNodeId> */}
 
-        {/* {addIdNode && (
+          {/* {addIdNode && (
           <ContentInputs
             errorUserName={errors.node_id}
             label="ID NODE"
@@ -232,9 +246,17 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
           />
         )} */}
 
-        <S.Button type="submit" value="Enviar" />
-      </S.Form>
-    </S.Container>
+          <S.Button type="submit" value="Enviar" />
+        </S.Form>
+      </S.Container>
+      {pivotAlreadyExists && (
+        <ModalWarningAlreadEists
+          closeModal={() => setPivotAlreadyExists(false)}
+          alert="Já existe um Pivô com esse Id"
+          subAlert="Por favor Digite um Pivô diferente"
+        />
+      )}
+    </>
   );
 };
 
