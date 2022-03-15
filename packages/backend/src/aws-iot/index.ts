@@ -206,7 +206,7 @@ class IoTDevice {
             const { power, direction, water, percentimeter, angle, timestamp } =
               statusObject;
             await updatePivotController(
-              `${farm_id}_${node_num}_${pivot_num}`,
+              `${farm_id}_${node_num}}`, //Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
               true,
               power,
               water,
