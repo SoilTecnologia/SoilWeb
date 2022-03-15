@@ -14,7 +14,7 @@ const UserFarms = () => {
     if (user) {
       getAllFarmsUser(user.user_id)
     }
-  }, [])
+  }, [user])
 
   return <MainFarm farmList={farmList} />
 };

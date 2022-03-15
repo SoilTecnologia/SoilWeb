@@ -1,6 +1,5 @@
-import Pivot from "utils/models/pivot";
 import * as S from "./styles";
-
+import Pivot from "utils/models/pivot";
 import WaterOnIcon from "../../../../public/icons/Com_agua.png"
 import WaterOffIcon from "../../../../public/icons/Sem_agua.png"
 import ErrorIcon from "../../../../public/icons/Exclamação.png"
@@ -9,78 +8,104 @@ import AntiClockwiseIcon from "../../../../public/icons/Sentido_antihorario.png"
 
 import Image from "next/image";
 
-type PivotProps = {
+interface PivotProps {
   pivot: Pivot
-  connection: boolean | null
-  power: boolean | null
-  water: boolean | null;
-  direction: "CLOCKWISE" | "ANTI_CLOCKWISE";
-  percentimeter: number;
-  angle: number;
-  timestamp: Date;
 }
-const PivotStatusComponent = (pivot: PivotProps) => {
 
+const PivotStatusComponent = ({ pivot }: PivotProps) => {
 
   return (
-    <S.Container>
+    pivot.connection == true ? ( // trocar != para  ==
 
-      <S.StatusWrapper>
-        <S.StatusView>
+      <S.Container>
+
+        <S.StatusWrapper>
+          <S.StatusView>
+            <S.StatusName>
+              Sentido:
+            </S.StatusName>
+            <S.ImageContainer>
+              <Image
+                layout="responsive"
+                src={(pivot.direction === "CLOCKWISE") ? ClockwiseIcon : AntiClockwiseIcon}
+                alt={(pivot.direction === "CLOCKWISE") ? 'Horário' : 'Anti Horário'}
+              />
+            </S.ImageContainer>
+          </S.StatusView>
+
+          <S.StatusView>
+            <S.StatusName>
+              Água:
+            </S.StatusName>
+            <S.ImageContainer>
+
+              <Image
+                layout="responsive"
+                src={(pivot.water === true) ? WaterOnIcon : WaterOffIcon}
+                alt={(pivot.water === true) ? 'Com Água' : 'Sem Água'}
+              />
+
+            </S.ImageContainer>
+          </S.StatusView>
+
+          <S.StatusView>
+            <S.StatusName>
+              statusName
+            </S.StatusName>
+            <S.PivotCurrentPercent>
+              {pivot.percentimeter == null ? "0%" : `${pivot.percentimeter}%`}
+            </S.PivotCurrentPercent>
+          </S.StatusView>
+
+        </S.StatusWrapper>
+
+        <S.LastUpdateWrapper>
+
           <S.StatusName>
-            Sentido:
+            Última Atualização:
           </S.StatusName>
-          <S.ImageContainer>
-            <Image
-              layout="responsive"
-              src={(pivot.direction === "CLOCKWISE") ? ClockwiseIcon : AntiClockwiseIcon}
-              alt={(pivot.direction === "CLOCKWISE") ? 'Horário' : 'Anti Horário'}
-            />
-          </S.ImageContainer>
-        </S.StatusView>
 
-        <S.StatusView>
+          <S.LastUpdate>
+            {pivot.timestamp == null ? 'Nunca foi Atualizado' : pivot.timestamp}
+          </S.LastUpdate>
+
+        </S.LastUpdateWrapper>
+
+      </S.Container>
+
+    ) : (
+
+      <S.Container>
+        <S.StatusWrapper>
+          <S.StatusView>
+
+            <S.StatusName>
+              PIVÔ SEM CONEXÃO
+            </S.StatusName>
+            <S.ImageContainer>
+              <Image
+                layout="responsive"
+                src={ErrorIcon}
+              />
+            </S.ImageContainer>
+
+          </S.StatusView>
+        </S.StatusWrapper>
+        <S.LastUpdateWrapper>
+
           <S.StatusName>
-            Água:
+            Última Atualização:
           </S.StatusName>
-          <S.ImageContainer>
 
-            <Image
-              layout="responsive"
-              src={(pivot.water === true) ? WaterOnIcon : WaterOffIcon}
-              alt={(pivot.water === true) ? 'Com Água' : 'Sem Água'}
-            />
+          <S.LastUpdate>
+            {pivot.timestamp == null ? 'Nunca foi Atualizado' : pivot.timestamp}
+          </S.LastUpdate>
 
-          </S.ImageContainer>
-        </S.StatusView>
+        </S.LastUpdateWrapper>
+      </S.Container>
+    )
 
-        <S.StatusView>
-          <S.StatusName>
-            statusName
-          </S.StatusName>
-          <S.PivotCurrentPercent>
-            {pivot.percentimeter == null ? "0%" : `${pivot.percentimeter}%`}
-          </S.PivotCurrentPercent>
-        </S.StatusView>
-
-      </S.StatusWrapper>
-
-      <S.LastUpdateWrapper>
-
-        <S.StatusName>
-          Última Atualização:
-        </S.StatusName>
-
-        <S.LastUpdate>
-          {pivot.timestamp == null ? 'Nunca foi Atualizado' : pivot.timestamp}
-        </S.LastUpdate>
-
-      </S.LastUpdateWrapper>
-
-    </S.Container>
-
-
-  );
+  )
 };
 
 export default PivotStatusComponent;

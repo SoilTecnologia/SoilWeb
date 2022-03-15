@@ -24,13 +24,12 @@ export const ButtonsView = styled.div`
 `;
 
 export const Button= styled.button`
-  background:${({theme})=>theme.colors.primary};
   display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:row;
   padding:1.5rem ${({theme})=>theme.spacings.xlarge};
-  /* background: linear-gradient( ${({theme})=>theme.colors.secondary} 90%, ${({theme})=>theme.colors.primary_gradient} 100% ); */
+  background: linear-gradient( ${({theme})=>theme.colors.primary} 90%, ${({theme})=>theme.colors.primary_gradient} 100% );
   box-shadow: 5px 5px 15px gray;
   transition: all .3s linear;
   border-radius: 1.5rem;

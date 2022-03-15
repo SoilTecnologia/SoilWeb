@@ -3,15 +3,18 @@ import Header from "components/globalComponents/Header";
 import Pivot from "utils/models/pivot";
 import PivotsContainer from "../PivotCard";
 import Router from "next/router";
+import router from "next/router";
 
 type PivotListProps = {
   pivotList: Pivot[]
 }
 
 const MainPivot = ({ pivotList }: PivotListProps) => {
-
   const handleFarms = () => {
     Router.push("/farms");
+  }
+  const handleMapa = () => {
+    router.push("/map")
   }
 
   return (
@@ -28,7 +31,7 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
           </S.Button>
           <S.Button>
 
-            <S.Text>
+            <S.Text onClick={handleMapa}>
               Mapa
             </S.Text>
           </S.Button>
@@ -36,12 +39,7 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
 
         <S.Grid>
           {pivotList.map((pivot: Pivot) => (
-
-            <>
-              <PivotsContainer key={pivot.pivot_id} pivot={pivot} pop={1} />
-
-            </>
-
+            <PivotsContainer key={pivot.pivot_id} pivot={pivot} />
           ))}
         </S.Grid>
 

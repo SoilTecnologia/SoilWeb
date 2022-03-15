@@ -2,8 +2,8 @@ import * as S from "./styles";
 import Router from "next/router";
 import { useContextUserData } from "hooks/useContextUserData";
 import Farm from "utils/models/farm";
-interface FarmProps{
-  farm:Farm
+interface FarmProps {
+  farm: Farm
 }
 const FarmsContainer = ({ farm }: FarmProps) => {
   const { farm_city, farm_name } = farm
@@ -11,7 +11,7 @@ const FarmsContainer = ({ farm }: FarmProps) => {
 
   const handlePivotsPage = () => {
     setFarm(farm)
-    Router.push("/pivots",);
+    Router.push("/pivots");
   }
 
   return (

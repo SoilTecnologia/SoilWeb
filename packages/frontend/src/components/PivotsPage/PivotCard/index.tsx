@@ -4,28 +4,35 @@ import Pivot from "utils/models/pivot";
 import PivotStatusComponent from "../PivotStatusComponent";
 
 
-type PivotProps = {
+interface PivotProps {
   pivot: Pivot
-  pop:number
+
 }
-const PivotsContainer = ({ pivot,pop }: PivotProps) => {
+
+
+const PivotsContainer = ({ pivot }: PivotProps) => {
   const { pivot_name, pivot_id } = pivot
 
   function pivotStateSelector() {
-    if (pivot.power === true) {
-      return 'Ligado'
+    if (pivot.connection === true) {
+      if (pivot.power === true) {
+        return 'Ligado'
+      }
+      return "Delisgado"
     }
-    return "Delisgado"
+  }
+  const handleIntent =()=>{
+    Router.push("/intent")
   }
 
   return (
-    <S.Container>
-      <S.Box>
+    <S.Container >
+      <S.Box onClick={handleIntent}>
         <S.ContentData>
 
           <S.PivotNameWrapper>
             <S.PivotName>
-              PIVÔ {pop}
+              PIVÔ {pivot_name}
             </S.PivotName>
           </S.PivotNameWrapper>
 
