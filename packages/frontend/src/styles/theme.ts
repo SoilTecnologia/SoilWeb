@@ -17,6 +17,7 @@ export default {
 
     secondary: "#edffcd",
     light: "#e1e1e1",
+    dark: "#1e1e1e",
 
     topbttprimary: "#758d42",
     topbttprimary_gradient: "#93b153",
@@ -33,6 +34,11 @@ export default {
       Poppins: "'Poppins', sans-serif",
       Tangerine: "'Tangerine', cursive",
       Roboto: '"Roboto", monospace',
+      Montserrat_bold:"Montserrat-Bold",
+      Montserrat_light:"Montserrat-Light",
+      Syncopate_bold:"Syncopate-Bold",
+      Syncopate_regular:"Syncopate-Regular",
+
     },
     sizes: {
       xsmall: "1.2rem",

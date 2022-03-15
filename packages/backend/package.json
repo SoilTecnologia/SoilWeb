@@ -43,7 +43,7 @@
     "form-data-encoder": "^1.7.0",
     "formdata-node": "^4.3.1",
     "jsonwebtoken": "^8.5.1",
-    "knex": "^0.95.14",
+    "knex": "^1.0.3",
     "lodash": "^4.17.21",
     "mysql2": "^2.3.0",
     "pg": "^8.7.1",

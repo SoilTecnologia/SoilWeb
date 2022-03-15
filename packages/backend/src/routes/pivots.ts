@@ -1,14 +1,23 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
-import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
+  getCyclesFromPivot,
+  getLastCycleFromPivot
+} from '../controllers/cycles';
+import {
+  createPivotControllerAdm,
+  deletePivotController,
+  getAllPivotController,
+  getOnePivotController,
+  putPivotController,
   readAllPivotController,
-  updatePivotController,
   readListPivotController,
-  readMapPivotController
+  readMapPivotController,
+  updatePivotController
 } from '../controllers/pivots';
-import { getCyclesFromPivot, getLastCycleFromPivot } from '../controllers/cycles';
 import { readPivotStateController } from '../controllers/states';
+import authMiddleware from '../middlewares/auth';
+import Pivot from '../models/pivot';
+import { authHandler, IUserAuthInfoRequest } from '../types/express';
 
 const router = express.Router();
 
@@ -64,15 +73,15 @@ router.get(
   '/map/:farm_id',
   authMiddleware(),
   authHandler(async (req, res, next) => {
-    const {farm_id} = req.params;
-    const {user_id} = req.user;
+    const { farm_id } = req.params;
+    const { user_id } = req.user;
 
     try {
       const pivotList = await readMapPivotController(user_id, farm_id);
       res.json(pivotList);
     } catch (err) {
-        console.log(`[ERROR] Server 500 on /pivots/map`);
-        console.log(err);
+      console.log(`[ERROR] Server 500 on /pivots/map`);
+      console.log(err);
       next(err);
     }
   })
@@ -82,14 +91,14 @@ router.get(
   '/cycles/:pivot_id',
   authMiddleware(),
   authHandler(async (req, res, next) => {
-    const {pivot_id} = req.params;
+    const { pivot_id } = req.params;
 
     try {
       const pivotList = await getLastCycleFromPivot(pivot_id);
       res.json(pivotList);
     } catch (err) {
-        console.log(`[ERROR] Server 500 on /pivots/cycles`);
-        console.log(err);
+      console.log(`[ERROR] Server 500 on /pivots/cycles`);
+      console.log(err);
       next(err);
     }
   })
@@ -99,14 +108,14 @@ router.get(
   '/cycles/:pivot_id/:start/:end',
   authMiddleware(),
   authHandler(async (req, res, next) => {
-    const {pivot_id, start, end} = req.params;
+    const { pivot_id, start, end } = req.params;
 
     try {
       const pivotList = await getCyclesFromPivot(pivot_id, start, end);
       res.json(pivotList);
     } catch (err) {
-        console.log(`[ERROR] Server 500 on /pivots/cycles/start/end`);
-        console.log(err);
+      console.log(`[ERROR] Server 500 on /pivots/cycles/start/end`);
+      console.log(err);
       next(err);
     }
   })
@@ -116,15 +125,15 @@ router.get(
   '/list/:farm_id',
   authMiddleware(),
   authHandler(async (req, res, next) => {
-    const {farm_id} = req.params;
-    const {user_id} = req.user;
+    const { farm_id } = req.params;
+    const { user_id } = req.user;
 
     try {
       const pivotList = await readListPivotController(user_id, farm_id);
       res.json(pivotList);
     } catch (err) {
-        console.log(`[ERROR] Server 500 on /pivots/list`);
-        console.log(err);
+      console.log(`[ERROR] Server 500 on /pivots/list`);
+      console.log(err);
       next(err);
     }
   })
@@ -162,11 +171,182 @@ router.post(
 
       res.json(updatedPivot);
     } catch (err) {
-        console.log(`[ERROR] Server 500 on /pivots/update`);
-        console.log(err);
+      console.log(`[ERROR] Server 500 on /pivots/update`);
+      console.log(err);
       next(err);
     }
   })
+);
+
+// Admin
+router.get(
+  '/getPivots/:id',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { id } = req.params;
+      try {
+        if (id) {
+          const allPivotsFromNode = await getAllPivotController(id);
+
+          res.send(allPivotsFromNode);
+        } else {
+          res.status(201).send('Id not identifier');
+        }
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on pivots`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.get(
+  '/getOnePivot/:pivot_num/:farm_id',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { pivot_num, farm_id } = req.params;
+      try {
+        const pivotResult = await getOnePivotController(
+          Number(pivot_num),
+          farm_id
+        );
+
+        res.send(pivotResult);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on pivots`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.post(
+  '/addPivot',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const {
+        pivot_num,
+        pivot_lng,
+        pivot_lat,
+        pivot_start_angle,
+        pivot_end_angle,
+        pivot_radius,
+        radio_id,
+        node_id,
+        farm_id
+      } = req.body;
+
+      const newPivot = {
+        pivot_num,
+        pivot_lng,
+        pivot_lat,
+        pivot_start_angle,
+        pivot_end_angle,
+        pivot_radius,
+        radio_id,
+        node_id,
+        farm_id
+      };
+      try {
+        const allPivotsFromNode = await createPivotControllerAdm(newPivot);
+
+        res.send(allPivotsFromNode);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /pivots/readAll`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.delete(
+  '/deletePivot/:id',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { id } = req.params;
+
+      try {
+        const allPivotsFromNode = await deletePivotController(id);
+
+        res.send(allPivotsFromNode);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /pivots/readAll`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
+
+router.put(
+  '/putPivot/',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const {
+        pivot_num,
+        pivot_lng,
+        pivot_lat,
+        pivot_start_angle,
+        pivot_end_angle,
+        pivot_radius,
+        radio_id,
+        node_id,
+        farm_id,
+        pivot_id
+      }: Pivot = req.body;
+
+      const newPivot = {
+        pivot_num,
+        pivot_lng,
+        pivot_lat,
+        pivot_start_angle,
+        pivot_end_angle,
+        pivot_radius,
+        radio_id,
+        node_id,
+        farm_id,
+        pivot_id
+      };
+
+      try {
+        const pivotNew = await putPivotController(newPivot);
+
+        res.send(pivotNew);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /pivots/readAll`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
 );
 
 export default router;

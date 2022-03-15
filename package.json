@@ -2,10 +2,15 @@
   "name": "root",
   "private": true,
   "devDependencies": {
+    "@types/cookie": "^0.4.1",
     "husky": "^7.0.2",
     "lerna": "^4.0.0"
   },
   "scripts": {
     "prepare": "husky install"
+  },
+  "dependencies": {
+    "axios": "^0.26.0",
+    "nookies": "^2.5.2"
   }
 }
