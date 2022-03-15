@@ -7,14 +7,13 @@ this file is responsible for:
   - Setting up the event emitter to be used on other systems
 */
 
-import express from 'express';
-import { Server, Socket } from 'socket.io';
-import { createServer } from 'http';
 import cors from 'cors';
-import router from './routes';
-import * as raspberry from './raspberry/tests';
-import emitter from './utils/eventBus';
+import express from 'express';
+import { createServer } from 'http';
+import { Server, Socket } from 'socket.io';
 import IoTDevice from './aws-iot/index';
+import router from './routes';
+import emitter from './utils/eventBus';
 
 require('dotenv').config();
 
@@ -71,7 +70,7 @@ io.on('connection', (socket: Socket) => {
   });
 });
 
-raspberry.start();
+// raspberry.start();
 
 // const iotDevice = new IoTDevice('Cloud', 0);
 const iotDevice = new IoTDevice(

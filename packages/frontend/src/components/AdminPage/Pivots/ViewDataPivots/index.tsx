@@ -1,14 +1,14 @@
 import { useContextData } from "hooks/useContextData";
 import { useState } from "react";
-import Node from "utils/models/node";
+import Farm from "utils/models/farm";
 import BoxPivots from "../BoxPivots";
 import CreatePivot from "../CreatePivot";
 import * as S from "./styles";
 
 type vewDataPivotsProps = {
-  nodeData: Node;
+  farm: Farm;
 };
-const ViewDataPivots = ({ nodeData }: vewDataPivotsProps) => {
+const ViewDataPivots = ({ farm }: vewDataPivotsProps) => {
   const [addPivot, setAddPivot] = useState(false);
 
   const { pivotList } = useContextData();
@@ -19,18 +19,14 @@ const ViewDataPivots = ({ nodeData }: vewDataPivotsProps) => {
       </S.AddNode>
       {pivotList.length > 0 ? (
         pivotList.map((pivot) => (
-          <BoxPivots
-            key={pivot.pivot_id}
-            pivotData={pivot}
-            nodeData={nodeData}
-          />
+          <BoxPivots key={pivot.pivot_id} pivotData={pivot} />
         ))
       ) : (
         <p>Nenhum Pivô cadastrado</p>
       )}
       {addPivot && (
         <S.ContentAddNode>
-          <CreatePivot setAddNode={setAddPivot} node={nodeData} />
+          <CreatePivot setAddNode={setAddPivot} farm={farm} />
         </S.ContentAddNode>
       )}
     </S.Container>

@@ -13,7 +13,7 @@ export async function up(knex: Knex): Promise<void> {
     })
     .createTable('farms', (table) => {
       table.string('farm_id').unique().primary().notNullable();
-      table.string('farm_name').notNullable().unique();
+      table.string('farm_name').notNullable();
       table.string('farm_city').notNullable();
       table.float('farm_lng').notNullable();
       table.float('farm_lat').notNullable();

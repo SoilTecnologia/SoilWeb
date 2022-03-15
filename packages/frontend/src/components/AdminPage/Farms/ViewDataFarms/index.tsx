@@ -1,9 +1,8 @@
-import * as S from "./styles";
-import { useState } from "react";
-
-import ViewDataNode from "components/AdminPage/Nodes/ViewDataNode";
-import Farm from "utils/models/farm";
+import ViewDataPivots from "components/AdminPage/Pivots/ViewDataPivots";
 import { useContextActionCrud } from "hooks/useActionsCrud";
+import { useState } from "react";
+import Farm from "utils/models/farm";
+import * as S from "./styles";
 
 type FarmProps = {
   farmData: Farm;
@@ -13,14 +12,14 @@ const ViewDataFarms = ({ farmData }: FarmProps) => {
   const { getAllNodes } = useContextActionCrud();
 
   //States
-  const [nodesVisible, setNodesVisible] = useState(false);
+  const [pivotsvisible, setPivotVisible] = useState(false);
 
-  const viewDataNodes = () => {
-    if (!nodesVisible) {
+  const viewDataPivots = () => {
+    if (!pivotsvisible) {
       getAllNodes(farmData.farm_id);
-      setNodesVisible(true);
+      setPivotVisible(true);
     } else {
-      setNodesVisible(false);
+      setPivotVisible(false);
     }
   };
 
@@ -45,10 +44,10 @@ const ViewDataFarms = ({ farmData }: FarmProps) => {
       </S.ContentData>
 
       <S.ContentPivotsNodes>
-        <S.NodeName onClick={viewDataNodes}>
-          Nodes <S.IconDown />
+        <S.NodeName onClick={viewDataPivots}>
+          Pivots <S.IconDown />
         </S.NodeName>
-        {nodesVisible && <ViewDataNode farmData={farmData} />}
+        {pivotsvisible && <ViewDataPivots farm={farmData} />}
       </S.ContentPivotsNodes>
     </S.Container>
   );

@@ -4,6 +4,7 @@ import {
   createFarmController,
   deleteFarmController,
   getAllFarmUser,
+  getOneFarmController,
   putFarmController,
   readAllFarmController,
   readMapFarmControler
@@ -169,55 +170,28 @@ router.delete('/deleteFarm/:id', authMiddleware(), async (req, res, next) => {
     next(err);
   }
 });
+router.get(
+  '/getOneFarm/:farmId',
+  authMiddleware(),
+  authHandler(
+    async (
+      req: IUserAuthInfoRequest,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      const { farmId } = req.params;
 
-// router.get(
-//   '/readAll',
-//   authMiddleware(['SUDO']),
-//   authHandler(
-//     async (
-//       req: IUserAuthInfoRequest,
-//       res: express.Response,
-//       next: express.NextFunction
-//     ) => {
-//       const user = req.user;
+      try {
+        const allFarmsFromUser = await getOneFarmController(farmId);
 
-//       try {
-//         const farms = await readAllFarmController(user.user_id);
-
-//         return res.send(farms);
-//       } catch (err) {
-//         next(err);
-//       }
-//     }
-//   )
-// );
-
-// router.put(
-//   '/addAdmin/:target_farm_id',
-//   authMiddleware(['SUDO']),
-//   authHandler(
-//     async (
-//       req: IUserAuthInfoRequest,
-//       res: express.Response,
-//       next: express.NextFunction
-//     ) => {
-//       const user = req.user;
-//       const { target_farm_id } = req.params;
-//       const { target_user_id } = req.body;
-
-//       try {
-//         const farms = await addUserToFarmController(
-//           user.user_id,
-//           target_user_id,
-//           target_farm_id
-//         );
-
-//         return res.send(farms);
-//       } catch (err) {
-//         next(err);
-//       }
-//     }
-//   )
-// );
+        res.send(allFarmsFromUser);
+      } catch (err) {
+        console.log(`[ERROR] Server 500 on /farms/readAll`);
+        console.log(err);
+        next(err);
+      }
+    }
+  )
+);
 
 export default router;

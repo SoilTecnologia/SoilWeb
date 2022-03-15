@@ -38,6 +38,12 @@ export const getAllFarmUser = async (user_id: User['user_id']) => {
   return farms;
 };
 
+export const getOneFarmController = async (farm_id: Farm['farm_id']) => {
+  const farms = await knex<Farm>('farms').select().where({ farm_id }).first();
+
+  return farms;
+};
+
 export const readMapFarmControler = async (farm_id: Farm['farm_id']) => {
   const result = await knex('farms')
     .join('nodes', 'farms.farm_id', 'nodes.farm_id')

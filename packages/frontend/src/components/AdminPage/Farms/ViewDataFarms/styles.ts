@@ -1,5 +1,5 @@
-import styled, { css } from "styled-components";
 import { FaAngleDown } from "react-icons/fa";
+import styled, { css } from "styled-components";
 
 export const Container = styled.div`
   ${({ theme }) => css`
@@ -7,9 +7,18 @@ export const Container = styled.div`
     background: ${theme.colors.primary};
     padding: ${theme.spacings.small} 4rem;
     border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   `}
 `;
-export const ContentData = styled.div``;
+export const ContentData = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+`;
 
 export const FarmName = styled.p`
   color: ${({ theme }) => theme.colors.offline};

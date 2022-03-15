@@ -5,7 +5,6 @@ import React, {
   useContext,
   useState,
 } from "react";
-
 import Farm from "utils/models/farm";
 import Node from "utils/models/node";
 import Pivot from "utils/models/pivot";
@@ -24,7 +23,7 @@ export type stateContentProps = {
   updateFarm: Farm | null;
   dataFarmSelected: Farm | null;
 
-  dataNodeSelected: Node | null;
+  dataPivotSelected: Pivot | null;
   updatePivot: Pivot | null;
 
   nodeList: Node[];
@@ -59,7 +58,7 @@ function UseContextProvider({ children }: UserProviderProps) {
     createFarm: false,
     updateFarm: null,
     dataFarmSelected: null,
-    dataNodeSelected: null,
+    dataPivotSelected: null,
     updatePivot: null,
     nodeList: [] as Node[],
   };

@@ -11,6 +11,7 @@ import {
   requestGetAllPivots,
   requestGetAllPivotsWithFarmId,
   requestGetAllUsers,
+  requestOneFarm,
   requestPostUser,
   requestUpdateFarm,
   requestUpdateNode,
@@ -36,17 +37,18 @@ interface actionCrudProps {
   updateUser: (user: User) => void;
   deleteUser: (id: string) => void;
   getAllFarmsUser: (id: string) => void;
+  getOneFarms: (farm_id: string) => Promise<Farm | null | undefined>;
   createFarm: (farm: FarmCreate) => void;
   updateFarm: (farm: Farm) => void;
   deleteFarm: (farm_id: Farm["farm_id"], user_id: User["user_id"]) => void;
   getAllNodes: (farm_id: Farm["farm_id"]) => void;
-  createNode: (node: NodeCreate, farm: Farm) => void;
+  createNode: (node: NodeCreate) => Promise<Node>;
   updateNode: (node: Node) => void;
   deleteNode: (id: string, farmRelation: Farm) => void;
-  getAllPivots: (node: Node) => void;
-  createPivot: (pivot: PivotCreate, nodeNum: Node["node_num"]) => void;
-  updatePivot: (pivot: Pivot, node: Node) => void;
-  deletePivot: (id: string, node: Node) => void;
+  getAllPivots: (farm_id: Farm["farm_id"]) => void;
+  createPivot: (pivot: PivotCreate) => void;
+  updatePivot: (pivot: Pivot) => void;
+  deletePivot: (pivot: Pivot) => void;
 
   getAllPivotWithFarmId: (farm_id: Farm["farm_id"]) => void;
 }
@@ -106,6 +108,9 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const response = await requestGetAllFarmsUser(id, user?.token);
     response && setFarmList(response);
   };
+  const getOneFarms = async (id: string) =>
+    await requestOneFarm(id, user?.token);
+
   const createFarm = async (farm: FarmCreate) => {
     await requestCreateFarm(farm, user?.token);
     setData({ ...stateAdmin, createFarm: false });
@@ -130,8 +135,9 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     response && setNodeList(response);
   };
   const createNode = async (node: NodeCreate) => {
-    await requestCreateNode(node, user?.token);
-    await getAllNodes(node.farm_id);
+    const nodeCreated = await requestCreateNode(node, user?.token);
+
+    return nodeCreated;
   };
   const updateNode = async (node: Node) => {
     const newNode = await requestUpdateNode(node, user?.token);
@@ -144,30 +150,26 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   };
 
   //CRUD PIVOT
-  const getAllPivots = async (node: Node) => {
-    const result = await requestGetAllPivots(node.node_id, user?.token);
+  const getAllPivots = async (farm_id: Farm["farm_id"]) => {
+    const result = await requestGetAllPivots(farm_id, user?.token);
     result && setPivotList(result);
-    setData({
-      ...stateDefault,
-      showIsListUser: false,
-      dataNodeSelected: node,
-    });
+    // setData({
+    //   ...stateDefault,
+    //   showIsListUser: false,
+    //   dataPivotSelected: node,
+    // });
   };
-  const createPivot = async (pivot: PivotCreate, nodeNum: Node["node_num"]) => {
-    await requestCreateNewPivot(pivot, nodeNum, user?.token);
-    stateAdmin.dataNodeSelected && getAllPivots(stateAdmin.dataNodeSelected);
+  const createPivot = async (pivot: PivotCreate) => {
+    await requestCreateNewPivot(pivot, user?.token);
+    getAllPivots(pivot.farm_id);
   };
-  const updatePivot = async (pivot: Pivot, node: Node) => {
-    const newPivot = await requestUpdatePivot(
-      pivot,
-      node.node_num,
-      user?.token
-    );
-    newPivot && (await getAllPivots(node));
+  const updatePivot = async (pivot: Pivot) => {
+    const newPivot = await requestUpdatePivot(pivot, user?.token);
+    newPivot && (await getAllPivots(pivot.farm_id));
   };
-  const deletePivot = async (id: Pivot["pivot_id"], node: Node) => {
-    await requestDeletePivot(id, user?.token);
-    await getAllPivots(node);
+  const deletePivot = async (pivot: Pivot) => {
+    await requestDeletePivot(pivot.pivot_id, user?.token);
+    await getAllPivots(pivot.farm_id);
   };
   //Rota page user
   const getAllPivotWithFarmId = async (farm_id: Farm["farm_id"]) => {
@@ -183,6 +185,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         updateUser,
         deleteUser,
         getAllFarmsUser,
+        getOneFarms,
         createFarm,
         updateFarm,
         deleteFarm,

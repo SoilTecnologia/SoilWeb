@@ -1,16 +1,29 @@
 import knex from '../database';
+import Farm from '../models/farm';
 import Node from '../models/node';
 
 export const createNodeController = async (node: Node) => {
-  const newNode = await knex<Node>('nodes').insert({ ...node });
+  const newNode = await knex<Node>('nodes').insert(node).returning('*');
 
-  return newNode;
+  return newNode[0];
 };
 
 export const readAllNodeController = async (farm_id: Node['farm_id']) => {
   const allNodesFromFarm = await knex<Node>('nodes')
     .select('*')
     .where({ farm_id });
+
+  return allNodesFromFarm;
+};
+
+export const readWithNodeNumController = async (
+  farm_id: Farm['farm_id'],
+  node_num: Node['node_num']
+) => {
+  const allNodesFromFarm = await knex<Node>('nodes')
+    .select()
+    .where({ farm_id, node_num })
+    .first();
 
   return allNodesFromFarm;
 };

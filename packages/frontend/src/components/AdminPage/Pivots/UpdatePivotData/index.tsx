@@ -2,7 +2,6 @@ import ContentInputs from "components/globalComponents/ContentInputs";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import Node from "utils/models/node";
 import Pivot, { PivotForm } from "utils/models/pivot";
 import { defaultError } from "../CreatePivot";
 import { MessageError } from "../CreatePivot/styles";
@@ -10,7 +9,6 @@ import * as S from "./styles";
 
 type updateFarmProps = {
   pivotData: Pivot;
-  nodeData: Node;
   closeModal: () => void;
 };
 type errorProps = {
@@ -18,11 +16,7 @@ type errorProps = {
   error: string | null;
 };
 
-const UpdatePivotData = ({
-  pivotData,
-  nodeData,
-  closeModal,
-}: updateFarmProps) => {
+const UpdatePivotData = ({ pivotData, closeModal }: updateFarmProps) => {
   //Contexts
   const { updatePivot } = useContextActionCrud();
   //States
@@ -88,7 +82,7 @@ const UpdatePivotData = ({
     const addPivot = handleDataForm(data);
     if (addPivot) {
       closeModal();
-      updatePivot(addPivot, nodeData);
+      updatePivot(addPivot);
     }
   });
 

@@ -380,16 +380,13 @@ export const updatePivotController = async (
 };
 
 // Admin
-export const getAllPivotController = async (node_id: Node['node_id']) => {
-  const pivots = await knex<Pivot>('pivots').select().where({ node_id });
+export const getAllPivotController = async (farm_id: Node['farm_id']) => {
+  const pivots = await knex<Pivot>('pivots').select().where({ farm_id });
   return pivots;
 };
 
-export const createPivotControllerAdm = async (
-  pivot: pivotCreate,
-  node_num: Node['node_num']
-) => {
-  const pivot_id = `${pivot.farm_id}_${node_num}_${pivot.pivot_num}`;
+export const createPivotControllerAdm = async (pivot: pivotCreate) => {
+  const pivot_id = `${pivot.farm_id}_${pivot.pivot_num}`;
   const newPivot = { ...pivot, pivot_id };
 
   const pivots = await knex<Pivot>('pivots').insert(newPivot);
@@ -414,11 +411,8 @@ export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
   }
 };
 
-export const putPivotController = async (
-  pivot: Pivot,
-  node_num: Node['node_num']
-) => {
-  const pivot_id = `${pivot.farm_id}_${node_num}_${pivot.pivot_num}`;
+export const putPivotController = async (pivot: Pivot) => {
+  const pivot_id = `${pivot.farm_id}_${pivot.pivot_num}`;
   const getPivot = await knex<Pivot>('pivots')
     .select()
     .where({ pivot_id: pivot.pivot_id })

@@ -43,7 +43,7 @@ const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
   };
 
   const viewDataPivots = () => {
-    getAllPivots(nodeData);
+    // getAllPivots(nodeData);
   };
   return (
     <>

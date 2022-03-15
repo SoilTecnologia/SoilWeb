@@ -1,18 +1,19 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import ContentInputs from "components/globalComponents/ContentInputs";
+import SelectOptionsComponent from "components/globalComponents/SelectOptionsComponent";
 import { useContextActionCrud } from "hooks/useActionsCrud";
-import { useContextData } from "hooks/useContextData";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import theme from "styles/theme";
-import Node from "utils/models/node";
+import Farm from "utils/models/farm";
+import Node, { NodeCreate } from "utils/models/node";
 import { PivotCreate, PivotForm } from "utils/models/pivot";
 import * as Yup from "yup";
 import * as S from "./styles";
 
 type createPivotProps = {
   setAddNode: Dispatch<SetStateAction<boolean>>;
-  node: Node;
+  farm: Farm;
 };
 
 type errorProps = {
@@ -24,6 +25,8 @@ export const defaultError = {
   error: null,
 };
 const schema = Yup.object({
+  is_gprs: Yup.string().required(),
+  gatewayNode: Yup.string(),
   pivot_num: Yup.number().required("Digite o numero do Pivo"),
   pivot_lat: Yup.string().required("Digite a Latitude"),
   pivot_lng: Yup.string().required("Digite a Longitude"),
@@ -33,14 +36,25 @@ const schema = Yup.object({
   radio_id: Yup.number().required("Digite um radio"),
 }).required();
 
-const CreatePivot = ({ setAddNode, node }: createPivotProps) => {
+const optionsSelect = [
+  {
+    label: "SIM",
+    value: "yes",
+  },
+  {
+    label: "NÃO",
+    value: "not",
+  },
+];
+
+const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
   //Contexts
-  const { stateAdmin } = useContextData();
-  const { createPivot } = useContextActionCrud();
+  const { createPivot, createNode } = useContextActionCrud();
 
   //States
-  const [addIdNode, setAddIdNode] = useState(false);
+  // const [addIdNode, setAddIdNode] = useState(false);
   const [error, setError] = useState<errorProps>(defaultError);
+  const [gatewayVisible, setGatewayVisible] = useState(false);
   const {
     handleSubmit,
     register,
@@ -48,6 +62,17 @@ const CreatePivot = ({ setAddNode, node }: createPivotProps) => {
   } = useForm<PivotForm>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
 
+  const createNewNode = async (pivotData: PivotForm) => {
+    const isGrpsValid = pivotData.is_gprs === "yes" ? true : false;
+    const newNode: NodeCreate = {
+      is_gprs: isGrpsValid,
+      node_num: isGrpsValid ? pivotData.pivot_num : 0,
+      farm_id: farm.farm_id,
+      gateway: isGrpsValid ? undefined : pivotData.gatewayNode,
+    };
+    const newNodeCreated = await createNode(newNode);
+    return newNodeCreated;
+  };
   const formatLatAndLong = (type: "lat" | "lng", latLong: string) => {
     const number = Number(latLong);
     if (number) {
@@ -61,34 +86,38 @@ const CreatePivot = ({ setAddNode, node }: createPivotProps) => {
     }
   };
 
-  const handleDataForm = (dataForm: PivotForm) => {
-    if (stateAdmin.dataNodeSelected && stateAdmin.dataNodeSelected?.node_id) {
-      const latForNumber = formatLatAndLong("lat", dataForm.pivot_lat);
-      const longForNumber = formatLatAndLong("lng", dataForm.pivot_lng);
+  const handleDataForm = (dataForm: PivotForm, node_id: Node["node_id"]) => {
+    const latForNumber = formatLatAndLong("lat", dataForm.pivot_lat);
+    const longForNumber = formatLatAndLong("lng", dataForm.pivot_lng);
 
-      if (latForNumber && longForNumber) {
-        const newPivot: PivotCreate = {
-          farm_id: node.farm_id,
-          node_id: stateAdmin.dataNodeSelected.node_id,
-          pivot_num: dataForm.pivot_num,
-          pivot_lng: latForNumber,
-          pivot_lat: longForNumber,
-          pivot_start_angle: dataForm.pivot_start_angle,
-          pivot_end_angle: dataForm.pivot_end_angle,
-          pivot_radius: dataForm.pivot_radius,
-          radio_id: dataForm.radio_id,
-        };
-        return newPivot;
-      }
+    if (latForNumber && longForNumber) {
+      const newPivot: PivotCreate = {
+        farm_id: farm.farm_id,
+        node_id,
+        pivot_num: dataForm.pivot_num,
+        pivot_lng: latForNumber,
+        pivot_lat: longForNumber,
+        pivot_start_angle: dataForm.pivot_start_angle,
+        pivot_end_angle: dataForm.pivot_end_angle,
+        pivot_radius: dataForm.pivot_radius,
+        radio_id: dataForm.radio_id,
+      };
+      return newPivot;
     }
   };
-
-  const onSubmit = handleSubmit((data) => {
+  const checkIsGprsTrue = (e: FormEvent<HTMLFormElement>) => {
+    if (e.target.value === "not") {
+      setGatewayVisible(true);
+    } else if (e.target.value === "yes") {
+      setGatewayVisible(false);
+    }
+  };
+  const onSubmit = handleSubmit(async (data) => {
     error.error && setError(defaultError);
-
-    const addPivot = handleDataForm(data);
+    const nodeCreated = await createNewNode(data);
+    const addPivot = handleDataForm(data, nodeCreated.node_id);
     if (addPivot) {
-      createPivot(addPivot, node.node_num);
+      createPivot(addPivot);
       setAddNode(false);
     }
   });
@@ -96,7 +125,26 @@ const CreatePivot = ({ setAddNode, node }: createPivotProps) => {
   return (
     <S.Container>
       <S.IconClose onClick={() => setAddNode(false)} />
-      <S.Form onSubmit={onSubmit} ref={formRef}>
+      <S.Form onSubmit={onSubmit} ref={formRef} onChange={checkIsGprsTrue}>
+        <SelectOptionsComponent
+          colorLabel={theme.colors.secondary}
+          label="GPRS"
+          id="is_gprs"
+          register={register}
+          options={optionsSelect}
+        />
+        {gatewayVisible && (
+          <ContentInputs
+            errorUserName={errors.gatewayNode}
+            label="GATEWAY"
+            colorLabel={theme.colors.secondary}
+            id="gatewayNode"
+            type="string"
+            placeholder="GATEWAY"
+            register={register}
+          />
+        )}
+
         <ContentInputs
           errorUserName={errors.pivot_num}
           label="PIVOT"
@@ -168,11 +216,11 @@ const CreatePivot = ({ setAddNode, node }: createPivotProps) => {
           register={register}
         />
 
-        <S.ButtonAddNodeId onClick={() => setAddIdNode(!addIdNode)}>
+        {/* <S.ButtonAddNodeId onClick={() => setAddIdNode(!addIdNode)}>
           Adicionar Node Id?{" "}
-        </S.ButtonAddNodeId>
+        </S.ButtonAddNodeId> */}
 
-        {addIdNode && (
+        {/* {addIdNode && (
           <ContentInputs
             errorUserName={errors.node_id}
             label="ID NODE"
@@ -182,7 +230,7 @@ const CreatePivot = ({ setAddNode, node }: createPivotProps) => {
             placeholder="ID NODE"
             register={register}
           />
-        )}
+        )} */}
 
         <S.Button type="submit" value="Enviar" />
       </S.Form>

@@ -28,6 +28,8 @@ export type PivotUpdate = {
 
 export default Pivot;
 export type PivotForm = {
+  is_gprs: string;
+  gatewayNode?: string;
   node_id: string;
   pivot_num: number;
   pivot_lng: string;

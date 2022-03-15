@@ -97,6 +97,18 @@ export const requestGetAllFarmsUser = async (
       return null;
     });
 };
+export const requestOneFarm = async (farmId: string, tokenId: tokenState) => {
+  return await api
+    .get<Farm | undefined>(`farms/getOneFarm/${farmId}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
+};
 
 export const requestCreateFarm = async (
   farm: FarmCreate,
@@ -203,11 +215,11 @@ export const requestUpdateNode = async (node: Node, tokenId: tokenState) => {
 
 //Pivots
 export const requestGetAllPivots = async (
-  node_id: Node["node_id"],
+  farm_id: Farm["farm_id"],
   tokenId: tokenState
 ) => {
   return await api
-    .get(`pivots/getPivots/${node_id}`, {
+    .get(`pivots/getPivots/${farm_id}`, {
       headers: { Authorization: tokenId ? tokenId : token },
     })
     .then((response) => {
@@ -221,11 +233,10 @@ export const requestGetAllPivots = async (
 
 export const requestCreateNewPivot = async (
   pivot: PivotCreate,
-  nodeNum: Node["node_num"],
   tokenId: tokenState
 ) => {
   return await api
-    .post(`pivots/addPivot/${nodeNum}`, pivot, {
+    .post(`pivots/addPivot`, pivot, {
       headers: { Authorization: tokenId ? tokenId : token },
     })
     .then((response) => response.data)
@@ -250,11 +261,24 @@ export const requestDeletePivot = async (
 };
 export const requestUpdatePivot = async (
   newPivot: Pivot,
-  nodeNum: Node["node_num"],
   tokenId: tokenState
 ) => {
   return await api
-    .put(`pivots/putPivot/${nodeNum}`, newPivot, {
+    .put(`pivots/putPivot`, newPivot, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
+export const requestGetNodeWithPivotNum = async (
+  node: NodeCreate,
+  tokenId: tokenState
+) => {
+  return await api
+    .get(`nodes/nodeNum/${node.node_num}/${node.farm_id}`, {
       headers: { Authorization: tokenId ? tokenId : token },
     })
     .then((response) => response.data)

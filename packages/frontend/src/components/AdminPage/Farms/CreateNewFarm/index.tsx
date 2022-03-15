@@ -24,13 +24,15 @@ const schema = Yup.object({
   farm_lat: Yup.string().required("Digite a Latitude"),
   farm_lng: Yup.string().required("Digite a Longitude"),
 }).required();
+
 const CreateNewFarm = () => {
   //Contexts
-  const { createFarm } = useContextActionCrud();
+  const { createFarm, getOneFarms } = useContextActionCrud();
   const { stateAdmin } = useContextData();
 
   //States
   const [error, setError] = useState<errorProps>(defaultError);
+  const [farmAlreadyExists, setFarmAlreadyExists] = useState(false);
 
   const {
     handleSubmit,
@@ -72,6 +74,14 @@ const CreateNewFarm = () => {
       return newFarmUser;
     }
   };
+  const verifyFarmAlreadyExists = async (farm: FarmCreate) => {
+    const farmExists = await getOneFarms(farm.farm_id);
+    if (farmExists) {
+      setFarmAlreadyExists(true);
+    } else {
+      createFarm(farm);
+    }
+  };
 
   const onSubmit = handleSubmit((data) => {
     error && setError(defaultError);
@@ -79,9 +89,7 @@ const CreateNewFarm = () => {
     const user = stateAdmin.dataUserSelected;
     if (user) {
       const addFarm = handleDataForm(data, user.user_id);
-      if (addFarm) {
-        createFarm(addFarm);
-      }
+      addFarm && verifyFarmAlreadyExists(addFarm);
     }
   });
 

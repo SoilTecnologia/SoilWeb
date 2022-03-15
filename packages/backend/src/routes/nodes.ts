@@ -1,15 +1,37 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
-import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
   createNodeController,
   deleteNodeController,
   putNodeController,
-  readAllNodeController
+  readAllNodeController,
+  readWithNodeNumController
 } from '../controllers/nodes';
+import authMiddleware from '../middlewares/auth';
 import Node from '../models/node';
+import { authHandler, IUserAuthInfoRequest } from '../types/express';
 
 const router = express.Router();
+
+router.get(
+  '/nodeNum/:node_num/:farm_id',
+  authMiddleware(),
+  async (req, res, next) => {
+    const { farm_id, node_num } = req.params;
+
+    try {
+      const allNodesFromFarm = await readWithNodeNumController(
+        farm_id,
+        Number(node_num)
+      );
+
+      res.send(allNodesFromFarm);
+    } catch (err) {
+      console.log(`[ERROR] Server 500 on /nodes/readAll`);
+      console.log(err);
+      next(err);
+    }
+  }
+);
 
 router.get('/readAll/:farm_id', authMiddleware(), async (req, res, next) => {
   const { farm_id } = req.params;

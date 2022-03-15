@@ -3,17 +3,15 @@ import ModalDeleteData from "components/globalComponents/ModalDeleteData";
 import ModalUpdateData from "components/globalComponents/ModalUpdateData";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useState } from "react";
-import Node from "utils/models/node";
 import Pivot from "utils/models/pivot";
 import UpdatePivotData from "../UpdatePivotData";
 import * as S from "./styles";
 
 type boxPivotProps = {
   pivotData: Pivot;
-  nodeData: Node;
 };
 
-const BoxPivots = ({ pivotData, nodeData }: boxPivotProps) => {
+const BoxPivots = ({ pivotData }: boxPivotProps) => {
   //Contexts
   const { deletePivot } = useContextActionCrud();
 
@@ -38,7 +36,7 @@ const BoxPivots = ({ pivotData, nodeData }: boxPivotProps) => {
 
   const okDeletePivot = () => {
     setIsDeletePivot(false);
-    deletePivot(pivotData.pivot_id, nodeData);
+    deletePivot(pivotData);
   };
   const notDeletePivot = () => {
     setIsDeletePivot(false);
@@ -94,7 +92,6 @@ const BoxPivots = ({ pivotData, nodeData }: boxPivotProps) => {
         <ModalUpdateData closeModal={closeModalUpdate}>
           <UpdatePivotData
             pivotData={pivotData}
-            nodeData={nodeData}
             closeModal={closeModalUpdate}
           />
         </ModalUpdateData>
