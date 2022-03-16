@@ -52,7 +52,7 @@ const CreateNode = ({ farm, setAddNode }: createNodeProps) => {
       gateway: data.gateway,
     };
     setAddNode(false);
-    createNode(newNode, farm);
+    createNode(newNode);
   });
 
   return (

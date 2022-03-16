@@ -14,7 +14,7 @@ const Admin = () => {
     } = parseCookies();
 
     if (token) {
-      !user && setUser({ user_type, user_id });
+      !user && setUser({token, user_type, user_id });
       user_type !== "SUDO" && Router.push("/user");
     } else {
       Router.push("/");

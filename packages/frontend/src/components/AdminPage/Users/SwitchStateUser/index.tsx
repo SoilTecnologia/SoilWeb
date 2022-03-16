@@ -13,8 +13,6 @@ const SwitchStateUser = () => {
     return <ListUsers />;
   } else if (stateAdmin.createFarm && stateAdmin.dataUserSelected) {
     return <CreateNewFarm />;
-  } else if (stateAdmin.dataNodeSelected) {
-    return <ViewDataPivots nodeData={stateAdmin.dataNodeSelected} />;
   } else if (stateAdmin.dataFarmSelected) {
     return <ViewDataFarms farmData={stateAdmin.dataFarmSelected} />;
   } else if (stateAdmin.dataUserSelected) {

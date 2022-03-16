@@ -33,11 +33,6 @@ const MainLogin = () => {
       <S.TextTech>TECNOLOGIA</S.TextTech>
       <div style={{ marginTop: "10px" }}></div>
       <S.TextTech>PARA IRRIGAÇÃO</S.TextTech>
-      <p
-        style={{ fontFamily: theme.font.family.MontSerrat, fontWeight: "bold" }}
-      >
-        Testando
-      </p>
     </S.Container>
   );
 };
