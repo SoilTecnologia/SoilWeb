@@ -15,7 +15,7 @@ interface PivotProps {
 const PivotStatusComponent = ({ pivot }: PivotProps) => {
 
   return (
-    pivot.connection == true ? ( // trocar != para  ==
+    pivot.connection == true ? (
 
       <S.Container>
 
@@ -50,7 +50,7 @@ const PivotStatusComponent = ({ pivot }: PivotProps) => {
 
           <S.StatusView>
             <S.StatusName>
-              statusName
+              Percentímetro:
             </S.StatusName>
             <S.PivotCurrentPercent>
               {pivot.percentimeter == null ? "0%" : `${pivot.percentimeter}%`}

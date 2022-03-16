@@ -19,12 +19,15 @@ import {
   requestUpdateNode,
   requestUpdatePivot,
   requestUpdateUser,
+  requestSendPivotIntent
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
 import Farm, { FarmCreate } from "utils/models/farm";
+import Intent from "utils/models/intent";
 import Node, { NodeCreate } from "utils/models/node";
 import Pivot, { PivotCreate } from "utils/models/pivot";
+import State from "utils/models/state";
 import User, { requestUser, UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 import { useContextAuth } from "./useLoginAuth";
@@ -54,6 +57,7 @@ interface actionCrudProps {
   deletePivot: (pivot: Pivot) => void;
   getGetPivotsListWithFarmId: (farm_id: Farm["farm_id"]) => void;
   getAllPivotWithFarmId: (farm_id: Farm["farm_id"]) => void;
+  sendPivotIntent: (pivotId: string, intent: Intent) => void
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -168,6 +172,9 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const newPivot = await requestUpdatePivot(pivot, user?.token);
     newPivot && (await getAllPivots(pivot.farm_id));
   };
+  const sendPivotIntent = async (pivotId: Pivot["pivot_id"], intent: Intent) => {
+    await requestSendPivotIntent(pivotId,intent, user?.token);
+  };
   const deletePivot = async (pivot: Pivot) => {
     await requestDeletePivot(pivot.pivot_id, user?.token);
     await getAllPivots(pivot.farm_id);
@@ -180,8 +187,6 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
 
   const getGetPivotsListWithFarmId = async (farm_id: Farm["farm_id"]) => {
     const result = await requestGetPivotsListWithFarmId(farm_id, user?.token);
-    console.log("Todas os Pivos da fazenda");
-    console.log(result);
     result && setPivotList(result);
   };
 
@@ -208,6 +213,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         deleteNode,
         getAllPivotWithFarmId,
         getGetPivotsListWithFarmId,
+        sendPivotIntent
       }}
     >
       {children}

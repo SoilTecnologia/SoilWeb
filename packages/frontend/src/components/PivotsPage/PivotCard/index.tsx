@@ -2,6 +2,7 @@ import * as S from "./styles";
 import Router from "next/router";
 import Pivot from "utils/models/pivot";
 import PivotStatusComponent from "../PivotStatusComponent";
+import { useContextUserData } from "hooks/useContextUserData";
 
 
 interface PivotProps {
@@ -12,6 +13,7 @@ interface PivotProps {
 
 const PivotsContainer = ({ pivot }: PivotProps) => {
   const { pivot_num } = pivot
+  const { setPivot } = useContextUserData()
 
   function pivotStateSelector() {
     if (pivot.connection === true) {
@@ -22,6 +24,7 @@ const PivotsContainer = ({ pivot }: PivotProps) => {
     }
   }
   const handleIntent =()=>{
+    setPivot(pivot)
     Router.push("/intent")
   }
 

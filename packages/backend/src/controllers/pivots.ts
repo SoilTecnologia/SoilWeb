@@ -171,6 +171,7 @@ type PartialListResponse = {
   power: State['power'];
   water: State['water'];
   direction: State['direction'];
+  connection: State["connection"];
   percentimeter: StateVariable['percentimeter'];
   rssi: RadioVariable['rssi'];
   father: RadioVariable['father'];
@@ -188,7 +189,7 @@ export const readListPivotController = async (
 
   for (let pivot of pivots) {
     const state = await knex<State>('states')
-      .select('state_id', 'power', 'water', 'direction')
+      .select('state_id', 'power', 'water', 'direction', 'connection')
       .where('pivot_id', pivot.pivot_id)
       .orderBy('timestamp', 'desc')
       .first();
@@ -206,6 +207,7 @@ export const readListPivotController = async (
         power: state.power,
         water: state.water,
         direction: state.direction,
+        connection: state.connection,
         percentimeter: variable ? variable.percentimeter : null,
         rssi: null,
         father: null,
@@ -218,6 +220,7 @@ export const readListPivotController = async (
         power: false,
         water: false,
         direction: null,
+        connection: false,
         percentimeter: 0,
         rssi: null,
         father: null,
