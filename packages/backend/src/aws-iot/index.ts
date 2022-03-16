@@ -304,7 +304,6 @@ class IoTDevice {
 
       console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
       });
-
     }
   };
 
