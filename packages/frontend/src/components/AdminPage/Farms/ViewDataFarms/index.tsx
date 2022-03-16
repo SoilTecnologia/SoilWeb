@@ -9,14 +9,14 @@ type FarmProps = {
 };
 const ViewDataFarms = ({ farmData }: FarmProps) => {
   //Contexts
-  const { getAllNodes } = useContextActionCrud();
+  const { getAllPivots } = useContextActionCrud();
 
   //States
   const [pivotsvisible, setPivotVisible] = useState(false);
 
   const viewDataPivots = () => {
     if (!pivotsvisible) {
-      getAllNodes(farmData.farm_id);
+      getAllPivots(farmData.farm_id);
       setPivotVisible(true);
     } else {
       setPivotVisible(false);
@@ -25,23 +25,25 @@ const ViewDataFarms = ({ farmData }: FarmProps) => {
 
   return (
     <S.Container>
-      <S.ContentData>
-        <S.FarmName>
-          Fazenda: <span>{farmData.farm_name}</span>
-        </S.FarmName>
-        <S.FarmCity>
-          Cidade: <span>{farmData.farm_city}</span>
-        </S.FarmCity>
-      </S.ContentData>
+      <S.ContentFullData>
+        <S.ContentData>
+          <S.FarmName>
+            Fazenda: <span>{farmData.farm_name}</span>
+          </S.FarmName>
+          <S.FarmCity>
+            Cidade: <span>{farmData.farm_city}</span>
+          </S.FarmCity>
+        </S.ContentData>
 
-      <S.ContentData>
-        <S.Latitude>
-          Latitude: <span>{farmData.farm_lat.toString()}</span>
-        </S.Latitude>
-        <S.Longitude>
-          Longitude: <span>{farmData.farm_lng.toString()}</span>
-        </S.Longitude>
-      </S.ContentData>
+        <S.ContentData>
+          <S.Latitude>
+            Latitude: <span>{farmData.farm_lat.toString()}</span>
+          </S.Latitude>
+          <S.Longitude>
+            Longitude: <span>{farmData.farm_lng.toString()}</span>
+          </S.Longitude>
+        </S.ContentData>
+      </S.ContentFullData>
 
       <S.ContentPivotsNodes>
         <S.NodeName onClick={viewDataPivots}>

@@ -2,6 +2,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { defaultError } from "components/AdminPage/Pivots/CreatePivot";
 import { MessageError } from "components/AdminPage/Pivots/CreatePivot/styles";
 import ContentInputs from "components/globalComponents/ContentInputs";
+import ModalWarningAlreadEists from "components/globalComponents/ModalWarningAlreadEists";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useContextData } from "hooks/useContextData";
 import { useRef, useState } from "react";
@@ -144,6 +145,13 @@ const CreateNewFarm = () => {
         )}
         <S.Button type="submit" value="Enviar" />
       </S.Form>
+      {farmAlreadyExists && (
+        <ModalWarningAlreadEists
+          closeModal={() => setFarmAlreadyExists(false)}
+          alert="Já existe uma Fazenda com esse Id"
+          subAlert="Por favor Digite um Id da Fazenda diferente"
+        />
+      )}
     </S.Container>
   );
 };
