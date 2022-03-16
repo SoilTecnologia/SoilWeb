@@ -282,10 +282,10 @@ class IoTDevice {
             id: `${action.farm_id}_${action.node_num}`,
             pivot_num: null,
             payload: objectToActionString(
-              action.power,
-              action.water,
-              action.direction,
-              action.percentimeter
+              action.payload.power,
+              action.payload.water,
+              action.payload.direction,
+              action.payload.percentimeter
             )
           });
         } else {

@@ -67,6 +67,7 @@ export const objectToActionString = (power: Action['power'], water: Action['wate
     if(water) actionString += '6';
     else actionString += '5';
     actionString += '1';
+    actionString += '-'
     actionString += percentimeter.toString().padStart(3, '0');
   } else {
     return '00200';

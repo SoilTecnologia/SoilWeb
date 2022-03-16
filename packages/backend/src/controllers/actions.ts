@@ -38,6 +38,7 @@ export const createActionController = async (
   const node = await knex('nodes').select('*').where({ node_id }).first();
   const { farm_id, node_num, is_gprs } = node;
 
+
   emitter.emit('action', {
     farm_id,
     is_gprs,
