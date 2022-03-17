@@ -45,7 +45,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloud3';
-      this.clientId = 'cloud3';
+      this.clientId = 'cloud34';
     }
   }
 
@@ -141,7 +141,9 @@ class IoTDevice {
     qos: mqtt.QoS,
     retain: boolean
   ) => {
-    const decoder = new TextDecoder('utf8');
+    const decoder = new TextDecoder('utf8', {fatal: false});
+    // const filteredMessage = messageToString.substring(0, messageToString.indexOf('}'))
+   
     const json = JSON.parse(decoder.decode(message));
     const {
       type,
