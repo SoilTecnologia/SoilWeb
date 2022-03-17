@@ -54,7 +54,7 @@ io.on('connection', (socket: Socket) => {
       percentimeter
     });
 
-    console.log(`socket de state: `, status);
+    // console.log(`socket de state: `, status);
   });
 
   emitter.on('variable-change', (status: any) => {
@@ -66,7 +66,7 @@ io.on('connection', (socket: Socket) => {
       percentimeter
     });
 
-    console.log(`socket de variavel: `, status);
+    // console.log(`socket de variavel: `, status);
   });
 });
 
