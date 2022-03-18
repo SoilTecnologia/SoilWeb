@@ -270,7 +270,8 @@ class IoTDevice {
           payload: {
             ...status.payload,
             timestamp: status.payload.timestamp.toString()
-          }
+          },
+          attempts: 0,
         });
         console.log(
           `[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`
@@ -288,7 +289,8 @@ class IoTDevice {
               action.payload.water,
               action.payload.direction,
               action.payload.percentimeter
-            )
+            ),
+            attempts: 0,
           });
         } else {
           // this.queue.enqueue({
@@ -314,9 +316,18 @@ class IoTDevice {
       const current = this.queue.peek()!;
       const [farm_id, node_num] = current.id.split('_');
 
-      if (this.type === 'Raspberry') this.publish(current, this.pubTopic);
-      else this.publish(current, `${farm_id}_${node_num}`);
+      if(current.attempts <= 3) {
+      if (this.type === 'Raspberry') {
+        this.publish(current, this.pubTopic);
+      } else {
+        this.publish(current, `${farm_id}_${node_num}`);
+      }
+      current.attempts++;
+    } else {
+      console.log("[REMOVING ACTION FROM QUEUE] - Too Many Attempts");
+      this.queue.remove(current);
     }
+  }
   };
 }
 
@@ -325,6 +336,7 @@ type MessageQueue = {
   id: string;
   pivot_num: number | null;
   payload: any;
+  attempts: number;
 };
 
 export default IoTDevice;
