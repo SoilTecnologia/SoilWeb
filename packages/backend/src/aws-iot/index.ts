@@ -262,10 +262,10 @@ class IoTDevice {
           },
           attempts: 0
         });
-        this.processQueue();
         console.log(
           `[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`
         );
+        this.processQueue();
       });
     } else {
       emitter.on('action', (action) => {
@@ -322,7 +322,6 @@ class IoTDevice {
       }
       this.ready = true;
       setTimeout(() => {
-        console.log("Called on setTimeout")
         this.processQueue();
       }, 10.0 * 1000);
     }
