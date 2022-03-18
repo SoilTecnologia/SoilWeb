@@ -321,11 +321,11 @@ class IoTDevice {
         return;
       }
       this.ready = true;
-    }
       setTimeout(() => {
         console.log("Called on setTimeout")
         this.processQueue();
       }, 10.0 * 1000);
+    }
   };
 }
 
