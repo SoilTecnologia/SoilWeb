@@ -322,7 +322,8 @@ class IoTDevice {
       }
       this.ready = true;
     }
-      setTimeout(() => {
+      setTimeout(function() {
+        console.log("Called on setTimeout")
         this.processQueue();
       }, 10000);
   };
