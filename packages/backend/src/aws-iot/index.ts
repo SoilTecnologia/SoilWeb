@@ -274,7 +274,6 @@ class IoTDevice {
           this.queue.enqueue({
             type: 'action',
             id: `${action.farm_id}_${action.node_num}`,
-            pivot_num: null,
             payload: objectToActionString(
               action.payload.power,
               action.payload.water,
@@ -325,7 +324,7 @@ class IoTDevice {
 type MessageQueue = {
   type: 'action' | 'status';
   id: string;
-  pivot_num: number | null;
+  pivot_num?: number | null;
   payload: any;
   attempts: number;
 };
