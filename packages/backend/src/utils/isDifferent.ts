@@ -10,6 +10,9 @@ export const isStateDifferent = (oldState: CustomState, newState: CustomState): 
     oldState.water != newState.water ||
     oldState.direction != newState.direction
   ) {
+    console.log("Mudança de estado: ")
+    console.log(oldState)
+    console.log(newState)
     return true;
   }
   return false;
@@ -24,6 +27,9 @@ export const isStateVariableDifferent = (
     (oldStateVariable.angle! <= newStateVariable.angle! -5 || oldStateVariable.angle! >= newStateVariable.angle! +5) ||
     (oldStateVariable.percentimeter! <= newStateVariable.percentimeter! -5 || oldStateVariable.percentimeter! >= newStateVariable.percentimeter! +5)
   ) {
+    console.log("atualização de variavel")
+    console.log(oldStateVariable)
+    console.log(newStateVariable)
     return true;
   }
 
