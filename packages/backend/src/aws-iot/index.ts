@@ -217,9 +217,7 @@ class IoTDevice {
         }
       } else if (json.type === 'action') {
         console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
-        console.log(json)
-        let removed = this.queue.remove(json);
-        console.log(this.queue._store)
+       this.queue.remove(json);
       }
     } else if (this.type === 'Raspberry') {
       if (json.type === 'status') {
@@ -306,11 +304,7 @@ class IoTDevice {
   processQueue = () => {
     if (this.ready && !this.queue.isEmpty()) {
       this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
-      console.log('FULL QUEUE:');
-      console.log(this.queue);
-      console.log('peek: ');
       const current = this.queue.peek()!;
-      console.log(current);
       const [farm_id, node_num] = current.id.split('_');
 
       if (current.attempts! < 3) {
