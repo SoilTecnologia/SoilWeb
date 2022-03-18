@@ -2,7 +2,6 @@
 import express from 'express';
 import {
   getAllFarmUser,
-  getOneFarmController,
   readAllFarmController,
   readMapFarmControler
 } from '../controllers/farms';
@@ -14,6 +13,7 @@ import StateVariable from '../models/stateVariable';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
 import { createFarmController } from '../useCases/Farms/CreateFarms';
 import { deleteFarmController } from '../useCases/Farms/DeleteFarm';
+import { getOneFarmController } from '../useCases/Farms/GetOneFarm';
 import { updateFarmController } from '../useCases/Farms/UpdateFarm';
 
 type PivotMapData = {
@@ -115,27 +115,12 @@ router.delete(
   authMiddleware(),
   async (req, res, next) => await deleteFarmController.handle(req, res, next)
 );
+
 router.get(
   '/getOneFarm/:farmId',
   authMiddleware(),
   authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { farmId } = req.params;
-
-      try {
-        const allFarmsFromUser = await getOneFarmController(farmId);
-
-        res.send(allFarmsFromUser);
-      } catch (err) {
-        console.log(`[ERROR] Server 500 on /farms/readAll`);
-        console.log(err);
-        next(err);
-      }
-    }
+    async (req, res, next) => await getOneFarmController.handle(req, res, next)
   )
 );
 
