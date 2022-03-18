@@ -322,10 +322,10 @@ class IoTDevice {
       }
       this.ready = true;
     }
-      setTimeout(function() {
+      setTimeout(() => {
         console.log("Called on setTimeout")
         this.processQueue();
-      }, 10000);
+      }, 10.0 * 1000);
   };
 }
 
