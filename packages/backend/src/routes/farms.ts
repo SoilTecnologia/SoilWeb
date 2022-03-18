@@ -1,7 +1,6 @@
 /* eslint-disable spaced-comment */
 import express from 'express';
 import {
-  deleteFarmController,
   getAllFarmUser,
   getOneFarmController,
   readAllFarmController,
@@ -14,6 +13,7 @@ import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
 import { createFarmController } from '../useCases/Farms/CreateFarms';
+import { deleteFarmController } from '../useCases/Farms/DeleteFarm';
 import { updateFarmController } from '../useCases/Farms/UpdateFarm';
 
 type PivotMapData = {
@@ -110,19 +110,11 @@ router.put(
   async (req, res, next) => await updateFarmController.handle(req, res, next)
 );
 
-router.delete('/deleteFarm/:id', authMiddleware(), async (req, res, next) => {
-  const { id } = req.params;
-
-  try {
-    const deletedFarm = await deleteFarmController(id);
-
-    res.send(deletedFarm);
-  } catch (err) {
-    console.log('[ERROR] 500 Internal server error');
-    console.log(err);
-    next(err);
-  }
-});
+router.delete(
+  '/deleteFarm/:id',
+  authMiddleware(),
+  async (req, res, next) => await deleteFarmController.handle(req, res, next)
+);
 router.get(
   '/getOneFarm/:farmId',
   authMiddleware(),

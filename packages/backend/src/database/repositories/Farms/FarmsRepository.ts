@@ -35,6 +35,15 @@ class FarmsRepository implements IFarmsRepository {
 
     return result[0];
   }
+
+  async deleteFarm(farm_id: string): Promise<number | undefined> {
+    const delResult = await knex<Farm>('farms')
+      .select()
+      .where({ farm_id })
+      .del();
+
+    return delResult;
+  }
 }
 
 export { FarmsRepository };

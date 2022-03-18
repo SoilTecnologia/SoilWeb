@@ -62,7 +62,7 @@ class UsersRepository implements IUsersRepository {
   }
 
   async deleteUser(user_id: string): Promise<number | undefined> {
-    const user = await knex<User>('users').select().where({ user_id }).first();
+    const user = await this.findById(user_id);
     if (user) {
       const del = await knex<User>('users').select().where({ user_id }).del();
       return del;
