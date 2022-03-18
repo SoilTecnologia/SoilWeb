@@ -32,11 +32,7 @@ export const readAllFarmController = async (
   return farms;
 };
 
-export const getAllFarmUser = async (user_id: User['user_id']) => {
-  const farms = await knex<Farm>('farms').select().where({ user_id });
-
-  return farms;
-};
+export const getAllFarmUser = async (user_id: User['user_id']) => {};
 
 export const getOneFarmController = async (farm_id: Farm['farm_id']) => {
   const farms = await knex<Farm>('farms').select().where({ farm_id }).first();

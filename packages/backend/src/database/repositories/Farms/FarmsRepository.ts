@@ -50,6 +50,14 @@ class FarmsRepository implements IFarmsRepository {
 
     return farms;
   }
+
+  async getFarmsByUser(
+    user_id: string | undefined
+  ): Promise<FarmModel[] | undefined> {
+    const farms = await knex<Farm>('farms').select().where({ user_id });
+
+    return farms;
+  }
 }
 
 export { FarmsRepository };
