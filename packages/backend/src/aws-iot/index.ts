@@ -217,6 +217,7 @@ class IoTDevice {
       } else if (json.type === 'action') {
         console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
         this.queue.remove(json);
+        console.log(this.queue)
       }
     } else if (this.type === 'Raspberry') {
       if (json.type === 'status') {
@@ -320,6 +321,7 @@ class IoTDevice {
       } else {
         console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
         this.queue.remove(current);
+        return;
       }
       this.ready = true;
     }
