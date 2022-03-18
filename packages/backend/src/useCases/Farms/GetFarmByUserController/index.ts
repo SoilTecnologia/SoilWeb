@@ -8,4 +8,4 @@ const getFarmsByuserController = new GetFarmsByUserController(
   getFarmByUserUseCase
 );
 
-export { getFarmByUserUseCase };
+export { getFarmsByuserController };

@@ -4,11 +4,10 @@ import { FarmsRepository } from '../../../database/repositories/Farms/FarmsRepos
 class CreateFarmUseCase {
   constructor(private farmRepository: FarmsRepository) {}
 
-  execute(farm: FarmModel) {
+  async execute(farm: FarmModel) {
     const farmModel = new FarmModel();
     Object.assign(farmModel, farm);
-
-    const result = this.farmRepository.create(farmModel);
+    const result = await this.farmRepository.create(farmModel);
 
     return result;
   }

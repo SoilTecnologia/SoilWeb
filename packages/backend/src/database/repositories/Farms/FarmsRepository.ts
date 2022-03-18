@@ -45,18 +45,22 @@ class FarmsRepository implements IFarmsRepository {
     return delResult;
   }
 
-  async getOneFarm(farm_id: string): Promise<FarmModel | undefined> {
-    const farms = await knex<Farm>('farms').select().where({ farm_id }).first();
-
-    return farms;
-  }
-
   async getFarmsByUser(
     user_id: string | undefined
   ): Promise<FarmModel[] | undefined> {
-    const farms = await knex<Farm>('farms').select().where({ user_id });
+    return await knex<Farm>('farms').select().where({ user_id });
+  }
 
-    return farms;
+  async getAllFarms(): Promise<FarmModel[]> {
+    return await knex<Farm>('farms').select();
+  }
+
+  async getMapFarm(farm_id: string): Promise<any> {
+    const result = await knex('farms')
+      .join('nodes', 'farms.farm_id', 'nodes.farm_id')
+      .select('*');
+
+    return result;
   }
 }
 
