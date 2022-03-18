@@ -303,7 +303,11 @@ class IoTDevice {
 
   processQueue = () => {
     if (!this.queue.isEmpty()) {
+      console.log("FULL QUEUE:");
+      console.log(this.queue)
+      console.log("peek: ")
       const current = this.queue.peek()!;
+      console.log(current)
       const [farm_id, node_num] = current.id.split('_');
 
       if (current.attempts < 3) {
