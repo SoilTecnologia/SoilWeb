@@ -94,7 +94,7 @@ class IoTDevice {
 
       await this.setupQueue();
       setInterval(() => {
-        if (this.ready) this.processQueue();
+        if (this.ready && !this.queue.isEmpty()) this.processQueue();
       }, 5000);
     } catch (err) {
       console.log(err);
@@ -302,7 +302,7 @@ class IoTDevice {
   };
 
   processQueue = () => {
-    if (!this.queue.isEmpty()) {
+    this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
       console.log("FULL QUEUE:");
       console.log(this.queue)
       console.log("peek: ")
@@ -321,7 +321,7 @@ class IoTDevice {
         console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
         this.queue.remove(current);
       }
-    }
+      this.ready = true;
   };
 }
 
