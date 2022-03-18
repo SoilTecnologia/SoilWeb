@@ -281,6 +281,7 @@ class IoTDevice {
             ),
             attempts: 0
           });
+        console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
         this.processQueue();
         } else {
           // this.queue.enqueue({
@@ -296,7 +297,6 @@ class IoTDevice {
           // });
         }
 
-        console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
       });
     }
   };
