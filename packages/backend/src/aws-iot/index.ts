@@ -8,6 +8,7 @@ import {
   objectToActionString,
   statusPayloadStringToObject
 } from '../utils/conversions';
+import MessageQueue from '../types/message_queue';
 
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
@@ -33,12 +34,12 @@ class IoTDevice {
 
   private ready: boolean = true; // Variavel auxiliar do loop da fila
 
-  private queue: Queue<MessageQueue>; // Fila de mensagens à serem enviadas
+  private queue: Queue; // Fila de mensagens à serem enviadas
 
   constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
     this.type = type;
     this.qos = qos;
-    this.queue = new Queue<MessageQueue>();
+    this.queue = new Queue();
     if (type == 'Raspberry' && topic) {
       this.subTopic = `${topic}`;
       this.pubTopic = `cloud3`;
@@ -103,7 +104,7 @@ class IoTDevice {
   /*
   Função que faz a publicação de mensagens e respostas.
   A função JSON.stringify() customizada converte o objeto em uma string, além de converter campos especiais como null para string. Isso é importante pois a resposta deve ser exatamente igual ao que o cliente enviou, e campos null normalmente são apagados quando se usa a função JSON.stringify() original.
-  */
+ */
 
   publish(payload: any, topic?: string) {
     let finalTopic;
@@ -312,13 +313,13 @@ class IoTDevice {
       console.log(current);
       const [farm_id, node_num] = current.id.split('_');
 
-      if (current.attempts < 3) {
+      if (current.attempts! < 3) {
         if (this.type === 'Raspberry') {
           this.publish(current, this.pubTopic);
         } else {
           this.publish(current, `${farm_id}_${node_num}`);
         }
-        current.attempts++;
+        current.attempts!++;
       } else {
         console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
         this.queue.remove(current);
@@ -332,12 +333,5 @@ class IoTDevice {
   };
 }
 
-type MessageQueue = {
-  type: 'action' | 'status';
-  id: string;
-  pivot_num?: number | null;
-  payload: any;
-  attempts: number;
-};
 
 export default IoTDevice;

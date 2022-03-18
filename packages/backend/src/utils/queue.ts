@@ -1,9 +1,11 @@
+import MessageQueue from "../types/message_queue";
+
 var _ = require('lodash');
 
-class Queue<T> {
-  _store: T[] = [];
+class Queue {
+  _store: MessageQueue[] = [];
 
-  enqueue(val: T) {
+  enqueue(val: MessageQueue) {
     // (Object.keys(val) as Array<keyof T>).forEach((key) => {
     //   if (val[key] instanceof Object) {
     //     Object.keys(val[key]).forEach((key2) => {
@@ -18,11 +20,11 @@ class Queue<T> {
     this._store.push(val);
   }
 
-  dequeue(): T | undefined {
+  dequeue(): MessageQueue | undefined {
     return this._store.shift();
   }
 
-  peek(): T {
+  peek(): MessageQueue {
     return this._store[0];
   }
 
@@ -30,18 +32,19 @@ class Queue<T> {
     return this._store.length === 0;
   }
 
-  remove(value: T): T[] | null {
+  remove(value: MessageQueue): MessageQueue[] | null {
     for (let i = 0; i < this._store.length; i++) {
-      if (_.isEqual(this._store[i], value)) {
+      let inQueue = this._store[i];
+      let newValue = value;
+
+      delete inQueue.attempts;
+      delete newValue.attempts;
+      if(_.isEqual(inQueue, newValue)) {
         return this._store.splice(i, 1);
       }
     }
     return null;
   }
-
-  // _cleanupValue(val: T) {
-
-  // }
 }
 
 export default Queue;
