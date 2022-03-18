@@ -14,6 +14,7 @@ import { Server, Socket } from 'socket.io';
 import IoTDevice from './aws-iot/index';
 import router from './routes';
 import emitter from './utils/eventBus';
+import knex from './database';
 
 require('dotenv').config();
 
@@ -67,6 +68,36 @@ io.on('connection', (socket: Socket) => {
     });
 
     // console.log(`socket de variavel: `, status);
+  });
+
+  emitter.on('action-ack-received', async (action) => {
+    const { id } = action;
+    const [farm_id, pivot_num] = id.split('_');
+
+    /* Tentar melhorar isso daqui, nao depender de fazer uma query pra saber o usuario" */
+    const farm = await knex('farms').select('*').where({ farm_id }).first();
+    const { user_id, farm_name } = farm;
+
+    socket.emit(`${user_id}-ackreceived`, {
+      type: 'ack',
+      pivot_num,
+      farm_name
+    });
+  });
+
+  emitter.on('action-ack-not-received', async (action) => {
+    const { id } = action;
+    const [farm_id, pivot_num] = id.split('_');
+
+    /* Tentar melhorar isso daqui, nao depender de fazer uma query pra saber o usuario" */
+    const farm = await knex('farms').select('*').where({ farm_id }).first();
+    const { user_id, farm_name } = farm;
+
+    socket.emit(`${user_id}-acknotreceived`, {
+      type: 'ack',
+      pivot_num,
+      farm_name
+    });
   });
 });
 
