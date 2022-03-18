@@ -93,7 +93,6 @@ class IoTDevice {
       */
 
       await this.setupQueue();
-      this.processQueue();
     } catch (err) {
       console.log(err);
     }
@@ -262,6 +261,7 @@ class IoTDevice {
           },
           attempts: 0
         });
+        this.processQueue();
         console.log(
           `[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`
         );
@@ -280,6 +280,7 @@ class IoTDevice {
             ),
             attempts: 0
           });
+        this.processQueue();
         } else {
           // this.queue.enqueue({
           //   type: 'action',
@@ -321,11 +322,10 @@ class IoTDevice {
         this.queue.remove(current);
       }
       this.ready = true;
-
+    }
       setTimeout(() => {
         this.processQueue();
       }, 10000);
-    }
   };
 }
 
