@@ -1,9 +1,10 @@
 import express from 'express';
-import { getAllUsersController, signInController } from '../controllers/users';
+import { signInController } from '../controllers/users';
 import authMiddleware from '../middlewares/auth';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
 import { createUserController } from '../useCases/User/CreateUser';
 import { deleteUserController } from '../useCases/User/DeleteUser';
+import { getAllUserController } from '../useCases/User/GetAllUsers';
 import { updateUserController } from '../useCases/User/Updateuser';
 
 const router = express.Router();
@@ -48,25 +49,8 @@ router.get(
   )
 );
 
-router.get(
-  '/allUsers',
-  authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      try {
-        const usersList = await getAllUsersController();
-        res.send(usersList);
-      } catch (err) {
-        console.log('[ERROR] Error in the server');
-        console.log(err);
-        next(err);
-      }
-    }
-  )
+router.get('/allUsers', authMiddleware(), (req, res, next) =>
+  getAllUserController.handle(req, res, next)
 );
 
 router.put(
