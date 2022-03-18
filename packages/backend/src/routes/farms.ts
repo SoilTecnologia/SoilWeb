@@ -4,7 +4,6 @@ import {
   deleteFarmController,
   getAllFarmUser,
   getOneFarmController,
-  putFarmController,
   readAllFarmController,
   readMapFarmControler
 } from '../controllers/farms';
@@ -15,6 +14,7 @@ import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
 import { createFarmController } from '../useCases/Farms/CreateFarms';
+import { updateFarmController } from '../useCases/Farms/UpdateFarm';
 
 type PivotMapData = {
   pivot_position: { lng: Pivot['pivot_lng']; lat: Pivot['pivot_lat'] };
@@ -107,24 +107,7 @@ router.get(
 router.put(
   '/updateFarm',
   authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const farm = req.body;
-      try {
-        const putFarm = await putFarmController(farm);
-
-        res.send(putFarm);
-      } catch (err) {
-        console.log('[ERROR] Internal Server error');
-        console.log(err);
-        next(err);
-      }
-    }
-  )
+  async (req, res, next) => await updateFarmController.handle(req, res, next)
 );
 
 router.delete('/deleteFarm/:id', authMiddleware(), async (req, res, next) => {

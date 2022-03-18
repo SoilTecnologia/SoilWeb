@@ -75,16 +75,13 @@ export const putFarmController = async (farm: Farm) => {
     .first();
 
   if (getFarm) {
-    await knex<Farm>('farms')
-      .where({ farm_id: farm.farm_id })
-      .update({
-        ...getFarm,
-        farm_name: farm.farm_name ? farm.farm_name : getFarm.farm_name,
-        farm_city: farm.farm_city ? farm.farm_city : getFarm.farm_city,
-        farm_lng: farm.farm_lng ? farm.farm_lng : getFarm.farm_lng,
-        farm_lat: farm.farm_lat ? farm.farm_lat : getFarm.farm_lat
-      });
-
+    // {
+    //   ...getFarm,
+    //   farm_name: farm.farm_name ? farm.farm_name : getFarm.farm_name,
+    //   farm_city: farm.farm_city ? farm.farm_city : getFarm.farm_city,
+    //   farm_lng: farm.farm_lng ? farm.farm_lng : getFarm.farm_lng,
+    //   farm_lat: farm.farm_lat ? farm.farm_lat : getFarm.farm_lat
+    // }
     const newFarm = await knex<Farm>('farms')
       .select()
       .where({ farm_id: farm.farm_id })

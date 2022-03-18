@@ -26,6 +26,15 @@ class FarmsRepository implements IFarmsRepository {
 
     return newFarm[0];
   }
+
+  async updateFarm(farm: FarmModel): Promise<FarmModel | undefined> {
+    const result = await knex<FarmModel>('farms')
+      .where({ farm_id: farm.farm_id })
+      .update(farm)
+      .returning('*');
+
+    return result[0];
+  }
 }
 
 export { FarmsRepository };
