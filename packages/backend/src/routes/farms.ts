@@ -1,7 +1,6 @@
 /* eslint-disable spaced-comment */
 import express from 'express';
 import {
-  createFarmController,
   deleteFarmController,
   getAllFarmUser,
   getOneFarmController,
@@ -15,6 +14,7 @@ import Pivot from '../models/pivot';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
+import { createFarmController } from '../useCases/Farms/CreateFarms';
 
 type PivotMapData = {
   pivot_position: { lng: Pivot['pivot_lng']; lat: Pivot['pivot_lat'] };
@@ -36,37 +36,7 @@ const router = express.Router();
 router.post(
   '/addFarm',
   authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const {
-        user_id,
-        farm_name,
-        farm_city,
-        farm_lng,
-        farm_lat,
-        farm_id
-      }: Farm = req.body;
-      try {
-        const farm = await createFarmController(
-          farm_id,
-          user_id,
-          farm_name,
-          farm_city,
-          farm_lng,
-          farm_lat
-        );
-        res.send(farm);
-      } catch (err) {
-        console.log(`[ERROR] Server 500 on /users/addFarm!`);
-        console.log(err);
-        next(err);
-      }
-    }
-  )
+  async (req, res, next) => await createFarmController.handle(req, res, next)
 );
 
 router.get(

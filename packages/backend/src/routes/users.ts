@@ -1,7 +1,7 @@
 import express from 'express';
-import { signInController } from '../controllers/users';
 import authMiddleware from '../middlewares/auth';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
+import { authSigInController } from '../useCases/User/AuthSignInUser';
 import { createUserController } from '../useCases/User/CreateUser';
 import { deleteUserController } from '../useCases/User/DeleteUser';
 import { getAllUserController } from '../useCases/User/GetAllUsers';
@@ -14,19 +14,10 @@ router.post(
   async (req, res, next) => await createUserController.handle(req, res, next)
 );
 
-router.post('/signin', async (req, res, next) => {
-  const { login, password } = req.body;
-
-  try {
-    const cookieInfo = await signInController(login, password);
-
-    res.send(cookieInfo);
-  } catch (err) {
-    console.log(`[ERROR] Server 500 on /users/signin:`);
-    console.log(err);
-    next(err);
-  }
-});
+router.post(
+  '/signin',
+  async (req, res, next) => await authSigInController.handle(req, res, next)
+);
 
 /* Returns the user id. This route is used by the mobile application to check if the token
 it has saved is still valid.
