@@ -93,9 +93,7 @@ class IoTDevice {
       */
 
       await this.setupQueue();
-      setInterval(() => {
-        if (this.ready && !this.queue.isEmpty()) this.processQueue();
-      }, 5000);
+      this.processQueue();
     } catch (err) {
       console.log(err);
     }
@@ -302,12 +300,13 @@ class IoTDevice {
   };
 
   processQueue = () => {
-    this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
-      console.log("FULL QUEUE:");
-      console.log(this.queue)
-      console.log("peek: ")
+    if (this.ready && !this.queue.isEmpty()) {
+      this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
+      console.log('FULL QUEUE:');
+      console.log(this.queue);
+      console.log('peek: ');
       const current = this.queue.peek()!;
-      console.log(current)
+      console.log(current);
       const [farm_id, node_num] = current.id.split('_');
 
       if (current.attempts < 3) {
@@ -322,6 +321,11 @@ class IoTDevice {
         this.queue.remove(current);
       }
       this.ready = true;
+
+      setTimeout(() => {
+        this.processQueue();
+      }, 10000);
+    }
   };
 }
 
