@@ -70,26 +70,13 @@ class UsersRepository implements IUsersRepository {
     throw new Error('Failed Delete User');
   }
 
-  async putUserController(user: User): Promise<User | undefined> {
-    const userModel = new UserModel();
-    const selectUser = await this.findById(user.user_id);
+  async putUserController(user: UserModel): Promise<User | undefined> {
+    const putUser = await knex<User>('users')
+      .where({ user_id: user.user_id })
+      .update(user)
+      .returning('*');
 
-    if (selectUser) {
-      Object.assign(userModel, {
-        user_id: user.user_id ? user.user_id : selectUser.user_id,
-        login: user.login ? user.login : selectUser.login,
-        password: user.password ? user.password : selectUser.password,
-        user_type: user.user_type ? user.user_type : selectUser.user_type
-      });
-
-      const putUser = await knex<User>('users')
-        .where({ user_id: user.user_id })
-        .update(userModel)
-        .returning('*');
-
-      return putUser[0];
-    }
-    throw new Error('[ERROR] User not find');
+    return putUser[0];
   }
 
   async getAllUsersController(): Promise<User[]> {

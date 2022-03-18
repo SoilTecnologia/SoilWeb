@@ -26,7 +26,7 @@ interface IUsersRepository {
 
   deleteUserController(user_id: User['user_id']): Promise<number | undefined>;
 
-  putUserController(user: User): Promise<User | undefined>;
+  putUserController(user: UserModel): Promise<User | undefined>;
 
   getAllUsersController(): Promise<User[]>;
 }

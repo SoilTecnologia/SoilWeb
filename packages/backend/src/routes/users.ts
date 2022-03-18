@@ -2,12 +2,12 @@ import express from 'express';
 import {
   deleteUserController,
   getAllUsersController,
-  putUserController,
   signInController
 } from '../controllers/users';
 import authMiddleware from '../middlewares/auth';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
 import { createUserController } from '../useCases/User/CreateUser';
+import { updateUserController } from '../useCases/User/Updateuser';
 
 const router = express.Router();
 
@@ -93,30 +93,7 @@ router.get(
 router.put(
   '/putUser',
   authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { user_id, login, password, user_type } = req.body;
-
-      try {
-        const putUser = await putUserController({
-          user_id,
-          login,
-          password,
-          user_type
-        });
-
-        res.send(putUser);
-      } catch (err) {
-        console.log('[ERROR] Internal Server error');
-        console.log(err);
-        next(err);
-      }
-    }
-  )
+  async (req, res, next) => await updateUserController.handle(req, res, next)
 );
 
 router.delete(
