@@ -61,7 +61,7 @@ class UsersRepository implements IUsersRepository {
     throw new InvalidCredentials();
   }
 
-  async deleteUserController(user_id: string): Promise<number | undefined> {
+  async deleteUser(user_id: string): Promise<number | undefined> {
     const user = await knex<User>('users').select().where({ user_id }).first();
     if (user) {
       const del = await knex<User>('users').select().where({ user_id }).del();
@@ -70,7 +70,7 @@ class UsersRepository implements IUsersRepository {
     throw new Error('Failed Delete User');
   }
 
-  async putUserController(user: UserModel): Promise<User | undefined> {
+  async putUser(user: UserModel): Promise<User | undefined> {
     const putUser = await knex<User>('users')
       .where({ user_id: user.user_id })
       .update(user)
@@ -79,7 +79,7 @@ class UsersRepository implements IUsersRepository {
     return putUser[0];
   }
 
-  async getAllUsersController(): Promise<User[]> {
+  async getAllUsers(): Promise<User[]> {
     const users = await knex<User>('users').select();
     if (!users) throw new Error('No user found');
 

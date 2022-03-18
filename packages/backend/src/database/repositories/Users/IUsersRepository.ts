@@ -24,11 +24,11 @@ interface IUsersRepository {
 
   create({ login, password, user_type }: UserModel): Promise<User[]>;
 
-  deleteUserController(user_id: User['user_id']): Promise<number | undefined>;
+  deleteUser(user_id: User['user_id']): Promise<number | undefined>;
 
-  putUserController(user: UserModel): Promise<User | undefined>;
+  putUser(user: UserModel): Promise<User | undefined>;
 
-  getAllUsersController(): Promise<User[]>;
+  getAllUsers(): Promise<User[]>;
 }
 
 export { IUsersRepository, ResponseDTO };

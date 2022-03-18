@@ -16,7 +16,7 @@ class UpdateUserUseCase {
         user_type: user_type || selectUser.user_type
       });
 
-      const newUser = await this.userRepository.putUserController(userModel);
+      const newUser = await this.userRepository.putUser(userModel);
 
       return newUser;
     }

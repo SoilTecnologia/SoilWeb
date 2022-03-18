@@ -1,34 +1,13 @@
 import express from 'express';
-import {
-  deleteUserController,
-  getAllUsersController,
-  signInController
-} from '../controllers/users';
+import { getAllUsersController, signInController } from '../controllers/users';
 import authMiddleware from '../middlewares/auth';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
 import { createUserController } from '../useCases/User/CreateUser';
+import { deleteUserController } from '../useCases/User/DeleteUser';
 import { updateUserController } from '../useCases/User/Updateuser';
 
 const router = express.Router();
 
-// async (req, res, next) => {
-//   const { user_id, login, password, user_type } = req.body;
-
-//   try {
-//     const cookieInfo = await signUpController(
-//       login,
-//       password,
-//       user_type,
-//       user_id
-//     );
-
-//     res.send(cookieInfo);
-//   } catch (err) {
-//     console.log(`[ERROR] Server 500 on /users/signup:`);
-//     console.log(err);
-//     next(err);
-//   }
-// }
 router.post(
   '/signup',
   async (req, res, next) => await createUserController.handle(req, res, next)
@@ -99,23 +78,7 @@ router.put(
 router.delete(
   '/delUser/:id',
   authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { id } = req.params;
-      try {
-        const notUser = await deleteUserController(id);
-        res.sendStatus(200).send(notUser);
-      } catch (err) {
-        console.log(`[ERROR] 500 on /users/deleteUser`);
-        console.log(err);
-        next(err);
-      }
-    }
-  )
+  async (req, res, next) => await deleteUserController.handle(req, res, next)
 );
 export default router;
 
