@@ -257,7 +257,7 @@ class IoTDevice {
         this.queue.enqueue({
           type: 'status',
           id: `${status.farm_id}_${status.node_num}`, //TODO status ta vindo node_num?
-          pivot_num: null,
+          pivot_num: status.node_num,
           payload: {
             ...status.payload,
             timestamp: status.payload.timestamp.toString()
