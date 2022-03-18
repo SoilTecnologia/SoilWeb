@@ -317,6 +317,7 @@ class IoTDevice {
       } else {
         console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
         this.queue.remove(current);
+        this.ready = true;
         return;
       }
       this.ready = true;
