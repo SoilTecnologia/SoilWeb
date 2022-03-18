@@ -1,6 +1,6 @@
 import { mqtt, iot } from 'aws-iot-device-sdk-v2';
 import { TextDecoder } from 'util';
-import Queue from '../utils/queue';
+import MessageQueue from '../utils/message_queue';
 import emitter from '../utils/eventBus';
 import { updatePivotController } from '../controllers/pivots';
 import { createActionController } from '../controllers/actions';
@@ -8,7 +8,7 @@ import {
   objectToActionString,
   statusPayloadStringToObject
 } from '../utils/conversions';
-import MessageQueue from '../types/message_queue';
+import MessageQueueType from '../types/message_queue';
 
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
@@ -34,12 +34,12 @@ class IoTDevice {
 
   private ready: boolean = true; // Variavel auxiliar do loop da fila
 
-  private queue: Queue; // Fila de mensagens à serem enviadas
+  private queue: MessageQueue; // Fila de mensagens à serem enviadas
 
   constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
     this.type = type;
     this.qos = qos;
-    this.queue = new Queue();
+    this.queue = new MessageQueue();
     if (type == 'Raspberry' && topic) {
       this.subTopic = `${topic}`;
       this.pubTopic = `cloud3`;
