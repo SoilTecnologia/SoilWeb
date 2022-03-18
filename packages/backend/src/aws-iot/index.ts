@@ -216,8 +216,8 @@ class IoTDevice {
         }
       } else if (json.type === 'action') {
         console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
-        this.queue.remove(json);
-        console.log(this.queue)
+        let removed = this.queue.remove(json);
+        console.log(removed)
       }
     } else if (this.type === 'Raspberry') {
       if (json.type === 'status') {
