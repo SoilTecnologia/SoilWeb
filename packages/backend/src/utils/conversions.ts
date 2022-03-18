@@ -31,7 +31,6 @@ export const statusStringToObject = (status: string) => {
   };
 
   if (match) {
-    console.log("THE MATCH IS", match);
     if (direction == '3') {
       response.direction = 'CLOCKWISE';
     } else if (direction == '4') {
@@ -110,7 +109,7 @@ export const statusPayloadStringToObject = (payload: string) => {
   
       response.percentimeter = Number(percentimeter);
       response.angle = Number(angle);
-      response.timestamp = new Date(Number(timestamp));
+      response.timestamp = new Date(Number(timestamp)*1000);
   
       return response;
     }
