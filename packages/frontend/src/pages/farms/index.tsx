@@ -1,9 +1,8 @@
+import MainFarm from "components/FarmsPage/MainFarm";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useContextData } from "hooks/useContextData";
 import { useContextAuth } from "hooks/useLoginAuth";
 import { useEffect } from "react";
-import MainFarm from "components/FarmsPage/MainFarm";
-import { useContextUserData } from "hooks/useContextUserData";
 
 const UserFarms = () => {
   const { user } = useContextAuth();
@@ -13,7 +12,7 @@ const UserFarms = () => {
     if (user) {
       getAllFarmsUser(user.user_id);
     }
-  }, [user])
+  }, [user]);
 
   return <MainFarm farmList={farmList} />;
 };

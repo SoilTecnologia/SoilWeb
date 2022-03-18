@@ -1,11 +1,10 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
-import { IUserAuthInfoRequest, authHandler } from '../types/express';
 import {
   createActionController,
   readAllActionsController
 } from '../controllers/actions';
-import { readOnePivotController } from '../controllers/pivots';
+import authMiddleware from '../middlewares/auth';
+import { authHandler } from '../types/express';
 
 const router = express.Router();
 router.post(

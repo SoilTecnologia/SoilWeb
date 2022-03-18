@@ -1,8 +1,8 @@
 import MainAdmin from "components/AdminPage/MainAdmin";
-import { useEffect } from "react";
-import { parseCookies } from "nookies";
-import Router from "next/router";
 import { useContextAuth } from "hooks/useLoginAuth";
+import Router from "next/router";
+import { parseCookies } from "nookies";
+import { useEffect } from "react";
 
 const Admin = () => {
   const { user, setUser } = useContextAuth();
@@ -14,7 +14,7 @@ const Admin = () => {
     } = parseCookies();
 
     if (token) {
-      !user && setUser({ user_type, user_id });
+      !user && setUser({ token, user_type, user_id });
       user_type !== "SUDO" && Router.push("/user");
     } else {
       Router.push("/");

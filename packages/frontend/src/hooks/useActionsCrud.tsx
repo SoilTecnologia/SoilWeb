@@ -88,6 +88,8 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
 
   const createUser = async (newUser: UserCreate) => {
     const result = await requestPostUser(newUser);
+    console.log("Retorno");
+    console.log(result);
 
     if (result) {
       await getAllUser(user?.token);

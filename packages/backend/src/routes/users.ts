@@ -1,34 +1,38 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
 import {
-  signUpController,
-  signInController,
   deleteUserController,
   getAllUsersController,
-  putUserController
+  putUserController,
+  signInController
 } from '../controllers/users';
-import { IUserAuthInfoRequest, authHandler } from '../types/express';
+import authMiddleware from '../middlewares/auth';
+import { authHandler, IUserAuthInfoRequest } from '../types/express';
+import { createUserController } from '../useCases/User/CreateUser';
 
 const router = express.Router();
 
-router.post('/signup', async (req, res, next) => {
-  const { user_id, login, password, user_type } = req.body;
+// async (req, res, next) => {
+//   const { user_id, login, password, user_type } = req.body;
 
-  try {
-    const cookieInfo = await signUpController(
-      login,
-      password,
-      user_type,
-      user_id
-    );
+//   try {
+//     const cookieInfo = await signUpController(
+//       login,
+//       password,
+//       user_type,
+//       user_id
+//     );
 
-    res.send(cookieInfo);
-  } catch (err) {
-    console.log(`[ERROR] Server 500 on /users/signup:`);
-    console.log(err);
-    next(err);
-  }
-});
+//     res.send(cookieInfo);
+//   } catch (err) {
+//     console.log(`[ERROR] Server 500 on /users/signup:`);
+//     console.log(err);
+//     next(err);
+//   }
+// }
+router.post(
+  '/signup',
+  async (req, res, next) => await createUserController.handle(req, res, next)
+);
 
 router.post('/signin', async (req, res, next) => {
   const { login, password } = req.body;
