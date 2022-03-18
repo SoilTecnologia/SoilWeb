@@ -114,13 +114,12 @@ class IoTDevice {
     else finalTopic = this.pubTopic;
 
     try {
-        const string = JSON.stringify(payload, (k, v) =>
-          v === undefined ? null : v
-        );
+      const string = JSON.stringify(payload, (k, v) =>
+        v === undefined ? null : v
+      );
 
-      
-        this.connection.publish(finalTopic!, string, 0, false);
-        console.log(`[IOT] ${finalTopic} Enviando mensagem... ${string}`);
+      this.connection.publish(finalTopic!, string, 0, false);
+      console.log(`[IOT] ${finalTopic} Enviando mensagem... ${string}`);
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -141,9 +140,9 @@ class IoTDevice {
     qos: mqtt.QoS,
     retain: boolean
   ) => {
-    const decoder = new TextDecoder('utf8', {fatal: false});
+    const decoder = new TextDecoder('utf8', { fatal: false });
     // const filteredMessage = messageToString.substring(0, messageToString.indexOf('}'))
-   
+
     const json = JSON.parse(decoder.decode(message));
     const {
       type,
@@ -227,17 +226,9 @@ class IoTDevice {
         console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
         this.queue.remove(json);
       } else if (json.type === 'action') {
-        const {
-          author,
-          power,
-          water,
-          direction,
-          percentimeter,
-          timestamp
-        } = json.payload;
-        const {
-          farm_id, node_num, pivot_num
-        } = json;
+        const { author, power, water, direction, percentimeter, timestamp } =
+          json.payload;
+        const { farm_id, node_num, pivot_num } = json;
         await createActionController(
           `${farm_id}_${node_num}_${pivot_num}`,
           author,
@@ -271,7 +262,7 @@ class IoTDevice {
             ...status.payload,
             timestamp: status.payload.timestamp.toString()
           },
-          attempts: 0,
+          attempts: 0
         });
         console.log(
           `[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`
@@ -290,7 +281,7 @@ class IoTDevice {
               action.payload.direction,
               action.payload.percentimeter
             ),
-            attempts: 0,
+            attempts: 0
           });
         } else {
           // this.queue.enqueue({
@@ -306,7 +297,7 @@ class IoTDevice {
           // });
         }
 
-      console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
+        console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
       });
     }
   };
@@ -316,18 +307,18 @@ class IoTDevice {
       const current = this.queue.peek()!;
       const [farm_id, node_num] = current.id.split('_');
 
-      if(current.attempts <= 3) {
-      if (this.type === 'Raspberry') {
-        this.publish(current, this.pubTopic);
+      if (current.attempts < 3) {
+        if (this.type === 'Raspberry') {
+          this.publish(current, this.pubTopic);
+        } else {
+          this.publish(current, `${farm_id}_${node_num}`);
+        }
+        current.attempts++;
       } else {
-        this.publish(current, `${farm_id}_${node_num}`);
+        console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
+        this.queue.remove(current);
       }
-      current.attempts++;
-    } else {
-      console.log("[REMOVING ACTION FROM QUEUE] - Too Many Attempts");
-      this.queue.remove(current);
     }
-  }
   };
 }
 
