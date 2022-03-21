@@ -2,9 +2,6 @@ import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 import Action from '../models/action';
 
-var moment = require('moment-timezone');
-moment().tz("America/Sao_Paulo").format();
-
 export type StringStatusData =
   `${number}${number}${number}-${number}${number}${number}-${number}${number}${number}-${number}`;
 
@@ -109,11 +106,10 @@ export const statusPayloadStringToObject = (payload: string) => {
       } else if (power == '2') {
         response.power = false;
       }
-      
+  
       response.percentimeter = Number(percentimeter);
       response.angle = Number(angle);
-      var timeConverter = new Date(Number(timestamp)*1000);
-      response.timestamp = moment.tz(timeConverter, "America/Los_Angeles").format()
+      response.timestamp = new Date(Number(timestamp)*1000);
   
       return response;
     }

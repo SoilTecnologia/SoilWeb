@@ -45,7 +45,6 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^1.0.3",
     "lodash": "^4.17.21",
-    "moment-timezone": "^0.5.34",
     "mysql2": "^2.3.0",
     "pg": "^8.7.1",
     "postgres": "^1.0.2",
