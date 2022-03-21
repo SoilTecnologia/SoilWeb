@@ -4,7 +4,6 @@ import {
   getLastCycleFromPivot
 } from '../controllers/cycles';
 import {
-  createPivotControllerAdm,
   deletePivotController,
   getAllPivotController,
   getOnePivotController,
@@ -18,6 +17,7 @@ import { readPivotStateController } from '../controllers/states';
 import authMiddleware from '../middlewares/auth';
 import Pivot from '../models/pivot';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
+import { createPivotController } from '../useCases/Pivots';
 
 const router = express.Router();
 
@@ -236,44 +236,7 @@ router.post(
   '/addPivot',
   authMiddleware(),
   authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const {
-        pivot_num,
-        pivot_lng,
-        pivot_lat,
-        pivot_start_angle,
-        pivot_end_angle,
-        pivot_radius,
-        radio_id,
-        node_id,
-        farm_id
-      } = req.body;
-
-      const newPivot = {
-        pivot_num,
-        pivot_lng,
-        pivot_lat,
-        pivot_start_angle,
-        pivot_end_angle,
-        pivot_radius,
-        radio_id,
-        node_id,
-        farm_id
-      };
-      try {
-        const allPivotsFromNode = await createPivotControllerAdm(newPivot);
-
-        res.send(allPivotsFromNode);
-      } catch (err) {
-        console.log(`[ERROR] Server 500 on /pivots/readAll`);
-        console.log(err);
-        next(err);
-      }
-    }
+    async (req, res, next) => await createPivotController.handle(req, res, next)
   )
 );
 
