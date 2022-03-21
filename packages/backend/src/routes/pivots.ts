@@ -1,5 +1,4 @@
 import express from 'express';
-import { readListPivotController } from '../controllers/pivots';
 import { readPivotStateController } from '../controllers/states';
 import authMiddleware from '../middlewares/auth';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
@@ -8,6 +7,7 @@ import { DeletePivotController } from '../useCases/Pivots/DeletePivot/DeletePivo
 import { GetAllPivotsController } from '../useCases/Pivots/GetAllPivots/GetAllPivotsController';
 import { GetOnePivotController } from '../useCases/Pivots/GetOnePivot/GetOnePivotController';
 import { ReadAllController } from '../useCases/Pivots/ReadAll/ReadAllController';
+import { ReadListController } from '../useCases/Pivots/ReadList/ReadListController';
 import { ReadMapController } from '../useCases/Pivots/ReadMap/ReadMapController';
 import { UpdatePivotController } from '../useCases/Pivots/UpdatePivot/UpdatePivotController';
 
@@ -20,6 +20,7 @@ const deletePivotController = new DeletePivotController();
 const updatePivotController = new UpdatePivotController();
 const readAllController = new ReadAllController();
 const readMapController = new ReadMapController();
+const readListPivotController = new ReadListController();
 
 router.get('/readAll/:farm_id', authMiddleware(), readAllController.handle);
 
@@ -83,23 +84,7 @@ router.get('/map/:farm_id', authMiddleware(), readMapController.handle);
 //   })
 // );
 
-router.get(
-  '/list/:farm_id',
-  authMiddleware(),
-  authHandler(async (req, res, next) => {
-    const { farm_id } = req.params;
-    const { user_id } = req.user;
-
-    try {
-      const pivotList = await readListPivotController(user_id, farm_id);
-      res.json(pivotList);
-    } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/list`);
-      console.log(err);
-      next(err);
-    }
-  })
-);
+router.get('/list/:farm_id', authMiddleware(), readListPivotController.handle);
 
 // router.post(
 //   '/update/:pivot_id',

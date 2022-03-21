@@ -1,6 +1,7 @@
 import { PivotModel } from '../database/model/Pivot';
 import Farm from './farm';
 import Node from './node';
+import RadioVariable from './radioVariable';
 import State from './state';
 import StateVariable from './stateVariable';
 
@@ -52,6 +53,18 @@ export type MapResponse = {
   farm_lng: Farm['farm_lng'];
   farm_lat: Farm['farm_lat'];
   pivots: PartialMapResponse[];
+};
+
+export type PartialListResponse = {
+  pivot_id: Pivot['pivot_id'];
+  pivot_num: Pivot['pivot_num'];
+  power: State['power'];
+  water: State['water'];
+  direction: State['direction'];
+  percentimeter: StateVariable['percentimeter'];
+  rssi: RadioVariable['rssi'];
+  father: RadioVariable['father'];
+  timestamp: StateVariable['timestamp'] | null;
 };
 
 export default Pivot;

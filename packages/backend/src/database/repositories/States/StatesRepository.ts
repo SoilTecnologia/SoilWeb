@@ -10,6 +10,14 @@ class StatesRepository implements IStateRepository {
       .orderBy('timestamp', 'desc')
       .first();
   }
+
+  async findById(state_id: string): Promise<State | undefined> {
+    return await knex<State>('states')
+      .select()
+      .where({ state_id })
+      .orderBy('timestamp', 'desc')
+      .first();
+  }
 }
 
 export { StatesRepository };
