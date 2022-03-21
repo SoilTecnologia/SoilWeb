@@ -1,8 +1,12 @@
+import { inject, injectable } from 'tsyringe';
 import { UserModel } from '../../../database/model/User';
 import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
 
+@injectable()
 class UpdateUserUseCase {
-  constructor(private userRepository: IUsersRepository) {}
+  constructor(
+    @inject('UsersRepository') private userRepository: IUsersRepository
+  ) {}
 
   async execute({ login, password, user_type, user_id }: UserModel) {
     const userModel = new UserModel();

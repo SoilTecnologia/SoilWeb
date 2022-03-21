@@ -1,7 +1,11 @@
+import { inject, injectable } from 'tsyringe';
 import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
 
+@injectable()
 class DeleteUserUseCase {
-  constructor(private userRepository: IUsersRepository) {}
+  constructor(
+    @inject('UsersRepository') private userRepository: IUsersRepository
+  ) {}
 
   async execute(user_id: string) {
     const selectUser = await this.userRepository.findById(user_id!!);

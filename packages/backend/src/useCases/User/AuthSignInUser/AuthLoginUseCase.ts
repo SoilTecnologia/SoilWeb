@@ -1,11 +1,15 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { UsersRepository } from '../../../database/repositories/Users/UserRepository';
+import { inject, injectable } from 'tsyringe';
+import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
 import User from '../../../models/user';
 import { InvalidCredentials } from '../../../types/errors';
 
+@injectable()
 class AuthSignInUseCase {
-  constructor(private userRepository: UsersRepository) {}
+  constructor(
+    @inject('UsersRepository') private userRepository: IUsersRepository
+  ) {}
 
   async execute(login: User['login'], password: User['password']) {
     const user = await this.userRepository.findByLogin(login);

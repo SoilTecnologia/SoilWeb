@@ -6,13 +6,14 @@ this file is responsible for:
   - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)
   - Setting up the event emitter to be used on other systems
 */
-
 import cors from 'cors';
 import express from 'express';
 import { createServer } from 'http';
+import 'reflect-metadata';
 import { Server, Socket } from 'socket.io';
 import IoTDevice from './aws-iot/index';
 import router from './routes';
+import './shared/container';
 import emitter from './utils/eventBus';
 
 require('dotenv').config();

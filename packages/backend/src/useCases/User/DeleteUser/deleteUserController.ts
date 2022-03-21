@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
+import { container } from 'tsyringe';
 import { DeleteUserUseCase } from './deleteUserUseCase';
 
 class DeleteUserController {
-  constructor(private deleteUserUseCase: DeleteUserUseCase) {}
-
   async handle(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
+    const deleteUserUseCase = container.resolve(DeleteUserUseCase);
     try {
-      const notUser = await this.deleteUserUseCase.execute(id);
+      const notUser = await deleteUserUseCase.execute(id);
       res.sendStatus(200).send(notUser);
     } catch (err) {
       console.log(`[ERROR] 500 on /users/deleteUser`);

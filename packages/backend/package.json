@@ -48,6 +48,7 @@
     "mysql2": "^2.3.0",
     "pg": "^8.7.1",
     "postgres": "^1.0.2",
+    "reflect-metadata": "^0.1.13",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.3.2"
   }

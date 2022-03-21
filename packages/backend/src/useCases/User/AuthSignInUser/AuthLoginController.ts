@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
+import { container } from 'tsyringe';
 import { AuthSignInUseCase } from './AuthLoginUseCase';
 
 class AuthSignInController {
-  constructor(private authSignInUseCase: AuthSignInUseCase) {}
-
   async handle(req: Request, res: Response, next: NextFunction) {
     const { login, password } = req.body;
+    const authSignInUseCase = container.resolve(AuthSignInUseCase);
 
     try {
-      const cookieInfo = await this.authSignInUseCase.execute(login, password);
+      const cookieInfo = await authSignInUseCase.execute(login, password);
 
       res.status(200).send(cookieInfo);
     } catch (err) {

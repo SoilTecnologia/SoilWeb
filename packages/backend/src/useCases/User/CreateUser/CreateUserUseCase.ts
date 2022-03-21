@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { inject, injectable } from 'tsyringe';
 import { UserModel } from '../../../database/model/User';
 import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
 import User from '../../../models/user';
@@ -9,8 +10,11 @@ interface IRequest {
   description: string;
 }
 
+@injectable()
 class CreateUserUseCase {
-  constructor(private userRepository: IUsersRepository) {}
+  constructor(
+    @inject('UsersRepository') private userRepository: IUsersRepository
+  ) {}
 
   createJwt(user: User) {
     const token = jwt.sign(

@@ -1,9 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
+import { container } from 'tsyringe';
 import { CreateUserUseCase } from './CreateUserUseCase';
 
 class CreateUserController {
-  constructor(private createUserUseCase: CreateUserUseCase) {}
-
   async handle(
     request: Request,
     response: Response,
@@ -11,8 +10,10 @@ class CreateUserController {
   ): Promise<Response | undefined> {
     const { login, password, user_type } = request.body;
 
+    const createUserUseCase = container.resolve(CreateUserUseCase);
+
     try {
-      const result = await this.createUserUseCase.execute({
+      const result = await createUserUseCase.execute({
         login,
         password,
         user_type
