@@ -1,7 +1,7 @@
 import knex from '../database';
 import Farm from '../models/farm';
 import Node from '../models/node';
-import Pivot, { pivotCreate } from '../models/pivot';
+import Pivot from '../models/pivot';
 import RadioVariable from '../models/radioVariable';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
@@ -12,7 +12,6 @@ import {
   isStateDifferent,
   isStateVariableDifferent
 } from '../utils/isDifferent';
-import { getLastCycleFromPivot } from './cycles';
 
 export const createPivotController = async (
   pivot_id: Pivot['pivot_id'],
@@ -46,6 +45,8 @@ export const readAllPivotController = async (farm_id: Farm['farm_id']) => {
     .join('nodes', 'pivots.node_id', 'nodes.node_id')
     .where('nodes.farm_id', farm_id);
 
+  console.log(pivots[0]);
+
   return pivots;
 };
 
@@ -64,106 +65,106 @@ export const readAllPivotsController2 = async () => {
   return pivots;
 };
 
-type PartialMapResponse = {
-  pivot_id: Pivot['pivot_id'];
-  pivot_lng: Pivot['pivot_lng'];
-  pivot_lat: Pivot['pivot_lat'];
-  pivot_num: Pivot['pivot_num'];
-  pivot_start_angle: Pivot['pivot_start_angle'];
-  pivot_end_angle: Pivot['pivot_end_angle'];
-  pivot_radius: Pivot['pivot_radius'];
-  power: State['power'];
-  connection: State['connection'];
-  water: State['water'];
-  direction: State['direction'];
-  start_angle: StateVariable['angle'];
-  end_angle: StateVariable['angle'];
-};
-type MapResponse = {
-  farm_lng: Farm['farm_lng'];
-  farm_lat: Farm['farm_lat'];
-  pivots: Array<PartialMapResponse>;
-};
+// type PartialMapResponse = {
+//   pivot_id: Pivot['pivot_id'];
+//   pivot_lng: Pivot['pivot_lng'];
+//   pivot_lat: Pivot['pivot_lat'];
+//   pivot_num: Pivot['pivot_num'];
+//   pivot_start_angle: Pivot['pivot_start_angle'];
+//   pivot_end_angle: Pivot['pivot_end_angle'];
+//   pivot_radius: Pivot['pivot_radius'];
+//   power: State['power'];
+//   connection: State['connection'];
+//   water: State['water'];
+//   direction: State['direction'];
+//   start_angle: StateVariable['angle'];
+//   end_angle: StateVariable['angle'];
+// };
+// type MapResponse = {
+//   farm_lng: Farm['farm_lng'];
+//   farm_lat: Farm['farm_lat'];
+//   pivots: Array<PartialMapResponse>;
+// };
 
-export const readMapPivotController = async (
-  user_id: User['user_id'],
-  farm_id: Farm['farm_id']
-): Promise<MapResponse> => {
-  let pivotArray: Array<PartialMapResponse> = [];
+// export const readMapPivotController = async (
+//   user_id: User['user_id'],
+//   farm_id: Farm['farm_id']
+// ): Promise<MapResponse> => {
+//   let pivotArray: Array<PartialMapResponse> = [];
 
-  const farm = await knex<Farm>('farms')
-    .select('farm_lng', 'farm_lat')
-    .where('farm_id', farm_id)
-    .first();
+//   const farm = await knex<Farm>('farms')
+//     .select('farm_lng', 'farm_lat')
+//     .where('farm_id', farm_id)
+//     .first();
 
-  const nodes = await knex<Node>('nodes')
-    .select('node_id')
-    .where('farm_id', farm_id);
+//   const nodes = await knex<Node>('nodes')
+//     .select('node_id')
+//     .where('farm_id', farm_id);
 
-  for (let node of nodes) {
-    const pivots = await knex<Pivot>('pivots')
-      .select(
-        'pivot_id',
-        'pivot_num',
-        'pivot_lng',
-        'pivot_lat',
-        'pivot_start_angle',
-        'pivot_end_angle',
-        'pivot_radius'
-      )
-      .where('node_id', node.node_id);
+//   for (let node of nodes) {
+//     const pivots = await knex<Pivot>('pivots')
+//       .select(
+//         'pivot_id',
+//         'pivot_num',
+//         'pivot_lng',
+//         'pivot_lat',
+//         'pivot_start_angle',
+//         'pivot_end_angle',
+//         'pivot_radius'
+//       )
+//       .where('node_id', node.node_id);
 
-    for (let pivot of pivots) {
-      const state = await knex<State>('states')
-        .select('state_id', 'power', 'water', 'direction', 'connection')
-        .where('pivot_id', pivot.pivot_id)
-        .orderBy('timestamp', 'desc')
-        .first();
+//     for (let pivot of pivots) {
+//       const state = await knex<State>('states')
+//         .select('state_id', 'power', 'water', 'direction', 'connection')
+//         .where('pivot_id', pivot.pivot_id)
+//         .orderBy('timestamp', 'desc')
+//         .first();
 
-      const variables = await getLastCycleFromPivot(pivot.pivot_id);
+//       const variables = await getLastCycleFromPivot(pivot.pivot_id);
 
-      if (state && variables && variables.length > 0) {
-        pivotArray.push({
-          pivot_id: pivot.pivot_id,
-          pivot_lng: pivot.pivot_lng,
-          pivot_lat: pivot.pivot_lat,
-          pivot_num: pivot.pivot_num,
-          pivot_start_angle: pivot.pivot_start_angle,
-          pivot_end_angle: pivot.pivot_end_angle,
-          pivot_radius: pivot.pivot_radius,
-          power: state.power,
-          water: state.water,
-          direction: state.direction,
-          connection: state.connection,
-          start_angle: variables[0]!.angle,
-          end_angle: variables[variables.length - 1]!.angle
-        });
-      } else {
-        pivotArray.push({
-          pivot_id: pivot.pivot_id,
-          pivot_lng: pivot.pivot_lng,
-          pivot_lat: pivot.pivot_lat,
-          pivot_num: pivot.pivot_num,
-          pivot_start_angle: pivot.pivot_start_angle,
-          pivot_end_angle: pivot.pivot_end_angle,
-          pivot_radius: pivot.pivot_radius,
-          power: false,
-          water: false,
-          direction: null,
-          connection: true,
-          start_angle: pivot.pivot_start_angle,
-          end_angle: pivot.pivot_start_angle
-        });
-      }
-    }
-  }
+//       if (state && variables && variables.length > 0) {
+//         pivotArray.push({
+//           pivot_id: pivot.pivot_id,
+//           pivot_lng: pivot.pivot_lng,
+//           pivot_lat: pivot.pivot_lat,
+//           pivot_num: pivot.pivot_num,
+//           pivot_start_angle: pivot.pivot_start_angle,
+//           pivot_end_angle: pivot.pivot_end_angle,
+//           pivot_radius: pivot.pivot_radius,
+//           power: state.power,
+//           water: state.water,
+//           direction: state.direction,
+//           connection: state.connection,
+//           start_angle: variables[0]!.angle,
+//           end_angle: variables[variables.length - 1]!.angle
+//         });
+//       } else {
+//         pivotArray.push({
+//           pivot_id: pivot.pivot_id,
+//           pivot_lng: pivot.pivot_lng,
+//           pivot_lat: pivot.pivot_lat,
+//           pivot_num: pivot.pivot_num,
+//           pivot_start_angle: pivot.pivot_start_angle,
+//           pivot_end_angle: pivot.pivot_end_angle,
+//           pivot_radius: pivot.pivot_radius,
+//           power: false,
+//           water: false,
+//           direction: null,
+//           connection: true,
+//           start_angle: pivot.pivot_start_angle,
+//           end_angle: pivot.pivot_start_angle
+//         });
+//       }
+//     }
+//   }
 
-  return {
-    farm_lat: farm!.farm_lat,
-    farm_lng: farm!.farm_lng,
-    pivots: pivotArray
-  };
-};
+//   return {
+//     farm_lat: farm!.farm_lat,
+//     farm_lng: farm!.farm_lng,
+//     pivots: pivotArray
+//   };
+// };
 
 type PartialListResponse = {
   pivot_id: Pivot['pivot_id'];
@@ -380,82 +381,3 @@ export const updatePivotController = async (
 };
 
 // Admin
-export const getAllPivotController = async (farm_id: Node['farm_id']) => {
-  const pivots = await knex<Pivot>('pivots').select().where({ farm_id });
-  return pivots;
-};
-
-export const getOnePivotController = async (
-  pivot_num: Pivot['pivot_num'],
-  farm_id: Pivot['farm_id']
-) => {
-  const pivots = await knex<Pivot>('pivots')
-    .select()
-    .where({ farm_id, pivot_num })
-    .first();
-  return pivots;
-};
-
-export const createPivotControllerAdm = async (pivot: pivotCreate) => {
-  const pivot_id = `${pivot.farm_id}_${pivot.pivot_num}`;
-  const newPivot = { ...pivot, pivot_id };
-
-  const pivots = await knex<Pivot>('pivots').insert(newPivot);
-  return pivots;
-};
-export const deletePivotController = async (pivot_id: Pivot['pivot_id']) => {
-  try {
-    const farm = await knex<Pivot>('pivots')
-      .select()
-      .where({ pivot_id })
-      .first();
-    if (farm) {
-      const delResult = await knex<Pivot>('pivots')
-        .select()
-        .where({ pivot_id })
-        .del();
-      return delResult;
-    }
-  } catch (err) {
-    console.log('[ERROR] Internal Server Error');
-    console.log(err);
-  }
-};
-
-export const putPivotController = async (pivot: Pivot) => {
-  const pivot_id = `${pivot.farm_id}_${pivot.pivot_num}`;
-  const getPivot = await knex<Pivot>('pivots')
-    .select()
-    .where({ pivot_id: pivot.pivot_id })
-    .first();
-
-  if (getPivot) {
-    await knex<Pivot>('pivots')
-      .where({ pivot_id: pivot.pivot_id })
-      .update({
-        ...getPivot,
-        pivot_id,
-        pivot_lat: pivot.pivot_lat ? pivot.pivot_lat : getPivot.pivot_lat,
-        pivot_lng: pivot.pivot_lng ? pivot.pivot_lng : getPivot.pivot_lng,
-        pivot_num: pivot.pivot_num ? pivot.pivot_num : getPivot.pivot_num,
-        pivot_radius: pivot.pivot_radius
-          ? pivot.pivot_radius
-          : getPivot.pivot_radius,
-        pivot_start_angle: pivot.pivot_start_angle
-          ? pivot.pivot_start_angle
-          : getPivot.pivot_start_angle,
-        pivot_end_angle: pivot.pivot_end_angle
-          ? pivot.pivot_end_angle
-          : getPivot.pivot_end_angle,
-        radio_id: pivot.radio_id ? pivot.radio_id : getPivot.radio_id
-      });
-
-    const newFarm = await knex<Pivot>('pivots')
-      .select()
-      .where({ pivot_id: pivot.pivot_id })
-      .first();
-
-    return newFarm;
-  }
-  throw new Error('Não fooi possivel atualizar Pivot');
-};

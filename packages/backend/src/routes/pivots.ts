@@ -1,13 +1,5 @@
 import express from 'express';
-import {
-  getCyclesFromPivot,
-  getLastCycleFromPivot
-} from '../controllers/cycles';
-import {
-  readAllPivotController,
-  readListPivotController,
-  readMapPivotController
-} from '../controllers/pivots';
+import { readListPivotController } from '../controllers/pivots';
 import { readPivotStateController } from '../controllers/states';
 import authMiddleware from '../middlewares/auth';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
@@ -15,6 +7,8 @@ import { CreatePivotController } from '../useCases/Pivots/CreatePivots/CreatePiv
 import { DeletePivotController } from '../useCases/Pivots/DeletePivot/DeletePivotController';
 import { GetAllPivotsController } from '../useCases/Pivots/GetAllPivots/GetAllPivotsController';
 import { GetOnePivotController } from '../useCases/Pivots/GetOnePivot/GetOnePivotController';
+import { ReadAllController } from '../useCases/Pivots/ReadAll/ReadAllController';
+import { ReadMapController } from '../useCases/Pivots/ReadMap/ReadMapController';
 import { UpdatePivotController } from '../useCases/Pivots/UpdatePivot/UpdatePivotController';
 
 const router = express.Router();
@@ -24,30 +18,10 @@ const getAllPivotsController = new GetAllPivotsController();
 const getOnePivotController = new GetOnePivotController();
 const deletePivotController = new DeletePivotController();
 const updatePivotController = new UpdatePivotController();
+const readAllController = new ReadAllController();
+const readMapController = new ReadMapController();
 
-router.get(
-  '/readAll/:farm_id',
-  authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { farm_id } = req.params;
-
-      try {
-        const allPivotsFromNode = await readAllPivotController(farm_id);
-
-        res.send(allPivotsFromNode);
-      } catch (err) {
-        console.log(`[ERROR] Server 500 on /pivots/readAll`);
-        console.log(err);
-        next(err);
-      }
-    }
-  )
-);
+router.get('/readAll/:farm_id', authMiddleware(), readAllController.handle);
 
 router.get(
   '/state/:pivot_id',
@@ -73,57 +47,41 @@ router.get(
   )
 );
 
-router.get(
-  '/map/:farm_id',
-  authMiddleware(),
-  authHandler(async (req, res, next) => {
-    const { farm_id } = req.params;
-    const { user_id } = req.user;
+router.get('/map/:farm_id', authMiddleware(), readMapController.handle);
 
-    try {
-      const pivotList = await readMapPivotController(user_id, farm_id);
-      res.json(pivotList);
-    } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/map`);
-      console.log(err);
-      next(err);
-    }
-  })
-);
+// router.get( FOI PARA ROTA CYCLES
+//   '/cycles/:pivot_id',
+//   authMiddleware(),
+//   authHandler(async (req, res, next) => {
+//     const { pivot_id } = req.params;
 
-router.get(
-  '/cycles/:pivot_id',
-  authMiddleware(),
-  authHandler(async (req, res, next) => {
-    const { pivot_id } = req.params;
+//     try {
+//       const pivotList = await getLastCycleFromPivot(pivot_id);
+//       res.json(pivotList);
+//     } catch (err) {
+//       console.log(`[ERROR] Server 500 on /pivots/cycles`);
+//       console.log(err);
+//       next(err);
+//     }
+//   })
+// );
 
-    try {
-      const pivotList = await getLastCycleFromPivot(pivot_id);
-      res.json(pivotList);
-    } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/cycles`);
-      console.log(err);
-      next(err);
-    }
-  })
-);
+// router.get(  FOI PARA ROTA CYCLES
+//   '/cycles/:pivot_id/:start/:end',
+//   authMiddleware(),
+//   authHandler(async (req, res, next) => {
+//     const { pivot_id, start, end } = req.params;
 
-router.get(
-  '/cycles/:pivot_id/:start/:end',
-  authMiddleware(),
-  authHandler(async (req, res, next) => {
-    const { pivot_id, start, end } = req.params;
-
-    try {
-      const pivotList = await getCyclesFromPivot(pivot_id, start, end);
-      res.json(pivotList);
-    } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/cycles/start/end`);
-      console.log(err);
-      next(err);
-    }
-  })
-);
+//     try {
+//       const pivotList = await getCyclesFromPivot(pivot_id, start, end);
+//       res.json(pivotList);
+//     } catch (err) {
+//       console.log(`[ERROR] Server 500 on /pivots/cycles/start/end`);
+//       console.log(err);
+//       next(err);
+//     }
+//   })
+// );
 
 router.get(
   '/list/:farm_id',

@@ -1,16 +1,12 @@
 import express from 'express';
-import userRoute from './users';
+// import raspberryRoute from './raspberry';
+import { ServerError } from '../types/errors';
+import actionRoute from './actions';
+import cycleRoute from './cycles';
 import farmRoute from './farms';
 import nodeRoute from './nodes';
 import pivotRoute from './pivots';
-import actionRoute from './actions';
-// import raspberryRoute from './raspberry';
-
-import {
-  DuplicateUniqueError,
-  InvalidCredentials,
-  ServerError
-} from '../types/errors';
+import userRoute from './users';
 
 const router = express.Router();
 
@@ -29,7 +25,7 @@ function error(
   res: express.Response,
   next: express.NextFunction
 ) {
-  console.log(err)
+  console.log(err);
   if (err instanceof ServerError) res.status(400).send(err.message);
   else if (err instanceof Error) res.status(500).send(err.message);
   else res.status(500).send('Internal Server Error');
@@ -41,7 +37,7 @@ router.use('/farms', farmRoute);
 router.use('/pivots', pivotRoute);
 router.use('/nodes', nodeRoute);
 router.use('/actions', actionRoute);
-// router.use('/cycle', cycleRoute);
+router.use('/cycle', cycleRoute);
 // router.use('/radio', radioRoute);
 // router.use('/intent', intentRoute);
 // // router.use('/raspberry', raspberryRoute);

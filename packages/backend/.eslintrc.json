@@ -34,7 +34,8 @@
     "no-useless-constructor": "off",
     "no-empty-function": "off",
     "import/no-extraneous-dependencies": "off",
-    "import/no-unresolved": "off"
+    "import/no-unresolved": "off",
+    "no-lonely-if": "off"
   },
   "overrides": [
     {
