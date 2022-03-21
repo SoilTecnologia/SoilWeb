@@ -42,6 +42,22 @@ class PivotsRepository implements IPivotsRepository {
       .where({ farm_id, pivot_num })
       .first();
   }
+
+  async delete(pivot_id: string): Promise<number | undefined> {
+    return await knex<Pivot>('pivots').select().where({ pivot_id }).del();
+  }
+
+  async update(
+    pivot: PivotModel,
+    pivot_id: PivotModel['pivot_id']
+  ): Promise<PivotModel | undefined> {
+    const pivots = await knex<Pivot>('pivots')
+      .where({ pivot_id })
+      .update(pivot)
+      .returning('*');
+
+    return pivots[0];
+  }
 }
 
 export { PivotsRepository };

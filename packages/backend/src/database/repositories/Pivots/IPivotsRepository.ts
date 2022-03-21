@@ -10,6 +10,13 @@ interface IPivotsRepository {
     pivot_num: PivotModel['pivot_num'],
     farm_id: PivotModel['farm_id']
   ): Promise<PivotModel | undefined>;
+
+  delete(pivot_id: PivotModel['pivot_id']): Promise<number | undefined>;
+
+  update(
+    pivot: PivotModel,
+    pivot_id: PivotModel['pivot_id']
+  ): Promise<PivotModel | undefined>;
 }
 
 export { IPivotsRepository };
