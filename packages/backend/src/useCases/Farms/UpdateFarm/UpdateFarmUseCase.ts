@@ -1,8 +1,12 @@
+import { inject, injectable } from 'tsyringe';
 import { FarmModel } from '../../../database/model/Farm';
 import { IFarmsRepository } from '../../../database/repositories/Farms/IFarmsRepository';
 
+@injectable()
 class UpdateFarmUseCase {
-  constructor(private farmRepository: IFarmsRepository) {}
+  constructor(
+    @inject('FarmsRepository') private farmRepository: IFarmsRepository
+  ) {}
 
   async execute(farm: FarmModel) {
     const farmExists = await this.farmRepository.findById(farm.farm_id);

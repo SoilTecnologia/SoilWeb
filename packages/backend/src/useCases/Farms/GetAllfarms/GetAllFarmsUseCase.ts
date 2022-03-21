@@ -1,7 +1,11 @@
+import { inject, injectable } from 'tsyringe';
 import { IFarmsRepository } from '../../../database/repositories/Farms/IFarmsRepository';
 
+@injectable()
 class GetAllFarmsUseCase {
-  constructor(private farmRepository: IFarmsRepository) {}
+  constructor(
+    @inject('FarmsRepository') private farmRepository: IFarmsRepository
+  ) {}
 
   async execute() {
     const farms = await this.farmRepository.getAllFarms();

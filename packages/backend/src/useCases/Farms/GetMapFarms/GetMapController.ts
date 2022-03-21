@@ -1,14 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
+import { container } from 'tsyringe';
 import { GetMapFarmUseCase } from './GetMapFarmsuseCase';
 
 class GetMapFarmsController {
-  constructor(private getMapFarmsUsecase: GetMapFarmUseCase) {}
-
   async handle(req: Request, res: Response, next: NextFunction) {
     const { farm_id } = req.params;
 
+    const getMapFarmsUseCase = container.resolve(GetMapFarmUseCase);
+
     try {
-      const result = await this.getMapFarmsUsecase.execute(farm_id);
+      const result = await getMapFarmsUseCase.execute(farm_id);
 
       res.json(result);
     } catch (err) {

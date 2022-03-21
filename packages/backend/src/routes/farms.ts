@@ -1,63 +1,34 @@
 /* eslint-disable spaced-comment */
 import express from 'express';
 import authMiddleware from '../middlewares/auth';
-import { authHandler } from '../types/express';
-import { createFarmController } from '../useCases/Farms/CreateFarms';
-import { deleteFarmController } from '../useCases/Farms/DeleteFarm';
-import { getAllFarmsController } from '../useCases/Farms/GetAllfarms';
-import { getFarmsByuserController } from '../useCases/Farms/GetFarmByUserController';
-import { getMapFarmsController } from '../useCases/Farms/GetMapFarms';
-import { getOneFarmController } from '../useCases/Farms/GetOneFarm';
-import { updateFarmController } from '../useCases/Farms/UpdateFarm';
+import { CreateFarmController } from '../useCases/Farms/CreateFarms/CreateFarmController';
+import { DeleteFarmController } from '../useCases/Farms/DeleteFarm/DeleteFarmController';
+import { GetAllFarmsController } from '../useCases/Farms/GetAllfarms/GetAllFarmsController';
+import { GetFarmsByUserController } from '../useCases/Farms/GetFarmByUserController/GetFarmsByUserController';
+import { GetMapFarmsController } from '../useCases/Farms/GetMapFarms/GetMapController';
+import { GetOneFarmController } from '../useCases/Farms/GetOneFarm/GetOneFarmController';
+import { UpdateFarmController } from '../useCases/Farms/UpdateFarm/UpdateFarmsController';
 
 const router = express.Router();
 
-router.post(
-  '/addFarm',
-  authMiddleware(),
-  async (req, res, next) => await createFarmController.handle(req, res, next)
-);
+const createFarmController = new CreateFarmController();
+const deleteFarmController = new DeleteFarmController();
+const getAllFarmsController = new GetAllFarmsController();
+const getFarmsByuserController = new GetFarmsByUserController();
+const getMapFarmsController = new GetMapFarmsController();
+const getOneFarmController = new GetOneFarmController();
+const updateFarmController = new UpdateFarmController();
 
-router.get(
-  '/farmUser/:id',
-  authHandler(
-    async (req, res, next) =>
-      await getFarmsByuserController.handle(req, res, next)
-  )
-);
-
-router.get(
-  '/readAll',
-  authMiddleware(),
-  authHandler(
-    async (req, res, next) => await getAllFarmsController.handle(req, res, next)
-  )
-);
-
-router.get(
-  '/map/:farm_id',
-  authMiddleware(),
-  async (req, res, next) => await getMapFarmsController.handle(req, res, next)
-);
-
-router.put(
-  '/updateFarm',
-  authMiddleware(),
-  async (req, res, next) => await updateFarmController.handle(req, res, next)
-);
-
-router.delete(
-  '/deleteFarm/:id',
-  authMiddleware(),
-  async (req, res, next) => await deleteFarmController.handle(req, res, next)
-);
-
+router.post('/addFarm', authMiddleware(), createFarmController.handle);
+router.get('/farmUser/:id', getFarmsByuserController.handle);
+router.get('/readAll', authMiddleware(), getAllFarmsController.handle);
+router.get('/map/:farm_id', authMiddleware(), getMapFarmsController.handle);
+router.put('/updateFarm', authMiddleware(), updateFarmController.handle);
+router.delete('/deleteFarm/:id', authMiddleware(), deleteFarmController.handle);
 router.get(
   '/getOneFarm/:farmId',
   authMiddleware(),
-  authHandler(
-    async (req, res, next) => await getOneFarmController.handle(req, res, next)
-  )
+  getOneFarmController.handle
 );
 
 export default router;
