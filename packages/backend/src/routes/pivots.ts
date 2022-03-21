@@ -5,8 +5,6 @@ import {
 } from '../controllers/cycles';
 import {
   deletePivotController,
-  getAllPivotController,
-  getOnePivotController,
   putPivotController,
   readAllPivotController,
   readListPivotController,
@@ -17,9 +15,15 @@ import { readPivotStateController } from '../controllers/states';
 import authMiddleware from '../middlewares/auth';
 import Pivot from '../models/pivot';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
-import { createPivotController } from '../useCases/Pivots';
+import { CreatePivotController } from '../useCases/Pivots/CreatePivots/CreatePivotController';
+import { GetAllPivotsController } from '../useCases/Pivots/GetAllPivots/GetAllPivotsController';
+import { GetOnePivotController } from '../useCases/Pivots/GetOnePivot/GetOnePivotController';
 
 const router = express.Router();
+
+const createPivotController = new CreatePivotController();
+const getAllPivotsController = new GetAllPivotsController();
+const getOnePivotController = new GetOnePivotController();
 
 router.get(
   '/readAll/:farm_id',
@@ -179,66 +183,15 @@ router.post(
 );
 
 // Admin
-router.get(
-  '/getPivots/:id',
-  authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { id } = req.params;
-      try {
-        if (id) {
-          const allPivotsFromNode = await getAllPivotController(id);
-
-          res.send(allPivotsFromNode);
-        } else {
-          res.status(201).send('Id not identifier');
-        }
-      } catch (err) {
-        console.log(`[ERROR] Server 500 on pivots`);
-        console.log(err);
-        next(err);
-      }
-    }
-  )
-);
+router.get('/getPivots/:id', authMiddleware(), getAllPivotsController.handle);
 
 router.get(
   '/getOnePivot/:pivot_num/:farm_id',
   authMiddleware(),
-  authHandler(
-    async (
-      req: IUserAuthInfoRequest,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
-      const { pivot_num, farm_id } = req.params;
-      try {
-        const pivotResult = await getOnePivotController(
-          Number(pivot_num),
-          farm_id
-        );
-
-        res.send(pivotResult);
-      } catch (err) {
-        console.log(`[ERROR] Server 500 on pivots`);
-        console.log(err);
-        next(err);
-      }
-    }
-  )
+  getOnePivotController.handle
 );
 
-router.post(
-  '/addPivot',
-  authMiddleware(),
-  authHandler(
-    async (req, res, next) => await createPivotController.handle(req, res, next)
-  )
-);
+router.post('/addPivot', authMiddleware(), createPivotController.handle);
 
 router.delete(
   '/deletePivot/:id',

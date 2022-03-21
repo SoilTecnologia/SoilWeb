@@ -1,9 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
+import { container } from 'tsyringe';
 import { CreatePivotUseCase } from './CreatePivotUseCase';
 
 class CreatePivotController {
-  constructor(private createPivotUseCase: CreatePivotUseCase) {}
-
   async handle(req: Request, res: Response, next: NextFunction) {
     const {
       pivot_num,
@@ -17,8 +16,10 @@ class CreatePivotController {
       farm_id
     } = req.body;
 
+    const createPivotUseCase = container.resolve(CreatePivotUseCase);
+
     try {
-      const allPivotsFromNode = await this.createPivotUseCase.execute({
+      const allPivotsFromNode = await createPivotUseCase.execute({
         pivot_num,
         pivot_lng,
         pivot_lat,

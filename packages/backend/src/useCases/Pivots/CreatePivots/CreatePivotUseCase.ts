@@ -1,8 +1,12 @@
-import { PivotModel } from '../../database/model/Pivot';
-import { PivotsRepository } from '../../database/repositories/Pivots/PivotsRepository';
+import { inject, injectable } from 'tsyringe';
+import { PivotModel } from '../../../database/model/Pivot';
+import { PivotsRepository } from '../../../database/repositories/Pivots/PivotsRepository';
 
+@injectable()
 class CreatePivotUseCase {
-  constructor(private pivotRepository: PivotsRepository) {}
+  constructor(
+    @inject('PivotsRepository') private pivotRepository: PivotsRepository
+  ) {}
 
   async execute(pivot: Omit<PivotModel, 'pivot_id'>) {
     const {
