@@ -3,7 +3,7 @@ import { FormDataEncoder } from 'form-data-encoder';
 import { FormData } from 'formdata-node';
 import Axios, { AxiosResponse } from 'axios';
 import emitter from '../utils/eventBus';
-import Queue from '../utils/queue';
+import GenericQueue from '../utils/generic_queue';
 import {
   StatusObject,
   statusStringToObject,
@@ -33,8 +33,8 @@ type IdleData = {
   attempts: number;
 };
 
-const activeQueue: Queue<ActionData> = new Queue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
-const idleQueue: Queue<IdleData> = new Queue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
+const activeQueue: GenericQueue<ActionData> = new GenericQueue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
+const idleQueue: GenericQueue<IdleData> = new GenericQueue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
 
 let ready = true;
 

@@ -1,7 +1,8 @@
-import { inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { NodeModel } from '../../../database/model/Node';
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
 
+@injectable()
 class DeleteNodeUseCase {
   constructor(
     @inject('NodesRepository') private nodeRepository: INodesRepository

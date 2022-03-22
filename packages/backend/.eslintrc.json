@@ -35,7 +35,8 @@
     "no-empty-function": "off",
     "import/no-extraneous-dependencies": "off",
     "import/no-unresolved": "off",
-    "no-lonely-if": "off"
+    "no-lonely-if": "off",
+    "no-plusplus": "off"
   },
   "overrides": [
     {

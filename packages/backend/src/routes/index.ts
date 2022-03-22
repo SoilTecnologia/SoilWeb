@@ -38,6 +38,9 @@ router.use('/pivots', pivotRoute);
 router.use('/nodes', nodeRoute);
 router.use('/actions', actionRoute);
 router.use('/cycle', cycleRoute);
+router.use('/api-status', (req, res, next) => {
+  res.sendStatus(200);
+});
 // router.use('/radio', radioRoute);
 // router.use('/intent', intentRoute);
 // // router.use('/raspberry', raspberryRoute);

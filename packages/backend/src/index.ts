@@ -12,6 +12,7 @@ import { createServer } from 'http';
 import 'reflect-metadata';
 import { Server, Socket } from 'socket.io';
 import IoTDevice from './aws-iot/index';
+import knex from './database';
 import router from './routes';
 import './shared/container';
 import emitter from './utils/eventBus';
@@ -34,7 +35,7 @@ io.on('connection', (socket: Socket) => {
   emitter.on('state-change', (status: any) => {
     const {
       user_id,
-      pivot_name,
+      pivot_num,
       farm_name,
       pivot_id,
       connection,
@@ -46,7 +47,7 @@ io.on('connection', (socket: Socket) => {
     socket.emit(`${user_id}-status`, {
       type: 'status',
       pivot_id,
-      pivot_name,
+      pivot_num,
       farm_name,
       power,
       water,
@@ -55,7 +56,7 @@ io.on('connection', (socket: Socket) => {
       percentimeter
     });
 
-    console.log(`socket de state: `, status);
+    // console.log(`socket de state: `, status);
   });
 
   emitter.on('variable-change', (status: any) => {
@@ -67,18 +68,48 @@ io.on('connection', (socket: Socket) => {
       percentimeter
     });
 
-    console.log(`socket de variavel: `, status);
+    // console.log(`socket de variavel: `, status);
+  });
+
+  emitter.on('action-ack-received', async (action) => {
+    const { id } = action;
+    const [farm_id, pivot_num] = id.split('_');
+
+    /* Tentar melhorar isso daqui, nao depender de fazer uma query pra saber o usuario" */
+    const farm = await knex('farms').select('*').where({ farm_id }).first();
+    const { user_id, farm_name } = farm;
+
+    socket.emit(`${user_id}-ackreceived`, {
+      type: 'ack',
+      pivot_num,
+      farm_name
+    });
+  });
+
+  emitter.on('action-ack-not-received', async (action) => {
+    const { id } = action;
+    const [farm_id, pivot_num] = id.split('_');
+
+    /* Tentar melhorar isso daqui, nao depender de fazer uma query pra saber o usuario" */
+    const farm = await knex('farms').select('*').where({ farm_id }).first();
+    const { user_id, farm_name } = farm;
+
+    socket.emit(`${user_id}-acknotreceived`, {
+      type: 'ack',
+      pivot_num,
+      farm_name
+    });
   });
 });
 
 // raspberry.start();
 
-// const iotDevice = new IoTDevice('Cloud', 0);
-const iotDevice = new IoTDevice(
-  'Raspberry',
-  0,
-  'e5ce95e1-277d-40a7-b843-6d2cb51d1e8f/0'
-);
+const iotDevice = new IoTDevice('Cloud', 0);
+// const iotDevice = new IoTDevice(
+//   'Raspberry',
+//   0,
+//   'e5ce95e1-277d-40a7-b843-6d2cb51d1e8f/0'
+// );
 iotDevice.start();
 // e5ce95e1-277d-40a7-b843-6d2cb51d1e8f
 // cae38681-5734-4629-b564-31764fef9b97/1

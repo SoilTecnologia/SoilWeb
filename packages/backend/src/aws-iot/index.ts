@@ -1,25 +1,20 @@
 import { iot, mqtt } from 'aws-iot-device-sdk-v2';
 import { container } from 'tsyringe';
 import { TextDecoder } from 'util';
-// import { updatePivotController } from '../controllers/pivots';
 import { createActionController } from '../controllers/actions';
 import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
-import { objectToActionString } from '../utils/conversions';
+import {
+  objectToActionString,
+  statusPayloadStringToObject
+} from '../utils/conversions';
 import emitter from '../utils/eventBus';
-import Queue from '../utils/queue';
+import MessageQueue from '../utils/message_queue';
 
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
 Com ela, conseguimos fazer o envio de mensagens para o broker aws-iot-core, e, dependendo de como 
 inicializamos sua instância, decidimos como ela deve ser utilizada.
 */
-
-type MessageQueue = {
-  type: 'action' | 'status';
-  farm_id: string;
-  node_name: number;
-  payload: any;
-};
 
 // A biblioteca pode ser inicializada utilizando algum desses dois types:
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
@@ -39,19 +34,19 @@ class IoTDevice {
 
   private ready: boolean = true; // Variavel auxiliar do loop da fila
 
-  private queue: Queue<MessageQueue>; // Fila de mensagens à serem enviadas
+  private queue: MessageQueue; // Fila de mensagens à serem enviadas
 
   constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
     this.type = type;
     this.qos = qos;
-    this.queue = new Queue<MessageQueue>();
-    if (type == 'Raspberry' && topic) {
+    this.queue = new MessageQueue();
+    if (type === 'Raspberry' && topic) {
       this.subTopic = `${topic}`;
-      this.pubTopic = `cloud2`;
+      this.pubTopic = `cloud3`;
       this.clientId = topic;
     } else {
-      this.subTopic = 'cloud2';
-      this.clientId = 'cloud2';
+      this.subTopic = 'cloud3';
+      this.clientId = 'SPFC';
     }
   }
 
@@ -99,9 +94,6 @@ class IoTDevice {
       */
 
       await this.setupQueue();
-      setInterval(() => {
-        if (this.ready) this.processQueue();
-      }, 5000);
     } catch (err) {
       console.log(err);
     }
@@ -112,24 +104,20 @@ class IoTDevice {
   /*
   Função que faz a publicação de mensagens e respostas.
   A função JSON.stringify() customizada converte o objeto em uma string, além de converter campos especiais como null para string. Isso é importante pois a resposta deve ser exatamente igual ao que o cliente enviou, e campos null normalmente são apagados quando se usa a função JSON.stringify() original.
-  */
+ */
 
   publish(payload: any, topic?: string) {
     let finalTopic;
-    if (this.type == 'Cloud') finalTopic = topic;
+    if (this.type === 'Cloud') finalTopic = topic;
     else finalTopic = this.pubTopic;
 
     try {
-      if (typeof payload === 'string') {
-        this.connection.publish(finalTopic!, payload, 0, false);
-        console.log(`[IOT] Enviando mensagem à um GPRS...`);
-      } else {
-        const string = JSON.stringify(payload, (k, v) =>
-          v === undefined ? null : v
-        );
-        this.connection.publish(finalTopic!, string, 0, false);
-        console.log(`[IOT] Enviando mensagem...`);
-      }
+      const string = JSON.stringify(payload, (k, v) =>
+        v === undefined ? null : v
+      );
+
+      this.connection.publish(finalTopic!, string, 0, false);
+      console.log(`[IOT] ${finalTopic} Enviando mensagem... ${string}`);
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -144,15 +132,29 @@ class IoTDevice {
   */
   processMessage = async (
     topic: string,
-    payload: ArrayBuffer,
+    message: ArrayBuffer,
     dup: boolean,
     qos: mqtt.QoS,
     retain: boolean
   ) => {
-    const decoder = new TextDecoder('utf8');
-    const json = JSON.parse(decoder.decode(payload));
-    const updatePivotUseCase = container.resolve(UpdatePivotStateUseCase);
+    const decoder = new TextDecoder('utf8', { fatal: false });
+    // const filteredMessage = messageToString.substring(0, messageToString.indexOf('}'))
 
+    const json = JSON.parse(decoder.decode(message));
+    const {
+      type,
+      id,
+      pivot_num,
+      payload
+    }: {
+      type: 'status' | 'action';
+      id: string;
+      pivot_num: number;
+      payload: any;
+    } = json;
+
+    const updatePivotUseCase = container.resolve(UpdatePivotStateUseCase);
+    const [farm_id, node_num] = id.split('');
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
         const {
@@ -181,42 +183,59 @@ class IoTDevice {
         );
 
         /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
-        const { farm_id, node_name } = json;
-        this.publish(json, `${farm_id}/${node_name}`);
+        this.publish(json, `${farm_id}/${node_num}`);
         console.log(
           `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
         );
-      } else if (json.type === 'action') {
-        console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
-        this.queue.remove(json);
+      } else {
+        // GPRS
+
+        console.log('Received status from GPRS');
+        const statusObject = statusPayloadStringToObject(payload);
+
+        if (statusObject) {
+          const { power, direction, water, percentimeter, angle, timestamp } =
+            statusObject;
+          await updatePivotUseCase.execute(
+            `${farm_id}_${node_num}`, // Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
+            true,
+            power,
+            water,
+            direction,
+            angle,
+            percentimeter,
+            timestamp,
+            null,
+            null
+          );
+        }
       }
-    } else if (json.type === 'status') {
-      console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
-      this.queue.remove(json);
     } else if (json.type === 'action') {
-      const {
-        pivot_id,
-        radio_id,
-        author,
-        power,
-        water,
-        direction,
-        percentimeter,
-        timestamp
-      } = json.payload;
-      await createActionController(
-        pivot_id,
-        author,
-        power,
-        water,
-        direction,
-        percentimeter,
-        new Date(timestamp)
-      );
-      console.log(
-        `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
-      );
-      this.publish(json);
+      console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
+      emitter.emit('action-ack-received', json);
+      this.queue.remove(json);
+    } else if (this.type === 'Raspberry') {
+      if (json.type === 'status') {
+        console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
+        this.queue.remove(json);
+      } else if (json.type === 'action') {
+        const { author, power, water, direction, percentimeter, timestamp } =
+          json.payload;
+
+        await createActionController(
+          `${farm_id}_${node_num}_${pivot_num}`,
+          author,
+          power,
+          water,
+          direction,
+          percentimeter,
+          new Date(timestamp)
+        );
+        console.log(
+          `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
+        );
+        this.publish(json);
+      }
     }
   };
 
@@ -226,63 +245,80 @@ class IoTDevice {
   */
 
   setupQueue = async () => {
-    if (this.type == 'Raspberry') {
+    if (this.type === 'Raspberry') {
       emitter.on('status', (status) => {
         this.queue.enqueue({
           type: 'status',
-          farm_id: status.farm_id,
-          node_name: status.node_name,
+          id: `${status.farm_id}_${status.node_num}`, // TODO status ta vindo node_num?
+          pivot_num: status.node_num,
           payload: {
             ...status.payload,
             timestamp: status.payload.timestamp.toString()
-          }
+          },
+          attempts: 0
         });
         console.log(
           `[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`
         );
+        this.processQueue();
       });
     } else {
       emitter.on('action', (action) => {
         if (action.is_gprs) {
           this.queue.enqueue({
             type: 'action',
-            farm_id: action.farm_id,
-            node_name: action.node_name,
+            id: `${action.farm_id}_${action.node_num}`,
             payload: objectToActionString(
-              action.power,
-              action.water,
-              action.direction,
-              action.percentimeter
-            )
+              action.payload.power,
+              action.payload.water,
+              action.payload.direction,
+              action.payload.percentimeter
+            ),
+            attempts: 0
           });
+          console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
+          this.processQueue();
+        } else {
+          // this.queue.enqueue({
+          //   type: 'action',
+          //   farm_id: action.farm_id,
+          //   node_num: action.node_num,
+          //   pivot_num: action.pivot_num,
+          //   is_gprs: false,
+          //   payload: {
+          //     ...action.payload,
+          //     timestamp: action.payload.timestamp.toString()
+          //   }
+          // });
         }
-
-        this.queue.enqueue({
-          type: 'action',
-          farm_id: action.farm_id,
-          node_name: action.node_name,
-          payload: {
-            ...action.payload,
-            timestamp: action.payload.timestamp.toString()
-          }
-        });
       });
-
-      console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
     }
   };
 
   processQueue = () => {
-    if (!this.queue.isEmpty()) {
+    if (this.ready && !this.queue.isEmpty()) {
+      this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
       const current = this.queue.peek()!;
+      const [farm_id, node_num] = current.id.split('_');
 
-      if (this.type === 'Raspberry') this.publish(current, this.pubTopic);
-      else if (typeof current.payload === 'string')
-        this.publish(
-          current.payload,
-          `${current.farm_id}/${current.node_name}`
-        );
-      else this.publish(current, `${current.farm_id}/${current.node_name}`);
+      if (current.attempts! < 3) {
+        if (this.type === 'Raspberry') {
+          this.publish(current, this.pubTopic);
+        } else {
+          this.publish(current, `${farm_id}_${node_num}`);
+        }
+        current.attempts!++;
+      } else {
+        console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
+        emitter.emit('action-ack-not-received', current);
+        this.queue.remove(current);
+        this.ready = true;
+        return;
+      }
+      this.ready = true;
+      setTimeout(() => {
+        this.processQueue();
+      }, 10.0 * 1000);
     }
   };
 }

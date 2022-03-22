@@ -174,7 +174,7 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
             colorLabel={theme.colors.secondary}
             id="pivot_lat"
             type="text"
-            placeholder="LATITUDE"
+            placeholder="EX: -21.00"
             register={register}
           />
           {error && error.type === "lat" && (
@@ -186,7 +186,7 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
             colorLabel={theme.colors.secondary}
             id="pivot_lng"
             type="text"
-            placeholder="LONGITUDE"
+            placeholder="EX: -46.00"
             register={register}
           />
           {error && error.type === "lng" && (

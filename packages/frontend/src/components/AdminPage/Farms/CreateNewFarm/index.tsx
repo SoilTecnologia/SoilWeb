@@ -126,7 +126,7 @@ const CreateNewFarm = () => {
           label="LATITUDE"
           id="farm_lat"
           type="text"
-          placeholder="LATITUDE"
+          placeholder="EX: -21.00"
           register={register}
         />
         {error && error.type === "lat" && (
@@ -137,7 +137,7 @@ const CreateNewFarm = () => {
           label="LONGITUDE"
           id="farm_lng"
           type="text"
-          placeholder="LONGITUDE"
+          placeholder="EX: -46.00"
           register={register}
         />
         {error && error.type === "lng" && (
