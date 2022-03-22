@@ -1,5 +1,6 @@
 import knex from '../..';
 import State from '../../../models/state';
+import { StateModel } from '../../model/State';
 import { IStateRepository } from './IState';
 
 class StatesRepository implements IStateRepository {
@@ -17,6 +18,12 @@ class StatesRepository implements IStateRepository {
       .where({ state_id })
       .orderBy('timestamp', 'desc')
       .first();
+  }
+
+  async create(state: Omit<StateModel, 'state_id'>): Promise<State> {
+    const newState = await knex<State>('states').insert(state).returning('*');
+
+    return newState[0];
   }
 }
 
