@@ -1,18 +1,9 @@
 import knex from '../..';
 import Node from '../../../models/node';
+import { NodeModel } from '../../model/Node';
 import { INodesRepository } from './INodesRepository';
 
 class NodesRepository implements INodesRepository {
-  private static INSTANCE: NodesRepository;
-
-  public static getInstance(): NodesRepository {
-    if (!NodesRepository.INSTANCE) {
-      NodesRepository.INSTANCE = new NodesRepository();
-    }
-
-    return NodesRepository.INSTANCE;
-  }
-
   async findById(node_id: string | undefined): Promise<Node | undefined> {
     return await knex<Node>('nodes').select().where({ node_id }).first();
   }
@@ -23,6 +14,24 @@ class NodesRepository implements INodesRepository {
 
   async findByPivotId(node_id: string): Promise<Node | undefined> {
     return await knex<Node>('nodes').select().where({ node_id }).first();
+  }
+
+  async create(node: Omit<NodeModel, 'node_id'>): Promise<Node | undefined> {
+    const newNode = await knex<Node>('nodes').insert(node).returning('*');
+    return newNode[0];
+  }
+
+  async delete(node_id: string | undefined): Promise<number | undefined> {
+    return await knex<Node>('nodes').select().where({ node_id }).del();
+  }
+
+  async update(node: NodeModel): Promise<NodeModel | undefined> {
+    const newNode = await knex<Node>('nodes')
+      .where({ node_id: node.node_id })
+      .update(node)
+      .returning('*');
+
+    return newNode[0];
   }
 }
 

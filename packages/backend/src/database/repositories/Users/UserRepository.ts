@@ -7,16 +7,6 @@ import { UserModel } from '../../model/User';
 import { IUsersRepository, ResponseDTO } from './IUsersRepository';
 
 class UsersRepository implements IUsersRepository {
-  private static INSTANCE: UsersRepository;
-
-  public static getInstance(): UsersRepository {
-    if (!UsersRepository.INSTANCE) {
-      UsersRepository.INSTANCE = new UsersRepository();
-    }
-
-    return UsersRepository.INSTANCE;
-  }
-
   async findByLogin(login: string): Promise<User | undefined> {
     return await knex<User>('users').select('*').where({ login }).first();
   }

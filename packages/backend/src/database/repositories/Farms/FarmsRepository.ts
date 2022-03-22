@@ -4,16 +4,6 @@ import { FarmModel } from '../../model/Farm';
 import { IFarmsRepository } from './IFarmsRepository';
 
 class FarmsRepository implements IFarmsRepository {
-  private static INSTANCE: FarmsRepository;
-
-  public static getInstance(): FarmsRepository {
-    if (!FarmsRepository.INSTANCE) {
-      FarmsRepository.INSTANCE = new FarmsRepository();
-    }
-
-    return FarmsRepository.INSTANCE;
-  }
-
   async findById(farm_id: string): Promise<FarmModel | undefined> {
     return await knex<FarmModel>('farms')
       .select('*')
