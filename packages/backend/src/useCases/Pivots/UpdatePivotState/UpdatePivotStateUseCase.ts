@@ -1,7 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
 import { StateModel } from '../../../database/model/State';
-import { StateVariableModel } from '../../../database/model/StateVariables';
 import { IFarmsRepository } from '../../../database/repositories/Farms/IFarmsRepository';
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
@@ -39,8 +38,6 @@ class UpdatePivotStateUseCase {
     this.shouldNotifyUpdate = false;
     this.shouldNotifyState = false;
     this.state = undefined;
-
-    console.log('Chegando');
   }
 
   private createStateIfNotExists = async (
@@ -65,7 +62,6 @@ class UpdatePivotStateUseCase {
   };
 
   private alterStateVariable = async (
-    state_id: StateVariableModel['state_id'],
     angle: StateVariable['angle'],
     percentimeter: StateVariable['percentimeter'],
     timestamp: StateModel['timestamp']
@@ -73,7 +69,7 @@ class UpdatePivotStateUseCase {
     if (angle !== undefined && percentimeter !== undefined) {
       if (this.state) {
         const oldStateVariable =
-          await this.stateVariableRepository.findByStateId(state_id);
+          await this.stateVariableRepository.findByStateId(this.state.state_id);
 
         if (
           !oldStateVariable ||
@@ -93,23 +89,22 @@ class UpdatePivotStateUseCase {
 
   private alterRadioVariable = async (
     pivot_id: RadioVariable['pivot_id'],
-    state_id: StateModel['state_id'],
     father: RadioVariable['father'],
     rssi: RadioVariable['rssi'],
     timestamp: StateModel['timestamp']
   ) => {
-    if (father && rssi) {
+    if (father !== undefined && rssi !== undefined) {
       const oldRadioVariable = await this.radioVariableRepository.findByPivotId(
         pivot_id
       );
       if (
         !oldRadioVariable ||
-        isRadioVariableDifferent(oldRadioVariable!!, { father, rssi })
+        isRadioVariableDifferent(oldRadioVariable, { father, rssi })
       ) {
         this.shouldNotifyUpdate = true;
         await this.radioVariableRepository.create({
           pivot_id,
-          state_id,
+          state_id: this.state!.state_id,
           father,
           rssi,
           timestamp: new Date(timestamp)
@@ -145,69 +140,14 @@ class UpdatePivotStateUseCase {
       timestamp
     );
 
-    // if (
-    //   !oldState ||
-    //   isStateDifferent(oldState, { connection, power, water, direction })
-    // ) {
-    //   this.shouldNotifyUpdate = true;
-    //   this.shouldNotifyState = true;
-
-    //   this.state = await this.stateRepository.create({
-    //     pivot_id,
-    //     connection,
-    //     power,
-    //     water,
-    //     direction,
-    //     timestamp: new Date(timestamp)
-    //   });
-    // }
-
-    if (angle !== undefined && percentimeter !== undefined) {
-      if (this.state) {
-        const oldStateVariable =
-          await this.stateVariableRepository.findByStateId(this.state.state_id);
-
-        if (
-          !oldStateVariable ||
-          isStateVariableDifferent(oldStateVariable, { angle, percentimeter })
-        ) {
-          this.shouldNotifyUpdate = true;
-          await this.stateVariableRepository.create({
-            state_id: this.state.state_id,
-            angle,
-            percentimeter,
-            timestamp: new Date(timestamp)
-          });
-        }
-      }
-    }
-
-    if (father !== undefined && rssi !== undefined) {
-      const oldRadioVariable = await this.radioVariableRepository.findByPivotId(
-        pivot_id
-      );
-      if (
-        !oldRadioVariable ||
-        isRadioVariableDifferent(oldRadioVariable, { father, rssi })
-      ) {
-        this.shouldNotifyUpdate = true;
-        await this.radioVariableRepository.create({
-          pivot_id,
-          state_id: this.state!.state_id,
-          father,
-          rssi,
-          timestamp: new Date(timestamp)
-        });
-      }
-    }
+    await this.alterStateVariable(angle, percentimeter, timestamp);
+    await this.alterRadioVariable(pivot_id, father, rssi, timestamp);
 
     // teste
 
     if (this.shouldNotifyUpdate) {
       const pivot = await this.pivotRepository.findById(pivot_id);
-
       const node = await this.nodesRepository.findById(pivot?.node_id);
-
       const farm = await this.farmRepository.findById(pivot?.farm_id!!);
 
       emitter.emit('status', {
