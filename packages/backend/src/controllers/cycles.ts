@@ -1,13 +1,11 @@
+import knex from '../database';
 import Pivot from '../models/pivot';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 
-import knex from '../database';
-import { last } from 'lodash';
-
 export const getLastCycleFromPivot = async (
   pivot_id: Pivot['pivot_id']
-): Promise<Array<{ angle: number | null, percentimeter: number | null }>> => {
+): Promise<Array<{ angle: number | null; percentimeter: number | null }>> => {
   const lastState = await knex<State>('states')
     .select('power', 'state_id')
     .where('pivot_id', pivot_id)
@@ -34,7 +32,8 @@ export const getLastCycleFromPivot = async (
         .where('states.timestamp', '>', lastOff!.timestamp);
 
       return beforeThat;
-    } else if (lastState.power === false) {
+    }
+    if (lastState.power === false) {
       return await knex<StateVariable>('state_variables')
         .select('angle', 'percentimeter')
         .where('state_id', lastState.state_id);
@@ -60,7 +59,7 @@ type PartialCycleResponse = {
     connection: State['connection'];
     timestamp: Date;
   }>;
-  percentimeters: Array<{value: number, timestamp: Date}>;
+  percentimeters: Array<{ value: number; timestamp: Date }>;
 };
 type fullCycleResponse = Array<PartialCycleResponse>;
 
@@ -94,8 +93,10 @@ export const getCyclesFromPivot = async (
       until it finds a state with power = false
     */
   let foundStart = false;
-  let currentCycle: PartialCycleResponse = {states: [], percentimeters: []} as unknown as PartialCycleResponse;
-
+  let currentCycle: PartialCycleResponse = {
+    states: [],
+    percentimeters: []
+  } as unknown as PartialCycleResponse;
 
   for (let state of states) {
     if (foundStart) {
@@ -112,7 +113,10 @@ export const getCyclesFromPivot = async (
 
         response.push(currentCycle!);
         foundStart = false;
-        currentCycle = {states: [], percentimeters: []} as unknown as PartialCycleResponse;
+        currentCycle = {
+          states: [],
+          percentimeters: []
+        } as unknown as PartialCycleResponse;
       } else {
         currentCycle!.states.push({
           power: state.power,
@@ -143,23 +147,25 @@ export const getCyclesFromPivot = async (
     }
 
     const variables = await knex<StateVariable>('state_variables')
-      .select('percentimeter', 'timestamp'/*'AVG(percentimeter)')*/)
+      .select('percentimeter', 'timestamp' /* 'AVG(percentimeter)') */)
       .where('state_id', state.state_id)
-     .groupBy('angle', 'percentimeter', 'timestamp')
-
+      .groupBy('angle', 'percentimeter', 'timestamp');
 
     for (let variable of variables) {
       if (variable)
-        currentCycle!.percentimeters.push({value: variable.percentimeter!, timestamp: variable.timestamp!});
+        currentCycle!.percentimeters.push({
+          value: variable.percentimeter!,
+          timestamp: variable.timestamp!
+        });
     }
   }
 
-  //If there's one that started but hasn't ended, make sure to send it too
-  if(foundStart)
-  // if(currentCycle.states.length > 0 || currentCycle.percentimeters.length > 0) {
+  // If there's one that started but hasn't ended, make sure to send it too
+  if (foundStart)
+    // if(currentCycle.states.length > 0 || currentCycle.percentimeters.length > 0) {
     response.push(currentCycle);
-  //}
-  
+  // }
+
   // Return the reverse so that most recent cycles are shown
   return response.reverse();
 };

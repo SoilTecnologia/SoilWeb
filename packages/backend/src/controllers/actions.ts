@@ -1,6 +1,5 @@
-import Action from '../models/action';
-
 import knex from '../database';
+import Action from '../models/action';
 import emitter from '../utils/eventBus';
 
 export const readAllActionsController = async (): Promise<Action[]> => {
@@ -30,7 +29,8 @@ export const createActionController = async (
       percentimeter,
       timestamp_sent: timestamp,
       author
-    }).returning("*")!;
+    })
+    .returning('*')!;
 
   const pivot = await knex('pivots').select('*').where({ pivot_id }).first();
   const { node_id } = pivot;

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { UpdatePivotStateUseCase } from './UpdatePivotStateUseCase';
 
-class UpdatePivotController {
+class UpdateStatePivotController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const { pivot_id } = req.params;
     const {
@@ -12,11 +12,12 @@ class UpdatePivotController {
       direction,
       angle,
       percentimeter,
-      timestamp
+      timestamp,
+      father,
+      rssi
     } = req.body;
 
     const updatePivotState = container.resolve(UpdatePivotStateUseCase);
-    const { father, rssi } = req.body;
 
     try {
       const updatedPivot = await updatePivotState.execute(
@@ -41,4 +42,4 @@ class UpdatePivotController {
   }
 }
 
-export { UpdatePivotController };
+export { UpdateStatePivotController };

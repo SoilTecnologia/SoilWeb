@@ -11,7 +11,7 @@ class DeletePivotController {
     try {
       const allPivotsFromNode = await deletePivotUseCase.execute(id);
 
-      res.send(allPivotsFromNode);
+      res.sendStatus(200).send(allPivotsFromNode);
     } catch (err) {
       console.log(`[ERROR] Server 500 on /pivots/readAll`);
       console.log(err);
