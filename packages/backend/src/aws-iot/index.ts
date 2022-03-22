@@ -14,6 +14,13 @@ Com ela, conseguimos fazer o envio de mensagens para o broker aws-iot-core, e, d
 inicializamos sua instância, decidimos como ela deve ser utilizada.
 */
 
+type MessageQueue = {
+  type: 'action' | 'status';
+  farm_id: string;
+  node_name: number;
+  payload: any;
+};
+
 // A biblioteca pode ser inicializada utilizando algum desses dois types:
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 
@@ -279,12 +286,5 @@ class IoTDevice {
     }
   };
 }
-
-type MessageQueue = {
-  type: 'action' | 'status';
-  farm_id: string;
-  node_name: number;
-  payload: any;
-};
 
 export default IoTDevice;
