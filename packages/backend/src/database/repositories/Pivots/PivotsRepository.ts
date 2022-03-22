@@ -6,7 +6,7 @@ import { IPivotsRepository } from './IPivotsRepository';
 class PivotsRepository implements IPivotsRepository {
   async findById(pivot_id: string): Promise<PivotModel | undefined> {
     return await knex<PivotModel>('pivots')
-      .select('*')
+      .select()
       .where({ pivot_id })
       .first();
   }

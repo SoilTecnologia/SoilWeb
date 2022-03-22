@@ -8,6 +8,6 @@ type State = {
   timestamp: Date;
 };
 
-export type HandleState = Omit<State, 'state_id'>;
+export type HandleState = Omit<State, 'state_id' | 'pivot_id' | 'timestamp'>;
 
 export default State;

@@ -57,14 +57,10 @@ const ViewDataUser = () => {
         {modalVisible && (
           <ModalUpdateData closeModal={closeModal}>
             {stateAdmin.updateFarm && (
-<<<<<<< HEAD
               <UpdateFarmSelected
                 farmSelected={stateAdmin.updateFarm}
                 closeModal={() => setModalVisible(false)}
               />
-=======
-              <UpdateFarmSelected farmSelected={stateAdmin.updateFarm} closeModal={() => setModalVisible(false)} />
->>>>>>> develop
             )}
           </ModalUpdateData>
         )}

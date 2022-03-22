@@ -20,6 +20,12 @@ import {
 
 @injectable()
 class UpdatePivotStateUseCase {
+  private shouldNotifyUpdate: boolean;
+
+  private shouldNotifyState: boolean;
+
+  private state: StateModel | undefined;
+
   constructor(
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository,
     @inject('FarmsRepository') private farmRepository: IFarmsRepository,
@@ -29,40 +35,32 @@ class UpdatePivotStateUseCase {
     private stateVariableRepository: IStatesVariable,
     @inject('RadioVariablesRepository')
     private radioVariableRepository: IRadioVariableRepository
-  ) {}
+  ) {
+    this.shouldNotifyUpdate = false;
+    this.shouldNotifyState = false;
+    this.state = undefined;
 
-  private shouldNotifyUpdate: boolean = false;
-
-  private shouldNotifyState: boolean = false;
-
-  private state: StateModel | undefined;
+    console.log('Chegando');
+  }
 
   private createStateIfNotExists = async (
     pivot_id: StateModel['pivot_id'],
     oldState: StateModel | undefined,
-    newState: HandleState
+    newState: HandleState,
+    timestamp: Date
   ) => {
-    const { connection, power, water, direction } = newState!!;
-
-    const stateChanged = isStateDifferent(oldState!!, {
-      connection,
-      power,
-      water,
-      direction
-    });
-    if (!oldState || stateChanged) {
+    if (!oldState || isStateDifferent(oldState, newState)) {
       this.shouldNotifyUpdate = true;
       this.shouldNotifyState = true;
-      const state = await this.stateRepository.create({
-        pivot_id,
-        connection,
-        power,
-        water,
-        direction,
-        timestamp: new Date(newState.timestamp)
-      });
 
-      return state;
+      this.state = await this.stateRepository.create({
+        pivot_id,
+        connection: newState.connection,
+        power: newState.power,
+        water: newState.water,
+        direction: newState.direction,
+        timestamp: new Date(timestamp)
+      });
     }
   };
 
@@ -132,49 +130,88 @@ class UpdatePivotStateUseCase {
     father: RadioVariable['father'],
     rssi: RadioVariable['rssi']
   ) {
-    const onePivot = await this.pivotRepository.findById(pivot_id);
-    const farm = await this.farmRepository.findById(onePivot!!.farm_id);
-
-    const oldState = await this.stateRepository.findByPivotId(
-      onePivot!!.pivot_id
-    );
-
+    const oldState = await this.stateRepository.findByPivotId(pivot_id);
     this.state = oldState;
 
-    const handleState = {
+    await this.createStateIfNotExists(
       pivot_id,
-      connection,
-      power,
-      water,
-      direction,
-      timestamp
-    };
-
-    await this.createStateIfNotExists(pivot_id, oldState, handleState);
-
-    await this.alterStateVariable(
-      oldState!!.state_id,
-      angle,
-      percentimeter,
+      oldState,
+      {
+        connection,
+        power,
+        water,
+        direction
+      },
       timestamp
     );
 
-    await this.alterRadioVariable(
-      pivot_id,
-      oldState!!.state_id,
-      father,
-      rssi,
-      timestamp
-    );
+    // if (
+    //   !oldState ||
+    //   isStateDifferent(oldState, { connection, power, water, direction })
+    // ) {
+    //   this.shouldNotifyUpdate = true;
+    //   this.shouldNotifyState = true;
+
+    //   this.state = await this.stateRepository.create({
+    //     pivot_id,
+    //     connection,
+    //     power,
+    //     water,
+    //     direction,
+    //     timestamp: new Date(timestamp)
+    //   });
+    // }
+
+    if (angle !== undefined && percentimeter !== undefined) {
+      if (this.state) {
+        const oldStateVariable =
+          await this.stateVariableRepository.findByStateId(this.state.state_id);
+
+        if (
+          !oldStateVariable ||
+          isStateVariableDifferent(oldStateVariable, { angle, percentimeter })
+        ) {
+          this.shouldNotifyUpdate = true;
+          await this.stateVariableRepository.create({
+            state_id: this.state.state_id,
+            angle,
+            percentimeter,
+            timestamp: new Date(timestamp)
+          });
+        }
+      }
+    }
+
+    if (father !== undefined && rssi !== undefined) {
+      const oldRadioVariable = await this.radioVariableRepository.findByPivotId(
+        pivot_id
+      );
+      if (
+        !oldRadioVariable ||
+        isRadioVariableDifferent(oldRadioVariable, { father, rssi })
+      ) {
+        this.shouldNotifyUpdate = true;
+        await this.radioVariableRepository.create({
+          pivot_id,
+          state_id: this.state!.state_id,
+          father,
+          rssi,
+          timestamp: new Date(timestamp)
+        });
+      }
+    }
 
     // teste
 
     if (this.shouldNotifyUpdate) {
       const pivot = await this.pivotRepository.findById(pivot_id);
-      const node = await this.nodesRepository.findById(pivot!!.node_id);
+
+      const node = await this.nodesRepository.findById(pivot?.node_id);
+
+      const farm = await this.farmRepository.findById(pivot?.farm_id!!);
 
       emitter.emit('status', {
-        farm_id: node?.farm_id,
+        farm_id: pivot?.farm_id,
         node_num: node?.node_num,
         payload: {
           pivot_id,
