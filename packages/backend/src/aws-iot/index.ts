@@ -375,7 +375,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloud3';
-      this.clientId = 'SPFC222ss';
+      this.clientId = 'HenriqueDev';
     }
   }
 
