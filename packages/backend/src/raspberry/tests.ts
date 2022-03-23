@@ -2,15 +2,12 @@ import Axios from 'axios';
 import { FormDataEncoder } from 'form-data-encoder';
 import { FormData } from 'formdata-node';
 import { Readable } from 'stream';
-import {
-  readAllActionsController,
-  updateActionController
-} from '../controllers/actions';
-import {
-  readAllPivotsController2,
-  updatePivotController
-} from '../controllers/pivots';
-import Action from '../database/model/types/action';
+import { container } from 'tsyringe';
+import { ActionModel } from '../database/model/Action';
+import { PivotsRepository } from '../database/repositories/Pivots/PivotsRepository';
+import { GetAllActionsUseCase } from '../useCases/Actions/GetAllActions/GetAllActionUseCase';
+import { UpdateActionsUseCase } from '../useCases/Actions/UpdateActionUseCase';
+import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import {
   objectToActionString,
   StatusObject,
@@ -22,7 +19,7 @@ import GenericQueue from '../utils/generic_queue';
 const TIMEOUT = 10000;
 
 type ActionData = {
-  action: Action;
+  action: ActionModel;
   timestamp: Date;
   attempts: number;
 };
@@ -32,37 +29,17 @@ type IdleData = {
   radio_id: number;
   attempts: number;
 };
-
-const activeQueue: GenericQueue<ActionData> = new GenericQueue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
-const idleQueue: GenericQueue<IdleData> = new GenericQueue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
-
-let ready = true;
-
-export const start = async () => {
-  loadActions();
-  loadPivots();
-
-  emitter.on('action', (action) => {
-    activeQueue.enqueue({
-      action: action.payload,
-      timestamp: new Date(),
-      attempts: 0
-    });
-  });
-
-  // Seta um intervalo para ficar checando a pool
-  // Dentro da checkPool existe uma flag ready para ver se ja posso checar o proximo
-  setInterval(() => {
-    if (ready) checkPool();
-  }, 5000);
-};
-
 type RadioResponse = {
   cmd: number;
   id: number;
   payload: Array<number>;
   status: string;
 };
+
+const activeQueue: GenericQueue<ActionData> = new GenericQueue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
+const idleQueue: GenericQueue<IdleData> = new GenericQueue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
+
+let ready = true;
 
 const sendData = async (radio_id: number, data: string) => {
   const bodyFormData = new FormData();
@@ -85,11 +62,7 @@ const sendData = async (radio_id: number, data: string) => {
 
   return response;
 };
-
-/*
-Checa se a resposta da placa é igual à uma action que mandamos à ela
-*/
-const checkResponse = (action: Action, payload: StatusObject) => {
+const checkResponse = (action: ActionModel, payload: StatusObject) => {
   if (payload) {
     if (action.power) {
       // Se nossa intenção era ligar, checamos todo o payload
@@ -109,7 +82,31 @@ const checkResponse = (action: Action, payload: StatusObject) => {
   return false;
 };
 
+export const loadActions = async () => {
+  const readPivots = container.resolve(GetAllActionsUseCase);
+  const allActions = await readPivots.execute();
+
+  for (const action of allActions) {
+    activeQueue.enqueue({ action, attempts: 0, timestamp: new Date() });
+  }
+};
+
+export const loadPivots = async () => {
+  const getAllPivots = new PivotsRepository();
+  const allPivots = await getAllPivots.findAll();
+
+  for (const pivot of allPivots) {
+    idleQueue.enqueue({
+      pivot_id: pivot.pivot_id,
+      radio_id: pivot.radio_id,
+      attempts: 0
+    });
+  }
+};
 const checkPool = async () => {
+  const getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
+  const updateActionUseCase = container.resolve(UpdateActionsUseCase);
+
   ready = false;
   if (!activeQueue.isEmpty()) {
     console.log('CHECKING ACTIVE');
@@ -142,7 +139,7 @@ const checkPool = async () => {
         current.action.radio_id == data.id &&
         checkResponse(current.action, payloadObject)
       ) {
-        await updatePivotController(
+        await getUpdatePivotController.execute(
           current.action.pivot_id,
           true,
           payloadObject.power,
@@ -157,7 +154,7 @@ const checkPool = async () => {
         current.attempts = 0;
 
         console.log('UPDATING ACTION:', current.action.action_id);
-        await updateActionController(current.action.action_id, true);
+        await updateActionUseCase.execute(current.action.action_id, true);
         activeQueue.dequeue();
       } else {
         current.attempts++;
@@ -168,7 +165,7 @@ const checkPool = async () => {
     } finally {
       if (current.attempts > 4) {
         console.log('Failing PIVOT');
-        await updatePivotController(
+        await getUpdatePivotController.execute(
           current.action.pivot_id,
           false,
           null,
@@ -181,7 +178,7 @@ const checkPool = async () => {
           null
         );
         const removed = activeQueue.dequeue()!;
-        await updateActionController(removed.action.action_id, false);
+        await updateActionUseCase.execute(removed.action.action_id, false);
       }
     }
   } else if (!idleQueue.isEmpty()) {
@@ -200,7 +197,7 @@ const checkPool = async () => {
       );
 
       if (payloadObject && current.radio_id == data.id) {
-        await updatePivotController(
+        await getUpdatePivotController.execute(
           current.pivot_id,
           true,
           payloadObject.power,
@@ -222,7 +219,7 @@ const checkPool = async () => {
     } finally {
       if (current.attempts >= 10) {
         console.log('Failing PIVOT');
-        await updatePivotController(
+        await getUpdatePivotController.execute(
           current.pivot_id,
           false,
           null,
@@ -242,26 +239,28 @@ const checkPool = async () => {
   }
   ready = true;
 };
+export const start = async () => {
+  loadActions();
+  loadPivots();
 
-export const loadActions = async () => {
-  const allActions = await readAllActionsController();
-
-  for (const action of allActions) {
-    activeQueue.enqueue({ action, attempts: 0, timestamp: new Date() });
-  }
-};
-
-export const loadPivots = async () => {
-  const allPivots = await readAllPivotsController2();
-
-  for (const pivot of allPivots) {
-    idleQueue.enqueue({
-      pivot_id: pivot.pivot_id,
-      radio_id: pivot.radio_id,
+  emitter.on('action', (action) => {
+    activeQueue.enqueue({
+      action: action.payload,
+      timestamp: new Date(),
       attempts: 0
     });
-  }
+  });
+
+  // Seta um intervalo para ficar checando a pool
+  // Dentro da checkPool existe uma flag ready para ver se ja posso checar o proximo
+  setInterval(() => {
+    if (ready) checkPool();
+  }, 5000);
 };
+
+/*
+Checa se a resposta da placa é igual à uma action que mandamos à ela
+*/
 
 // Sends data to radio
 // Returns the response

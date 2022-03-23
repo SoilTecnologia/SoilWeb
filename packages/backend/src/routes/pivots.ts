@@ -1,7 +1,5 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth';
-import { GetCycleController } from '../useCases/Cycles/GetCycles/GetCycleController';
-import { GetLastCycleController } from '../useCases/Cycles/GetLastCycles/GetLastCyclesController';
 import { CreatePivotController } from '../useCases/Pivots/CreatePivots/CreatePivotController';
 import { DeletePivotController } from '../useCases/Pivots/DeletePivot/DeletePivotController';
 import { GetAllPivotsController } from '../useCases/Pivots/GetAllPivots/GetAllPivotsController';
@@ -26,18 +24,17 @@ const readListPivotController = new ReadListController();
 const readPivotStateController = new ReadPivotStateController();
 const updatePivotStateController = new UpdateStatePivotController();
 
-// cycles
-const getLastCycleController = new GetLastCycleController();
-const getCycleController = new GetCycleController();
-
 router.get('/readAll/:farm_id', authMiddleware(), readAllController.handle);
+
 router.get('/map/:farm_id', authMiddleware(), readMapController.handle);
+
 router.get(
   '/state/:pivot_id',
   authMiddleware(),
   readPivotStateController.handle
 );
 router.get('/list/:farm_id', authMiddleware(), readListPivotController.handle);
+
 router.post(
   '/update/:pivot_id',
   authMiddleware(),
@@ -62,17 +59,5 @@ router.delete(
 );
 
 router.put('/putPivot', authMiddleware(), updatePivotController.handle);
-
-router.get(
-  '/cycles/:pivot_id',
-  authMiddleware(),
-  getLastCycleController.handle
-);
-
-router.get(
-  '/cycles/:pivot_id/:start/:end',
-  authMiddleware(),
-  getCycleController.handle
-);
 
 export default router;

@@ -5,6 +5,7 @@ import { realdAllPivots } from '../../model/types/pivot';
 
 interface IPivotsRepository {
   findById(pivot_id: PivotModel['pivot_id']): Promise<PivotModel | undefined>;
+  findAll(): Promise<PivotModel[]>;
   findByNodeId(
     node_id: NodeModel['node_id']
   ): Promise<PivotModel[] | undefined>;

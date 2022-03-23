@@ -11,6 +11,10 @@ class PivotsRepository implements IPivotsRepository {
       .first();
   }
 
+  async findAll(): Promise<PivotModel[]> {
+    return await knex<PivotModel>('pivots').select();
+  }
+
   async findByNodeId(
     node_id: string | undefined
   ): Promise<PivotModel[] | undefined> {

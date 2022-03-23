@@ -37,7 +37,7 @@ router.use('/farms', farmRoute);
 router.use('/pivots', pivotRoute);
 router.use('/nodes', nodeRoute);
 router.use('/actions', actionRoute);
-router.use('/cycle', cycleRoute);
+router.use('/cycles', cycleRoute);
 router.use('/api-status', (req, res, next) => {
   res.sendStatus(200);
 });
