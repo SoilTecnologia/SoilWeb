@@ -369,13 +369,13 @@ class IoTDevice {
     this.type = type;
     this.qos = qos;
     this.queue = new MessageQueue();
-    if (type == 'Raspberry' && topic) {
+    if (type === 'Raspberry' && topic) {
       this.subTopic = `${topic}`;
       this.pubTopic = `cloud3`;
       this.clientId = topic;
     } else {
       this.subTopic = 'cloud3';
-      this.clientId = 'SPFC';
+      this.clientId = 'SPFC222ss';
     }
   }
 
@@ -437,7 +437,7 @@ class IoTDevice {
 
   publish(payload: any, topic?: string) {
     let finalTopic;
-    if (this.type == 'Cloud') finalTopic = topic;
+    if (this.type === 'Cloud') finalTopic = topic;
     else finalTopic = this.pubTopic;
 
     try {
@@ -555,7 +555,7 @@ class IoTDevice {
       } else if (json.type === 'action') {
         const { author, power, water, direction, percentimeter, timestamp } =
           json.payload;
-        const { farm_id, node_num, pivot_num } = json;
+        const { farm_id, node_num } = json;
         await createActionController(
           `${farm_id}_${node_num}_${pivot_num}`,
           author,
@@ -579,7 +579,7 @@ class IoTDevice {
   */
 
   setupQueue = async () => {
-    if (this.type == 'Raspberry') {
+    if (this.type === 'Raspberry') {
       emitter.on('status', (status) => {
         this.queue.enqueue({
           type: 'status',

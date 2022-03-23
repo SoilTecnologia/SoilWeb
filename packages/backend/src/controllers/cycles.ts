@@ -21,17 +21,19 @@ export const getLastCycleFromPivot = async (
         .orderBy('timestamp', 'desc')
         .first();
 
-      const beforeThat = await knex<State>('states')
-        .innerJoin(
-          'state_variables',
-          'state_variables.state_id',
-          'states.state_id'
-        )
-        .select('angle', 'percentimeter')
-        .where('pivot_id', pivot_id)
-        .where('states.timestamp', '>', lastOff!.timestamp);
+      if (lastOff) {
+        const beforeThat = await knex<State>('states')
+          .innerJoin(
+            'state_variables',
+            'state_variables.state_id',
+            'states.state_id'
+          )
+          .select('angle', 'percentimeter')
+          .where('pivot_id', pivot_id)
+          .where('states.timestamp', '>', lastOff.timestamp);
 
-      return beforeThat;
+        return beforeThat;
+      }
     }
     if (lastState.power === false) {
       return await knex<StateVariable>('state_variables')

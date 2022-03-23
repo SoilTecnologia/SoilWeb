@@ -27,6 +27,7 @@ const io = new Server(httpServer);
 app.use(cors());
 app.use(express.json());
 app.use(router);
+
 httpServer.listen(PORT, () => {
   console.info(`Server Listening on PORT ${PORT}`);
 });

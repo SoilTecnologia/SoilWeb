@@ -2,7 +2,10 @@ import RadioVariable from '../models/radioVariable';
 import State from '../models/state';
 import StateVariable from '../models/stateVariable';
 
-type CustomState = Pick<State, 'connection' | 'power' | 'water' | 'direction'>;
+export type CustomState = Pick<
+  State,
+  'connection' | 'power' | 'water' | 'direction'
+>;
 export const isStateDifferent = (
   oldState: CustomState,
   newState: CustomState
@@ -13,9 +16,9 @@ export const isStateDifferent = (
     oldState.water !== newState.water ||
     oldState.direction !== newState.direction
   ) {
-    console.log("Mudança de estado: ")
-    console.log(oldState)
-    console.log(newState)
+    console.log('Mudança de estado: ');
+    console.log(oldState);
+    console.log(newState);
     return true;
   }
   return false;
@@ -32,9 +35,9 @@ export const isStateVariableDifferent = (
     oldStateVariable.percentimeter! <= newStateVariable.percentimeter! - 5 ||
     oldStateVariable.percentimeter! >= newStateVariable.percentimeter! + 5
   ) {
-    console.log("atualização de variavel")
-    console.log(oldStateVariable)
-    console.log(newStateVariable)
+    console.log('atualização de variavel');
+    console.log(oldStateVariable);
+    console.log(newStateVariable);
     return true;
   }
 

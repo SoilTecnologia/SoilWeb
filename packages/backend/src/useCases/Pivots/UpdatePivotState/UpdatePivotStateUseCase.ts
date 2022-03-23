@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
 import { StateModel } from '../../../database/model/State';
 import { IFarmsRepository } from '../../../database/repositories/Farms/IFarmsRepository';
@@ -16,6 +16,7 @@ import {
   isStateDifferent,
   isStateVariableDifferent
 } from '../../../utils/isDifferent';
+import { CreateStateUseCase } from '../../States/CreateStateUseCase';
 
 @injectable()
 class UpdatePivotStateUseCase {
@@ -50,13 +51,15 @@ class UpdatePivotStateUseCase {
       this.shouldNotifyUpdate = true;
       this.shouldNotifyState = true;
 
-      this.state = await this.stateRepository.create({
+      const createStateUseCase = container.resolve(CreateStateUseCase);
+
+      this.state = await createStateUseCase.execute({
         pivot_id,
         connection: newState.connection,
         power: newState.power,
         water: newState.water,
         direction: newState.direction,
-        timestamp: new Date(timestamp)
+        timestamp
       });
     }
   };
@@ -128,18 +131,9 @@ class UpdatePivotStateUseCase {
     const oldState = await this.stateRepository.findByPivotId(pivot_id);
     this.state = oldState;
 
-    await this.createStateIfNotExists(
-      pivot_id,
-      oldState,
-      {
-        connection,
-        power,
-        water,
-        direction
-      },
-      timestamp
-    );
+    const newState = { connection, power, water, direction };
 
+    await this.createStateIfNotExists(pivot_id, oldState, newState, timestamp);
     await this.alterStateVariable(angle, percentimeter, timestamp);
     await this.alterRadioVariable(pivot_id, father, rssi, timestamp);
 

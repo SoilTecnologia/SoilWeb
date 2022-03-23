@@ -40,22 +40,24 @@ router.post(
 
 // Admin
 router.get('/getPivots/:id', authMiddleware(), getAllPivotsController.handle);
+
 router.get(
   '/getOnePivot/:pivot_num/:farm_id',
   authMiddleware(),
   getOnePivotController.handle
 );
+
 router.post('/addPivot', authMiddleware(), createPivotController.handle);
+
 router.delete(
   '/deletePivot/:id',
   authMiddleware(),
   deletePivotController.handle
 );
+
 router.put('/putPivot', authMiddleware(), updatePivotController.handle);
 
-export default router;
-
-// router.get( FOI PARA ROTA CYCLES
+// router.get(
 //   '/cycles/:pivot_id',
 //   authMiddleware(),
 //   authHandler(async (req, res, next) => {
@@ -72,7 +74,7 @@ export default router;
 //   })
 // );
 
-// router.get(  FOI PARA ROTA CYCLES
+// router.get(
 //   '/cycles/:pivot_id/:start/:end',
 //   authMiddleware(),
 //   authHandler(async (req, res, next) => {
@@ -88,3 +90,5 @@ export default router;
 //     }
 //   })
 // );
+
+export default router;
