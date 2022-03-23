@@ -1,8 +1,7 @@
 import { inject, injectable } from 'tsyringe';
-import knex from '../../../database';
 import { StateModel } from '../../../database/model/State';
 import { IStateRepository } from '../../../database/repositories/States/IState';
-import StateVariable from '../../../models/stateVariable';
+import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
 
 type PartialCycleResponse = {
   start_date: Date;
@@ -36,7 +35,9 @@ class GetCyclesUseCase {
   } as unknown as PartialCycleResponse;
 
   constructor(
-    @inject('StatesRepository') private stateRepository: IStateRepository
+    @inject('StatesRepository') private stateRepository: IStateRepository,
+    @inject('StatesVariablesRepository')
+    private stateVariablesRepository: IStatesVariableRepository
   ) {
     this.foundStart = false;
     this.response = [] as fullCycleResponse;
@@ -106,10 +107,13 @@ class GetCyclesUseCase {
         }
       }
 
-      const variables = await knex<StateVariable>('state_variables')
-        .select('percentimeter', 'timestamp' /* 'AVG(percentimeter)') */)
-        .where('state_id', state.state_id)
-        .groupBy('angle', 'percentimeter', 'timestamp');
+      const variables = await this.stateVariablesRepository.getVariableGroupBy(
+        state.state_id
+      );
+      // knex<StateVariable>('state_variables')
+      //   .select('percentimeter', 'timestamp' /* 'AVG(percentimeter)') */)
+      //   .where('state_id', state.state_id)
+      //   .groupBy('angle', 'percentimeter', 'timestamp');
 
       for (let variable of variables) {
         if (variable)

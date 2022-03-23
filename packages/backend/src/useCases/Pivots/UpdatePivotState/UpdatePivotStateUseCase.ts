@@ -6,7 +6,7 @@ import { INodesRepository } from '../../../database/repositories/Nodes/INodesRep
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IRadioVariableRepository } from '../../../database/repositories/RadioVariables/IRadioVariableRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
-import { IStatesVariable } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
+import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
 import RadioVariable from '../../../models/radioVariable';
 import { HandleState } from '../../../models/state';
 import StateVariable from '../../../models/stateVariable';
@@ -32,7 +32,7 @@ class UpdatePivotStateUseCase {
     @inject('NodesRepository') private nodesRepository: INodesRepository,
     @inject('StatesRepository') private stateRepository: IStateRepository,
     @inject('StatesVariablesRepository')
-    private stateVariableRepository: IStatesVariable,
+    private stateVariableRepository: IStatesVariableRepository,
     @inject('RadioVariablesRepository')
     private radioVariableRepository: IRadioVariableRepository
   ) {

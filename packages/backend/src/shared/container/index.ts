@@ -9,7 +9,7 @@ import { IRadioVariableRepository } from '../../database/repositories/RadioVaria
 import { RadioVariableRepository } from '../../database/repositories/RadioVariables/RadioVariablesRepository';
 import { IStateRepository } from '../../database/repositories/States/IState';
 import { StatesRepository } from '../../database/repositories/States/StatesRepository';
-import { IStatesVariable } from '../../database/repositories/StatesVariables/IStatesVariablesRepository';
+import { IStatesVariableRepository } from '../../database/repositories/StatesVariables/IStatesVariablesRepository';
 import { StatesVariablesRepository } from '../../database/repositories/StatesVariables/StatesVariablesRepository';
 import { IUsersRepository } from '../../database/repositories/Users/IUsersRepository';
 import { UsersRepository } from '../../database/repositories/Users/UserRepository';
@@ -37,7 +37,7 @@ container.registerSingleton<IStateRepository>(
   delay(() => StatesRepository)
 );
 
-container.registerSingleton<IStatesVariable>(
+container.registerSingleton<IStatesVariableRepository>(
   'StatesVariablesRepository',
   delay(() => StatesVariablesRepository)
 );

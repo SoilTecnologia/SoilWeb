@@ -1,13 +1,14 @@
 import { inject, injectable } from 'tsyringe';
-import knex from '../../../database';
 import { StateModel } from '../../../database/model/State';
 import { IStateRepository } from '../../../database/repositories/States/IState';
-import StateVariable from '../../../models/stateVariable';
+import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
 
 @injectable()
 class GetLastCycleUseCase {
   constructor(
-    @inject('StatesRepository') private stateRepository: IStateRepository
+    @inject('StatesRepository') private stateRepository: IStateRepository,
+    @inject('StatesVariablesRepository')
+    private stateVariableRepository: IStatesVariableRepository
   ) {}
 
   async execute(pivot_id: StateModel['pivot_id']) {
@@ -25,9 +26,9 @@ class GetLastCycleUseCase {
         }
       }
       if (lastState.power === false) {
-        return await knex<StateVariable>('state_variables')
-          .select('angle', 'percentimeter')
-          .where('state_id', lastState.state_id);
+        return await this.stateVariableRepository.getAnglePercentimeter(
+          lastState.state_id
+        );
       }
     }
 
