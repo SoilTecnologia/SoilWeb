@@ -20,6 +20,12 @@ interface IStateRepository {
     pivot_id: StateModel['pivot_id'],
     timestamp: StateModel['timestamp']
   ): Promise<any[]>;
+
+  getHistoryCycle(
+    pivot_id: StateModel['pivot_id'],
+    start: string,
+    end: string
+  ): Promise<any[]>;
 }
 
 export { IStateRepository };

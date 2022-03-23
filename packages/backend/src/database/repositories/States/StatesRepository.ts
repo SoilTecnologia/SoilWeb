@@ -65,6 +65,26 @@ class StatesRepository implements IStateRepository {
       .where('pivot_id', pivot_id)
       .where('states.timestamp', '>', timestamp);
   }
+
+  async getHistoryCycle(
+    pivot_id: string,
+    start: string,
+    end: string
+  ): Promise<any[]> {
+    return await knex<StateModel>('states')
+      .select(
+        'states.state_id',
+        'power',
+        'water',
+        'direction',
+        'timestamp',
+        'connection'
+      )
+      .where('pivot_id', pivot_id)
+      .where('timestamp', '>=', `${start}T00:00:00`)
+      .where('timestamp', '<=', `${end}T23:59:59Z`)
+      .orderBy('timestamp', 'asc');
+  }
 }
 
 export { StatesRepository };

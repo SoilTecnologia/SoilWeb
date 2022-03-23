@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
-import knex from '../../database';
-import { StateModel } from '../../database/model/State';
-import { IStateRepository } from '../../database/repositories/States/IState';
-import StateVariable from '../../models/stateVariable';
+import knex from '../../../database';
+import { StateModel } from '../../../database/model/State';
+import { IStateRepository } from '../../../database/repositories/States/IState';
+import StateVariable from '../../../models/stateVariable';
 
 @injectable()
 class GetLastCycleUseCase {
