@@ -1,12 +1,7 @@
 type Intent ={
-  power: boolean,
-  water: boolean,
-  direction: 'CLOCKWISE'|'ANTI_CLOCKWISE',
+  power: boolean|null,
+  water: boolean|null,
+  direction: 'CLOCKWISE'|'ANTI_CLOCKWISE' |null,
   percentimeter: number,
-
-  /////deletar daqui para baixo
-  connection: boolean,
-  angle: number,
-  timestamp:number
 }
 export default Intent;

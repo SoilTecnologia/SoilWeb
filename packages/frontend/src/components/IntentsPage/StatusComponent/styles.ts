@@ -2,6 +2,14 @@ import styled, {css} from "styled-components";
 
 export const CurrentStateWrapper = styled.div`
   display:flex;
+  align-self:stretch;
+  flex-direction:column;
+  justify-content:center;
+`
+export const RowAlignment=styled.div`
+display:flex;
+justify-content:center;
+align-self:stretch;
   flex-direction:row;
 `
 export const FailStateWrapper = styled.div`
@@ -26,4 +34,15 @@ ${({theme})=> css`
   font-family:${theme.font.family.Montserrat_bold};
 `}
 `
+
+export const Percent = styled.h1`
+${({theme})=> css`
+  text-align:center;
+  align-self:center;
+  font-size:${theme.font.sizes.xxlarge};
+  color:${theme.colors.primary};
+  font-family:${theme.font.family.Montserrat_bold};
+`}
+`;
+
 

@@ -1,5 +1,7 @@
 import styled, {css} from "styled-components";
-import { ImArrowLeft2 } from "react-icons/im";
+import { FaHistory } from "react-icons/fa";
+import { GrMap } from "react-icons/gr";
+import { RiRoadMapLine } from "react-icons/ri";
 
 export const Container =styled.div`
 ${({theme})=> css`
@@ -59,17 +61,18 @@ export const CurrentStateIcon = styled.img``
 export const ButtonsView = styled.div`
   display:flex;
   flex-direction:row;
-  justify-content:space-evenly;
-  margin: 30px 210px;
-  `;
+  justify-content:space-around;
+  margin: 30px ;
+`;
 
 export const Button = styled.button`
 ${({theme})=> css`
   display:flex;
+  width:30%;
   align-items:center;
   justify-content:center;
   flex-direction:row;
-  padding:1.5rem ${theme.spacings.xlarge};
+  padding:1.5rem ${theme.spacings.xxlarge};
   background: linear-gradient( ${theme.colors.primary} 90%, ${theme.colors.primary_gradient} 100% );
   box-shadow: 5px 5px 15px gray;
   transition: all .3s linear;
@@ -102,6 +105,26 @@ ${({theme})=> css`
   }
 `}
 `;
+
+
+export const Text=styled.h1`
+  font-size:${({theme})=>theme.font.sizes.xxlarge};
+  color:${({theme})=>theme.colors.secondary};
+  font-family:${({theme})=>theme.font.family.Montserrat_bold};
+  margin: 0 1rem;
+`;
+
+export const MapIcon = styled(RiRoadMapLine)`
+  font-size:${({theme})=>theme.font.sizes.xxlarge};
+  color:${({theme})=>theme.colors.secondary};
+  font-family:${({theme})=>theme.font.family.Montserrat_bold};
+`
+export const ClockIcon = styled(FaHistory)`
+  font-size:${({theme})=>theme.font.sizes.xxlarge};
+  color:${({theme})=>theme.colors.secondary};
+  font-family:${({theme})=>theme.font.family.Montserrat_bold};
+`
+
 
 
 

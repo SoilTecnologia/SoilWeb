@@ -19,7 +19,7 @@ const StatusComponent = () => {
       <S.CurrentStateWrapper>
 
         {pivot?.power == false ? (
-          <>
+          <S.RowAlignment>
             <S.ImageContainer>
               <Image
                 layout="responsive"
@@ -27,36 +27,44 @@ const StatusComponent = () => {
                 alt={'Desligado'}
               />
             </S.ImageContainer>
-          </>
+          </S.RowAlignment>
         ) : (
           <>
-            <S.ImageContainer>
-              <Image
-                layout="responsive"
-                src={OnIcon}
-                alt={'Ligado'}
-              />
-            </S.ImageContainer>
+            <S.RowAlignment>
+              <S.ImageContainer>
+                <Image
+                  layout="responsive"
+                  src={OnIcon}
+                  alt={'Ligado'}
+                />
+              </S.ImageContainer>
 
-            <S.ImageContainer>
-              <Image
-                layout="responsive"
-                src={(pivot?.direction == "CLOCKWISE") ? ClockwiseIcon : AntiClockwiseIcon}
-                alt={(pivot?.direction == "CLOCKWISE") ? 'Horário' : 'Anti Horário'}
-              />
-            </S.ImageContainer>
+              <S.ImageContainer>
+                <Image
+                  layout="responsive"
+                  src={(pivot?.direction == "CLOCKWISE") ? ClockwiseIcon : AntiClockwiseIcon}
+                  alt={(pivot?.direction == "CLOCKWISE") ? 'Horário' : 'Anti Horário'}
+                />
+              </S.ImageContainer>
 
-            <S.ImageContainer>
-              <Image
-                layout="responsive"
-                src={(pivot?.water === true) ? WaterOnIcon : WaterOffIcon}
-                alt={(pivot?.water === true) ? 'Com Água' : 'Sem Água'}
-              />
-            </S.ImageContainer>
+              <S.ImageContainer>
+                <Image
+                  layout="responsive"
+                  src={(pivot?.water === true) ? WaterOnIcon : WaterOffIcon}
+                  alt={(pivot?.water === true) ? 'Com Água' : 'Sem Água'}
+                />
+              </S.ImageContainer>
+
+
+            </S.RowAlignment>
+            <S.Percent>
+              Percentímetro: {pivot.percentimeter}%
+            </S.Percent>
           </>
-
         )
         }
+
+
 
       </S.CurrentStateWrapper >
     ) : (

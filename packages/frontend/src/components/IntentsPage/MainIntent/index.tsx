@@ -2,7 +2,7 @@ import * as S from "./styles";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useContextUserData } from "hooks/useContextUserData";
 import Header from "components/globalComponents/Header";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Intent from "utils/models/intent";
 
 //Icons
@@ -10,6 +10,7 @@ import { ImArrowLeft2, ImCalendar } from "react-icons/im";
 
 
 import StatusComponent from "../StatusComponent";
+import IntentBlock from "../IntentBlock";
 
 
 
@@ -26,23 +27,24 @@ const MainIntent = () => {
   const [intent, setIntent] = useState<Intent>({
     connection: true,
     power: true,
-    water: true,
+    water: false,
     direction: 'ANTI_CLOCKWISE',
-    percentimeter: 11,
+    percentimeter: 30,
     angle: 100,
     timestamp: new Date().valueOf()
   })
 
 
   const func = () => {
-    sendPivotIntent(pivot?.pivot_id, intent)
+    if (pivot)
+      sendPivotIntent(pivot.pivot_id, intent)
   }
 
   return (
     <S.Container>
       <Header
         text={`Pivô ${pivot?.pivot_num}`}
-        subHeaderText={pivot?.timestamp == null ? 'Nunca foi Atualizado' : `${pivot?.timestamp}`}
+        subHeaderText={pivot?.timestamp == null ? 'Nunca foi Atualizado' : `${pivot.timestamp}`}
       />
       <S.Body>
         <S.ScheduleButton onClick={func}>
@@ -62,8 +64,39 @@ const MainIntent = () => {
           </S.StateText>
 
 
-          <StatusComponent/>
+          <StatusComponent />
         </S.CurrentStateContainer>
+
+        <S.ButtonsView>
+
+          <S.Button >
+
+            <S.MapIcon />
+
+            <S.Text>
+              Mapa
+            </S.Text>
+
+          </S.Button>
+
+          <S.Button>
+
+            <S.ClockIcon />
+
+            <S.Text >
+              Histórico
+            </S.Text>
+
+          </S.Button>
+
+        </S.ButtonsView>
+
+
+
+        <IntentBlock />
+
+
+
 
       </S.Body>
 

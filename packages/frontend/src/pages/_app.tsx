@@ -8,6 +8,7 @@ import { UseContextProvider } from "hooks/useContextData";
 import { UseCrudContextProvider } from "hooks/useActionsCrud";
 import { UseLoginProvider } from "hooks/useLoginAuth";
 import { UserDataProvider } from "hooks/useContextUserData";
+import { IntentsDataProvider} from "hooks/useContextIntentData"
 
 function App({ Component, pageProps }: AppProps) {
   return (
@@ -16,6 +17,7 @@ function App({ Component, pageProps }: AppProps) {
         <UseContextProvider>
           <UseCrudContextProvider>
             <UserDataProvider>
+              <IntentsDataProvider>
               <Head>
                 <title>SoilTech</title>
                 <link rel="shortcut icon" href="/logos/logo.png" />
@@ -28,6 +30,7 @@ function App({ Component, pageProps }: AppProps) {
               </Head>
               <Component {...pageProps} />
               <GlobalStyles />
+              </IntentsDataProvider>
             </UserDataProvider>
           </UseCrudContextProvider>
         </UseContextProvider>

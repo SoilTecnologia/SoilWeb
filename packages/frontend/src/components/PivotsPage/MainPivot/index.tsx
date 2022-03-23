@@ -1,9 +1,8 @@
 import * as S from "./styles";
 import Header from "components/globalComponents/Header";
 import Pivot from "utils/models/pivot";
-import PivotsContainer from "../PivotCard";
+import PivotsContainer from "../PivotContainer";
 import Router from "next/router";
-import router from "next/router";
 
 type PivotListProps = {
   pivotList: Pivot[]
@@ -14,7 +13,7 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
     Router.push("/farms");
   }
   const handleMapa = () => {
-    router.push("/map")
+    Router.push("/map")
   }
 
   return (
