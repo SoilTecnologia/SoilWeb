@@ -1,49 +1,19 @@
 import express from 'express';
-import {
-  createActionController,
-  readAllActionsController
-} from '../controllers/actions';
 import authMiddleware from '../middlewares/auth';
-import { authHandler } from '../types/express';
+import { CreateActionController } from '../useCases/Actions/CreateAction/CreateActionController';
+import { GetAllActionsController } from '../useCases/Actions/GetAllActions/GetAllActionsController';
 
 const router = express.Router();
+
+const getAllActionController = new GetAllActionsController();
+const createActionController = new CreateActionController();
+
 router.post(
   '/create/:pivot_id',
   authMiddleware(),
-  authHandler(async (req, res, next) => {
-    const { pivot_id } = req.params;
-    const { power, water, direction, percentimeter } = req.body;
-
-    try {
-      const newAction = await createActionController(
-        pivot_id,
-        req.user.user_id,
-        power,
-        water,
-        direction,
-        percentimeter,
-        new Date()
-      );
-
-      res.json(newAction);
-    } catch (err) {
-      console.log(`[ERROR] Server 500 on /actions/create`);
-      console.log(err);
-      next(err);
-    }
-  })
+  createActionController.handle
 );
 
-router.get('/read', async (req, res, next) => {
-  try {
-    const actions = await readAllActionsController();
-
-    res.json(actions);
-  } catch (err) {
-    console.log(`[ERROR] Server 500 on /actions/read`);
-    console.log(err);
-    next(err);
-  }
-});
+router.get('/read', getAllActionController.handle);
 
 export default router;

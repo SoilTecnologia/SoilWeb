@@ -1,5 +1,4 @@
 import knex from '../..';
-import Farm from '../../../models/farm';
 import { FarmModel } from '../../model/Farm';
 import { IFarmsRepository } from './IFarmsRepository';
 
@@ -12,7 +11,7 @@ class FarmsRepository implements IFarmsRepository {
   }
 
   async create(farm: FarmModel): Promise<FarmModel | undefined> {
-    const newFarm = await knex<Farm>('farms').insert(farm).returning('*');
+    const newFarm = await knex<FarmModel>('farms').insert(farm).returning('*');
 
     return newFarm[0];
   }
@@ -27,7 +26,7 @@ class FarmsRepository implements IFarmsRepository {
   }
 
   async deleteFarm(farm_id: string): Promise<number | undefined> {
-    const delResult = await knex<Farm>('farms')
+    const delResult = await knex<FarmModel>('farms')
       .select()
       .where({ farm_id })
       .del();
@@ -38,11 +37,11 @@ class FarmsRepository implements IFarmsRepository {
   async getFarmsByUser(
     user_id: string | undefined
   ): Promise<FarmModel[] | undefined> {
-    return await knex<Farm>('farms').select().where({ user_id });
+    return await knex<FarmModel>('farms').select().where({ user_id });
   }
 
   async getAllFarms(): Promise<FarmModel[]> {
-    return await knex<Farm>('farms').select();
+    return await knex<FarmModel>('farms').select();
   }
 
   async getMapFarm(farm_id: string): Promise<any> {

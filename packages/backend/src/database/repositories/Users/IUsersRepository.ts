@@ -1,28 +1,27 @@
-import User from '../../../models/user';
 import { UserModel } from '../../model/User';
 
 type ResponseDTO = {
-  user_type: User['user_type'];
-  user_id: User['user_id'];
+  user_type: UserModel['user_type'];
+  user_id: UserModel['user_id'];
   token: string;
 };
 
 interface IUsersRepository {
-  findByLogin(login: User['login']): Promise<User | undefined>;
-  findById(login: User['login']): Promise<User | undefined>;
+  findByLogin(login: UserModel['login']): Promise<UserModel | undefined>;
+  findById(login: UserModel['login']): Promise<UserModel | undefined>;
 
   signInController(
-    login: User['login'],
-    password: User['password']
+    login: UserModel['login'],
+    password: UserModel['password']
   ): Promise<ResponseDTO | null>;
 
-  create({ login, password, user_type }: UserModel): Promise<User[]>;
+  create({ login, password, user_type }: UserModel): Promise<UserModel[]>;
 
-  deleteUser(user_id: User['user_id']): Promise<number | undefined>;
+  deleteUser(user_id: UserModel['user_id']): Promise<number | undefined>;
 
-  putUser(user: UserModel): Promise<User | undefined>;
+  putUser(user: UserModel): Promise<UserModel | undefined>;
 
-  getAllUsers(): Promise<User[]>;
+  getAllUsers(): Promise<UserModel[]>;
 }
 
 export { IUsersRepository, ResponseDTO };

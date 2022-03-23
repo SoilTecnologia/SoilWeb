@@ -330,7 +330,7 @@
 import { iot, mqtt } from 'aws-iot-device-sdk-v2';
 import { container } from 'tsyringe';
 import { TextDecoder } from 'util';
-import { createActionController } from '../controllers/actions';
+import { CreateActionUseCase } from '../useCases/Actions/CreateAction/CreateActionUseCase';
 import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import {
   objectToActionString,
@@ -467,6 +467,9 @@ class IoTDevice {
     qos: mqtt.QoS,
     retain: boolean
   ) => {
+    const updatePivotUseCase = container.resolve(UpdatePivotStateUseCase);
+    const createActionUseCase = container.resolve(CreateActionUseCase);
+
     const decoder = new TextDecoder('utf8', { fatal: false });
     // const filteredMessage = messageToString.substring(0, messageToString.indexOf('}'))
 
@@ -482,7 +485,6 @@ class IoTDevice {
       pivot_num: number;
       payload: any;
     } = json;
-    const updatePivotUseCase = container.resolve(UpdatePivotStateUseCase);
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
         const [farm_id, node_num] = id.split('_');
@@ -556,15 +558,18 @@ class IoTDevice {
         const { author, power, water, direction, percentimeter, timestamp } =
           json.payload;
         const { farm_id, node_num } = json;
-        await createActionController(
-          `${farm_id}_${node_num}_${pivot_num}`,
+
+        const newAction = {
+          pivot_id: `${farm_id}_${node_num}`,
           author,
           power,
           water,
           direction,
-          percentimeter,
-          new Date(timestamp)
-        );
+          percentimeter
+        };
+        const newTimestamp = new Date(timestamp);
+
+        await createActionUseCase.execute(newAction, newTimestamp);
         console.log(
           `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
         );

@@ -1,23 +1,23 @@
-import { Readable } from 'stream';
+import Axios from 'axios';
 import { FormDataEncoder } from 'form-data-encoder';
 import { FormData } from 'formdata-node';
-import Axios, { AxiosResponse } from 'axios';
-import emitter from '../utils/eventBus';
-import GenericQueue from '../utils/generic_queue';
-import {
-  StatusObject,
-  statusStringToObject,
-  objectToActionString
-} from '../utils/conversions';
-import {
-  updatePivotController,
-  readAllPivotsController2
-} from '../controllers/pivots';
+import { Readable } from 'stream';
 import {
   readAllActionsController,
   updateActionController
 } from '../controllers/actions';
-import Action from '../models/action';
+import {
+  readAllPivotsController2,
+  updatePivotController
+} from '../controllers/pivots';
+import Action from '../database/model/types/action';
+import {
+  objectToActionString,
+  StatusObject,
+  statusStringToObject
+} from '../utils/conversions';
+import emitter from '../utils/eventBus';
+import GenericQueue from '../utils/generic_queue';
 
 const TIMEOUT = 10000;
 

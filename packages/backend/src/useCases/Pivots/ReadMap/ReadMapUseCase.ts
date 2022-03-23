@@ -1,11 +1,11 @@
-import { inject, injectable } from 'tsyringe';
-import { getLastCycleFromPivot } from '../../../controllers/cycles';
+import { container, inject, injectable } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
+import { PartialMapResponse } from '../../../database/model/types/pivot';
 import { IFarmsRepository } from '../../../database/repositories/Farms/IFarmsRepository';
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
-import { PartialMapResponse } from '../../../models/pivot';
+import { GetLastCycleUseCase } from '../../Cycles/GetLastCycles/GetLastCycleUseCase';
 
 @injectable()
 class ReadMapUseCase {
@@ -17,11 +17,12 @@ class ReadMapUseCase {
   ) {}
 
   private handlePivotsResult = async (pivots: PivotModel[]) => {
+    const getLastCycleUseCase = container.resolve(GetLastCycleUseCase);
     const newArray: PartialMapResponse[] = [];
 
     for (let pivot of pivots) {
       const state = await this.stateRepository.findByPivotId(pivot.pivot_id);
-      const variables = await getLastCycleFromPivot(pivot.pivot_id);
+      const variables = await getLastCycleUseCase.execute(pivot.pivot_id);
 
       const isTrue = state && variables && variables.length > 0;
 

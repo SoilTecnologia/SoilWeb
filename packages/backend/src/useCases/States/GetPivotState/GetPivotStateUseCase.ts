@@ -1,27 +1,28 @@
 import { container, inject, injectable } from 'tsyringe';
-import { PivotModel } from '../../../database/model/Pivot';
+import { StateModel } from '../../../database/model/State';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { GetLastCycleUseCase } from '../../Cycles/GetLastCycles/GetLastCycleUseCase';
 
 @injectable()
-class ReadPivotStateUseCase {
+class GetPivotStateUseCase {
   constructor(
-    @inject('PivotsRepository') private pivotRepository: IPivotsRepository,
-    @inject('StatesRepository') private statesRepository: IStateRepository
+    @inject('StatesRepository') private stateRepository: IStateRepository,
+    @inject('PivotsRepository') private pivotRepository: IPivotsRepository
   ) {}
 
-  async execute(pivot_id: PivotModel['pivot_id']) {
+  async execute(pivot_id: StateModel['pivot_id']) {
     const getLastCycleUseCase = container.resolve(GetLastCycleUseCase);
-    const pivot = await this.pivotRepository.findById(pivot_id);
 
-    const state = await this.statesRepository.findByPivotId(pivot_id);
+    const pivot = await this.pivotRepository.findById(pivot_id);
+    const state = await this.stateRepository.findByPivotId(pivot_id);
+
     const variables = await getLastCycleUseCase.execute(pivot_id);
 
     const variableIsNotEmpty = variables && variables.length > 0;
-    const stateAndVariable = state && variableIsNotEmpty;
+    const stateAnVariabes = state && variableIsNotEmpty;
 
-    const result = {
+    return {
       pivot_id,
       pivot_num: pivot!.pivot_num,
       pivot_lng: pivot!.pivot_lng,
@@ -33,17 +34,13 @@ class ReadPivotStateUseCase {
       water: state ? state.water : false,
       direction: state ? state.direction : null,
       connection: state ? state.connection : true,
-      percentimeter: stateAndVariable
+      percentimeter: stateAnVariabes
         ? variables[variables.length - 1]!.percentimeter
         : 0,
-      start_angle: stateAndVariable ? variables[0]!.angle : null,
-      end_angle: stateAndVariable
-        ? variables[variables.length - 1]!.angle
-        : null
+      start_angle: stateAnVariabes ? variables[0]!.angle : null,
+      end_angle: stateAnVariabes ? variables[variables.length - 1]!.angle : null
     };
-
-    return result;
   }
 }
 
-export { ReadPivotStateUseCase };
+export { GetPivotStateUseCase };

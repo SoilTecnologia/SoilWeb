@@ -1,12 +1,12 @@
-import Farm from '../../models/farm';
-import Node from '../../models/node';
+import { FarmModel } from './Farm';
+import { NodeModel } from './Node';
 
 class PivotModel {
   pivot_id: string;
 
-  node_id: Node['node_id'];
+  node_id: NodeModel['node_id'];
 
-  farm_id: Farm['farm_id'];
+  farm_id: FarmModel['farm_id'];
 
   pivot_num: number;
 

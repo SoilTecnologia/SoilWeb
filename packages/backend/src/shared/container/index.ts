@@ -1,4 +1,6 @@
 import { container, delay } from 'tsyringe';
+import { ActionRepository } from '../../database/repositories/Action/ActionRepository';
+import { IActionRepository } from '../../database/repositories/Action/IActionRepository';
 import { FarmsRepository } from '../../database/repositories/Farms/FarmsRepository';
 import { IFarmsRepository } from '../../database/repositories/Farms/IFarmsRepository';
 import { INodesRepository } from '../../database/repositories/Nodes/INodesRepository';
@@ -45,4 +47,9 @@ container.registerSingleton<IStatesVariableRepository>(
 container.registerSingleton<IRadioVariableRepository>(
   'RadioVariablesRepository',
   delay(() => RadioVariableRepository)
+);
+
+container.registerSingleton<IActionRepository>(
+  'ActionsRepository',
+  delay(() => ActionRepository)
 );

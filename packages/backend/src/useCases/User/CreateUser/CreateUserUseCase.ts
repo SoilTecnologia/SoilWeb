@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import { inject, injectable } from 'tsyringe';
 import { UserModel } from '../../../database/model/User';
 import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
-import User from '../../../models/user';
 
 interface IRequest {
   name: string;
@@ -16,7 +15,7 @@ class CreateUserUseCase {
     @inject('UsersRepository') private userRepository: IUsersRepository
   ) {}
 
-  createJwt(user: User) {
+  createJwt(user: UserModel) {
     const token = jwt.sign(
       {
         user_id: user.user_id,

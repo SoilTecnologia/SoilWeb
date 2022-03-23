@@ -1,5 +1,4 @@
 import knex from '../..';
-import State from '../../../models/state';
 import { StateModel } from '../../model/State';
 import { IStateRepository } from './IState';
 
@@ -12,7 +11,7 @@ class StatesRepository implements IStateRepository {
       .first();
   }
 
-  async findById(state_id: string): Promise<State | undefined> {
+  async findById(state_id: string): Promise<StateModel | undefined> {
     return await knex<StateModel>('states')
       .select()
       .where({ state_id })
@@ -43,7 +42,7 @@ class StatesRepository implements IStateRepository {
   async getLastOffState(
     pivot_id: string
   ): Promise<Pick<StateModel, 'power' | 'timestamp'> | undefined> {
-    return await knex<State>('states')
+    return await knex<StateModel>('states')
       .select('timestamp', 'power')
       .where('pivot_id', pivot_id)
       .where('power', false)
@@ -55,7 +54,7 @@ class StatesRepository implements IStateRepository {
     pivot_id: string,
     timestamp: StateModel['timestamp']
   ): Promise<any[]> {
-    return await knex<State>('states')
+    return await knex<StateModel>('states')
       .innerJoin(
         'state_variables',
         'state_variables.state_id',

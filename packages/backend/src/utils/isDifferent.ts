@@ -1,9 +1,9 @@
-import RadioVariable from '../models/radioVariable';
-import State from '../models/state';
-import StateVariable from '../models/stateVariable';
+import { RadioVariableModel } from '../database/model/RadioVariable';
+import { StateModel } from '../database/model/State';
+import { StateVariableModel } from '../database/model/StateVariables';
 
 export type CustomState = Pick<
-  State,
+  StateModel,
   'connection' | 'power' | 'water' | 'direction'
 >;
 export const isStateDifferent = (
@@ -24,7 +24,7 @@ export const isStateDifferent = (
   return false;
 };
 
-type CustomStateVariable = Pick<StateVariable, 'angle' | 'percentimeter'>;
+type CustomStateVariable = Pick<StateVariableModel, 'angle' | 'percentimeter'>;
 export const isStateVariableDifferent = (
   oldStateVariable: CustomStateVariable,
   newStateVariable: CustomStateVariable
@@ -44,7 +44,7 @@ export const isStateVariableDifferent = (
   return false;
 };
 
-type CustomRadioVariable = Pick<RadioVariable, 'father' | 'rssi'>;
+type CustomRadioVariable = Pick<RadioVariableModel, 'father' | 'rssi'>;
 export const isRadioVariableDifferent = (
   oldRadioVariable: CustomRadioVariable,
   newRadioVariable: CustomRadioVariable

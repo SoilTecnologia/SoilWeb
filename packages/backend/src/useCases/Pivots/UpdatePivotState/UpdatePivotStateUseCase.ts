@@ -1,15 +1,15 @@
 import { container, inject, injectable } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
+import { RadioVariableModel } from '../../../database/model/RadioVariable';
 import { StateModel } from '../../../database/model/State';
+import { StateVariableModel } from '../../../database/model/StateVariables';
+import { HandleState } from '../../../database/model/types/state';
 import { IFarmsRepository } from '../../../database/repositories/Farms/IFarmsRepository';
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IRadioVariableRepository } from '../../../database/repositories/RadioVariables/IRadioVariableRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
-import RadioVariable from '../../../models/radioVariable';
-import { HandleState } from '../../../models/state';
-import StateVariable from '../../../models/stateVariable';
 import emitter from '../../../utils/eventBus';
 import {
   isRadioVariableDifferent,
@@ -65,8 +65,8 @@ class UpdatePivotStateUseCase {
   };
 
   private alterStateVariable = async (
-    angle: StateVariable['angle'],
-    percentimeter: StateVariable['percentimeter'],
+    angle: StateVariableModel['angle'],
+    percentimeter: StateVariableModel['percentimeter'],
     timestamp: StateModel['timestamp']
   ) => {
     if (angle !== undefined && percentimeter !== undefined) {
@@ -91,9 +91,9 @@ class UpdatePivotStateUseCase {
   };
 
   private alterRadioVariable = async (
-    pivot_id: RadioVariable['pivot_id'],
-    father: RadioVariable['father'],
-    rssi: RadioVariable['rssi'],
+    pivot_id: RadioVariableModel['pivot_id'],
+    father: RadioVariableModel['father'],
+    rssi: RadioVariableModel['rssi'],
     timestamp: StateModel['timestamp']
   ) => {
     if (father !== undefined && rssi !== undefined) {
@@ -122,11 +122,11 @@ class UpdatePivotStateUseCase {
     power: StateModel['power'],
     water: StateModel['water'],
     direction: StateModel['direction'],
-    angle: StateVariable['angle'],
-    percentimeter: StateVariable['percentimeter'],
+    angle: StateVariableModel['angle'],
+    percentimeter: StateVariableModel['percentimeter'],
     timestamp: Date,
-    father: RadioVariable['father'],
-    rssi: RadioVariable['rssi']
+    father: RadioVariableModel['father'],
+    rssi: RadioVariableModel['rssi']
   ) {
     const oldState = await this.stateRepository.findByPivotId(pivot_id);
     this.state = oldState;

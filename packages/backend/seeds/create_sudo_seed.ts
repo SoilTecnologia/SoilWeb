@@ -1,10 +1,14 @@
-
-import { Knex } from "knex";
-import User from '../src/models/user';
-import { signUpController } from "../src/controllers/users";
+import { Knex } from 'knex';
+import { container } from 'tsyringe';
+import { CreateUserUseCase } from '../src/useCases/User/CreateUser/CreateUserUseCase';
 
 // Insere um usuário SUDO para os administradores Soil
 
 export async function seed(knex: Knex): Promise<void> {
-    await signUpController('sudo', '1234', 'SUDO')
-};
+  const createUserUseCase = container.resolve(CreateUserUseCase);
+  await createUserUseCase.execute({
+    login: 'sudo',
+    password: '1234',
+    user_type: 'SUDO'
+  });
+}

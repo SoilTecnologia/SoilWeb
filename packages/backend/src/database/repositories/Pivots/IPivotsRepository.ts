@@ -1,11 +1,13 @@
-import Node from '../../../models/node';
-import { realdAllPivots } from '../../../models/pivot';
 import { FarmModel } from '../../model/Farm';
+import { NodeModel } from '../../model/Node';
 import { PivotModel } from '../../model/Pivot';
+import { realdAllPivots } from '../../model/types/pivot';
 
 interface IPivotsRepository {
   findById(pivot_id: PivotModel['pivot_id']): Promise<PivotModel | undefined>;
-  findByNodeId(node_id: Node['node_id']): Promise<PivotModel[] | undefined>;
+  findByNodeId(
+    node_id: NodeModel['node_id']
+  ): Promise<PivotModel[] | undefined>;
 
   create(pivot: PivotModel): Promise<PivotModel | undefined>;
   getAll(farm_id: FarmModel['farm_id']): Promise<PivotModel[]>;

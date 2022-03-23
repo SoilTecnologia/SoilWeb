@@ -1,6 +1,6 @@
 import knex from '../..';
-import { realdAllPivots } from '../../../models/pivot';
 import { PivotModel } from '../../model/Pivot';
+import { realdAllPivots } from '../../model/types/pivot';
 import { IPivotsRepository } from './IPivotsRepository';
 
 class PivotsRepository implements IPivotsRepository {

@@ -1,16 +1,17 @@
 import { inject, injectable } from 'tsyringe';
-import knex from '../../../database';
 import { PivotModel } from '../../../database/model/Pivot';
+import { PartialListResponse } from '../../../database/model/types/pivot';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
-import { PartialListResponse } from '../../../models/pivot';
-import StateVariable from '../../../models/stateVariable';
+import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
 
 @injectable()
 class ReadListPivotUseCase {
   constructor(
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository,
-    @inject('StatesRepository') private stateRepository: IStateRepository
+    @inject('StatesRepository') private stateRepository: IStateRepository,
+    @inject('StatesVariablesRepository')
+    private stateVariableRepository: IStatesVariableRepository
   ) {}
 
   async execute(farm_id: PivotModel['farm_id']) {
@@ -22,11 +23,7 @@ class ReadListPivotUseCase {
       const state = await this.stateRepository.findByPivotId(pivot.pivot_id);
       const variable =
         state &&
-        (await knex<StateVariable>('state_variables')
-          .select()
-          .where('state_id', state!!.state_id)
-          .orderBy('timestamp', 'desc')
-          .first());
+        (await this.stateVariableRepository.findByStateId(state.state_id));
 
       const result: PartialListResponse = {
         pivot_id: pivot.pivot_id,
