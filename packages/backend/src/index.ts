@@ -6,15 +6,16 @@ this file is responsible for:
   - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)
   - Setting up the event emitter to be used on other systems
 */
-
 import cors from 'cors';
 import express from 'express';
 import { createServer } from 'http';
+import 'reflect-metadata';
 import { Server, Socket } from 'socket.io';
 import IoTDevice from './aws-iot/index';
+import { FarmsRepository } from './database/repositories/Farms/FarmsRepository';
 import router from './routes';
+import './shared/container';
 import emitter from './utils/eventBus';
-import knex from './database';
 
 require('dotenv').config();
 
@@ -26,6 +27,7 @@ const io = new Server(httpServer);
 app.use(cors());
 app.use(express.json());
 app.use(router);
+
 httpServer.listen(PORT, () => {
   console.info(`Server Listening on PORT ${PORT}`);
 });
@@ -75,8 +77,9 @@ io.on('connection', (socket: Socket) => {
     const [farm_id, pivot_num] = id.split('_');
 
     /* Tentar melhorar isso daqui, nao depender de fazer uma query pra saber o usuario" */
-    const farm = await knex('farms').select('*').where({ farm_id }).first();
-    const { user_id, farm_name } = farm;
+    const farmRepository = new FarmsRepository();
+    const farm = await farmRepository.findById(farm_id);
+    const { user_id, farm_name } = farm!!;
 
     socket.emit(`${user_id}-ackreceived`, {
       type: 'ack',
@@ -90,8 +93,9 @@ io.on('connection', (socket: Socket) => {
     const [farm_id, pivot_num] = id.split('_');
 
     /* Tentar melhorar isso daqui, nao depender de fazer uma query pra saber o usuario" */
-    const farm = await knex('farms').select('*').where({ farm_id }).first();
-    const { user_id, farm_name } = farm;
+    const farmRepository = new FarmsRepository();
+    const farm = await farmRepository.findById(farm_id);
+    const { user_id, farm_name } = farm!!;
 
     socket.emit(`${user_id}-acknotreceived`, {
       type: 'ack',

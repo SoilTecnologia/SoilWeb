@@ -44,6 +44,10 @@ export const ContentLogo = styled.div`
 export const TextTech = styled.h3`
   ${({ theme }) => css`
     color: ${theme.colors.dark};
+<<<<<<< HEAD
+    font-style: bold;
+=======
+>>>>>>> develop
   `}
 `;
 

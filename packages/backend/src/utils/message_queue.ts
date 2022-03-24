@@ -1,6 +1,6 @@
-import MessageQueueType from "../types/message_queue";
+import MessageQueueType from '../types/message_queue';
 
-var _ = require('lodash');
+let _ = require('lodash');
 
 class MessageQueue {
   _store: MessageQueueType[] = [];
@@ -39,7 +39,7 @@ class MessageQueue {
 
       delete inQueue.attempts;
       delete newValue.attempts;
-      if(_.isEqual(inQueue, newValue)) {
+      if (_.isEqual(inQueue, newValue)) {
         return this._store.splice(i, 1);
       }
     }

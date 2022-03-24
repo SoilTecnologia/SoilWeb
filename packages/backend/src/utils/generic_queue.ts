@@ -1,4 +1,4 @@
-var _ = require('lodash');
+let _ = require('lodash');
 
 class Queue<T> {
   _store: T[] = [];

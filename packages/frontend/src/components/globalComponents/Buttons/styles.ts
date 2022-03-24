@@ -2,8 +2,8 @@ import styled, { css } from "styled-components";
 export const Container = styled.button`
   ${({ theme }) => css`
     width: max-content;
-    margin-bottom: 0.3rem;
-    margin-top: 0.5rem;
+
+    margin: 0.5rem 1.2rem 0.3rem;
     padding: 0.7rem ${theme.spacings.small};
     background: ${theme.colors.primary};
     color: ${theme.colors.secondary};

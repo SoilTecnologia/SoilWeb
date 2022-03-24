@@ -1,12 +1,18 @@
 import Logo from "components/globalComponents/Logo";
 import ModalMessage from "components/globalComponents/ModalMessage";
-import { useState } from "react";
-import theme from "styles/theme";
+import { useContextAuth } from "hooks/useLoginAuth";
+import { useEffect, useState } from "react";
 import FormValidate from "../FormValidate";
 import * as S from "./styles";
 
 const MainLogin = () => {
+  const { verifyUserCookie } = useContextAuth();
   const [errorAuth, setErrorAuth] = useState(false);
+
+  useEffect(() => {
+    verifyUserCookie();
+  }, []);
+
   return (
     <S.Container>
       <S.WrapperModalAndForm>

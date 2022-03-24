@@ -17,6 +17,7 @@ const ModalDeleteData = ({
       txtButton="NÃO"
       callbackButtonClick={callbackNotDelete}
       callbackOkDelete={callbackDelete}
+      textButtonConfirm="SIM"
     >
       <S.IconAttention />
     </ModalMessage>

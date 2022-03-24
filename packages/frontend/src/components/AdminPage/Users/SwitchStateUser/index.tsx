@@ -1,10 +1,8 @@
+import CreateNewFarm from "components/AdminPage/Farms/CreateNewFarm";
+import ViewDataFarms from "components/AdminPage/Farms/ViewDataFarms";
 import { useContextData } from "hooks/useContextData";
-
 import ListUsers from "../ListUsers";
 import ViewDataUser from "../ViewDataUser";
-import ViewDataFarms from "components/AdminPage/Farms/ViewDataFarms";
-import CreateNewFarm from "components/AdminPage/Farms/CreateNewFarm";
-import ViewDataPivots from "components/AdminPage/Pivots/ViewDataPivots";
 
 const SwitchStateUser = () => {
   const { stateAdmin } = useContextData();

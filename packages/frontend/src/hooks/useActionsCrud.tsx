@@ -6,6 +6,8 @@ import {
   requestDeleteNode,
   requestDeletePivot,
   requestDeleteUser,
+  requestFindAllPivots,
+  requestGetAllFarms,
   requestGetAllFarmsUser,
   requestGetAllNodes,
   requestGetAllPivots,
@@ -39,6 +41,7 @@ interface actionCrudProps {
   updateUser: (user: User) => void;
   deleteUser: (id: string) => void;
   getAllFarmsUser: (id: string) => void;
+  getAllFarms: () => void;
   getOneFarms: (farm_id: string) => Promise<Farm | null | undefined>;
   createFarm: (farm: FarmCreate) => void;
   updateFarm: (farm: Farm) => void;
@@ -48,6 +51,7 @@ interface actionCrudProps {
   updateNode: (node: Node) => void;
   deleteNode: (id: string, farmRelation: Farm) => void;
   getAllPivots: (farm_id: Farm["farm_id"]) => void;
+  findAllPivots: () => void;
   getOnePivot: (pivot: PivotCreate) => Promise<Pivot | null | undefined>;
   createPivot: (pivot: PivotCreate) => void;
   updatePivot: (pivot: Pivot) => void;
@@ -88,6 +92,8 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
 
   const createUser = async (newUser: UserCreate) => {
     const result = await requestPostUser(newUser);
+    console.log("Retorno");
+    console.log(result);
 
     if (result) {
       await getAllUser(user?.token);
@@ -109,6 +115,11 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   //CRUD FARMS
   const getAllFarmsUser = async (id: string) => {
     const response = await requestGetAllFarmsUser(id, user?.token);
+    response && setFarmList(response);
+  };
+
+  const getAllFarms = async () => {
+    const response = await requestGetAllFarms(user?.token);
     response && setFarmList(response);
   };
   const getOneFarms = async (id: string) =>
@@ -157,6 +168,11 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const result = await requestGetAllPivots(farm_id, user?.token);
     result && setPivotList(result);
   };
+  const findAllPivots = async () => {
+    const result = await requestFindAllPivots(user?.token);
+    console.log(`RESULT:   ${JSON.stringify(result)}`);
+    result && setPivotList(result);
+  };
 
   const getOnePivot = async (pivot: PivotCreate) =>
     await requestOnePivot(pivot, user?.token);
@@ -193,6 +209,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         updateUser,
         deleteUser,
         getAllFarmsUser,
+        getAllFarms,
         getOneFarms,
         createFarm,
         updateFarm,
@@ -202,6 +219,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         deletePivot,
         getAllNodes,
         getAllPivots,
+        findAllPivots,
         getOnePivot,
         createNode,
         updateNode,

@@ -42,8 +42,6 @@ const UpdateNode = ({ nodeData, closeModal }: updateNodeProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const onSubmit = handleSubmit((data) => {
     const verifyGrps = data.is_gprs === "yes" ? true : false;
-    console.log("========Node Update =============");
-    console.log(verifyGrps);
     const newNode: Node = {
       ...nodeData,
       node_num: data.node_num ? data.node_num : nodeData.node_num,

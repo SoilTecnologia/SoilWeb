@@ -5,14 +5,19 @@ import Pivot, { PivotCreate } from "utils/models/pivot";
 import User, { UserCreate } from "utils/models/user";
 import { api } from "./api";
 
+type tokenState = string | undefined;
+
 const { "soilauth-token": token } = parseCookies();
+
+const tokenHeader = (tokenId: tokenState) => {
+  return { headers: { Authorization: tokenId ? tokenId : token } };
+};
+
 export type Response = {
   user_type: User["user_type"];
   user_id: User["user_id"];
   token: string;
 };
-
-type tokenState = string | undefined;
 
 //User
 export const requestLoginAuth = async (login: string, password: string) => {
@@ -28,13 +33,8 @@ export const requestLoginAuth = async (login: string, password: string) => {
 };
 
 export const requestPostUser = async (user: UserCreate) => {
-  const sendNewUser = {
-    login: user.login,
-    password: user.password,
-    user_type: user.user_type,
-  };
   return await api
-    .post<Response | null>(`users/signup`, sendNewUser)
+    .post<Response | null>(`users/signup`, user)
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
@@ -44,9 +44,7 @@ export const requestPostUser = async (user: UserCreate) => {
 
 export const requestUpdateUser = async (user: User, tokenId: tokenState) => {
   return await api
-    .put<User[]>(`users/putUser`, user, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .put<User[]>(`users/putUser`, user, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error user update");
@@ -57,9 +55,7 @@ export const requestUpdateUser = async (user: User, tokenId: tokenState) => {
 
 export const requestGetAllUsers = async (tokenId: tokenState) => {
   return await api
-    .get(`users/allUsers`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .get(`users/allUsers`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
@@ -70,9 +66,7 @@ export const requestGetAllUsers = async (tokenId: tokenState) => {
 
 export const requestDeleteUser = async (id: string, tokenId: tokenState) => {
   return await api
-    .delete(`users/delUser/${id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .delete(`users/delUser/${id}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
@@ -87,9 +81,18 @@ export const requestGetAllFarmsUser = async (
   tokenId: tokenState
 ) => {
   return await api
-    .get(`farms/farmUser/${id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .get(`farms/farmUser/${id}`, tokenHeader(tokenId))
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
+};
+
+export const requestGetAllFarms = async (tokenId: tokenState) => {
+  return await api
+    .get(`farms/readAll`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
@@ -99,9 +102,7 @@ export const requestGetAllFarmsUser = async (
 };
 export const requestOneFarm = async (farmId: string, tokenId: tokenState) => {
   return await api
-    .get<Farm | undefined>(`farms/getOneFarm/${farmId}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .get<Farm | undefined>(`farms/getOneFarm/${farmId}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
@@ -115,9 +116,7 @@ export const requestCreateFarm = async (
   tokenId: tokenState
 ) => {
   return await api
-    .post("farms/addFarm", farm, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .post("farms/addFarm", farm, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
@@ -127,9 +126,7 @@ export const requestCreateFarm = async (
 
 export const requestUpdateFarm = async (farm: Farm, tokenId: tokenState) => {
   return await api
-    .put("farms/updateFarm", farm, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .put("farms/updateFarm", farm, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Erro ao deletar usúario ");
@@ -143,9 +140,7 @@ export const requestDeleteFarm = async (
   tokenId: tokenState
 ) => {
   return await api
-    .delete(`farms/deleteFarm/${farm_id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .delete(`farms/deleteFarm/${farm_id}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Erro ao deletar usúario ");
@@ -161,9 +156,7 @@ export const requestCreateNode = async (
   tokenId: tokenState
 ) => {
   return await api
-    .post("nodes/addNode", node, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .post("nodes/addNode", node, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
@@ -175,9 +168,7 @@ export const requestGetAllNodes = async (
   tokenId: tokenState
 ) => {
   return await api
-    .get<Node[]>(`nodes/readAll/${farm_id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .get<Node[]>(`nodes/readAll/${farm_id}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] error fetching data from server");
@@ -191,9 +182,7 @@ export const requestDeleteNode = async (
   tokenId: tokenState
 ) => {
   return await api
-    .delete(`nodes/deleteNode/${node_id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .delete(`nodes/deleteNode/${node_id}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
@@ -203,9 +192,7 @@ export const requestDeleteNode = async (
 
 export const requestUpdateNode = async (node: Node, tokenId: tokenState) => {
   return await api
-    .put("nodes/updateNode", node, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .put("nodes/updateNode", node, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
@@ -219,9 +206,18 @@ export const requestGetAllPivots = async (
   tokenId: tokenState
 ) => {
   return await api
-    .get(`pivots/getPivots/${farm_id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
+    .get(`pivots/getPivots/${farm_id}`, tokenHeader(tokenId))
+    .then((response) => {
+      return response.data;
     })
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
+export const requestFindAllPivots = async (tokenId: tokenState) => {
+  return await api
+    .get(`pivots/findAll`, tokenHeader(tokenId))
     .then((response) => {
       return response.data;
     })
@@ -236,9 +232,7 @@ export const requestCreateNewPivot = async (
   tokenId: tokenState
 ) => {
   return await api
-    .post(`pivots/addPivot`, pivot, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .post(`pivots/addPivot`, pivot, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
@@ -250,9 +244,7 @@ export const requestDeletePivot = async (
   tokenId: tokenState
 ) => {
   return await api
-    .delete(`pivots/deletePivot/${pivot_id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .delete(`pivots/deletePivot/${pivot_id}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
@@ -264,9 +256,7 @@ export const requestUpdatePivot = async (
   tokenId: tokenState
 ) => {
   return await api
-    .put(`pivots/putPivot`, newPivot, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .put(`pivots/putPivot`, newPivot, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
@@ -278,9 +268,7 @@ export const requestGetNodeWithPivotNum = async (
   tokenId: tokenState
 ) => {
   return await api
-    .get(`nodes/nodeNum/${node.node_num}/${node.farm_id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .get(`nodes/nodeNum/${node.node_num}/${node.farm_id}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar fazenda");
@@ -293,9 +281,7 @@ export const requestGetAllPivotsWithFarmId = async (
   tokenId: tokenState
 ) => {
   return await api
-    .get(`pivots/readAll/${farm_id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .get(`pivots/readAll/${farm_id}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar pivos");
@@ -308,23 +294,23 @@ export const requestOnePivot = async (
   tokenId: tokenState
 ) => {
   return await api
-    .get(`pivots/getOnePivot/${pivot.pivot_num}/${pivot.farm_id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .get(
+      `pivots/getOnePivot/${pivot.pivot_num}/${pivot.farm_id}`,
+      tokenHeader(tokenId)
+    )
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar pivos");
       console.log(err);
     });
 };
+
 export const requestGetPivotsListWithFarmId = async (
   farm_id: Farm["farm_id"],
   tokenId: tokenState
 ) => {
   return await api
-    .get(`pivots/list/${farm_id}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .get(`pivots/list/${farm_id}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar pivos");

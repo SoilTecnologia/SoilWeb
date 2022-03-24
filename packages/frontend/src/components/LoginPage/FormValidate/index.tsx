@@ -1,12 +1,10 @@
-import * as S from "./styles";
-import { Dispatch, SetStateAction, useRef } from "react";
-
-import InputsLogin from "components/globalComponents/InputsLogin";
-
-import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
+import InputsLogin from "components/globalComponents/InputsLogin";
 import { useContextAuth } from "hooks/useLoginAuth";
+import { Dispatch, SetStateAction, useRef } from "react";
+import { useForm } from "react-hook-form";
+import * as Yup from "yup";
+import * as S from "./styles";
 
 const schema = Yup.object({
   user: Yup.string()

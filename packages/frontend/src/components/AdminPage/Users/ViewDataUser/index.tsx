@@ -57,7 +57,10 @@ const ViewDataUser = () => {
         {modalVisible && (
           <ModalUpdateData closeModal={closeModal}>
             {stateAdmin.updateFarm && (
-              <UpdateFarmSelected farmSelected={stateAdmin.updateFarm} closeModal={() => setModalVisible(false)} />
+              <UpdateFarmSelected
+                farmSelected={stateAdmin.updateFarm}
+                closeModal={() => setModalVisible(false)}
+              />
             )}
           </ModalUpdateData>
         )}
