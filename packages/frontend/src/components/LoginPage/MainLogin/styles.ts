@@ -44,8 +44,10 @@ export const ContentLogo = styled.div`
 export const TextTech = styled.h3`
   ${({ theme }) => css`
     color: ${theme.colors.dark};
-    font-family: ${theme.font.family.MontSerrat};
+<<<<<<< HEAD
     font-style: bold;
+=======
+>>>>>>> develop
   `}
 `;
 

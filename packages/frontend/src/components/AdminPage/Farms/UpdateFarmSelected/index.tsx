@@ -107,7 +107,7 @@ const UpdateFarmSelected = ({ farmSelected, closeModal }: updateFarmProps) => {
         label="LATITUDE"
         id="farm_lat"
         type="text"
-        placeholder={farmSelected.farm_lat.toString()}
+        placeholder={farmSelected.farm_lat.toString() + " EX: -21.00"}
         register={register}
       />
       {error && error.type === "lat" && (
@@ -118,7 +118,7 @@ const UpdateFarmSelected = ({ farmSelected, closeModal }: updateFarmProps) => {
         label="LONGITUDE"
         id="farm_lng"
         type="text"
-        placeholder={farmSelected.farm_lng.toString()}
+        placeholder={farmSelected.farm_lng.toString() + " EX: -46.00"}
         register={register}
       />
       {error && error.type === "lng" && (

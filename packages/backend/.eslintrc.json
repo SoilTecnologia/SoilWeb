@@ -28,7 +28,16 @@
     "prefer-const": "off",
     "prefer-destructuring": "off",
     "no-console": "off",
-    "no-return-await": "off"
+    "no-return-await": "off",
+    "import/prefer-default-export": "off",
+    "class-methods-use-this": "off",
+    "no-useless-constructor": "off",
+    "no-empty-function": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/no-unresolved": "off",
+    "no-lonely-if": "off",
+    "no-plusplus": "off",
+    "eqeqeq": "off"
   },
   "overrides": [
     {

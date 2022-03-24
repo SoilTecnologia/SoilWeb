@@ -8,7 +8,7 @@ export const Container = styled.div`
   justify-content: space-evenly;
 
   background: ${({ theme }) => theme.colors.secondary};
-  padding: 4rem 6rem;
+  padding: 4rem 8rem;
   border-radius: 1rem;
 `;
 export const IconContent = styled.div``;
@@ -25,11 +25,16 @@ export const AlertMessage = styled.p`
   `}
 `;
 export const SubAlert = styled(AlertMessage)``;
-export const Button = styled.button``;
+export const Button = styled.button`
+  margin: 0 1rem;
+`;
+
 export const ContentButtons = styled.div`
   width: 50%;
   display: flex;
   align-items: space-evenly;
   justify-content: space-around;
-  margin: 3rem 0 1rem;
+  margin: 3rem 1rem;
+
+  padding: 0 2rem;
 `;

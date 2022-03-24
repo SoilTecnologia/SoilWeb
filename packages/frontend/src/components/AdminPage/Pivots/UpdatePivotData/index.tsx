@@ -101,7 +101,7 @@ const UpdatePivotData = ({ pivotData, closeModal }: updateFarmProps) => {
         label="LATITUDE"
         id="pivot_lat"
         type="text"
-        placeholder={pivotData.pivot_lat.toString()}
+        placeholder={pivotData.pivot_lat.toString() + "EX: -21.00"}
         register={register}
       />
       {error && error.type === "lat" && (
@@ -112,7 +112,7 @@ const UpdatePivotData = ({ pivotData, closeModal }: updateFarmProps) => {
         label="LONGITUDE"
         id="pivot_lng"
         type="text"
-        placeholder={pivotData.pivot_lng.toString()}
+        placeholder={pivotData.pivot_lng.toString() + "EX: -46.00"}
         register={register}
       />
       {error && error.type === "lng" && (

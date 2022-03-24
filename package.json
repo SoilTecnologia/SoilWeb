@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.26.0",
-    "nookies": "^2.5.2"
+    "nookies": "^2.5.2",
+    "tsyringe": "^4.6.0"
   }
 }

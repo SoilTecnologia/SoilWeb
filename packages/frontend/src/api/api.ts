@@ -1,7 +1,10 @@
 import axios from "axios";
 
+const dev = "http://localhost:3308/";
+const prod = "https://api.soiltech.com.br/";
+
 export const api = axios.create({
-  baseURL: `http://localhost:3308/`,
+  baseURL: dev,
 });
 
 // api.interceptors.request.use((config) => {

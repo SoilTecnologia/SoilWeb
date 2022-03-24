@@ -108,8 +108,8 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
         farm_id: farm.farm_id,
         node_id,
         pivot_num: dataForm.pivot_num,
-        pivot_lng: latForNumber,
-        pivot_lat: longForNumber,
+        pivot_lng: longForNumber,
+        pivot_lat: latForNumber,
         pivot_start_angle: dataForm.pivot_start_angle,
         pivot_end_angle: dataForm.pivot_end_angle,
         pivot_radius: dataForm.pivot_radius,
@@ -118,6 +118,7 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
       return newPivot;
     }
   };
+
   const checkIsGprsTrue = (e: FormEvent<HTMLFormElement>) => {
     const target = e.target as HTMLTextAreaElement;
     if (target.value === "not") {
@@ -126,6 +127,7 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
       setGatewayVisible(false);
     }
   };
+
   const onSubmit = handleSubmit(async (data) => {
     error.error && setError(defaultError);
     const nodeCreated = await createNewNode(data);
@@ -174,7 +176,7 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
             colorLabel={theme.colors.secondary}
             id="pivot_lat"
             type="text"
-            placeholder="LATITUDE"
+            placeholder="EX: -21.00"
             register={register}
           />
           {error && error.type === "lat" && (
@@ -186,7 +188,7 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
             colorLabel={theme.colors.secondary}
             id="pivot_lng"
             type="text"
-            placeholder="LONGITUDE"
+            placeholder="EX: -46.00"
             register={register}
           />
           {error && error.type === "lng" && (
