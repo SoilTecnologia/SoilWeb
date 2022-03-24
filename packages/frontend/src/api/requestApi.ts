@@ -215,6 +215,17 @@ export const requestGetAllPivots = async (
       console.log(err);
     });
 };
+export const requestFindAllPivots = async (tokenId: tokenState) => {
+  return await api
+    .get(`pivots/findAll`, tokenHeader(tokenId))
+    .then((response) => {
+      return response.data;
+    })
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
 
 export const requestCreateNewPivot = async (
   pivot: PivotCreate,

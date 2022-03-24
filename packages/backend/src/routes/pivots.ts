@@ -2,6 +2,7 @@ import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { CreatePivotController } from '../useCases/Pivots/CreatePivots/CreatePivotController';
 import { DeletePivotController } from '../useCases/Pivots/DeletePivot/DeletePivotController';
+import { FindAllController } from '../useCases/Pivots/FindAll/FindAllController';
 import { GetAllPivotsController } from '../useCases/Pivots/GetAllPivots/GetAllPivotsController';
 import { GetOnePivotController } from '../useCases/Pivots/GetOnePivot/GetOnePivotController';
 import { ReadAllController } from '../useCases/Pivots/ReadAll/ReadAllController';
@@ -23,6 +24,7 @@ const readMapController = new ReadMapController();
 const readListPivotController = new ReadListController();
 const readPivotStateController = new ReadPivotStateController();
 const updatePivotStateController = new UpdateStatePivotController();
+const findAllController = new FindAllController();
 
 router.get('/readAll/:farm_id', authMiddleware(), readAllController.handle);
 
@@ -34,6 +36,7 @@ router.get(
   readPivotStateController.handle
 );
 router.get('/list/:farm_id', authMiddleware(), readListPivotController.handle);
+router.get('/findAll', authMiddleware(), findAllController.handle);
 
 router.post(
   '/update/:pivot_id',

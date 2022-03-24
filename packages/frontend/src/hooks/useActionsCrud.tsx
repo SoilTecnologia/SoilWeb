@@ -6,6 +6,7 @@ import {
   requestDeleteNode,
   requestDeletePivot,
   requestDeleteUser,
+  requestFindAllPivots,
   requestGetAllFarms,
   requestGetAllFarmsUser,
   requestGetAllNodes,
@@ -50,6 +51,7 @@ interface actionCrudProps {
   updateNode: (node: Node) => void;
   deleteNode: (id: string, farmRelation: Farm) => void;
   getAllPivots: (farm_id: Farm["farm_id"]) => void;
+  findAllPivots: () => void;
   getOnePivot: (pivot: PivotCreate) => Promise<Pivot | null | undefined>;
   createPivot: (pivot: PivotCreate) => void;
   updatePivot: (pivot: Pivot) => void;
@@ -166,6 +168,11 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const result = await requestGetAllPivots(farm_id, user?.token);
     result && setPivotList(result);
   };
+  const findAllPivots = async () => {
+    const result = await requestFindAllPivots(user?.token);
+    console.log(`RESULT:   ${JSON.stringify(result)}`);
+    result && setPivotList(result);
+  };
 
   const getOnePivot = async (pivot: PivotCreate) =>
     await requestOnePivot(pivot, user?.token);
@@ -212,6 +219,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         deletePivot,
         getAllNodes,
         getAllPivots,
+        findAllPivots,
         getOnePivot,
         createNode,
         updateNode,

@@ -24,6 +24,7 @@ container.registerSingleton<IFarmsRepository>(
   'FarmsRepository',
   delay(() => FarmsRepository)
 );
+
 container.registerSingleton<IPivotsRepository>(
   'PivotsRepository',
   delay(() => PivotsRepository)
