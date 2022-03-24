@@ -1,6 +1,6 @@
 import { requestLoginAuth, Response } from "api/requestApi";
 import Router from "next/router";
-import { setCookie, parseCookies } from "nookies";
+import { parseCookies, setCookie } from "nookies";
 import React, {
   createContext,
   Dispatch,
@@ -9,7 +9,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { useContextActionCrud } from "./useActionsCrud";
 
 interface UserProviderProps {
   children: React.ReactNode;

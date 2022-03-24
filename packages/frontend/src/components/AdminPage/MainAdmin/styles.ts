@@ -1,32 +1,41 @@
+import { FaArrowLeft } from "react-icons/fa";
 import styled, { css } from "styled-components";
+
 export const Container = styled.main``;
 type isActiveOptionUser = {
   isActive: boolean;
 };
 export const ContentTittle = styled.div`
   height: 13vh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+
+  margin-left: -3.4rem;
 `;
 
 export const OptionUser = styled.button<isActiveOptionUser>`
   ${({ theme, isActive }) => css`
     position: relative;
     width: max-content;
+    height: max-content;
     font-size: ${theme.font.sizes.xxlarge};
     letter-spacing: 0.3rem;
-    color: ${theme.colors.light};
-    background: transparent;
-    padding: 0.4rem 2rem;
-    margin: 0 5rem;
+    color: ${theme.colors.primary_gradient};
+    padding: 0.4rem 3rem;
+    margin: 0 2rem;
     border-radius: 1rem;
     transition: all 0.3s linear;
+    background: ${isActive
+      ? theme.colors.primary_gradient
+      : theme.colors.secondary};
+    color: ${isActive ? theme.colors.secondary : theme.colors.primary_gradient};
+    border-radius: 1.4rem;
 
     &:hover {
       cursor: pointer;
-      background: ${theme.colors.primary_gradient};
+
       opacity: ${isActive ? 1 : 0.7};
     }
   `}
@@ -57,16 +66,17 @@ export const ContentOptionUser = styled.div`
     align-items: center;
     justify-content: center;
 
-    border-radius: 0.4rem;
+    border-radius: 1rem;
+    margin-top: 1.4rem;
 
-    background: ${theme.colors.secondary};
+    background: ${theme.colors.primary_gradient};
     z-index: 10;
   `}
 `;
 export const OptionCreateUser = styled.button`
   ${({ theme }) => css`
-    color: ${theme.colors.primary};
-    background: ${theme.colors.secondary};
+    color: ${theme.colors.secondary};
+    background: transparent;
 
     padding: 0.6rem 1.2rem;
     transition: all 0.3s linear;
@@ -86,4 +96,39 @@ export const ContentOption = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+`;
+
+export const Logout = styled(FaArrowLeft)`
+  color: inherit;
+  font-size: 2.6rem;
+  margin-right: 0.6rem;
+`;
+
+export const TextLogout = styled.div`
+  width: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.primary_gradient};
+
+  padding: 0.4rem 0.8rem;
+  border-radius: 1.8rem;
+  margin-left: 2.4rem;
+
+  transition: all 0.3s linear;
+
+  &:hover {
+    cursor: pointer;
+    background: ${({ theme }) => theme.colors.primary_gradient};
+    color: ${({ theme }) => theme.colors.secondary};
+  }
+`;
+
+export const ContentLogout = styled.div`
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 `;

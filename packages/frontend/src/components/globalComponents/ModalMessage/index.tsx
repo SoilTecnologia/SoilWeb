@@ -1,6 +1,6 @@
-import * as S from "./styles";
 import { Dispatch, SetStateAction } from "react";
 import Buttons from "../Buttons";
+import * as S from "./styles";
 
 type ModalProps = {
   children: React.ReactNode;
@@ -9,6 +9,7 @@ type ModalProps = {
   txtButton: string;
   callbackButtonClick: Dispatch<SetStateAction<boolean>>;
   callbackOkDelete?: Dispatch<SetStateAction<boolean>>;
+  textButtonConfirm?: string;
 };
 
 const ModalMessage = ({
@@ -18,6 +19,7 @@ const ModalMessage = ({
   txtButton,
   callbackButtonClick,
   callbackOkDelete,
+  textButtonConfirm,
 }: ModalProps) => {
   const handleEventButtonClick = () => callbackButtonClick(false);
 
@@ -33,7 +35,7 @@ const ModalMessage = ({
         <Buttons text={txtButton} callbackSendEvent={handleEventButtonClick} />
         {callbackOkDelete && (
           <Buttons
-            text="OK DELETAR"
+            text={textButtonConfirm ? textButtonConfirm : "OK DELETAR"}
             callbackSendEvent={() => callbackOkDelete(false)}
           />
         )}
