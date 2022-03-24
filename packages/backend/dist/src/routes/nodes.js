@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var express_1 = __importDefault(require("express"));
+var auth_1 = __importDefault(require("../middlewares/auth"));
+var CreateNodeController_1 = require("../useCases/Nodes/CreateNode/CreateNodeController");
+var DeleteNodeController_1 = require("../useCases/Nodes/DeleteNode/DeleteNodeController");
+var GetAllByFarmIdController_1 = require("../useCases/Nodes/GetAllByFarmId/GetAllByFarmIdController");
+var GetByNumByFarmController_1 = require("../useCases/Nodes/GetByNumByFarm/GetByNumByFarmController");
+var UpdateNodeController_1 = require("../useCases/Nodes/UpdateNode/UpdateNodeController");
+var router = express_1.default.Router();
+var createNodeController = new CreateNodeController_1.CreateNodeController();
+var updateNodeController = new UpdateNodeController_1.UpdateNodeController();
+var deleteNodeController = new DeleteNodeController_1.DeleteNodeController();
+var getAllByFarmIdController = new GetAllByFarmIdController_1.GetAllByFarmIdController();
+var getByNumByFarmController = new GetByNumByFarmController_1.GetByNumByFarmController();
+router.put('/updateNode', (0, auth_1.default)(), updateNodeController.handle);
+router.post('/addNode', (0, auth_1.default)(), createNodeController.handle);
+router.delete('/deleteNode/:id', (0, auth_1.default)(), deleteNodeController.handle);
+router.get('/nodeNum/:node_num/:farm_id', (0, auth_1.default)(), getByNumByFarmController.handle);
+router.get('/readAll/:farm_id', (0, auth_1.default)(), getAllByFarmIdController.handle);
+exports.default = router;
