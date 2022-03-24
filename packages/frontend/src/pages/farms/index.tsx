@@ -6,21 +6,21 @@ import { useContextAuth } from "hooks/useLoginAuth";
 import { useEffect } from "react";
 
 const UserFarms = () => {
-  const { user, isUserAuth, haveUserAuth } = useContextAuth();
+  const { user, isUserAuth } = useContextAuth();
   const { getAllFarmsUser, getAllFarms } = useContextActionCrud();
   const { farmList } = useContextData();
 
   useEffect(() => {
     isUserAuth();
 
-    if (user?.user_type === "SUDO") {
+    if (user && user.user_type === "SUDO") {
       getAllFarms();
     } else {
       user && getAllFarmsUser(user.user_id);
     }
   }, [user]);
 
-  return <>{!haveUserAuth ? <Loading /> : <MainFarm farmList={farmList} />}</>;
+  return <>{!user ? <Loading /> : <MainFarm farmList={farmList} />}</>;
 };
 
 export default UserFarms;

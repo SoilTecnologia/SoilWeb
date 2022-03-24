@@ -6,7 +6,6 @@ import React, {
   Dispatch,
   SetStateAction,
   useContext,
-  useEffect,
   useState,
 } from "react";
 
@@ -25,18 +24,13 @@ type dataContextAuth = {
   user: ResponseUser | null;
   setUser: Dispatch<SetStateAction<ResponseUser | null>>;
   isUserAuth: () => void;
-  haveUserAuth: boolean;
+  verifyUserCookie: () => void;
 };
 
 const UserLoginData = createContext({} as dataContextAuth);
 
 function UseLoginProvider({ children }: UserProviderProps) {
   const [user, setUser] = useState<ResponseUser | null>(null);
-  const [haveUserAuth, setHaveUserAuth] = useState(false);
-
-  useEffect(() => {
-    verifyUserCookie();
-  }, []);
 
   const verifyUserCookie = () => {
     const {
@@ -73,19 +67,35 @@ function UseLoginProvider({ children }: UserProviderProps) {
   };
 
   const isUserAuth = () => {
+    const {
+      "soilauth-token": token,
+      "soilauth-usertype": user_type,
+      "soilauth-userid": user_id,
+    } = parseCookies();
+
     setTimeout(() => {
-      if (user) {
-        !user.token ? Router.push("/") : setHaveUserAuth(true);
-      } else {
-        setHaveUserAuth(false);
+      if (!user && !token) {
+        setUser(null);
         Router.push("/");
+      } else {
+        if (!user) {
+          setUser({ token, user_id, user_type });
+          return;
+        }
+        return;
       }
-    }, 2000);
+    }, 1200);
   };
 
   return (
     <UserLoginData.Provider
-      value={{ signIn, user, setUser, isUserAuth, haveUserAuth }}
+      value={{
+        signIn,
+        user,
+        setUser,
+        isUserAuth,
+        verifyUserCookie,
+      }}
     >
       {children}
     </UserLoginData.Provider>

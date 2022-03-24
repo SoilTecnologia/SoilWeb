@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 const UserPivots = () => {
   const { farm } = useContextUserData();
-  const { isUserAuth, haveUserAuth } = useContextAuth();
+  const { isUserAuth, user } = useContextAuth();
   const { getGetPivotsListWithFarmId } = useContextActionCrud();
   const { pivotList } = useContextData();
 
@@ -19,9 +19,7 @@ const UserPivots = () => {
     }
   }, [farm]);
 
-  return (
-    <>{!haveUserAuth ? <Loading /> : <MainPivot pivotList={pivotList} />}</>
-  );
+  return <>{!user ? <Loading /> : <MainPivot pivotList={pivotList} />}</>;
 };
 
 export default UserPivots;
