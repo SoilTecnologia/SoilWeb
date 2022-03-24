@@ -1,4 +1,3 @@
-import { FaArrowLeft } from "react-icons/fa";
 import styled, { css } from "styled-components";
 
 export const Container = styled.main``;
@@ -89,6 +88,13 @@ export const OptionCreateUser = styled.button`
 export const ListUser = styled(OptionCreateUser)`
   margin-top: 2rem;
 `;
+
+export const ContentLogout = styled.div`
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`;
 export const ContentOption = styled.div`
   width: inherit;
   min-height: 87vh;
@@ -96,39 +102,4 @@ export const ContentOption = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-`;
-
-export const Logout = styled(FaArrowLeft)`
-  color: inherit;
-  font-size: 2.6rem;
-  margin-right: 0.6rem;
-`;
-
-export const TextLogout = styled.div`
-  width: max-content;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: ${({ theme }) => theme.colors.secondary};
-  color: ${({ theme }) => theme.colors.primary_gradient};
-
-  padding: 0.4rem 0.8rem;
-  border-radius: 1.8rem;
-  margin-left: 2.4rem;
-
-  transition: all 0.3s linear;
-
-  &:hover {
-    cursor: pointer;
-    background: ${({ theme }) => theme.colors.primary_gradient};
-    color: ${({ theme }) => theme.colors.secondary};
-  }
-`;
-
-export const ContentLogout = styled.div`
-  width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
 `;

@@ -6,6 +6,7 @@ import {
   requestDeleteNode,
   requestDeletePivot,
   requestDeleteUser,
+  requestGetAllFarms,
   requestGetAllFarmsUser,
   requestGetAllNodes,
   requestGetAllPivots,
@@ -39,6 +40,7 @@ interface actionCrudProps {
   updateUser: (user: User) => void;
   deleteUser: (id: string) => void;
   getAllFarmsUser: (id: string) => void;
+  getAllFarms: () => void;
   getOneFarms: (farm_id: string) => Promise<Farm | null | undefined>;
   createFarm: (farm: FarmCreate) => void;
   updateFarm: (farm: Farm) => void;
@@ -111,6 +113,11 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   //CRUD FARMS
   const getAllFarmsUser = async (id: string) => {
     const response = await requestGetAllFarmsUser(id, user?.token);
+    response && setFarmList(response);
+  };
+
+  const getAllFarms = async () => {
+    const response = await requestGetAllFarms(user?.token);
     response && setFarmList(response);
   };
   const getOneFarms = async (id: string) =>
@@ -195,6 +202,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         updateUser,
         deleteUser,
         getAllFarmsUser,
+        getAllFarms,
         getOneFarms,
         createFarm,
         updateFarm,

@@ -24,26 +24,19 @@ type dataContextAuth = {
   signIn: (login: string, password: string) => Promise<Response | null>;
   user: ResponseUser | null;
   setUser: Dispatch<SetStateAction<ResponseUser | null>>;
+  isUserAuth: () => void;
+  haveUserAuth: boolean;
 };
 
 const UserLoginData = createContext({} as dataContextAuth);
 
 function UseLoginProvider({ children }: UserProviderProps) {
   const [user, setUser] = useState<ResponseUser | null>(null);
+  const [haveUserAuth, setHaveUserAuth] = useState(false);
 
   useEffect(() => {
     verifyUserCookie();
   }, []);
-
-  const redirectForPageWithRole = (role: string) => {
-    if (role === "SUDO") {
-      Router.push("/adm");
-    } else if (role === "USER") {
-      Router.push("/farms");
-    } else {
-      Router.back();
-    }
-  };
 
   const verifyUserCookie = () => {
     const {
@@ -55,7 +48,7 @@ function UseLoginProvider({ children }: UserProviderProps) {
     setUser({ user_id, user_type, token });
 
     if (token) {
-      redirectForPageWithRole(user_type);
+      Router.push("/adm");
     }
   };
 
@@ -72,15 +65,28 @@ function UseLoginProvider({ children }: UserProviderProps) {
 
         setUser({ user_id, user_type, token });
 
-        user_type === "SUDO" ? Router.push("/adm") : Router.push("/farms");
+        Router.push("/adm");
       }
     }
 
     return response;
   };
 
+  const isUserAuth = () => {
+    setTimeout(() => {
+      if (user) {
+        !user.token ? Router.push("/") : setHaveUserAuth(true);
+      } else {
+        setHaveUserAuth(false);
+        Router.push("/");
+      }
+    }, 2000);
+  };
+
   return (
-    <UserLoginData.Provider value={{ signIn, user, setUser }}>
+    <UserLoginData.Provider
+      value={{ signIn, user, setUser, isUserAuth, haveUserAuth }}
+    >
       {children}
     </UserLoginData.Provider>
   );

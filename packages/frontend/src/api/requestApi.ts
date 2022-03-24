@@ -89,6 +89,17 @@ export const requestGetAllFarmsUser = async (
       return null;
     });
 };
+
+export const requestGetAllFarms = async (tokenId: tokenState) => {
+  return await api
+    .get(`farms/readAll`, tokenHeader(tokenId))
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
+};
 export const requestOneFarm = async (farmId: string, tokenId: tokenState) => {
   return await api
     .get<Farm | undefined>(`farms/getOneFarm/${farmId}`, tokenHeader(tokenId))
