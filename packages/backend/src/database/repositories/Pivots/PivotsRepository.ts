@@ -1,6 +1,6 @@
 import knex from '../..';
 import { PivotModel } from '../../model/Pivot';
-import { realdAllPivots } from '../../model/types/pivot';
+import { readAllPivots } from '../../model/types/pivot';
 import { IPivotsRepository } from './IPivotsRepository';
 
 class PivotsRepository implements IPivotsRepository {
@@ -59,8 +59,8 @@ class PivotsRepository implements IPivotsRepository {
     return pivots[0];
   }
 
-  async readAll(farm_id: string): Promise<realdAllPivots[] | undefined> {
-    const pivots: realdAllPivots[] = await knex<PivotModel>('pivots')
+  async readAll(farm_id: string): Promise<readAllPivots[] | undefined> {
+    const pivots: readAllPivots[] = await knex<PivotModel>('pivots')
       .select('*')
       .join('nodes', 'pivots.node_id', 'nodes.node_id')
       .where('nodes.farm_id', farm_id);

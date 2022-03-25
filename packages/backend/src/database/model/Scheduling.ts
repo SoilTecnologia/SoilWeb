@@ -19,6 +19,8 @@ class SchedulingModel {
 
    timestamp_end: Date | null;
 
+   timestamp: Date | null;
+
 }
 
 export {SchedulingModel}

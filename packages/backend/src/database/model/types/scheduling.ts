@@ -11,4 +11,8 @@ export type SchedulingAction = {
     percentimeter: number;
     timestamp_start: Date | 'NULL';
     timestamp_end: Date | 'NULL';
-  };
+    timestamp: Date | 'NULL';
+    
+  }
+
+  ;
