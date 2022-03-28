@@ -33,7 +33,7 @@ io.on('connection', (socket: Socket) => {
   emitter.on('state-change', (status: any) => {
     const {
       user_id,
-      pivot_name,
+      pivot_num,
       farm_name,
       pivot_id,
       connection,
@@ -45,7 +45,7 @@ io.on('connection', (socket: Socket) => {
     socket.emit(`${user_id}-status`, {
       type: 'status',
       pivot_id,
-      pivot_name,
+      pivot_num,
       farm_name,
       power,
       water,
@@ -53,8 +53,7 @@ io.on('connection', (socket: Socket) => {
       connection,
       percentimeter
     });
-
-    console.log(`socket de state: `, status);
+    
   });
 
   emitter.on('variable-change', (status: any) => {

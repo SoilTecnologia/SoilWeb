@@ -5,24 +5,8 @@ import IntentsInlineContainer from "../IntentsInlineContainer";
 import PercentComponent from "../PercentComponent";
 import * as S from "./styles";
 
-type IntentValue = Boolean | null;
-type IntentType = 'power' | 'direction' | 'water';
 
 const IntentManager = () => {
-  const { intents, setIntents } = useContextIntentsData()
-
-  const handleIntentStateChange = (value: IntentValue, type: IntentType) => {
-    if (type == 'direction' && value != null && intents) {
-      if (value == true) {
-        intents[`${type}`] = 'CLOCKWISE'
-      } else if (value === false) {
-        intents[`${type}`] = 'ANTI_CLOCKWISE'
-      }
-    } else {
-      intents[`${type}`] = value
-    }
-  }
-
 
   return (
     <S.Container>
@@ -31,19 +15,13 @@ const IntentManager = () => {
         <IntentsInlineContainer
           intentName="LIGA/DESLIGA"
         >
-          <IntentSelectionButtons
-            type="power"
-            handleIntentState={(value: IntentValue, type: IntentType) => handleIntentStateChange(value, type)}
-          />
+          <IntentSelectionButtons type="power" />
         </IntentsInlineContainer>
 
         <IntentsInlineContainer
           intentName="SENTIDO"
         >
-          <IntentSelectionButtons
-            type="direction"
-            handleIntentState={(value: IntentValue, type: IntentType) => handleIntentStateChange(value, type)}
-          />
+          <IntentSelectionButtons type="direction" />
         </IntentsInlineContainer>
 
       </S.IntentWrapper>
@@ -53,10 +31,7 @@ const IntentManager = () => {
         <IntentsInlineContainer
           intentName="ÁGUA"
         >
-          <IntentSelectionButtons
-            type="water"
-            handleIntentState={(value: IntentValue, type: IntentType) => handleIntentStateChange(value, type)}
-          />
+          <IntentSelectionButtons type="water" />
         </IntentsInlineContainer>
 
         <IntentsInlineContainer

@@ -21,24 +21,6 @@ type iconProps = {
 const Icon = ({ children }: iconProps) => (<S.Icon>{children}</S.Icon>)
 const MainIntent = () => {
   const { pivot } = useContextUserData()
-  const { sendPivotIntent } = useContextActionCrud()
-
-
-  const [intent, setIntent] = useState<Intent>({
-    connection: true,
-    power: true,
-    water: false,
-    direction: 'ANTI_CLOCKWISE',
-    percentimeter: 30,
-    angle: 100,
-    timestamp: new Date().valueOf()
-  })
-
-
-  const func = () => {
-    if (pivot)
-      sendPivotIntent(pivot.pivot_id, intent)
-  }
 
   return (
     <S.Container>
@@ -47,7 +29,7 @@ const MainIntent = () => {
         subHeaderText={pivot?.timestamp == null ? 'Nunca foi Atualizado' : `${pivot.timestamp}`}
       />
       <S.Body>
-        <S.ScheduleButton onClick={func}>
+        <S.ScheduleButton>
           <Icon>
             <ImCalendar />
           </Icon>

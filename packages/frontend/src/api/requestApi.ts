@@ -280,6 +280,8 @@ export const requestSendPivotIntent = async (
   intents: Intent,
   tokenId: tokenState
 ) => {
+  ///// actions/create
+  ///// pivots/update
   return await api
     .post(`pivots/update/${pivotId}`,
     intents
@@ -335,6 +337,20 @@ export const requestOnePivot = async (
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar pivos");
+      console.log(err);
+    });
+};
+export const requestPivotStatus = async (
+  pivot_id: Pivot['pivot_id'],
+  tokenId: tokenState
+) => {
+  return await api
+    .get(`pivots/state/${pivot_id}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar pivô");
       console.log(err);
     });
 };

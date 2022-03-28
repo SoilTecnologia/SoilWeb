@@ -11,10 +11,10 @@ const PercentComponent = () => {
     if (intents) {
       if (value > 0 && value < 100) {
         setPercentimeter(value),
-          intents['percentimeter'] = value
+          setIntents(prevState => ({ ...prevState, ['percentimeter']: value }))
       } else {
         setPercentimeter(0),
-          intents['percentimeter'] = 0
+          setIntents(prevState => ({ ...prevState, ['percentimeter']: 0 }))
       }
     }
   };

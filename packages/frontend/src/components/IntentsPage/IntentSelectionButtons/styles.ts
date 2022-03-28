@@ -13,7 +13,7 @@ export const InicialState =styled.button`
   align-self:center;
   margin:35px;
   flex-direction:row;
-  animation: breath 1s linear normal forwards;
+  animation: breath 0.2s linear normal forwards;
   box-shadow: 5px 5px 15px gray;
   @keyframes breath {
    0% { transform :scale(1.1,1.1) }
@@ -28,7 +28,7 @@ export const SelectedIntent =styled.button`
   align-self:center;
   margin:35px;
   flex-direction:row;
-  animation: breath-animation 1s linear normal forwards;
+  animation: breath-animation 0.2s linear normal forwards;
   box-shadow: 5px 5px 15px gray;
 
  @keyframes breath-animation {
@@ -46,7 +46,7 @@ export const UnselectedIntent =styled.button`
   align-self:center;
   margin:35px;
   flex-direction:row;
-  animation: reduce 1s linear normal forwards;
+  animation: reduce 0.2s linear normal forwards;
   box-shadow: 5px 5px 15px gray;
  @keyframes reduce {
    0% {

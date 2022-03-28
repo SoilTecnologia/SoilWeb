@@ -18,13 +18,13 @@ interface UserProviderProps {
 }
 
 type ContextFarmData = Farm | null;
-type ContextPivotData = Pivot | null;
+type ContextPivotData = Pivot;
 
 type UserDataContexProps = {
   farm: Farm | null,
   setFarm: React.Dispatch<React.SetStateAction<null | Farm>>
-  pivot: Pivot | null,
-  setPivot: React.Dispatch<React.SetStateAction<null | Pivot>>
+  pivot: Pivot,
+  setPivot: React.Dispatch<React.SetStateAction<Pivot>>
 }
 
 const UserDataContext = createContext({} as UserDataContexProps);
@@ -32,7 +32,7 @@ const UserDataContext = createContext({} as UserDataContexProps);
 function UserDataProvider({ children }: UserProviderProps) {
 
   const [farm, setFarm] = useState<ContextFarmData>(null);
-  const [pivot, setPivot] = useState<ContextPivotData>(null);
+  const [pivot, setPivot] = useState<ContextPivotData>({} as Pivot);
 
   return (
     <UserDataContext.Provider

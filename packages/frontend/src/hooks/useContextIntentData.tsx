@@ -13,12 +13,12 @@ interface IntentsProviderProps {
   children: React.ReactNode;
 }
 
-type ContextIntentsData = Intent | null;
+type ContextIntentsData = Intent;
 
 
 type IntentsDataContexProps = {
-  intents: Intent | null,
-  setIntents: React.Dispatch<React.SetStateAction<null | Intent>>
+  intents: Intent,
+  setIntents: React.Dispatch<React.SetStateAction<Intent>>
 
 }
 

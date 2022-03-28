@@ -1,5 +1,3 @@
-import { FaHistory } from "react-icons/fa";
-import { GrMapLocation } from "react-icons/gr";
 import styled, {css} from "styled-components";
 
 
@@ -21,13 +19,27 @@ ${({theme})=>css`
 `}
 `;
 
-export const Map= styled.div`
+export const MapStyle= styled.div`
 ${({theme})=>css`
   height:500px;
   width:500px;
+  background:black;
   margin:${theme.spacings.small};
 `}
 `;
+
+export const Circle=styled.button`
+  ${({theme})=>css`
+  height:100px;
+  width:100px;
+  border-radius:50%;
+  background:black;
+
+`}
+`;
+
+
+
 export const CaptionContainer=styled.div`
 ${({theme})=>css`
   display:flex;

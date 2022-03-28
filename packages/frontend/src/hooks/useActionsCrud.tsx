@@ -19,7 +19,8 @@ import {
   requestUpdateNode,
   requestUpdatePivot,
   requestUpdateUser,
-  requestSendPivotIntent
+  requestSendPivotIntent,
+  requestPivotStatus,
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
@@ -31,7 +32,7 @@ import State from "utils/models/state";
 import User, { requestUser, UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 import { useContextAuth } from "./useLoginAuth";
-
+import { useContextUserData } from './useContextUserData'
 interface UserProviderProps {
   children: React.ReactNode;
 }
@@ -58,6 +59,7 @@ interface actionCrudProps {
   getGetPivotsListWithFarmId: (farm_id: Farm["farm_id"]) => void;
   getAllPivotWithFarmId: (farm_id: Farm["farm_id"]) => void;
   sendPivotIntent: (pivotId: string, intent: Intent) => void
+  getPivotState: (pivot_id: Pivot['pivot_id']) => void
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -68,14 +70,13 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     stateAdmin,
     setData,
     stateDefault,
-
     setUsersList,
     setFarmList,
     setNodeList,
     setPivotList,
   } = useContextData();
   const { user } = useContextAuth();
-
+  const { setPivot } = useContextUserData()
   //CRUD USER
   const getAllUser = async (
     tokenState?: string
@@ -161,6 +162,10 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const result = await requestGetAllPivots(farm_id, user?.token);
     result && setPivotList(result);
   };
+  const getPivotState = async (pivot_id: Pivot['pivot_id']) => {
+    const result = await requestPivotStatus(pivot_id, user?.token)
+    result && setPivot(result)
+  }
 
   const getOnePivot = async (pivot: PivotCreate) =>
     await requestOnePivot(pivot, user?.token);
@@ -173,7 +178,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     newPivot && (await getAllPivots(pivot.farm_id));
   };
   const sendPivotIntent = async (pivotId: Pivot["pivot_id"], intent: Intent) => {
-    await requestSendPivotIntent(pivotId,intent, user?.token);
+    await requestSendPivotIntent(pivotId, intent, user?.token);
   };
   const deletePivot = async (pivot: Pivot) => {
     await requestDeletePivot(pivot.pivot_id, user?.token);
@@ -213,7 +218,8 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         deleteNode,
         getAllPivotWithFarmId,
         getGetPivotsListWithFarmId,
-        sendPivotIntent
+        sendPivotIntent,
+        getPivotState,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as S from "./styles";
 import Image from "next/image";
 
@@ -10,18 +10,18 @@ import WaterOffIcon from "../../../../public/icons/Sem_agua.png"
 
 import ClockwiseIcon from "../../../../public/icons/Sentido_horario.png"
 import AntiClockwiseIcon from "../../../../public/icons/Sentido_antihorario.png"
+import { useContextIntentsData } from "hooks/useContextIntentData";
 
 type IntentValue = Boolean | null;
 type IntentType = 'power' | 'direction' | 'water'
 
 type IntentSelectionButtonsProps = {
   type: IntentType,
-  handleIntentState: (value: IntentValue, type: IntentType) => void
+
 }
 
-const IntentSelectionButtons = ({ type, handleIntentState }: IntentSelectionButtonsProps) => {
-  const [state, setState] = useState<Boolean | null>(null)
-
+const IntentSelectionButtons = ({ type }: IntentSelectionButtonsProps) => {
+  const { intents, setIntents } = useContextIntentsData()
 
   const firstIconSelector = () => (
     (type === "power") ? OnIcon :
@@ -34,22 +34,33 @@ const IntentSelectionButtons = ({ type, handleIntentState }: IntentSelectionButt
       (type === "direction") ? AntiClockwiseIcon :
         WaterOffIcon
   )
+  const handleIntentStateChange = (value: IntentValue) => {
+    if (type == 'direction' && value != null && intents) {
+      if (value == true) {
+        setIntents(prevState => ({ ...prevState, [`${type}`]: 'CLOCKWISE' }))
+      } else if (value === false) {
+        setIntents(prevState => ({ ...prevState, [`${type}`]: 'ANTI_CLOCKWISE' }))
+      }
+    } else {
+      setIntents(prevState => ({ ...prevState, [`${type}`]: value }))
+    }
+  }
 
   const firstIcon = firstIconSelector()
   const secondIcon = secondIconSelector();
 
   const statesSelector = () => {
 
-    if (state == null) {
+    if (intents[`${type}`] == null) {
       return (
         <>
-          <S.InicialState onClick={() => { setState(true), handleIntentState(true, type) }}>
+          <S.InicialState onClick={() => { handleIntentStateChange(true) }}>
             <Image
               src={firstIcon}
             />
 
           </S.InicialState>
-          <S.InicialState onClick={() => { setState(false), handleIntentState(false, type) }} >
+          <S.InicialState onClick={() => { handleIntentStateChange(false) }} >
             <Image
               src={secondIcon}
             />
@@ -57,16 +68,16 @@ const IntentSelectionButtons = ({ type, handleIntentState }: IntentSelectionButt
         </>
 
       )
-    } else if (state == true) {
+    } else if (intents[`${type}`] == true || intents[`${type}`] == 'CLOCKWISE') {
       return (
         <>
-          <S.SelectedIntent onClick={() => { setState(null), handleIntentState(null, type) }}>
+          <S.SelectedIntent onClick={() => { handleIntentStateChange(null) }}>
             <Image
               src={firstIcon}
             />
 
           </S.SelectedIntent>
-          <S.UnselectedIntent onClick={() => { setState(false), handleIntentState(false, type) }} >
+          <S.UnselectedIntent onClick={() => { handleIntentStateChange(false) }} >
             <Image
               src={secondIcon}
             />
@@ -77,14 +88,14 @@ const IntentSelectionButtons = ({ type, handleIntentState }: IntentSelectionButt
     } else {
       return (
         <>
-          <S.UnselectedIntent onClick={() => { setState(true), handleIntentState(true, type) }}>
+          <S.UnselectedIntent onClick={() => { handleIntentStateChange(true) }}>
 
             <Image
               src={firstIcon}
             />
           </S.UnselectedIntent>
 
-          <S.SelectedIntent onClick={() => { setState(null), handleIntentState(null, type) }} >
+          <S.SelectedIntent onClick={() => { handleIntentStateChange(null) }} >
             <Image
               src={secondIcon}
             />
