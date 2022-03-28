@@ -110,10 +110,6 @@ class GetCyclesUseCase {
       const variables = await this.stateVariablesRepository.getVariableGroupBy(
         state.state_id
       );
-      // knex<StateVariable>('state_variables')
-      //   .select('percentimeter', 'timestamp' /* 'AVG(percentimeter)') */)
-      //   .where('state_id', state.state_id)
-      //   .groupBy('angle', 'percentimeter', 'timestamp');
 
       for (let variable of variables) {
         if (variable)

@@ -1,10 +1,12 @@
 import Axios from 'axios';
 import { FormDataEncoder } from 'form-data-encoder';
 import { FormData } from 'formdata-node';
+import 'reflect-metadata';
 import { Readable } from 'stream';
 import { container } from 'tsyringe';
 import { ActionModel } from '../database/model/Action';
 import { PivotsRepository } from '../database/repositories/Pivots/PivotsRepository';
+import '../shared/container';
 import { GetAllActionsUseCase } from '../useCases/Actions/GetAllActions/GetAllActionUseCase';
 import { UpdateActionsUseCase } from '../useCases/Actions/UpdateActionUseCase';
 import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
@@ -62,6 +64,7 @@ const sendData = async (radio_id: number, data: string) => {
 
   return response;
 };
+
 const checkResponse = (action: ActionModel, payload: StatusObject) => {
   if (payload) {
     if (action.power) {
@@ -103,6 +106,7 @@ export const loadPivots = async () => {
     });
   }
 };
+
 const checkPool = async () => {
   const getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
   const updateActionUseCase = container.resolve(UpdateActionsUseCase);
@@ -239,6 +243,7 @@ const checkPool = async () => {
   }
   ready = true;
 };
+
 export const start = async () => {
   loadActions();
   loadPivots();

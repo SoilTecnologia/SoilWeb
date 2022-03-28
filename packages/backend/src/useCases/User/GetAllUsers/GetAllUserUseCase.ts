@@ -1,11 +1,11 @@
 import { inject, injectable } from 'tsyringe';
-import { UsersRepository } from '../../../database/repositories/Users/UserRepository';
+import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
 import { InvalidCredentials } from '../../../types/errors';
 
 @injectable()
 class GetAllUserUseCase {
   constructor(
-    @inject('UsersRepository') private userRepository: UsersRepository
+    @inject('UsersRepository') private userRepository: IUsersRepository
   ) {}
 
   async execute() {

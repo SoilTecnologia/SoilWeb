@@ -1,7 +1,8 @@
-import { inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { ActionModel } from '../../database/model/Action';
 import { IActionRepository } from '../../database/repositories/Action/IActionRepository';
 
+@injectable()
 class UpdateActionsUseCase {
   constructor(
     @inject('ActionsRepository') private actionRepository: IActionRepository
