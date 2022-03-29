@@ -1,12 +1,14 @@
 import * as S from "./styles";
 import { format } from 'date-fns';
+import { ReactChild } from "react";
 
 type HeaderProps = {
   text: string | number | undefined,
   subHeaderText?: string | Date,
+  children?: ReactChild
 }
 
-const Header = ({ text, subHeaderText }: HeaderProps) => {
+const Header = ({ text, subHeaderText, children }: HeaderProps) => {
 
   const dateFormater = () => {
     if (subHeaderText !== 'Nunca foi Atualizado' && subHeaderText) {
@@ -19,6 +21,11 @@ const Header = ({ text, subHeaderText }: HeaderProps) => {
 
   return (
     <S.Container>
+      {children && (
+        <S.ChildrenContainer>
+          {children}
+        </S.ChildrenContainer>
+      )}
       <S.TextContainer>
         <S.Text>
           {text}
@@ -37,6 +44,7 @@ const Header = ({ text, subHeaderText }: HeaderProps) => {
           )
         }
       </S.TextContainer>
+
     </S.Container>
   )
 };

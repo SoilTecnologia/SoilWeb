@@ -6,27 +6,44 @@ import React, { useState } from "react";
 import Intent from "utils/models/intent";
 
 //Icons
-import { ImArrowLeft2, ImCalendar } from "react-icons/im";
+import { ImCalendar } from "react-icons/im";
 
 
 import StatusComponent from "../StatusComponent";
 import IntentBlock from "../IntentBlock";
-
-
-
+import { useContextData } from "hooks/useContextData";
+import Router from "next/router";
 
 type iconProps = {
   children: React.ReactNode
 }
+
 const Icon = ({ children }: iconProps) => (<S.Icon>{children}</S.Icon>)
 const MainIntent = () => {
   const { pivot } = useContextUserData()
+  const { pivotList } = useContextData()
+
+  const getTimestamp = () => {
+    if (pivot && pivotList) {
+      const timeStamp = pivotList.map((pivots) => (pivots.pivot_id == pivot.pivot_id ? pivots.timestamp : null))
+      console.log(timeStamp.toString())
+      return timeStamp.toString()
+    }
+    return null
+  }
+
+  const handleMap = () => {
+    Router.push('/map')
+  }
+  const handleHistoric = () => {
+    Router.push('/historic')
+  }
 
   return (
     <S.Container>
       <Header
         text={`Pivô ${pivot?.pivot_num}`}
-        subHeaderText={pivot?.timestamp == null ? 'Nunca foi Atualizado' : `${pivot.timestamp}`}
+        subHeaderText={getTimestamp() == null ? 'Nunca foi Atualizado' : `${getTimestamp()}`}
       />
       <S.Body>
         <S.ScheduleButton>
@@ -51,7 +68,7 @@ const MainIntent = () => {
 
         <S.ButtonsView>
 
-          <S.Button >
+          <S.Button onClick={handleMap} >
 
             <S.MapIcon />
 
@@ -61,7 +78,7 @@ const MainIntent = () => {
 
           </S.Button>
 
-          <S.Button>
+          <S.Button onClick={handleHistoric}>
 
             <S.ClockIcon />
 

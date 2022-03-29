@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { ImArrowLeft2 } from "react-icons/im";
+import { RiRoadMapLine } from "react-icons/ri";
 
 export const Container =styled.div`
   display: flex;
@@ -47,6 +48,11 @@ export const Text=styled.h1`
 `;
 
 export const BackIcon = styled(ImArrowLeft2)`
+  font-size:${({theme})=>theme.font.sizes.xxlarge};
+  color:${({theme})=>theme.colors.secondary};
+  font-family:${({theme})=>theme.font.family.Montserrat_bold};
+`
+export const MapIcon = styled(RiRoadMapLine)`
   font-size:${({theme})=>theme.font.sizes.xxlarge};
   color:${({theme})=>theme.colors.secondary};
   font-family:${({theme})=>theme.font.family.Montserrat_bold};

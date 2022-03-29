@@ -1,6 +1,6 @@
 import { requestLoginAuth, Response } from "api/requestApi";
 import Router from "next/router";
-import { setCookie, parseCookies } from "nookies";
+import { setCookie, parseCookies, destroyCookie } from "nookies";
 import React, {
   createContext,
   Dispatch,
@@ -23,6 +23,7 @@ type ResponseUser = {
 
 type dataContextAuth = {
   signIn: (login: string, password: string) => Promise<Response | null>;
+  signOut: () => Promise<void>;
   user: ResponseUser | null;
   setUser: Dispatch<SetStateAction<ResponseUser | null>>;
 };
@@ -79,9 +80,15 @@ function UseLoginProvider({ children }: UserProviderProps) {
 
     return response;
   };
+  const signOut = async () => {
+    destroyCookie(null, "soilauth-token")
+    destroyCookie(null, 'soilauth-userid')
+    destroyCookie(null, 'soilauth-usertype')
+    Router.push('/')
+  }
 
   return (
-    <UserLoginData.Provider value={{ signIn, user, setUser }}>
+    <UserLoginData.Provider value={{ signIn, signOut, user, setUser }}>
       {children}
     </UserLoginData.Provider>
   );

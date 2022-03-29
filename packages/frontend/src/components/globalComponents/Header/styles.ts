@@ -1,15 +1,22 @@
 import styled, {css} from "styled-components";
 
 export const Container = styled.div`
+display:flex;
   height:14rem;
   background: ${({ theme }) => theme.colors.primary};
+  flex-direction:row;
+`;
+export const ChildrenContainer = styled.div`
+  display:flex;
+  align-self:center;
   align-items:center;
   justify-content:center;
+  margin:0 30px;
 `;
 export const TextContainer=styled.div`
   display:flex;
   height:14rem;
-  align-self:center;
+  width:100%;
   align-items:center;
   justify-content:center;
   flex-direction:column;

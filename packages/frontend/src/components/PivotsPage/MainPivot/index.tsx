@@ -31,7 +31,7 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
           <S.Button
             onClick={handleMapa}
           >
-
+            <S.MapIcon />
             <S.Text >
               Mapa
             </S.Text>

@@ -3,8 +3,8 @@ import { useContextIntentsData } from "hooks/useContextIntentData";
 import * as S from "./styles";
 
 const PercentComponent = () => {
-  const [percentimeter, setPercentimeter] = useState(0)
   const { intents, setIntents } = useContextIntentsData()
+  const [percentimeter, setPercentimeter] = useState(0)
 
 
   const onChangeHandler = async (value: number) => {
