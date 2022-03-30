@@ -39,7 +39,8 @@
     "no-plusplus": "off",
     "eqeqeq": "off",
     "no-unused-expressions": "off",
-    "import/no-cycle": "off"
+    "import/no-cycle": "off",
+    "no-underscore-dangle": "off"
   },
   "overrides": [
     {

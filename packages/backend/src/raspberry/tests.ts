@@ -8,9 +8,9 @@ import { ActionModel } from '../database/model/Action';
 import { PivotsRepository } from '../database/repositories/Pivots/PivotsRepository';
 import '../shared/container';
 import { GetAllActionsUseCase } from '../useCases/Actions/GetAllActions/GetAllActionUseCase';
-import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import emitter from '../utils/eventBus';
 import GenericQueue from '../utils/generic_queue';
+import { CheckStatusRadio } from './common/checkStatusRadio';
 import { HandleActionActive } from './common/handleActionActive';
 import { payloadToString } from './common/payloadToString';
 
@@ -27,6 +27,7 @@ type IdleData = {
   radio_id: number;
   attempts: number;
 };
+
 type RadioResponse = {
   cmd: number;
   id: number;
@@ -81,65 +82,16 @@ export const loadPivots = async () => {
 };
 
 const checkPool = async () => {
-  const getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
-
   ready = false;
-  const actionIsActive = !activeQueue.isEmpty();
+  const actionIsActive = activeQueue.isEmpty();
+  const checkStatus = idleQueue.isEmpty();
 
-  if (actionIsActive) {
+  if (!actionIsActive) {
     const startAction = new HandleActionActive(activeQueue);
     await startAction.startHandleAction();
-  } else if (!idleQueue.isEmpty()) {
-    let current = idleQueue.peek();
-    console.log('CHECKING IDLE');
-
-    try {
-      console.log(`Checking radio ${current.radio_id}`);
-      const { result, data } = await sendData(current.radio_id, '000-000');
-      console.log(`Result   ${JSON.stringify(result)}`);
-      const matchIsNotEmpty = result.match && result.match !== '';
-      console.log(`Match: ${matchIsNotEmpty}`);
-      if (matchIsNotEmpty && current.radio_id == data.id) {
-        // await getUpdatePivotController.execute(
-        //   current.pivot_id,
-        //   true,
-        //   result?.payload.power,
-        //   result?.payload.water,
-        //   result?.payload.direction,
-        //   result?.payload.angle,
-        //   result?.payload.percentimeter,
-        //   new Date(),
-        //   null,
-        //   null
-        // );
-        // current.attempts = 0;
-      } else {
-        current.attempts++;
-      }
-    } catch (err) {
-      console.log(`[ERROR]: ${err}`);
-      current.attempts++;
-    } finally {
-      if (current.attempts >= 10) {
-        console.log('Failing PIVOT');
-
-        await getUpdatePivotController.execute(
-          current.pivot_id,
-          false,
-          null,
-          null,
-          null,
-          null,
-          null,
-          new Date(),
-          null,
-          null
-        );
-      }
-
-      current = idleQueue.dequeue()!;
-      idleQueue.enqueue(current);
-    }
+  } else if (!checkStatus) {
+    const startCheckState = new CheckStatusRadio(idleQueue);
+    await startCheckState.startChechStatusRadio();
   }
   ready = true;
 };

@@ -65,11 +65,14 @@ class HandleActionActive {
       '',
       null
     );
+
     this.attempts = 0;
 
     await this.updateActionUseCase.execute(this.action.action_id, true);
     console.log('UPDATING ACTION:', this.action.action_id);
 
+    // Verificar se está deletando essa ação do array
+    // Se não estiver procurar uma solução para isso
     this.activeQueue.dequeue();
   };
 
