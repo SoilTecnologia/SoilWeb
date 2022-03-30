@@ -30,32 +30,31 @@ export const statusStringToObject = (status: string) => {
     timestamp: new Date()
   };
 
-  if (match) {
-    if (direction === '3') {
-      response.direction = 'CLOCKWISE';
-    } else if (direction === '4') {
-      response.direction = 'ANTI_CLOCKWISE';
-    }
-
-    if (water === '5') {
-      response.water = false;
-    } else if (water === '6') {
-      response.water = true;
-    }
-
-    if (power == '1') {
-      response.power = true;
-    } else if (power == '2') {
-      response.power = false;
-    }
-
-    response.percentimeter = Number(percentimeter);
-    response.angle = Number(angle);
-    response.timestamp = new Date(Number(timestamp));
-
-    return response;
+  if (direction === '3') {
+    response.direction = 'CLOCKWISE';
+  } else if (direction === '4') {
+    response.direction = 'ANTI_CLOCKWISE';
   }
-  return null;
+
+  if (water === '5') {
+    response.water = false;
+  } else if (water === '6') {
+    response.water = true;
+  }
+
+  if (power == '1') {
+    response.power = true;
+  } else if (power == '2') {
+    response.power = false;
+  }
+
+  response.percentimeter = Number(percentimeter);
+  response.angle = Number(angle);
+  response.timestamp = new Date(Number(timestamp));
+
+  const data = { response, match };
+
+  return data;
 };
 
 export const objectToActionString = (
@@ -65,19 +64,16 @@ export const objectToActionString = (
   percentimeter: ActionModel['percentimeter']
 ) => {
   let actionString = '';
-  if (power) {
-    if (direction == 'CLOCKWISE') actionString += '3';
-    else if (direction == 'ANTI_CLOCKWISE') actionString += '4';
-    if (water) actionString += '6';
-    else actionString += '5';
-    actionString += '1';
-    actionString += '-';
-    actionString += percentimeter.toString().padStart(3, '0');
-  } else {
-    return '00200';
-  }
 
-  return actionString;
+  if (direction == 'CLOCKWISE') actionString += '3';
+  else if (direction == 'ANTI_CLOCKWISE') actionString += '4';
+  if (water) actionString += '6';
+  else actionString += '5';
+  actionString += '1';
+  actionString += '-';
+  actionString += percentimeter.toString().padStart(3, '0');
+
+  return power ? actionString : '002-000';
 };
 
 export const statusPayloadStringToObject = (payload: string) => {
@@ -136,7 +132,7 @@ export const objectToActionPayloadString = (
     actionString += '1';
     actionString += percentimeter.toString().padStart(3, '0');
   } else {
-    return '00200';
+    return '002-000';
   }
 
   return actionString;

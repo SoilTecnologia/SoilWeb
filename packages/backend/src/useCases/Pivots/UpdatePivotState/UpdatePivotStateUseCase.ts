@@ -144,11 +144,13 @@ class UpdatePivotStateUseCase {
       const node = await this.nodesRepository.findById(pivot?.node_id);
       const farm = await this.farmRepository.findById(pivot?.farm_id!!);
 
+      console.log(`Node: ${JSON.stringify(node)}`);
+
       emitter.emit('status', {
         farm_id: pivot?.farm_id,
         node_num: node?.node_num,
         payload: {
-          pivot_id,
+          pivot_id: pivot?.pivot_id,
           connection,
           power,
           water,

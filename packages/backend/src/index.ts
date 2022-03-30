@@ -13,7 +13,6 @@ import 'reflect-metadata';
 import { Server, Socket } from 'socket.io';
 import IoTDevice from './aws-iot/index';
 import { FarmsRepository } from './database/repositories/Farms/FarmsRepository';
-import * as raspberry from './raspberry/tests';
 import router from './routes';
 import './shared/container';
 import emitter from './utils/eventBus';
@@ -106,7 +105,7 @@ io.on('connection', (socket: Socket) => {
   });
 });
 
-raspberry.start();
+// raspberry.start();
 
 const iotDevice = new IoTDevice('Cloud', 0);
 // const iotDevice = new IoTDevice(

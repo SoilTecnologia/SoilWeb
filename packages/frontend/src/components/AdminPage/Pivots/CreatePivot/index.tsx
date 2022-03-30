@@ -127,7 +127,6 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
       setGatewayVisible(false);
     }
   };
-
   const onSubmit = handleSubmit(async (data) => {
     error.error && setError(defaultError);
     const nodeCreated = await createNewNode(data);

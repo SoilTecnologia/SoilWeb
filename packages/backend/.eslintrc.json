@@ -37,7 +37,9 @@
     "import/no-unresolved": "off",
     "no-lonely-if": "off",
     "no-plusplus": "off",
-    "eqeqeq": "off"
+    "eqeqeq": "off",
+    "no-unused-expressions": "off",
+    "import/no-cycle": "off"
   },
   "overrides": [
     {
