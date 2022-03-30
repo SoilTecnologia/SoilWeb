@@ -95,23 +95,24 @@ const checkPool = async () => {
 
     try {
       console.log(`Checking radio ${current.radio_id}`);
-      console.log('');
       const { result, data } = await sendData(current.radio_id, '000-000');
-
-      if (result.match && current.radio_id == data.id) {
-        await getUpdatePivotController.execute(
-          current.pivot_id,
-          true,
-          result.payload.power,
-          result.payload.water,
-          result.payload.direction,
-          result.payload.angle,
-          result.payload.percentimeter,
-          new Date(),
-          null,
-          null
-        );
-        current.attempts = 0;
+      console.log(`Result   ${JSON.stringify(result)}`);
+      const matchIsNotEmpty = result.match && result.match !== '';
+      console.log(`Match: ${matchIsNotEmpty}`);
+      if (matchIsNotEmpty && current.radio_id == data.id) {
+        // await getUpdatePivotController.execute(
+        //   current.pivot_id,
+        //   true,
+        //   result?.payload.power,
+        //   result?.payload.water,
+        //   result?.payload.direction,
+        //   result?.payload.angle,
+        //   result?.payload.percentimeter,
+        //   new Date(),
+        //   null,
+        //   null
+        // );
+        // current.attempts = 0;
       } else {
         current.attempts++;
       }
@@ -121,6 +122,7 @@ const checkPool = async () => {
     } finally {
       if (current.attempts >= 10) {
         console.log('Failing PIVOT');
+
         await getUpdatePivotController.execute(
           current.pivot_id,
           false,

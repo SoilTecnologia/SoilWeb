@@ -88,6 +88,7 @@ class HandleActionActive {
         null,
         null
       );
+
       await this.updateActionUseCase.execute(this.action.action_id, false);
       this.activeQueue.dequeue()!;
     }

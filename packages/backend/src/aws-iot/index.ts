@@ -228,10 +228,12 @@ class IoTDevice {
         this.queue.remove(newJson);
       }
     } else if (this.type === 'Raspberry') {
-      if (json.type === 'status') {
+      if (type === 'status') {
+        console.log(`Type: ${JSON.stringify(type)}`);
+
         console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
         this.queue.remove(json);
-      } else if (json.type === 'action') {
+      } else if (type === 'action') {
         const { author, power, water, direction, percentimeter, timestamp } =
           json.payload;
         const { farm_id } = json;
