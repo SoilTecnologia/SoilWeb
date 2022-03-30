@@ -8,12 +8,7 @@ const SendAndCancelButton = () => {
   const { pivot, setPivot } = useContextUserData()
   const { intents, setIntents } = useContextIntentsData()
   const { sendPivotIntent } = useContextActionCrud()
-  const [inicialIntentsState, setInicialIntentsState] = useState({
-    power: null,
-    water: null,
-    direction: null,
-    percentimeter: 0,
-  })
+  const [inicialIntentsState, setInicialIntentsState] = useState(intents)
 
 
   const handleSendIntents = () => {

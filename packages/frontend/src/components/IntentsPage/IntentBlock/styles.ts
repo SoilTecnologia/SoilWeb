@@ -43,8 +43,7 @@ export const Circle=styled.button`
 export const CaptionContainer=styled.div`
 ${({theme})=>css`
   display:flex;
-  height:100px;
-  width:300px;
+  width:100%;
 `}
 `;
 

@@ -4,6 +4,8 @@ import Map, { Layer, Source } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import * as S from "./styles";
 import { useContextUserData } from "hooks/useContextUserData";
+import CaptionComponent from "../CaptionComponent";
+import theme from "styles/theme";
 
 const IntentBlock = () => {
   const { farm, pivot } = useContextUserData()
@@ -43,31 +45,17 @@ const IntentBlock = () => {
     };
   };
 
-
-
-  // const geojson = {
-  //   type: 'FeatureCollection',
-  //   features: [{
-  //     type: 'Feature',
-  //     geometry: {
-  //       type: 'Point',
-  //       coordinates: [
-  //         farm?.farm_lng,
-  //         farm?.farm_lat
-  //       ]
-  //     }
-  //   }]
-  // };
   const stateSelector = () => {
+    if (pivot.connection) {
+      if (pivot.power) {
+        if (pivot.water)
+          return `${theme.colors.wet}`
+        return `${theme.colors.dry}`
 
-    if (pivot.power === true) {
-      if (pivot.water === true)
-        return 'blue'
-      return 'green'
-
+      }
+      return `${theme.colors.off}`
     }
-    return 'gray'
-
+    return `${theme.colors.offline}`
   }
 
 
@@ -88,7 +76,7 @@ const IntentBlock = () => {
 
           <Map
             initialViewState={{
-              zoom: 12.5,
+              zoom: 13.5,
               latitude: farm?.farm_lat,
               longitude: farm?.farm_lng,
             }}
@@ -106,7 +94,7 @@ const IntentBlock = () => {
 
         </S.MapStyle>
         <S.CaptionContainer>
-
+          <CaptionComponent />
         </S.CaptionContainer>
       </S.MapContainer>
 
