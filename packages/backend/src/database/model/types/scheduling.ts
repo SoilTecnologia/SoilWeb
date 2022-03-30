@@ -9,8 +9,8 @@ export type SchedulingAction = {
     start_angle: number | 'NULL';
     end_angle: number | 'NULL';
     percentimeter: number;
-    timestamp_start: Date | 'NULL';
-    timestamp_end: Date | 'NULL';
+    start_timestamp: Date | 'NULL';
+    end_timestamp: Date | 'NULL';
     timestamp: Date | 'NULL';
     
   }

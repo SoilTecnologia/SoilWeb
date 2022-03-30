@@ -15,9 +15,9 @@ class SchedulingModel {
 
    percentimeter: number | null;
 
-   timestamp_start: Date | null;
+   start_timestamp: Date | null;
 
-   timestamp_end: Date | null;
+   end_timestamp: Date | null;
 
    timestamp: Date | null;
 

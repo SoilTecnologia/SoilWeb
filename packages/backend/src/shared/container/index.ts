@@ -15,6 +15,8 @@ import { IStatesVariableRepository } from '../../database/repositories/StatesVar
 import { StatesVariablesRepository } from '../../database/repositories/StatesVariables/StatesVariablesRepository';
 import { IUsersRepository } from '../../database/repositories/Users/IUsersRepository';
 import { UsersRepository } from '../../database/repositories/Users/UserRepository';
+import { ISchedulingRepository } from '../../database/repositories/Scheduling/ISchedulingRepository';
+import { SchedulingRepository } from '../../database/repositories/Scheduling/SchedulingRepository';
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',
@@ -54,3 +56,9 @@ container.registerSingleton<IActionRepository>(
   'ActionsRepository',
   delay(() => ActionRepository)
 );
+
+container.registerSingleton<ISchedulingRepository>(
+  'SchedulingRepository',
+  delay(() => SchedulingRepository)
+);
+

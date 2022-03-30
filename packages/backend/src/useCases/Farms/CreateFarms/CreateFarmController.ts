@@ -13,7 +13,7 @@ class CreateFarmController {
       farm_lng,
       farm_lat
     }: FarmModel = req.body;
-
+    
     const createFarmUseCase = container.resolve(CreateFarmUseCase);
 
     const newFarm = {
