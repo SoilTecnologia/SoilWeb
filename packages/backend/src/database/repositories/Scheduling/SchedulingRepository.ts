@@ -1,3 +1,4 @@
+import { result } from "lodash";
 import knex from "../..";
 import { SchedulingModel } from "../../model/Scheduling";
 import { ISchedulingRepository } from "./ISchedulingRepository";
@@ -37,15 +38,13 @@ class SchedulingRepository implements ISchedulingRepository {
     }
 
     async update(
-        scheduling: SchedulingModel, 
-        scheduling_id: SchedulingModel['scheduling_id']
-        ): Promise<SchedulingModel | undefined> {
-            const schedulings = await knex<SchedulingModel>('schedulings')
-            .where({scheduling_id})
+        scheduling: SchedulingModel): Promise<SchedulingModel | undefined> {
+            const results = await knex<SchedulingModel>('schedulings')
+            .where({scheduling_id: scheduling.scheduling_id})
             .update(scheduling)
             .returning('*');
 
-            return schedulings[0];
+            return results[0];
         
     }
 

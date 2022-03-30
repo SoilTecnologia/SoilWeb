@@ -13,10 +13,7 @@ interface ISchedulingRepository{
 
     delete(scheduling_id: SchedulingModel['scheduling_id']) : Promise<SchedulingModel | undefined>
 
-    update(
-        scheduling: SchedulingModel,
-        scheduling_id: SchedulingModel['scheduling_id']
-        ) : Promise<SchedulingModel | undefined>
+    update(scheduling: SchedulingModel) : Promise<SchedulingModel | undefined>
 
     
 }
