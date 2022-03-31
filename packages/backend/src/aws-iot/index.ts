@@ -223,6 +223,7 @@ class IoTDevice {
           }
         }
       } else if (json.type === 'action') {
+        console.log(`JSON:  ${JSON.stringify(newJson)}`);
         console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
         emitter.emit('action-ack-received', newJson);
         this.queue.remove(newJson);
