@@ -20,7 +20,6 @@ class CreateActionUseCase {
     action: Omit<CreateAction, 'timestamp_sent'>,
     timestamp: CreateAction['timestamp_sent'] | null
   ) {
-    console.log(`Action:   ${action}`);
     const newTimestamp = timestamp ? timestamp : new Date();
     const actionResult = await this.actionRepository.create({
       ...action,

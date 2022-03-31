@@ -156,10 +156,7 @@ class IoTDevice {
     } = json;
 
     console.log(`JSON: ${JSON.stringify(json)}`);
-    const splitId = id.split('_');
-    const newPivotId = `${splitId[0]}_${splitId[1]}`;
 
-    const newJson = { ...json, id: newPivotId };
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
         const [farm_id, node_num] = id.split('_');
@@ -195,7 +192,7 @@ class IoTDevice {
             rssi
           );
           /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
-          this.publish(newJson, `${farm_id}_${node_num}`);
+          this.publish(json, `${farm_id}_${node_num}`);
           console.log(
             `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
           );
@@ -223,10 +220,10 @@ class IoTDevice {
           }
         }
       } else if (json.type === 'action') {
-        console.log(`JSON:  ${JSON.stringify(newJson)}`);
+        console.log(`JSON:  ${JSON.stringify(json)}`);
         console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
-        emitter.emit('action-ack-received', newJson);
-        this.queue.remove(newJson);
+        emitter.emit('action-ack-received', json);
+        this.queue.remove(json);
       }
     } else if (this.type === 'Raspberry') {
       if (type === 'status') {
