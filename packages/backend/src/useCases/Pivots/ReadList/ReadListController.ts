@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { ReadListPivotUseCase } from './ReadListUseCase';
 
 class ReadListController {
@@ -11,8 +12,12 @@ class ReadListController {
       const pivotList = await readListPivotUseCase.execute(farm_id);
       res.json(pivotList);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/list`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        ReadListController.name,
+        'Read List Pivots'
+      );
       next(err);
     }
   }
