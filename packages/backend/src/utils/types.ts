@@ -25,7 +25,7 @@ export const messageErrorTryAction = (
 ) => {
   const messageLog = isDatabase
     ? `${ERROR_QUERIES_DATABASE} --> ${className} in ${message}`
-    : `${ERROR_INTERNAL} --> ${className}`;
+    : `${ERROR_INTERNAL} --> ${className} in ${message}`;
   console.log(messageLog);
   console.log('ERROR: ');
   console.log(err.message);

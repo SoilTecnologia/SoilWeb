@@ -10,9 +10,9 @@ class DeleteNodeController {
     const deleteNodeUseCase = container.resolve(DeleteNodeUseCase);
 
     try {
-      const newNode = await deleteNodeUseCase.execute(id);
+      await deleteNodeUseCase.execute(id);
 
-      res.send(newNode);
+      res.sendStatus(200).send();
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -20,7 +20,7 @@ class DeleteNodeController {
         DeleteNodeController.name,
         'Delete Node '
       );
-      next(err);
+      next();
     }
   }
 }

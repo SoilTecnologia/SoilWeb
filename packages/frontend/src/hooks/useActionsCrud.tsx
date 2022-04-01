@@ -49,7 +49,7 @@ interface actionCrudProps {
   getAllNodes: (farm_id: Farm["farm_id"]) => void;
   createNode: (node: NodeCreate) => Promise<Node>;
   updateNode: (node: Node) => void;
-  deleteNode: (id: string, farmRelation: Farm) => void;
+  deleteNode: (id: string, farm_id: string) => void;
   getAllPivots: (farm_id: Farm["farm_id"]) => void;
   findAllPivots: () => void;
   getOnePivot: (pivot: PivotCreate) => Promise<Pivot | null | undefined>;
@@ -158,9 +158,9 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     setData(stateAdmin);
     newNode && (await getAllNodes(node.farm_id));
   };
-  const deleteNode = async (id: string, farmRelation: Farm) => {
+  const deleteNode = async (id: string, farm_id: string) => {
     await requestDeleteNode(id, user?.token);
-    getAllNodes(farmRelation.farm_id);
+    await getAllPivots(farm_id);
   };
 
   //CRUD PIVOT

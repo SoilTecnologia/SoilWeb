@@ -1,5 +1,4 @@
 import { inject, injectable } from 'tsyringe';
-import { NodeModel } from '../../../database/model/Node';
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
 import { messageErrorTryAction } from '../../../utils/types';
 
@@ -30,10 +29,10 @@ class DeleteNodeUseCase {
     }
   }
 
-  async execute(node_id: NodeModel['node_id']) {
-    const nodeAlreadyexists = await this.applyQueryFindByNodes(node_id!!);
+  async execute(node_id: string) {
+    const nodeAlreadyexists = await this.applyQueryFindByNodes(node_id);
 
-    if (!nodeAlreadyexists) throw new Error('Node Already Exists');
+    if (!nodeAlreadyexists) throw new Error('Does not find Node');
 
     return await this.applyQueryDeleteNodes(node_id!!);
   }

@@ -19,6 +19,7 @@ interface INodesRepository {
   ): Promise<NodeModel | undefined>;
   create(node: Omit<NodeModel, 'node_id'>): Promise<NodeModel | undefined>;
   delete(node_id: NodeModel['node_id']): Promise<number | undefined>;
+
   update(node: NodeModel): Promise<NodeModel | undefined>;
 }
 
