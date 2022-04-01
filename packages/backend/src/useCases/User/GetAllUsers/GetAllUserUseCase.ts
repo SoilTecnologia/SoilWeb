@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
-import { InvalidCredentials } from '../../../types/errors';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class GetAllUserUseCase {
@@ -8,15 +8,20 @@ class GetAllUserUseCase {
     @inject('UsersRepository') private userRepository: IUsersRepository
   ) {}
 
-  async execute() {
+  private async applyQueryGetUsers() {
     try {
-      const users = await this.userRepository.getAllUsers();
-      if (!users) throw new Error('No user found');
-
-      return users;
+      return await this.userRepository.getAllUsers();
     } catch (err) {
-      throw new InvalidCredentials();
+      messageErrorTryAction(err, true, 'Get All Users');
     }
+  }
+
+  async execute() {
+    const users = await this.applyQueryGetUsers();
+
+    if (!users) throw new Error('No user found');
+
+    return users;
   }
 }
 

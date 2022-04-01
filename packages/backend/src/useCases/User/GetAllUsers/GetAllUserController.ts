@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { GetAllUserUseCase } from './GetAllUserUseCase';
 
 class GetAllUserController {
@@ -9,8 +10,7 @@ class GetAllUserController {
       const usersList = await getAllUserUseCase.execute();
       res.status(200).send(usersList);
     } catch (err) {
-      console.log('[ERROR] Error in the server');
-      console.log(err);
+      messageErrorTryAction(err, false, 'Get All Users');
       next(err);
     }
   }
