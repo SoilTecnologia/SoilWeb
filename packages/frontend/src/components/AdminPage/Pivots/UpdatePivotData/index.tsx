@@ -18,7 +18,7 @@ type errorProps = {
 
 const UpdatePivotData = ({ pivotData, closeModal }: updateFarmProps) => {
   //Contexts
-  const { updatePivot } = useContextActionCrud();
+  const { updatePivot, getOneNode, updateNode } = useContextActionCrud();
   //States
   const [error, setError] = useState<errorProps>(defaultError);
 
@@ -42,8 +42,17 @@ const UpdatePivotData = ({ pivotData, closeModal }: updateFarmProps) => {
       setError(catchError);
     }
   };
+  const handlePivot = async (newNode_num: number) => {
+    const node = await getOneNode(pivotData.node_id);
+
+    node && updateNode({ ...node, node_num: newNode_num });
+  };
 
   const handleDataForm = (formData: PivotForm) => {
+    if (formData.pivot_num !== pivotData.pivot_num) {
+      handlePivot(formData.pivot_num);
+    }
+
     const latNotNull = formData.pivot_lat
       ? formData.pivot_lat
       : pivotData.pivot_lat;

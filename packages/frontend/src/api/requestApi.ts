@@ -179,6 +179,20 @@ export const requestGetAllNodes = async (
     });
 };
 
+export const requestGetOneNode = async (
+  node_id: Node["node_id"],
+  tokenId: tokenState
+) => {
+  return await api
+    .get<Node>(`nodes/getOne/${node_id}`, tokenHeader(tokenId))
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] error fetching data from server");
+      console.log(err);
+      return null;
+    });
+};
+
 export const requestDeleteNode = async (
   node_id: Node["node_id"],
   tokenId: tokenState
