@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { CreatePivotUseCase } from './CreatePivotUseCase';
 
 class CreatePivotController {
@@ -33,8 +34,12 @@ class CreatePivotController {
 
       res.send(allPivotsFromNode);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/readAll`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        CreatePivotController.name,
+        'Create Pivot'
+      );
       next(err);
     }
   }

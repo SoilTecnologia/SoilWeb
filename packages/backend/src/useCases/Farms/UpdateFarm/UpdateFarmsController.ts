@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { UpdateFarmUseCase } from './UpdateFarmUseCase';
 
 class UpdateFarmController {
@@ -11,8 +12,12 @@ class UpdateFarmController {
 
       res.status(200).send(putFarm);
     } catch (err) {
-      console.log('[ERROR] Internal Server error');
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        UpdateFarmController.name,
+        'Update Farm'
+      );
       next(err);
     }
   }
