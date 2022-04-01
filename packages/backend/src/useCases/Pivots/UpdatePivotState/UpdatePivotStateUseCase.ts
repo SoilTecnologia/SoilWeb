@@ -16,6 +16,7 @@ import {
   isStateDifferent,
   isStateVariableDifferent
 } from '../../../utils/isDifferent';
+import { messageErrorTryAction } from '../../../utils/types';
 import { CreateStateUseCase } from '../../States/CreateStateUseCase';
 
 @injectable()
@@ -41,6 +42,86 @@ class UpdatePivotStateUseCase {
     this.state = undefined;
   }
 
+  // Queries Database
+  private async applyQueryGetStateByPivot(pivot_id: string) {
+    try {
+      return await this.stateRepository.findByPivotId(pivot_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdatePivotStateUseCase.name,
+        'Find State By pivot Id'
+      );
+    }
+  }
+
+  private async applyQueryGetPivotByPivot(pivot_id: string) {
+    try {
+      return await this.pivotRepository.findById(pivot_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdatePivotStateUseCase.name,
+        'Find Pivot By pivot Id'
+      );
+    }
+  }
+
+  private async applyQueryGetNodeByNode(node_id: string) {
+    try {
+      return await this.nodesRepository.findById(node_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdatePivotStateUseCase.name,
+        'Find Node By node Id'
+      );
+    }
+  }
+
+  private async applyQueryGetFarmByFarm(farm_id: string) {
+    try {
+      return await this.farmRepository.findById(farm_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdatePivotStateUseCase.name,
+        'Find Farm By Farm Id'
+      );
+    }
+  }
+
+  private async applyQueryGetRadioVariable(pivot_id: string) {
+    try {
+      return await this.radioVariableRepository.findByPivotId(pivot_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdatePivotStateUseCase.name,
+        'Find RadioVariable By Pivot Id'
+      );
+    }
+  }
+
+  private async applyQueryGetStateVariable(state_id: string) {
+    try {
+      return await this.stateVariableRepository.findByStateId(state_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdatePivotStateUseCase.name,
+        'Find State Variable By State Id'
+      );
+    }
+  }
+
+  // Methods Actions
   private createStateIfNotExists = async (
     pivot_id: StateModel['pivot_id'],
     oldState: StateModel | undefined,
@@ -71,8 +152,9 @@ class UpdatePivotStateUseCase {
   ) => {
     if (angle !== undefined && percentimeter !== undefined) {
       if (this.state) {
-        const oldStateVariable =
-          await this.stateVariableRepository.findByStateId(this.state.state_id);
+        const oldStateVariable = await this.applyQueryGetStateVariable(
+          this.state.state_id
+        );
 
         if (
           !oldStateVariable ||
@@ -97,9 +179,7 @@ class UpdatePivotStateUseCase {
     timestamp: StateModel['timestamp']
   ) => {
     if (father !== undefined && rssi !== undefined) {
-      const oldRadioVariable = await this.radioVariableRepository.findByPivotId(
-        pivot_id
-      );
+      const oldRadioVariable = await this.applyQueryGetRadioVariable(pivot_id);
       if (
         !oldRadioVariable ||
         isRadioVariableDifferent(oldRadioVariable, { father, rssi })
@@ -128,7 +208,7 @@ class UpdatePivotStateUseCase {
     father: RadioVariableModel['father'],
     rssi: RadioVariableModel['rssi']
   ) {
-    const oldState = await this.stateRepository.findByPivotId(pivot_id);
+    const oldState = await this.applyQueryGetStateByPivot(pivot_id);
     this.state = oldState;
 
     const newState = { connection, power, water, direction };
@@ -141,8 +221,11 @@ class UpdatePivotStateUseCase {
 
     if (this.shouldNotifyUpdate) {
       const pivot = await this.pivotRepository.findById(pivot_id);
-      const node = await this.nodesRepository.findById(pivot?.node_id);
-      const farm = await this.farmRepository.findById(pivot?.farm_id!!);
+      if (!pivot) throw new Error('Pivot Does Not Find');
+      const node = await this.applyQueryGetNodeByNode(pivot.node_id!!);
+      const farm = await this.applyQueryGetFarmByFarm(pivot.farm_id!!);
+
+      if (!farm) throw new Error('Farm does Not Find');
 
       console.log(`Node: ${JSON.stringify(node)}`);
 

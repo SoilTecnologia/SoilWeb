@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { UpdatePivotStateUseCase } from './UpdatePivotStateUseCase';
 
 class UpdateStatePivotController {
@@ -35,8 +36,12 @@ class UpdateStatePivotController {
 
       res.json(updatedPivot);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/update`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        UpdateStatePivotController.name,
+        'Update State Pivot'
+      );
       next(err);
     }
   }
