@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { AuthSignInUseCase } from './AuthLoginUseCase';
 
 class AuthSignInController {
@@ -12,9 +13,8 @@ class AuthSignInController {
 
       res.status(200).send(cookieInfo);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /users/signin:`);
-      console.log(err);
-      next(err);
+      messageErrorTryAction(err, false, ` TRY LOGIN`);
+      next();
     }
   }
 }

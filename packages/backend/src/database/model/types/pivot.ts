@@ -61,6 +61,7 @@ export type PartialListResponse = {
   power: StateModel['power'];
   water: StateModel['water'];
   direction: StateModel['direction'];
+  connection: StateModel['connection'];
   percentimeter: StateVariableModel['percentimeter'];
   rssi: RadioVariableModel['rssi'];
   father: RadioVariableModel['father'];

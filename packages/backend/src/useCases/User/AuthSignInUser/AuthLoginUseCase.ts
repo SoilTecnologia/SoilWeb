@@ -4,40 +4,70 @@ import { inject, injectable } from 'tsyringe';
 import { UserModel } from '../../../database/model/User';
 import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
 import { InvalidCredentials } from '../../../types/errors';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class AuthSignInUseCase {
+  private user: UserModel | undefined;
+
   constructor(
     @inject('UsersRepository') private userRepository: IUsersRepository
-  ) {}
+  ) {
+    this.user = undefined;
+  }
+
+  private async comparePassword(password: UserModel['password']) {
+    try {
+      if (password) {
+        return await bcrypt.compare(password, this.user!!.password);
+      }
+      return false;
+    } catch (err) {
+      console.log('ERROR WHEN COMPARE PASSWORD');
+      console.log(err.message);
+    }
+  }
+
+  private generateTokenJwt() {
+    const { user_id, user_type } = this.user!!;
+
+    const token = jwt.sign(
+      {
+        user_id,
+        user_type
+      },
+      process.env.TOKEN_SECRET as jwt.Secret,
+      {
+        expiresIn: '2h'
+      }
+    );
+
+    const response = {
+      user_id,
+      user_type,
+      token
+    };
+
+    return response;
+  }
+
+  private async applyQuerie(login: UserModel['login']) {
+    try {
+      const user = await this.userRepository.findByLogin(login);
+
+      this.user = user;
+    } catch (err) {
+      messageErrorTryAction(err, true, 'LOGIN USER');
+    }
+  }
 
   async execute(login: UserModel['login'], password: UserModel['password']) {
-    const user = await this.userRepository.findByLogin(login);
-    const comparePassword = await bcrypt.compare(password, user!!.password);
+    await this.applyQuerie(login);
 
-    if (user && comparePassword) {
-      const { user_id, user_type } = user;
+    const comparePassword = await this.comparePassword(password);
 
-      const token = jwt.sign(
-        {
-          user_id,
-          user_type
-        },
-        process.env.TOKEN_SECRET as jwt.Secret,
-        {
-          expiresIn: '2h'
-        }
-      );
-
-      const response = {
-        user_id,
-        user_type,
-        token
-      };
-
-      return response;
-    }
-    throw new InvalidCredentials();
+    if (!this.user || !comparePassword) throw new InvalidCredentials();
+    else return this.generateTokenJwt();
   }
 }
 

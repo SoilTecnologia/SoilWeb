@@ -31,6 +31,7 @@ class ReadListPivotUseCase {
         power: state ? state.power : false,
         water: state ? state.water : false,
         direction: state ? state.direction : null,
+        connection: state ? state.connection : false,
         percentimeter: state && variable ? variable.percentimeter : null,
         rssi: null,
         father: null,

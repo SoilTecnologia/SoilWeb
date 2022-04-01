@@ -12,3 +12,22 @@ export function isType(
   }
   return false;
 }
+
+export const ERROR_QUERIES_DATABASE = 'error when querying'.toUpperCase();
+export const ERROR_INTERNAL =
+  '[ERROR] INTERNAL SERVER ERROR WHEN'.toUpperCase();
+
+export const messageErrorTryAction = (
+  err: any,
+  isDatabase?: boolean,
+  className?: string
+) => {
+  const messageLog = isDatabase
+    ? `${ERROR_QUERIES_DATABASE} --> ${className}`
+    : `${ERROR_INTERNAL} --> ${className}`;
+  console.log(messageLog);
+  console.log('ERROR: ');
+  console.log(err.message);
+  console.log('');
+  console.log('Server is Running');
+};

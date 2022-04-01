@@ -34,14 +34,14 @@ class ReadMapUseCase {
         pivot_start_angle: pivot.pivot_start_angle,
         pivot_end_angle: pivot.pivot_end_angle,
         pivot_radius: pivot.pivot_radius,
-        power: isTrue ? state.power : false,
-        water: isTrue ? state.water : false,
-        direction: isTrue ? state.direction : null,
-        connection: isTrue ? state.connection : true,
+        power: state ? state.power : false,
+        water: state ? state.water : false,
+        direction: state ? state.direction : null,
+        connection: state ? state.connection : false,
         start_angle: isTrue ? variables[0]!.angle : pivot.pivot_start_angle,
         end_angle: isTrue
           ? variables[variables.length - 1]!.angle
-          : pivot.pivot_start_angle
+          : pivot.pivot_end_angle
       };
       newArray.push(statePivot);
     }

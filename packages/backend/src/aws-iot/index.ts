@@ -6,6 +6,7 @@ import { CreateActionUseCase } from '../useCases/Actions/CreateAction/CreateActi
 import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import { statusPayloadStringToObject } from '../utils/conversions';
 import emitter from '../utils/eventBus';
+import { handleResultString } from '../utils/handleFarmIdWithUndescores';
 import MessageQueue from '../utils/message_queue';
 
 /*
@@ -115,7 +116,9 @@ class IoTDevice {
       );
 
       this.connection.publish(finalTopic!, string, 0, false);
-      console.log(`[IOT] ${finalTopic} Enviando mensagem... ${string}`);
+      console.log(`[IOT] ${finalTopic} Enviando mensagem... `);
+      console.log(string);
+      console.log('');
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
@@ -159,7 +162,7 @@ class IoTDevice {
 
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
-        const [farm_id, node_num] = id.split('_');
+        const { farm_id, node_num } = await handleResultString(id);
         // Se possui um pivot_num, é um concentrador
         // Caso contrário podemos assumir que é um GPRS
 
@@ -202,11 +205,14 @@ class IoTDevice {
           console.log('Received status from GPRS');
           const statusObject = statusPayloadStringToObject(payload);
 
+          const pivotNum = `${farm_id}_${pivot_num}`;
+          console.log(`Pivo Num:  ${pivotNum}`);
+
           if (statusObject) {
             const { power, direction, water, percentimeter, angle, timestamp } =
               statusObject;
             await updatePivotUseCase.execute(
-              `${farm_id}_${node_num}`, // Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
+              id, // Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
               true,
               power,
               water,
@@ -220,7 +226,6 @@ class IoTDevice {
           }
         }
       } else if (json.type === 'action') {
-        console.log(`JSON:  ${JSON.stringify(json)}`);
         console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
         emitter.emit('action-ack-received', json);
         this.queue.remove(json);
@@ -281,14 +286,15 @@ class IoTDevice {
         this.processQueue();
       });
     } else {
-      emitter.on('action', (action) => {
-        const pivotId = action.payload.pivot_id.split('_');
-        const pivot_num = pivotId[1];
+      emitter.on('action', async (action) => {
+        const id = action.payload.pivot_id;
+        const { node_num } = await handleResultString(id);
+        // const pivotId = action.payload.pivot_id.split('_');
         if (action.is_gprs) {
           this.queue.enqueue({
             type: 'action',
             id: `${action.farm_id}_${action.node_num}`,
-            pivot_num,
+            pivot_num: Number(node_num),
             payload: objectToActionString(
               action.payload.power,
               action.payload.water,
@@ -322,20 +328,26 @@ class IoTDevice {
       const current = this.queue.peek()!;
       const [farm_id, node_num] = current.id.split('_');
 
-      if (current.attempts! < 3) {
-        if (this.type === 'Raspberry') {
-          this.publish(current, this.pubTopic);
-        } else {
-          this.publish(current, `${farm_id}_${node_num}`);
-        }
-        current.attempts!++;
-      } else {
+      if (current.attempts && current.attempts >= 3) {
         console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
+
         emitter.emit('action-ack-not-received', current);
+
+        console.log('');
+        console.log('              ACK not received in Action...             ');
+
         this.queue.remove(current);
         this.ready = true;
         return;
       }
+
+      const pivotId = `${farm_id}_${node_num}`;
+      const raspOrCloud = this.type === 'Raspberry' ? this.pubTopic : pivotId;
+
+      this.publish(current, raspOrCloud);
+
+      current.attempts!++;
+
       this.ready = true;
       setTimeout(() => {
         this.processQueue();

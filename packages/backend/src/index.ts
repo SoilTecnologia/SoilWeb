@@ -11,13 +11,11 @@ import express from 'express';
 import { createServer } from 'http';
 import 'reflect-metadata';
 import { Server, Socket } from 'socket.io';
-import { container } from 'tsyringe';
-import IoTDevice from './aws-iot/index';
-import { FarmsRepository } from './database/repositories/Farms/FarmsRepository';
+import IoTDevice from './aws-iot';
 import router from './routes';
 import './shared/container';
-import { GetOneFarmUseCase } from './useCases/Farms/GetOneFarm/GetOneFarmsuseCase';
 import emitter from './utils/eventBus';
+import { handleResultAction } from './utils/handleFarmIdWithUndescores';
 
 require('dotenv').config();
 
@@ -77,21 +75,10 @@ io.on('connection', (socket: Socket) => {
   emitter.on('action-ack-received', async (action) => {
     console.log(`Action da ACK: ${JSON.stringify(action)}`);
 
-    const { id } = action;
-    const arrayId = id.split('_');
-    const newFarmId =
-      arrayId.length > 2
-        ? [`${arrayId[0]}_${arrayId[1]}`, ...arrayId]
-        : arrayId;
+    const { user_id, farm_name, pivot_num } = await handleResultAction(
+      action.id
+    );
 
-    const { farm_id, pivot_num } = newFarmId;
-
-    /* Tentar melhorar isso daqui, nao depender de fazer uma query pra saber o usuario" */
-    const getFarmUseCase = container.resolve(GetOneFarmUseCase);
-    const farm = await getFarmUseCase.execute(farm_id);
-    const { user_id, farm_name } = farm!!;
-
-    console.log(`${JSON.stringify(farm)}::: FArm`);
     socket.emit(`${user_id}-ackreceived`, {
       type: 'ack',
       pivot_num,
@@ -100,14 +87,9 @@ io.on('connection', (socket: Socket) => {
   });
 
   emitter.on('action-ack-not-received', async (action) => {
-    const { id } = action;
-    const [farm_id, pivot_num] = id.split('_');
-
-    /* Tentar melhorar isso daqui, nao depender de fazer uma query pra saber o usuario" */
-
-    const farmRepository = new FarmsRepository();
-    const farm = await farmRepository.findById(farm_id);
-    const { user_id, farm_name } = farm!!;
+    const { user_id, farm_name, pivot_num } = await handleResultAction(
+      action.id
+    );
 
     socket.emit(`${user_id}-acknotreceived`, {
       type: 'ack',

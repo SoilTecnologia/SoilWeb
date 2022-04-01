@@ -7,7 +7,15 @@ import { IUsersRepository, ResponseDTO } from './IUsersRepository';
 
 class UsersRepository implements IUsersRepository {
   async findByLogin(login: string): Promise<UserModel | undefined> {
-    return await knex<UserModel>('users').select('*').where({ login }).first();
+    try {
+      return await knex<UserModel>('users')
+        .select('*')
+        .where({ login })
+        .first();
+    } catch (err) {
+      console.log('ERROR IN DATABASE QUERIES GET USER BY LOGIN');
+      console.log(err);
+    }
   }
 
   async findById(user_id: string): Promise<UserModel | undefined> {

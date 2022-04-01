@@ -6,6 +6,7 @@ import cycleRoute from './cycles';
 import farmRoute from './farms';
 import nodeRoute from './nodes';
 import pivotRoute from './pivots';
+import stateRoute from './state';
 import userRoute from './users';
 
 const router = express.Router();
@@ -38,9 +39,11 @@ router.use('/pivots', pivotRoute);
 router.use('/nodes', nodeRoute);
 router.use('/actions', actionRoute);
 router.use('/cycles', cycleRoute);
+router.use('/states', stateRoute);
 router.use('/api-status', (req, res, next) => {
   res.sendStatus(200);
 });
+
 // router.use('/radio', radioRoute);
 // router.use('/intent', intentRoute);
 // // router.use('/raspberry', raspberryRoute);
