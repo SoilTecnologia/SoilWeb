@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class FindAllUseCase {
@@ -7,10 +8,16 @@ class FindAllUseCase {
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository
   ) {}
 
-  async execute() {
-    const pivotsAdm = await this.pivotRepository.findAll();
+  private async applyQueryGetAll() {
+    try {
+      return await this.pivotRepository.findAll();
+    } catch (error) {
+      messageErrorTryAction(error, true, FindAllUseCase.name, 'Get All Pivots');
+    }
+  }
 
-    return pivotsAdm;
+  async execute() {
+    return await this.applyQueryGetAll();
   }
 }
 

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { FindAllUseCase } from './FindAllUseCase';
 
 class FindAllController {
@@ -10,8 +11,12 @@ class FindAllController {
       const pivots = await findAlluseCase.execute();
       res.status(200).send(pivots);
     } catch (err) {
-      console.log('[ERROR] Internal Server Error');
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        FindAllController.name,
+        'Get All Pivots'
+      );
       next(err);
     }
   }

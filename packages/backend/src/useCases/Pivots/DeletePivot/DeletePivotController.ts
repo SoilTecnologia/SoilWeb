@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { DeletePivotUseCase } from './DeletePivotUseCase';
 
 class DeletePivotController {
@@ -13,8 +14,12 @@ class DeletePivotController {
 
       res.sendStatus(200).send(allPivotsFromNode);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/readAll`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        DeletePivotController.name,
+        'Delete Pivot'
+      );
       next(err);
     }
   }
