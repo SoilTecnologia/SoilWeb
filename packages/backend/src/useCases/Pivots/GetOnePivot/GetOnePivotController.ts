@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { GetOnePivotUseCase } from './GetOnePivotUseCase';
 
 class GetOnePivotController {
@@ -14,8 +15,12 @@ class GetOnePivotController {
 
       res.send(pivotResult);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on pivots`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        GetOnePivotController.name,
+        'Get One Pivot Of The Farm'
+      );
       next(err);
     }
   }
