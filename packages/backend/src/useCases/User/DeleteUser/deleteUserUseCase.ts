@@ -12,7 +12,12 @@ class DeleteUserUseCase {
     try {
       return await this.userRepository.findById(user_id!!);
     } catch (err) {
-      messageErrorTryAction(err, true, 'Find User By Id');
+      messageErrorTryAction(
+        err,
+        true,
+        DeleteUserUseCase.name,
+        'Find User By Id'
+      );
     }
   }
 
@@ -20,7 +25,7 @@ class DeleteUserUseCase {
     try {
       return await this.userRepository.deleteUser(user_id);
     } catch (err) {
-      messageErrorTryAction(err, true, 'DELETE USER');
+      messageErrorTryAction(err, true, DeleteUserUseCase.name, 'DELETE USER');
     }
   }
 

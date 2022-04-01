@@ -11,7 +11,12 @@ class DeleteUserController {
       const notUser = await deleteUserUseCase.execute(id);
       res.sendStatus(200).send(notUser);
     } catch (err) {
-      messageErrorTryAction(err, false, 'Delete User');
+      messageErrorTryAction(
+        err,
+        false,
+        DeleteUserController.name,
+        'Delete User'
+      );
       next(err);
     }
   }

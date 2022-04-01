@@ -10,7 +10,12 @@ class GetAllUserController {
       const usersList = await getAllUserUseCase.execute();
       res.status(200).send(usersList);
     } catch (err) {
-      messageErrorTryAction(err, false, 'Get All Users');
+      messageErrorTryAction(
+        err,
+        false,
+        GetAllUserController.name,
+        'Get All Users'
+      );
       next(err);
     }
   }

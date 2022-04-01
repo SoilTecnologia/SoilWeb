@@ -36,7 +36,12 @@ class CreateUserUseCase {
     try {
       return await this.userRepository.findByLogin(login);
     } catch (err) {
-      messageErrorTryAction(err, true, 'FIND USER EXISTS');
+      messageErrorTryAction(
+        err,
+        true,
+        CreateUserUseCase.name,
+        'FIND USER EXISTS'
+      );
     }
   }
 
@@ -44,7 +49,12 @@ class CreateUserUseCase {
     try {
       return await this.userRepository.create(user);
     } catch (err) {
-      messageErrorTryAction(err, true, 'CREATE NEW USER');
+      messageErrorTryAction(
+        err,
+        true,
+        CreateUserUseCase.name,
+        'CREATE NEW USER'
+      );
     }
   }
 

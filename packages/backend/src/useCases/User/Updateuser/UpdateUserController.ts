@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { UpdateUserUseCase } from './UpdateUserUseCase';
 
 class UpdateUserController {
@@ -21,8 +22,12 @@ class UpdateUserController {
 
       return response.status(201).send(result);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /users/signup:`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        UpdateUserController.name,
+        'Update User'
+      );
       next(err);
     }
   }

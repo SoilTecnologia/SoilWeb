@@ -12,7 +12,7 @@ class GetAllUserUseCase {
     try {
       return await this.userRepository.getAllUsers();
     } catch (err) {
-      messageErrorTryAction(err, true, 'Get All Users');
+      messageErrorTryAction(err, true, GetAllUserUseCase.name, 'Get All Users');
     }
   }
 

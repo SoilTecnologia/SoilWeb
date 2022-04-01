@@ -19,11 +19,12 @@ export const ERROR_INTERNAL =
 
 export const messageErrorTryAction = (
   err: any,
-  isDatabase?: boolean,
-  className?: string
+  isDatabase: boolean,
+  className: string,
+  message: string
 ) => {
   const messageLog = isDatabase
-    ? `${ERROR_QUERIES_DATABASE} --> ${className}`
+    ? `${ERROR_QUERIES_DATABASE} --> ${className} in ${message}`
     : `${ERROR_INTERNAL} --> ${className}`;
   console.log(messageLog);
   console.log('ERROR: ');

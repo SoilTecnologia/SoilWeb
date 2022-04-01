@@ -13,7 +13,12 @@ class AuthSignInController {
 
       res.status(200).send(cookieInfo);
     } catch (err) {
-      messageErrorTryAction(err, false, ` TRY LOGIN`);
+      messageErrorTryAction(
+        err,
+        false,
+        AuthSignInController.name,
+        ` TRY LOGIN`
+      );
       next();
     }
   }

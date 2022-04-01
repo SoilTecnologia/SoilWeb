@@ -56,7 +56,7 @@ class AuthSignInUseCase {
 
       this.user = user;
     } catch (err) {
-      messageErrorTryAction(err, true, 'LOGIN USER');
+      messageErrorTryAction(err, true, AuthSignInUseCase.name, 'LOGIN USER');
     }
   }
 

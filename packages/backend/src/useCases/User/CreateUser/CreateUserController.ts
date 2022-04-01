@@ -22,7 +22,12 @@ class CreateUserController {
 
       return response.status(201).send(result);
     } catch (err) {
-      messageErrorTryAction(err, false, 'TRY CREATE USER');
+      messageErrorTryAction(
+        err,
+        false,
+        CreateUserController.name,
+        'TRY CREATE USER'
+      );
       next(err);
     }
   }
