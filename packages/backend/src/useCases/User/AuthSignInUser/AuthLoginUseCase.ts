@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import { inject, injectable } from 'tsyringe';
 import { UserModel } from '../../../database/model/User';
 import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
-import { InvalidCredentials } from '../../../types/errors';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -66,7 +65,7 @@ class AuthSignInUseCase {
 
     const comparePassword = await this.comparePassword(password);
 
-    if (!this.user || !comparePassword) throw new InvalidCredentials();
+    if (!this.user || !comparePassword) throw new Error('Invalid Credentials');
     else return this.generateTokenJwt();
   }
 }
