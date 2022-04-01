@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { IActionRepository } from '../../../database/repositories/Action/IActionRepository';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class GetAllActionsUseCase {
@@ -7,10 +8,21 @@ class GetAllActionsUseCase {
     @inject('ActionsRepository') private actionRepository: IActionRepository
   ) {}
 
-  async execute() {
-    const actions = await this.actionRepository.getNotSucess();
+  private async applyQueryGetAllACtions() {
+    try {
+      return await this.actionRepository.getNotSucess();
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        GetAllActionsUseCase.name,
+        'Get All Actions'
+      );
+    }
+  }
 
-    return actions;
+  async execute() {
+    return await this.applyQueryGetAllACtions();
   }
 }
 

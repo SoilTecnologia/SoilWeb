@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { GetAllActionsUseCase } from './GetAllActionUseCase';
 
 class GetAllActionsController {
@@ -10,8 +11,12 @@ class GetAllActionsController {
 
       res.json(actions);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /actions/read`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        GetAllActionsController.name,
+        'Get All Actions'
+      );
       next(err);
     }
   }

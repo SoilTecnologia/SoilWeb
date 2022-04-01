@@ -5,6 +5,7 @@ import { IActionRepository } from '../../../database/repositories/Action/IAction
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import emitter from '../../../utils/eventBus';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class CreateActionUseCase {
@@ -14,21 +15,64 @@ class CreateActionUseCase {
     @inject('NodesRepository') private nodeRepository: INodesRepository
   ) {}
 
+  private async applyQueryGetPivotByPivot(pivot_id: string) {
+    try {
+      return await this.pivotRepository.findById(pivot_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        CreateActionUseCase.name,
+        'Get Pivot By Pivot Id'
+      );
+    }
+  }
+
+  private async applyQueryCreatedAction(action: CreateAction) {
+    try {
+      return await this.actionRepository.create(action);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        CreateActionUseCase.name,
+        'Create Action'
+      );
+    }
+  }
+
+  private async applyQueryGetNodeByNode(node_id: string) {
+    try {
+      return await this.nodeRepository.findById(node_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        CreateActionUseCase.name,
+        'Get Node By Node Id'
+      );
+    }
+  }
+
   async execute(
     action: Omit<CreateAction, 'timestamp_sent'>,
     timestamp: CreateAction['timestamp_sent'] | null
   ) {
     const newTimestamp = timestamp ? timestamp : new Date();
-    const actionResult = await this.actionRepository.create({
+    const actionResult = await this.applyQueryCreatedAction({
       ...action,
       timestamp_sent: newTimestamp
     });
 
-    const pivot = await this.pivotRepository.findById(action.pivot_id);
+    if (!actionResult) throw new Error('Does Not Create Action');
+
+    const pivot = await this.applyQueryGetPivotByPivot(action.pivot_id);
+    if (!pivot) throw new Error('Does Not Find Pivot');
 
     const node = await this.nodeRepository.findById(pivot?.node_id);
+    if (!node) throw new Error('Does Not find Node');
 
-    const { farm_id, node_num, is_gprs } = node!!;
+    const { farm_id, node_num, is_gprs } = node;
 
     emitter.emit('action', {
       farm_id,
@@ -36,8 +80,8 @@ class CreateActionUseCase {
       node_num,
       payload: {
         action_id: actionResult[0].action_id!!,
-        pivot_id: pivot?.pivot_id,
-        radio_id: pivot?.radio_id,
+        pivot_id: pivot.pivot_id,
+        radio_id: pivot.radio_id,
         author: action.author,
         power: action.power,
         water: action.water,

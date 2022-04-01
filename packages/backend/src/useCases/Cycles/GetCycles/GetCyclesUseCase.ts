@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { StateModel } from '../../../database/model/State';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
+import { messageErrorTryAction } from '../../../utils/types';
 
 type PartialCycleResponse = {
   start_date: Date;
@@ -43,14 +44,39 @@ class GetCyclesUseCase {
     this.response = [] as fullCycleResponse;
   }
 
+  private async applyQueryGetVariableGroupBt(state_id: string) {
+    try {
+      return await this.stateVariablesRepository.getVariableGroupBy(state_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        GetCyclesUseCase.name,
+        'Get Variable GroupBy'
+      );
+    }
+  }
+
+  private async applyQueryGetStoryCycle(
+    pivot_id: string,
+    start: string,
+    end: string
+  ) {
+    try {
+      return await this.stateRepository.getHistoryCycle(pivot_id, start, end);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        GetCyclesUseCase.name,
+        'Get Story Cycle'
+      );
+    }
+  }
+
   async execute(pivot_id: StateModel['pivot_id'], start: string, end: string) {
     // Get all status from a pivot and order it by last to more recent
-    const states = await this.stateRepository.getHistoryCycle(
-      pivot_id,
-      start,
-      end
-    );
-
+    const states = await this.applyQueryGetStoryCycle(pivot_id, start, end);
     /* 
     This will loop over all the states,
     once it finds a state with power = true,
@@ -59,7 +85,7 @@ class GetCyclesUseCase {
     until it finds a state with power = false
   */
 
-    for (let state of states) {
+    for (let state of states!!) {
       if (this.foundStart) {
         if (state.power === false) {
           this.currentCycle!.is_running = false;
@@ -107,9 +133,9 @@ class GetCyclesUseCase {
         }
       }
 
-      const variables = await this.stateVariablesRepository.getVariableGroupBy(
-        state.state_id
-      );
+      const variables = await this.applyQueryGetVariableGroupBt(state.state_id);
+
+      if (!variables) throw new Error('Does Not Find Variables');
 
       for (let variable of variables) {
         if (variable)

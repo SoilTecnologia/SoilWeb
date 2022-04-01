@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { GetCyclesUseCase } from './GetCyclesUseCase';
 
 class GetCycleController {
@@ -12,8 +13,7 @@ class GetCycleController {
       const pivotList = await getCyclesUseCase.execute(pivot_id, start, end);
       res.json(pivotList);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/cycles/start/end`);
-      console.log(err);
+      messageErrorTryAction(err, false, GetCycleController.name, 'Get Cycle');
       next(err);
     }
   }

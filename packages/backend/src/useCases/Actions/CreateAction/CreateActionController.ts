@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { CreateActionUseCase } from './CreateActionUseCase';
 
 export interface IUserAuthInfoRequest extends Request {
@@ -32,8 +33,12 @@ class CreateActionController {
 
       res.json(newAction);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /actions/create`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        CreateActionController.name,
+        'Create Action'
+      );
       next(err);
     }
   }
