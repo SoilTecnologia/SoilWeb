@@ -1,13 +1,12 @@
 import Header from "components/globalComponents/Header";
+import { useContextData } from "hooks/useContextData";
 import Farm from "utils/models/farm";
 import FarmsContainer from "../FarmsCard";
 import * as S from "./styles";
 
-type FarmListProps = {
-  farmList: Farm[];
-};
+const MainFarm = () => {
+  const { farmList } = useContextData();
 
-const MainFarm = ({ farmList }: FarmListProps) => {
   return (
     <>
       <Header text={"Fazendas"} />

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { DeleteUserUseCase } from './deleteUserUseCase';
 
 class DeleteUserController {
@@ -10,8 +11,7 @@ class DeleteUserController {
       const notUser = await deleteUserUseCase.execute(id);
       res.sendStatus(200).send(notUser);
     } catch (err) {
-      console.log(`[ERROR] 500 on /users/deleteUser`);
-      console.log(err);
+      messageErrorTryAction(err, false, 'Delete User');
       next(err);
     }
   }

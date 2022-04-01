@@ -100,6 +100,7 @@ export const requestGetAllFarms = async (tokenId: tokenState) => {
       return null;
     });
 };
+
 export const requestOneFarm = async (farmId: string, tokenId: tokenState) => {
   return await api
     .get<Farm | undefined>(`farms/getOneFarm/${farmId}`, tokenHeader(tokenId))
@@ -163,6 +164,7 @@ export const requestCreateNode = async (
       console.log(err);
     });
 };
+
 export const requestGetAllNodes = async (
   farm_id: Farm["farm_id"],
   tokenId: tokenState
@@ -215,6 +217,7 @@ export const requestGetAllPivots = async (
       console.log(err);
     });
 };
+
 export const requestFindAllPivots = async (tokenId: tokenState) => {
   return await api
     .get(`pivots/findAll`, tokenHeader(tokenId))
@@ -239,6 +242,7 @@ export const requestCreateNewPivot = async (
       console.log(err);
     });
 };
+
 export const requestDeletePivot = async (
   pivot_id: Pivot["pivot_id"],
   tokenId: tokenState
@@ -251,6 +255,7 @@ export const requestDeletePivot = async (
       console.log(err);
     });
 };
+
 export const requestUpdatePivot = async (
   newPivot: Pivot,
   tokenId: tokenState
@@ -263,6 +268,7 @@ export const requestUpdatePivot = async (
       console.log(err);
     });
 };
+
 export const requestGetNodeWithPivotNum = async (
   node: NodeCreate,
   tokenId: tokenState
