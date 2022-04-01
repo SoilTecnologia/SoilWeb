@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { FarmModel } from '../../../database/model/Farm';
+import { messageErrorTryAction } from '../../../utils/types';
 import { CreateFarmUseCase } from './CreateFarmUseCase';
 
 class CreateFarmController {
@@ -29,8 +30,12 @@ class CreateFarmController {
       const farm = await createFarmUseCase.execute(newFarm);
       res.status(200).send(farm);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /users/addFarm!`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        CreateFarmController.name,
+        'Create Farm'
+      );
       next(err);
     }
   }
