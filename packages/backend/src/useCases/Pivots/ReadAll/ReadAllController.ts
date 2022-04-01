@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { ReadAllUseCase } from './ReadAllUseCase';
 
 class ReadAllController {
@@ -13,8 +14,12 @@ class ReadAllController {
 
       res.status(200).send(allPivotsFromNode);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/readAll`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        ReadAllController.name,
+        'Read All data Pivot'
+      );
       next(err);
     }
   }
