@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { GetAllPivotsUseCase } from './GetAllPivotsUseCase';
 
 class GetAllPivotsController {
@@ -15,8 +16,12 @@ class GetAllPivotsController {
         res.status(201).send('Id not identifier');
       }
     } catch (err) {
-      console.log(`[ERROR] Server 500 on pivots`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        GetAllPivotsController.name,
+        'Get All Pivots Of The Farms'
+      );
       next(err);
     }
   }
