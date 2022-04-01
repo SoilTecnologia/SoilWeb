@@ -42,7 +42,7 @@ class ReadPivotStateUseCase {
     const getLastCycleUseCase = container.resolve(GetLastCycleUseCase);
     const pivot = await this.applyQueryGetPivotByPivot(pivot_id);
 
-    const state = await this.statesRepository.findByPivotId(pivot_id);
+    const state = await this.applyQueryGetStateByPivot(pivot_id);
     const variables = await getLastCycleUseCase.execute(pivot_id);
 
     const variableIsNotEmpty = variables && variables.length > 0;
