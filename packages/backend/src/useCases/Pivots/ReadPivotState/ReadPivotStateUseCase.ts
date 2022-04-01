@@ -2,6 +2,7 @@ import { container, inject, injectable } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
+import { messageErrorTryAction } from '../../../utils/types';
 import { GetLastCycleUseCase } from '../../Cycles/GetLastCycles/GetLastCycleUseCase';
 
 @injectable()
@@ -11,9 +12,35 @@ class ReadPivotStateUseCase {
     @inject('StatesRepository') private statesRepository: IStateRepository
   ) {}
 
+  private async applyQueryGetPivotByPivot(pivot_id: string) {
+    try {
+      return await this.pivotRepository.findById(pivot_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        ReadPivotStateUseCase.name,
+        'Get Pivot By Id'
+      );
+    }
+  }
+
+  private async applyQueryGetStateByPivot(pivot_id: string) {
+    try {
+      return await this.statesRepository.findByPivotId(pivot_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        ReadPivotStateUseCase.name,
+        'Get State By Pivot Id'
+      );
+    }
+  }
+
   async execute(pivot_id: PivotModel['pivot_id']) {
     const getLastCycleUseCase = container.resolve(GetLastCycleUseCase);
-    const pivot = await this.pivotRepository.findById(pivot_id);
+    const pivot = await this.applyQueryGetPivotByPivot(pivot_id);
 
     const state = await this.statesRepository.findByPivotId(pivot_id);
     const variables = await getLastCycleUseCase.execute(pivot_id);

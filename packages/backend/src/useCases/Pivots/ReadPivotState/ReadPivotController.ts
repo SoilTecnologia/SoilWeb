@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { ReadPivotStateUseCase } from './ReadPivotStateUseCase';
 
 class ReadPivotStateController {
@@ -12,8 +13,12 @@ class ReadPivotStateController {
 
       res.send(pivotState);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/state`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        ReadPivotStateController.name,
+        'Read State Pivot'
+      );
       next(err);
     }
   }
