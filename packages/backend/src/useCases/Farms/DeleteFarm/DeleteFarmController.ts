@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { DeleteFarmUseCase } from './DeleteFarmUseCase';
 
 class DeleteFarmController {
@@ -13,8 +14,12 @@ class DeleteFarmController {
 
       res.sendStatus(200).send(deletedFarm);
     } catch (err) {
-      console.log('[ERROR] 500 Internal server error');
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        DeleteFarmController.name,
+        'Delete Farm'
+      );
       next(err);
     }
   }
