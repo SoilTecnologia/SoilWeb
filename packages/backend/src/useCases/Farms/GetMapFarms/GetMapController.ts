@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { GetMapFarmUseCase } from './GetMapFarmsuseCase';
 
 class GetMapFarmsController {
@@ -13,8 +14,12 @@ class GetMapFarmsController {
 
       res.json(result);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /farms/map`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        GetMapFarmsController.name,
+        'Get Map Farms '
+      );
       next(err);
     }
   }

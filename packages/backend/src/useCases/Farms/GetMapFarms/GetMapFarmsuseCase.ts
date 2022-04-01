@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { FarmModel } from '../../../database/model/Farm';
 import { IFarmsRepository } from '../../../database/repositories/Farms/IFarmsRepository';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class GetMapFarmUseCase {
@@ -8,8 +9,16 @@ class GetMapFarmUseCase {
     @inject('FarmsRepository') private farmRepositor: IFarmsRepository
   ) {}
 
-  execute(farm_id: FarmModel['farm_id']) {
-    const dataFarms = this.farmRepositor.getMapFarm(farm_id);
+  private async applyQueryGetMapFarm(farm_id: string) {
+    try {
+      return await this.farmRepositor.getMapFarm(farm_id);
+    } catch (err) {
+      messageErrorTryAction(err, true, GetMapFarmUseCase.name, 'Get Map farms');
+    }
+  }
+
+  async execute(farm_id: FarmModel['farm_id']) {
+    const dataFarms = await this.applyQueryGetMapFarm(farm_id);
 
     return dataFarms;
   }
