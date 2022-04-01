@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { GetPivotStateUseCase } from './GetPivotStateUseCase';
 
 class GetPivotStateController {
@@ -12,8 +13,12 @@ class GetPivotStateController {
 
       res.status(200).send(pivotState);
     } catch (err) {
-      console.log('ERROR');
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        GetPivotStateController.name,
+        'Get State Pivot'
+      );
       next(err);
     }
   }
