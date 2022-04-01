@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { ReadMapUseCase } from './ReadMapUseCase';
 
 class ReadMapController {
@@ -12,8 +13,12 @@ class ReadMapController {
       const pivotList = await readMapUseCase.execute(farm_id);
       res.json(pivotList);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /pivots/map`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        ReadMapController.name,
+        'Read Map Pivots'
+      );
       next(err);
     }
   }
