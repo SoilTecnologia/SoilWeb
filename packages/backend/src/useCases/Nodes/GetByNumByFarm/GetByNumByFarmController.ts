@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { GetByNumByFarmUseCase } from './GetByNumByFarmUseCase';
 
 class GetByNumByFarmController {
@@ -16,8 +17,12 @@ class GetByNumByFarmController {
 
       res.send(allNodesFromFarm);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /nodes/readAll`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        GetByNumByFarmController.name,
+        'Get Node By Farm and Node Num'
+      );
       next(err);
     }
   }

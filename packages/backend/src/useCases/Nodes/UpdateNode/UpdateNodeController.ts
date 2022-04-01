@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { UpdateNodeUseCase } from './UpdateNodeUseCase';
 
 class UpdateNodeController {
@@ -19,8 +20,12 @@ class UpdateNodeController {
 
       res.send(newNode);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /nodes/addNode`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        UpdateNodeController.name,
+        'Update Node '
+      );
       next(err);
     }
   }

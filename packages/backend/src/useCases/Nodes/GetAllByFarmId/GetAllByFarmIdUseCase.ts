@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { NodeModel } from '../../../database/model/Node';
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class GetAllByFarmIdUseCase {
@@ -8,10 +9,21 @@ class GetAllByFarmIdUseCase {
     @inject('NodesRepository') private nodeRepository: INodesRepository
   ) {}
 
-  async execute(farm_id: NodeModel['farm_id']) {
-    const nodes = await this.nodeRepository.findListByFarms(farm_id);
+  private async applyQueryGetNodesByFarm(farm_id: string) {
+    try {
+      return await this.nodeRepository.findListByFarms(farm_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        GetAllByFarmIdUseCase.name,
+        'Get All nodes By Farm'
+      );
+    }
+  }
 
-    return nodes;
+  async execute(farm_id: NodeModel['farm_id']) {
+    return await this.applyQueryGetNodesByFarm(farm_id);
   }
 }
 

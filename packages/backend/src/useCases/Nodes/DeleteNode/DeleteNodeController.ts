@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { messageErrorTryAction } from '../../../utils/types';
 import { DeleteNodeUseCase } from './DeleteNodeUseCase';
 
 class DeleteNodeController {
@@ -13,8 +14,12 @@ class DeleteNodeController {
 
       res.send(newNode);
     } catch (err) {
-      console.log(`[ERROR] Server 500 on /nodes/addNode`);
-      console.log(err);
+      messageErrorTryAction(
+        err,
+        false,
+        DeleteNodeController.name,
+        'Delete Node '
+      );
       next(err);
     }
   }
