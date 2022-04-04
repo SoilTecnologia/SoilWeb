@@ -5,7 +5,7 @@ import { SchedulingModel } from "../../model/Scheduling";
 interface ISchedulingRepository{
     findByPivotId(
         pivot_id: PivotModel['pivot_id']
-    ) : Promise<SchedulingModel | undefined>;
+    ) : Promise<SchedulingModel[]>;
 
     findById(scheduling_id: SchedulingModel['scheduling_id']) : Promise<SchedulingModel | undefined>
 

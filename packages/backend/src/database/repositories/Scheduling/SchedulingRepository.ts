@@ -1,15 +1,13 @@
-import { result } from "lodash";
 import knex from "../..";
 import { SchedulingModel } from "../../model/Scheduling";
 import { ISchedulingRepository } from "./ISchedulingRepository";
 
 class SchedulingRepository implements ISchedulingRepository {
-    async findByPivotId(pivot_id: string): Promise<SchedulingModel | undefined> {
+    async findByPivotId(pivot_id: string): Promise<SchedulingModel[]> {
         return await knex<SchedulingModel>('schedulings')
-        .select()
-        .where([pivot_id])
-        .orderBy('timestamp', 'desc')
-        .first();
+        .select('*')
+        .where({ pivot_id })
+        .orderBy('timestamp', 'desc');
     }
 
     async findById(scheduling_id: string): Promise<SchedulingModel | undefined> {
