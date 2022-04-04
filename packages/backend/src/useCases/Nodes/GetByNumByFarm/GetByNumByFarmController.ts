@@ -23,7 +23,7 @@ class GetByNumByFarmController {
         GetByNumByFarmController.name,
         'Get Node By Farm and Node Num'
       );
-      next(err);
+      next();
     }
   }
 }

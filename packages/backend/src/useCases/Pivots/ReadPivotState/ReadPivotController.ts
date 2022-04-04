@@ -19,7 +19,7 @@ class ReadPivotStateController {
         ReadPivotStateController.name,
         'Read State Pivot'
       );
-      next(err);
+      next();
     }
   }
 }

@@ -17,7 +17,7 @@ class DeleteUserController {
         DeleteUserController.name,
         'Delete User'
       );
-      next(err);
+      next();
     }
   }
 }

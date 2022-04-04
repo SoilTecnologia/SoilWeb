@@ -18,7 +18,7 @@ class ReadListController {
         ReadListController.name,
         'Read List Pivots'
       );
-      next(err);
+      next();
     }
   }
 }

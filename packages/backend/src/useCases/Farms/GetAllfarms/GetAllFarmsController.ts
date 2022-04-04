@@ -17,7 +17,7 @@ class GetAllFarmsController {
         GetAllFarmsController.name,
         'Get All Farms'
       );
-      next(err);
+      next();
     }
   }
 }

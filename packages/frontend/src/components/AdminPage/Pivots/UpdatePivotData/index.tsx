@@ -45,7 +45,9 @@ const UpdatePivotData = ({ pivotData, closeModal }: updateFarmProps) => {
   const handlePivot = async (newNode_num: number) => {
     const node = await getOneNode(pivotData.node_id);
 
-    node && updateNode({ ...node, node_num: newNode_num });
+    if (node && node.node_num !== 0) {
+      updateNode({ ...node, node_num: newNode_num });
+    }
   };
 
   const handleDataForm = (formData: PivotForm) => {

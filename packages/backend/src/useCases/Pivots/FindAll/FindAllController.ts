@@ -17,7 +17,7 @@ class FindAllController {
         FindAllController.name,
         'Get All Pivots'
       );
-      next(err);
+      next();
     }
   }
 }

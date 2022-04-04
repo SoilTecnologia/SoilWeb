@@ -19,7 +19,7 @@ class GetPivotStateController {
         GetPivotStateController.name,
         'Get State Pivot'
       );
-      next(err);
+      next();
     }
   }
 }

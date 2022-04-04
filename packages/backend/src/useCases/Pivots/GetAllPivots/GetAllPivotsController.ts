@@ -22,7 +22,7 @@ class GetAllPivotsController {
         GetAllPivotsController.name,
         'Get All Pivots Of The Farms'
       );
-      next(err);
+      next();
     }
   }
 }

@@ -39,7 +39,7 @@ class CreateActionController {
         CreateActionController.name,
         'Create Action'
       );
-      next(err);
+      next();
     }
   }
 }

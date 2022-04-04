@@ -42,7 +42,7 @@ class UpdateStatePivotController {
         UpdateStatePivotController.name,
         'Update State Pivot'
       );
-      next(err);
+      next();
     }
   }
 }

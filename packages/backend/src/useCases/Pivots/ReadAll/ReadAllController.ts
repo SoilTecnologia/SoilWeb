@@ -20,7 +20,7 @@ class ReadAllController {
         ReadAllController.name,
         'Read All data Pivot'
       );
-      next(err);
+      next();
     }
   }
 }

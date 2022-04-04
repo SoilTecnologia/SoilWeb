@@ -18,7 +18,7 @@ class UpdateFarmController {
         UpdateFarmController.name,
         'Update Farm'
       );
-      next(err);
+      next();
     }
   }
 }

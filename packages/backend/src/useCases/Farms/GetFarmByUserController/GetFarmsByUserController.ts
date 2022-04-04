@@ -15,7 +15,7 @@ class GetFarmsByUserController {
     } catch (err) {
       console.log(`[ERROR] Server 500 on /farms/readAll`);
       console.log(err);
-      next(err);
+      next();
     }
   }
 }

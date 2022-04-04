@@ -14,7 +14,7 @@ class GetCycleController {
       res.json(pivotList);
     } catch (err) {
       messageErrorTryAction(err, false, GetCycleController.name, 'Get Cycle');
-      next(err);
+      next();
     }
   }
 }

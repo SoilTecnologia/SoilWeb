@@ -36,7 +36,7 @@ class CreateFarmController {
         CreateFarmController.name,
         'Create Farm'
       );
-      next(err);
+      next();
     }
   }
 }

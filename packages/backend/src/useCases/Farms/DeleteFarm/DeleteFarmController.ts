@@ -20,7 +20,7 @@ class DeleteFarmController {
         DeleteFarmController.name,
         'Delete Farm'
       );
-      next(err);
+      next();
     }
   }
 }

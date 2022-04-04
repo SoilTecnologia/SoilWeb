@@ -20,7 +20,7 @@ class GetOneNodeController {
         GetOneNodeController.name,
         'Get Node By Id'
       );
-      next(err);
+      next();
     }
   }
 }

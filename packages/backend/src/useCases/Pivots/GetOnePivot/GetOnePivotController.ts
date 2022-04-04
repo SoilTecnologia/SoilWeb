@@ -21,7 +21,7 @@ class GetOnePivotController {
         GetOnePivotController.name,
         'Get One Pivot Of The Farm'
       );
-      next(err);
+      next();
     }
   }
 }

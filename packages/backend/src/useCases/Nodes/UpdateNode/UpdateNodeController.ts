@@ -26,7 +26,7 @@ class UpdateNodeController {
         UpdateNodeController.name,
         'Update Node '
       );
-      next(err);
+      next();
     }
   }
 }

@@ -20,7 +20,7 @@ class GetMapFarmsController {
         GetMapFarmsController.name,
         'Get Map Farms '
       );
-      next(err);
+      next();
     }
   }
 }

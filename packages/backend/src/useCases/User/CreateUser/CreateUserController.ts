@@ -28,7 +28,7 @@ class CreateUserController {
         CreateUserController.name,
         'TRY CREATE USER'
       );
-      next(err);
+      next();
     }
   }
 }

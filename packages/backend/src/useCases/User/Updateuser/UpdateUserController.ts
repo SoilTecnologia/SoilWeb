@@ -28,7 +28,7 @@ class UpdateUserController {
         UpdateUserController.name,
         'Update User'
       );
-      next(err);
+      next();
     }
   }
 }

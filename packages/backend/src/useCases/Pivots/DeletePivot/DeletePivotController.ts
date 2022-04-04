@@ -20,7 +20,7 @@ class DeletePivotController {
         DeletePivotController.name,
         'Delete Pivot'
       );
-      next(err);
+      next();
     }
   }
 }

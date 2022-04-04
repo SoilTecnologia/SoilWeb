@@ -15,7 +15,7 @@ class GetAllByFarmIdController {
     } catch (err) {
       console.log(`[ERROR] Server 500 on /nodes/readAll`);
       console.log(err);
-      next(err);
+      next();
     }
   }
 }

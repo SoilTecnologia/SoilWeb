@@ -40,7 +40,7 @@ class CreatePivotController {
         CreatePivotController.name,
         'Create Pivot'
       );
-      next(err);
+      next();
     }
   }
 }

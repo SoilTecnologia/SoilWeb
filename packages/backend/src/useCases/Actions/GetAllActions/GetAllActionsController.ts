@@ -17,7 +17,7 @@ class GetAllActionsController {
         GetAllActionsController.name,
         'Get All Actions'
       );
-      next(err);
+      next();
     }
   }
 }

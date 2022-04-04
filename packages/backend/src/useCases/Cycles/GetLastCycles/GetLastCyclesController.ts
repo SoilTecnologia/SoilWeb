@@ -14,7 +14,7 @@ class GetLastCycleController {
     } catch (err) {
       console.log(`[ERROR] Server 500 on /pivots/cycles`);
       console.log(err);
-      next(err);
+      next();
     }
   }
 }

@@ -16,7 +16,7 @@ class GetAllUserController {
         GetAllUserController.name,
         'Get All Users'
       );
-      next(err);
+      next();
     }
   }
 }

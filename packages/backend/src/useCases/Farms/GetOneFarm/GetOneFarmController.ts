@@ -20,7 +20,7 @@ class GetOneFarmController {
         GetOneFarmController.name,
         'Get One Farm'
       );
-      next(err);
+      next();
     }
   }
 }

@@ -19,7 +19,7 @@ class ReadMapController {
         ReadMapController.name,
         'Read Map Pivots'
       );
-      next(err);
+      next();
     }
   }
 }

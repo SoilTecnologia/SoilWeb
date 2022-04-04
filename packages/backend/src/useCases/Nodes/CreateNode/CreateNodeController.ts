@@ -20,7 +20,7 @@ class CreateNodeController {
     } catch (err) {
       console.log(`[ERROR] Server 500 on /nodes/addNode`);
       console.log(err);
-      next(err);
+      next();
     }
   }
 }
