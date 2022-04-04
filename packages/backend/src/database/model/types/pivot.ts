@@ -23,7 +23,7 @@ interface Pivot extends pivotCreate {
   pivot_id: string;
   // last_communication: Date;
 }
-export interface realdAllPivots extends PivotModel {
+export interface readAllPivots extends PivotModel {
   node_num: number;
   is_grps: boolean;
   gateway: string;

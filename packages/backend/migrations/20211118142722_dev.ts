@@ -167,7 +167,31 @@ export async function up(knex: Knex): Promise<void> {
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
-    });
+    })
+
+    .createTable('schedulings',(table) =>{
+      table
+        .uuid('scheduling_id')
+        .primary()
+        .defaultTo(knex.raw('(uuid_generate_v4())'));
+      table
+        .string('pivot_id')
+        .references('pivot_id')
+        .inTable('pivots')
+        .index()
+        .notNullable()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+      table.boolean('power');
+      table.boolean('water');
+      table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);
+      table.float('start_angle');
+      table.float('end_angle')
+      table.float('percentimeter');
+      table.dateTime('start_timestamp');
+      table.dateTime('end_timestamp');
+      table.dateTime('timestamp').notNullable();
+    })
 }
 
 export async function down(knex: Knex): Promise<void> {
@@ -202,6 +226,10 @@ export async function down(knex: Knex): Promise<void> {
       table.dropPrimary();
       table.dropForeign('user_id');
     })
+    .alterTable('schedulings', (table)=>{
+      table.dropPrimary();
+      table.dropForeign('pivot_id');
+    })
     .alterTable('users', (table) => {
       table.dropPrimary();
     })
@@ -212,5 +240,6 @@ export async function down(knex: Knex): Promise<void> {
     .dropTable('pivots')
     .dropTable('nodes')
     .dropTable('farms')
-    .dropTable('users');
+    .dropTable('users')
+    .dropTable('schedulings');
 }

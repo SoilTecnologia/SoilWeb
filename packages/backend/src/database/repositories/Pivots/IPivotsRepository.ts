@@ -1,7 +1,7 @@
 import { FarmModel } from '../../model/Farm';
 import { NodeModel } from '../../model/Node';
 import { PivotModel } from '../../model/Pivot';
-import { realdAllPivots } from '../../model/types/pivot';
+import { readAllPivots } from '../../model/types/pivot';
 
 interface IPivotsRepository {
   findById(pivot_id: PivotModel['pivot_id']): Promise<PivotModel | undefined>;
@@ -26,7 +26,7 @@ interface IPivotsRepository {
 
   readAll(
     farm_id: PivotModel['farm_id']
-  ): Promise<realdAllPivots[] | undefined>;
+  ): Promise<readAllPivots[] | undefined>;
 }
 
 export { IPivotsRepository };

@@ -5,7 +5,9 @@ interface IStateRepository {
   findByPivotId(
     pivot_id: PivotModel['pivot_id']
   ): Promise<StateModel | undefined>;
+  
   findById(state_id: StateModel['state_id']): Promise<StateModel | undefined>;
+
   create(state: Omit<StateModel, 'state_id'>): Promise<StateModel | undefined>;
 
   getLastState(
