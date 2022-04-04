@@ -9,6 +9,7 @@ class CreateSchedulingUseCase {
     @inject('SchedulingRepository')
     private schedulingRepository: SchedulingRepository
   ) {}
+
   private async applyQueryCreate(scheduling: SchedulingModel) {
     try {
       return await this.schedulingRepository.create(scheduling);
@@ -21,6 +22,7 @@ class CreateSchedulingUseCase {
       );
     }
   }
+
   async execute(scheduling: Omit<SchedulingModel, 'scheduling_id'>) {
     const {
       pivot_id,
