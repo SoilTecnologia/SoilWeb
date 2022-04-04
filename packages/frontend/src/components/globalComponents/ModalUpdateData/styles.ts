@@ -1,6 +1,9 @@
-import styled, { css } from "styled-components";
 import { FaRegTimesCircle } from "react-icons/fa";
+import styled, { css } from "styled-components";
 
+type backProps = {
+  background: string | undefined;
+};
 export const Container = styled.div`
   ${({ theme }) => css`
     position: absolute;
@@ -16,8 +19,8 @@ export const Container = styled.div`
     z-index: 10;
   `}
 `;
-export const ContentDataUser = styled.div`
-  ${({ theme }) => css`
+export const ContentDataUser = styled.div<backProps>`
+  ${({ theme, background }) => css`
     position: relative;
     min-width: 50vw;
     display: flex;
@@ -27,7 +30,7 @@ export const ContentDataUser = styled.div`
 
     margin-bottom: 7rem;
 
-    background: ${theme.colors.secondary};
+    background: ${background ? background : theme.colors.secondary};
     padding: ${theme.spacings.small} ${theme.spacings.xxsmall};
     border-radius: 2rem;
   `}

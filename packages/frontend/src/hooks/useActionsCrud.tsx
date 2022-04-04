@@ -161,8 +161,9 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   };
   const updateNode = async (node: Node) => {
     const newNode = await requestUpdateNode(node, user?.token);
-    setData(stateAdmin);
-    newNode && (await getAllNodes(node.farm_id));
+    return newNode;
+    // setData(stateAdmin);
+    // newNode && (await getAllNodes(node.farm_id));
   };
   const deleteNode = async (id: string, farm_id: string) => {
     await requestDeleteNode(id, user?.token);

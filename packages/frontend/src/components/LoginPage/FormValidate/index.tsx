@@ -35,7 +35,8 @@ const FormValidate = ({ setErrorAuth }: FormDataProps) => {
   const formRef = useRef<HTMLFormElement>(null);
 
   const onSubmit = handleSubmit(async (data) => {
-    const response = await signIn(data.user, data.password);
+    const user = data.user.toLowerCase();
+    const response = await signIn(user, data.password);
     !response && setErrorAuth(true);
   });
 

@@ -61,7 +61,7 @@ class AuthSignInUseCase {
   }
 
   async execute(login: UserModel['login'], password: UserModel['password']) {
-    await this.applyQuerie(login);
+    await this.applyQuerie(login.toLowerCase());
 
     const comparePassword = await this.comparePassword(password);
 

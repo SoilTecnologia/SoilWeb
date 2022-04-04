@@ -3,6 +3,7 @@ import ModalDeleteData from "components/globalComponents/ModalDeleteData";
 import ModalUpdateData from "components/globalComponents/ModalUpdateData";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useState } from "react";
+import theme from "styles/theme";
 import Pivot from "utils/models/pivot";
 import UpdatePivotData from "../UpdatePivotData";
 import * as S from "./styles";
@@ -89,7 +90,10 @@ const BoxPivots = ({ pivotData }: boxPivotProps) => {
         />
       )}
       {updatePivot && (
-        <ModalUpdateData closeModal={closeModalUpdate}>
+        <ModalUpdateData
+          closeModal={closeModalUpdate}
+          background={theme.colors.primary_gradient}
+        >
           <UpdatePivotData
             pivotData={pivotData}
             closeModal={closeModalUpdate}

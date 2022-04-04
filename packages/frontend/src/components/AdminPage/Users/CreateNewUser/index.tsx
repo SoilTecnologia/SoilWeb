@@ -1,15 +1,12 @@
-import * as S from "./styles";
-import { useRef } from "react";
-
-import { useContextActionCrud } from "hooks/useActionsCrud";
-
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import { useForm } from "react-hook-form";
-
-import SelectOptionsComponent from "components/globalComponents/SelectOptionsComponent";
 import ContentInputs from "components/globalComponents/ContentInputs";
+import SelectOptionsComponent from "components/globalComponents/SelectOptionsComponent";
+import { useContextActionCrud } from "hooks/useActionsCrud";
+import { useRef } from "react";
+import { useForm } from "react-hook-form";
 import { UserCreate } from "utils/models/user";
+import * as Yup from "yup";
+import * as S from "./styles";
 
 const schema = Yup.object({
   login: Yup.string().required("Digite seu login"),
@@ -39,15 +36,16 @@ const CreateNewUser = () => {
     formState: { errors },
   } = useForm<UserCreate>({ resolver: yupResolver(schema) });
   const formRef = useRef<HTMLFormElement>(null);
+
   //Functions
-  const onSubmit = handleSubmit(({ user_type, login, password }) => {
-    const newUser: UserCreate = {
-      user_type,
-      login,
-      password,
-    };
-    createUser(newUser);
+  const onSubmit = handleSubmit(async (data) => {
+    createUser({
+      user_type: data.user_type,
+      login: data.login?.toLowerCase(),
+      password: data.password,
+    });
   });
+
   return (
     <S.Container>
       <S.Form onSubmit={onSubmit} ref={formRef}>

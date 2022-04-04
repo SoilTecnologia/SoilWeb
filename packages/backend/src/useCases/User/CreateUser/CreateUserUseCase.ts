@@ -11,7 +11,7 @@ class CreateUserUseCase {
     @inject('UsersRepository') private userRepository: IUsersRepository
   ) {}
 
-  createJwt(user: UserModel) {
+  private createJwt(user: UserModel) {
     const token = jwt.sign(
       {
         user_id: user.user_id,
@@ -61,7 +61,9 @@ class CreateUserUseCase {
   async execute({ login, password, user_type }: UserModel) {
     const encryptedPassword = await bcrypt.hash(password, 10);
 
-    const userALreadyExists = await this.apllyQueryFindUser(login);
+    const userALreadyExists = await this.apllyQueryFindUser(
+      login.toLowerCase()
+    );
 
     const userModel = new UserModel();
 
@@ -69,7 +71,7 @@ class CreateUserUseCase {
       throw new Error('This Users already exists in database');
 
     Object.assign(userModel, {
-      login,
+      login: login.toLowerCase(),
       password: encryptedPassword,
       user_type
     });

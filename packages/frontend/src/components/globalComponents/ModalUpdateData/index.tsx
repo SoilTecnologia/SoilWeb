@@ -3,11 +3,16 @@ import * as S from "./styles";
 type modalOptionsProps = {
   children: React.ReactNode;
   closeModal: () => void;
+  background?: string;
 };
 
-const ModalUpdateData = ({ children, closeModal }: modalOptionsProps) => (
+const ModalUpdateData = ({
+  children,
+  closeModal,
+  background,
+}: modalOptionsProps) => (
   <S.Container>
-    <S.ContentDataUser>
+    <S.ContentDataUser background={background}>
       {" "}
       <S.IconClosed onClick={closeModal} />
       {children}
