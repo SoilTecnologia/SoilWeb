@@ -118,12 +118,12 @@ class HandleActionActive {
         actionString
       );
 
-      const verifyResponseData = this.checkResponse(result.payload);
+      const verifyResponseData = result && this.checkResponse(result);
       const radioIsEquals = this.action.radio_id == data.id;
-      const allDataValids = verifyResponseData && radioIsEquals && result.match;
+      const allDataValids = verifyResponseData && radioIsEquals && result;
 
       allDataValids
-        ? this.updateActionWithCondicionsValid(result.payload)
+        ? this.updateActionWithCondicionsValid(result)
         : this.attempts++;
     } catch (err) {
       this.attempts++;
