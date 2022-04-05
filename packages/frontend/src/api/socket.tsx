@@ -25,6 +25,9 @@ const Socket = () => {
 
       })
     }
+    return () => {
+      socket.close()
+    }
   }, [user, farm])
   useEffect(() => {
 
@@ -37,6 +40,10 @@ const Socket = () => {
 
       })
     }
+    return () => {
+      socket.close()
+    }
+
   }, [pivot])
 
   return (<></>)

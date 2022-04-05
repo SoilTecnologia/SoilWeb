@@ -12,8 +12,8 @@ const Header = ({ text, subHeaderText, children }: HeaderProps) => {
 
   const dateFormater = () => {
     if (subHeaderText !== 'Nunca foi Atualizado' && subHeaderText) {
-      const updatedDate = format(new Date(subHeaderText), "dd/MM/yyyy' às 'kk:mm")
-      return updatedDate
+       const updatedDate = format(new Date(subHeaderText), "dd/MM/yyyy' às 'kk:mm")
+       return updatedDate
     }
     return 'Nunca foi Atualizado'
   }

@@ -21,6 +21,7 @@ import {
   requestUpdateUser,
   requestSendPivotIntent,
   requestPivotStatus,
+  requestGetAllPivotsForMapWithFarmId
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
@@ -58,8 +59,9 @@ interface actionCrudProps {
   deletePivot: (pivot: Pivot) => void;
   getGetPivotsListWithFarmId: (farm_id: Farm["farm_id"]) => void;
   getAllPivotWithFarmId: (farm_id: Farm["farm_id"]) => void;
-  sendPivotIntent: (pivotId: string, intent: Intent) => void
-  getPivotState: (pivot_id: Pivot['pivot_id']) => void
+  sendPivotIntent: (pivotId: string, intent: Intent) => void;
+  getPivotState: (pivot_id: Pivot['pivot_id']) => void;
+  getGetPivotsListForMapWithFarmId: (farm_id: Farm["farm_id"]) => Promise<void>;
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -74,6 +76,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     setFarmList,
     setNodeList,
     setPivotList,
+    setPivotMapList
   } = useContextData();
   const { user } = useContextAuth();
   const { setPivot } = useContextUserData()
@@ -194,6 +197,10 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const result = await requestGetPivotsListWithFarmId(farm_id, user?.token);
     result && setPivotList(result);
   };
+  const getGetPivotsListForMapWithFarmId = async (farm_id: Farm["farm_id"]) => {
+    const result = await requestGetAllPivotsForMapWithFarmId(farm_id, user?.token);
+    result && setPivotMapList(result);
+  };
 
   return (
     <ActionCrudContext.Provider
@@ -220,6 +227,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         getGetPivotsListWithFarmId,
         sendPivotIntent,
         getPivotState,
+        getGetPivotsListForMapWithFarmId,
       }}
     >
       {children}

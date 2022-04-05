@@ -11,6 +11,7 @@ export type PivotCreate = {
 };
 
 interface Pivot extends PivotCreate {
+  end_angle: number;
   pivot_id: string;
   pivot_name?: string;
   state_id?: string;

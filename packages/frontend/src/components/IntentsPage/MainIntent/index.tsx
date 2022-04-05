@@ -25,9 +25,9 @@ const MainIntent = () => {
 
   const getTimestamp = () => {
     if (pivot && pivotList) {
-      const timeStamp = pivotList.map((pivots) => (pivots.pivot_id == pivot.pivot_id ? pivots.timestamp : null))
-      console.log(timeStamp.toString())
-      return timeStamp.toString()
+      const pivotsFiltered = pivotList.filter((pivots) => pivots.pivot_id == pivot.pivot_id)
+      const timeStamp = pivotsFiltered[0].timestamp;
+      return timeStamp
     }
     return null
   }
