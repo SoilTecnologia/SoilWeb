@@ -10,6 +10,13 @@ type IdleData = {
   attempts: number;
 };
 
+type RadioResponse = {
+  cmd: number;
+  id: number;
+  payload: Array<number>;
+  status: string;
+};
+
 class CheckStatusRadio {
   private attempts: number;
 
@@ -18,6 +25,8 @@ class CheckStatusRadio {
   private radio_id: number;
 
   private idleQueue: GenericQueue<IdleData>;
+
+  private dataSend: RadioResponse | null;
 
   private getUpdatePivotController: UpdatePivotStateUseCase;
 
@@ -29,6 +38,7 @@ class CheckStatusRadio {
     this.attempts = current.attempts;
     this.pivot_id = current.pivot_id;
     this.radio_id = current.radio_id;
+    this.dataSend = null;
   }
 
   async updateStateChageIsTrue(payload: StatusObject) {
@@ -47,9 +57,9 @@ class CheckStatusRadio {
     this.attempts = 0;
   }
 
-  async checkFailurePivot() {
+  async sendFaillureRadio() {
     if (this.attempts >= 4) {
-      console.log("Mais de 4 tentativas")
+      console.log('Mais de 4 tentativas');
       console.log('Failing PIVOT');
       // Tratar de enviar esse stats de falha de conexão com pivo para nuvem
       // E a nuvem mandar confirmação para o concentrador *ACK
@@ -65,36 +75,43 @@ class CheckStatusRadio {
         null,
         null
       );
+
+      this.attempts = 0;
+      this.idleQueue.dequeue()!;
     }
-
-    this.idleQueue.dequeue()!;
-
-    // this.idleQueue.enqueue(current);
   }
 
   startChechStatusRadio = async () => {
+    if (this.attempts > 3) this.sendFaillureRadio();
     console.log('CHECKING IDLE');
-    console.log(`Checking radio ${this.radio_id}`);
+    console.log(
+      `Checking radio ${this.radio_id} of the Pivot ${this.pivot_id}`
+    );
     console.log('...........................................................');
 
     try {
-      const {
-        result,
-        data: { id }
-      } = await sendData(this.radio_id, '000-000');
+      const { result, data } = await sendData(this.radio_id, '000-000');
+      this.dataSend = data;
 
       const matchIsNotEmpty = result.match && result.match !== '';
-      const radioDataIsEquals = this.radio_id == id;
+      const radioDataIsEquals = this.radio_id == data.id;
       const dataIsValid = matchIsNotEmpty && radioDataIsEquals;
 
-      dataIsValid
-        ? this.updateStateChageIsTrue(result.payload)
-        : this.attempts++;
+      if (dataIsValid) this.updateStateChageIsTrue(result.payload);
+      else {
+        this.attempts++;
+        setTimeout(() => {
+          this.startChechStatusRadio();
+        }, 2000);
+      }
+
+      const current = this.idleQueue.dequeue()!;
+      this.attempts < 4 && this.idleQueue.enqueue(current);
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
       this.attempts++;
     } finally {
-      await this.checkFailurePivot();
+      this.dataSend = null;
     }
   };
 }

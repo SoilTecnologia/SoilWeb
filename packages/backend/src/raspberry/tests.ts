@@ -28,7 +28,7 @@ type IdleData = {
   attempts: number;
 };
 
-type RadioResponse = {
+export type RadioResponse = {
   cmd: number;
   id: number;
   payload: Array<number>;

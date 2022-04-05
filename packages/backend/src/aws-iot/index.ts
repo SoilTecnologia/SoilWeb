@@ -118,8 +118,13 @@ class IoTDevice {
       console.log(`[IOT] ${finalTopic} Enviando mensagem... `);
       console.log(string);
       console.log('');
-      const result = await this.connection.publish(finalTopic!, string, 0, false);
-      console.log(result)
+      const result = await this.connection.publish(
+        finalTopic!,
+        string,
+        0,
+        false
+      );
+      console.log(result);
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`
@@ -272,8 +277,12 @@ class IoTDevice {
   setupQueue = async () => {
     if (this.type === 'Raspberry') {
       emitter.on('status', (status) => {
-        const pivotId = status.payload.pivot_id.split('_');
-        const pivot_num = pivotId[1];
+        let results: null | { farm_id: string; node_num: string } = null;
+        handleResultString(status.payload.pivot_id).then((result) => {
+          results = result;
+        });
+        const pivot_num = Number(results!!.node_num);
+
         this.queue.enqueue({
           type: 'status',
           id: `${status.farm_id}_${status.node_num}`, // TODO status ta vindo node_num?

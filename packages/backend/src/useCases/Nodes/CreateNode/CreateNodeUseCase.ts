@@ -36,6 +36,7 @@ class CreateNodeUseCase {
       farm_id,
       node_num
     );
+    if (node_num === 0 && nodeAlreadyExits) return nodeAlreadyExits;
     if (nodeAlreadyExits) throw new Error('Node Already Exists');
 
     const nodeModel = new NodeModel();
