@@ -49,6 +49,7 @@ class CheckStatusRadio {
 
   async checkFailurePivot() {
     if (this.attempts >= 4) {
+      console.log("Mais de 4 tentativas")
       console.log('Failing PIVOT');
       // Tratar de enviar esse stats de falha de conexão com pivo para nuvem
       // E a nuvem mandar confirmação para o concentrador *ACK
@@ -66,8 +67,9 @@ class CheckStatusRadio {
       );
     }
 
-    const current = this.idleQueue.dequeue()!;
-    this.idleQueue.enqueue(current);
+    this.idleQueue.dequeue()!;
+
+    // this.idleQueue.enqueue(current);
   }
 
   startChechStatusRadio = async () => {
@@ -76,13 +78,18 @@ class CheckStatusRadio {
     console.log('...........................................................');
 
     try {
-      const { result, data } = await sendData(this.radio_id, '000-000');
+      const {
+        result,
+        data: { id }
+      } = await sendData(this.radio_id, '000-000');
 
       const matchIsNotEmpty = result.match && result.match !== '';
-      const radioDataIsEquals = this.radio_id == data.id;
+      const radioDataIsEquals = this.radio_id == id;
       const dataIsValid = matchIsNotEmpty && radioDataIsEquals;
 
-      dataIsValid ? await this.updateStateChageIsTrue : this.attempts++;
+      dataIsValid
+        ? this.updateStateChageIsTrue(result.payload)
+        : this.attempts++;
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
       this.attempts++;

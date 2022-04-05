@@ -15,9 +15,11 @@ class StatesVariablesRepository implements IStatesVariableRepository {
   async create(
     stateVariable: Omit<StateVariableModel, 'state_variable_id'>
   ): Promise<StateVariableModel> {
-    return await knex<StateVariableModel>('state_variables').insert(
-      stateVariable
-    );
+    const statsVariable = await knex<StateVariableModel>('state_variables')
+      .insert(stateVariable)
+      .returning('*');
+
+    return statsVariable[0];
   }
 
   async getAnglePercentimeter(

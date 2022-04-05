@@ -91,13 +91,12 @@ class IoTDevice {
       /*
       Aqui criamos a queue e o loop que irá ficar verificando se há mensagens na fila e enviando para o broker.
       */
-
+      console.log(`${this.type} connected to AWS IoT Core!`);
       await this.setupQueue();
     } catch (err) {
+      console.log('Aws does not connected'.toUpperCase());
       console.log(err);
     }
-
-    console.log(`${this.type} connected to AWS IoT Core!`);
   }
 
   /*
@@ -105,25 +104,27 @@ class IoTDevice {
   A função JSON.stringify() customizada converte o objeto em uma string, além de converter campos especiais como null para string. Isso é importante pois a resposta deve ser exatamente igual ao que o cliente enviou, e campos null normalmente são apagados quando se usa a função JSON.stringify() original.
  */
 
-  publish(payload: any, topic?: string) {
-    let finalTopic;
-    if (this.type === 'Cloud') finalTopic = topic;
-    else finalTopic = this.pubTopic;
+  async publish(payload: any, topic?: string) {
+    const finalTopic = this.type === 'Cloud' ? topic : this.pubTopic;
+    // let finalTopic;
+    // finalTopi
+    // if (this.type === 'Cloud') finalTopic = topic;
+    // else finalTopic = this.pubTopic;
 
     try {
       const string = JSON.stringify(payload, (k, v) =>
         v === undefined ? null : v
       );
-
-      this.connection.publish(finalTopic!, string, 0, false);
       console.log(`[IOT] ${finalTopic} Enviando mensagem... `);
       console.log(string);
       console.log('');
+      const result = await this.connection.publish(finalTopic!, string, 0, false);
+      console.log(result)
     } catch (err) {
       console.log(
-        `Error publishing to topic: ${finalTopic} from ${this.clientId}`,
-        err
+        `Error publishing to topic: ${finalTopic} from ${this.clientId}`
       );
+      console.log(err.message);
     }
   }
 
@@ -251,7 +252,10 @@ class IoTDevice {
         };
         const newTimestamp = new Date(timestamp);
 
-        await createActionUseCase.execute(newAction, newTimestamp);
+        const action = await createActionUseCase.execute(
+          newAction,
+          newTimestamp
+        );
         console.log(
           `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
         );
@@ -325,10 +329,10 @@ class IoTDevice {
   processQueue = () => {
     if (this.ready && !this.queue.isEmpty()) {
       this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
-      const current = this.queue.peek()!;
+      const current = this.queue.peek();
       const [farm_id, node_num] = current.id.split('_');
 
-      if (current.attempts && current.attempts >= 3) {
+      if (current.attempts && current.attempts > 3) {
         console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
 
         emitter.emit('action-ack-not-received', current);
@@ -341,14 +345,20 @@ class IoTDevice {
         return;
       }
 
-      const pivotId = `${farm_id}_${node_num}`;
-      const raspOrCloud = this.type === 'Raspberry' ? this.pubTopic : pivotId;
+      try {
+        const pivotId = `${farm_id}_${node_num}`;
+        const raspOrCloud = this.type === 'Raspberry' ? this.pubTopic : pivotId;
 
-      this.publish(current, raspOrCloud);
+        this.publish(current, raspOrCloud);
 
-      current.attempts!++;
+        current.attempts!!++;
 
-      this.ready = true;
+        this.ready = true;
+      } catch (err) {
+        console.log('ERROR AWS publish');
+        console.log(err.message);
+      }
+
       setTimeout(() => {
         this.processQueue();
       }, 10.0 * 1000);

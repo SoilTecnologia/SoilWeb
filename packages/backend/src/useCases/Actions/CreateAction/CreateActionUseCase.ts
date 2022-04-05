@@ -91,7 +91,7 @@ class CreateActionUseCase {
       }
     });
 
-    return action;
+    return actionResult ? true : false;
   }
 }
 

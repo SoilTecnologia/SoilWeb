@@ -142,6 +142,8 @@ class UpdatePivotStateUseCase {
         direction: newState.direction,
         timestamp
       });
+
+      console.log('STATE IS CREATED IN DATABASE');
     }
   };
 
@@ -161,12 +163,18 @@ class UpdatePivotStateUseCase {
           isStateVariableDifferent(oldStateVariable, { angle, percentimeter })
         ) {
           this.shouldNotifyUpdate = true;
-          await this.stateVariableRepository.create({
+          const stateVariable = await this.stateVariableRepository.create({
             state_id: this.state.state_id,
             angle,
             percentimeter,
             timestamp: new Date(timestamp)
           });
+
+          if (stateVariable) {
+            console.log('STATE VARIABLE IS CREATED IN DATABASE');
+            console.log(stateVariable);
+            console.log('');
+          }
         }
       }
     }
@@ -185,13 +193,19 @@ class UpdatePivotStateUseCase {
         isRadioVariableDifferent(oldRadioVariable, { father, rssi })
       ) {
         this.shouldNotifyUpdate = true;
-        await this.radioVariableRepository.create({
+        const radioVariable = await this.radioVariableRepository.create({
           pivot_id,
           state_id: this.state!.state_id,
           father,
           rssi,
           timestamp: new Date(timestamp)
         });
+
+        if (radioVariable) {
+          console.log('RADIO VARIABLE IS CREATED IN DATABASE');
+          console.log(radioVariable);
+          console.log('');
+        }
       }
     }
   };
@@ -226,8 +240,6 @@ class UpdatePivotStateUseCase {
       const farm = await this.applyQueryGetFarmByFarm(pivot.farm_id!!);
 
       if (!farm) throw new Error('Farm does Not Find');
-
-      console.log(`Node: ${JSON.stringify(node)}`);
 
       emitter.emit('status', {
         farm_id: pivot?.farm_id,
@@ -267,6 +279,8 @@ class UpdatePivotStateUseCase {
         });
       }
     }
+
+    return this.state;
   }
 }
 

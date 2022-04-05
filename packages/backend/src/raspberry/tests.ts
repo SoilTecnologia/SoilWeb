@@ -63,7 +63,7 @@ export const loadActions = async () => {
   const readPivots = container.resolve(GetAllActionsUseCase);
   const allActions = await readPivots.execute();
 
-  for (const action of allActions) {
+  for (const action of allActions!!) {
     activeQueue.enqueue({ action, attempts: 0, timestamp: new Date() });
   }
 };
