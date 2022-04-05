@@ -91,13 +91,12 @@ class CheckStatusRadio {
 
     try {
       const { result, data } = await sendData(this.radio_id, '000-000');
+      // if(stateResult){
       this.dataSend = data;
 
-      const matchIsNotEmpty = result.match && result.match !== '';
       const radioDataIsEquals = this.radio_id == data.id;
-      const dataIsValid = matchIsNotEmpty && radioDataIsEquals;
 
-      if (dataIsValid) this.updateStateChageIsTrue(result.payload);
+      if (result && radioDataIsEquals) this.updateStateChageIsTrue(result);
       else {
         this.attempts++;
         setTimeout(() => {

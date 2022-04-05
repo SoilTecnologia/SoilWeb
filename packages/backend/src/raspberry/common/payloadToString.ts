@@ -35,9 +35,7 @@ export const statusStringToObject = (status: string) => {
   response.angle = Number(angle);
   response.timestamp = new Date(Number(timestamp));
 
-  const data = { payload: response, match };
-
-  return data;
+  return match ? response : null;
 };
 
 export const payloadToString = (response: number[]) => {
