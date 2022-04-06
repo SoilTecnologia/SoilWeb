@@ -58,7 +58,7 @@ class CheckStatusRadio {
   }
 
   async sendFaillureRadio() {
-    if (this.attempts >= 4) {
+    if (this.attempts > 3) {
       console.log(
         `More 3 attempts in ${this.radio_id}_id of the Pivot ${this.pivot_id}`
       );
@@ -83,12 +83,10 @@ class CheckStatusRadio {
   }
 
   startChechStatusRadio = async () => {
-    if (this.attempts > 3) this.sendFaillureRadio();
     console.log('CHECKING IDLE');
     console.log(
       `Checking radio ${this.radio_id} of the Pivot ${this.pivot_id}`
     );
-    console.log('...........................................................');
 
     try {
       const { result, data } = await sendData(this.radio_id, '000-000');
@@ -107,9 +105,13 @@ class CheckStatusRadio {
       this.idleQueue.enqueue(current);
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
-      this.attempts++;
+      // this.attempts++;
     } finally {
+      this.sendFaillureRadio();
       this.dataSend = null;
+      console.log(
+        '...........................................................'
+      );
     }
   };
 }

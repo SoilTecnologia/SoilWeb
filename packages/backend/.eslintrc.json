@@ -40,7 +40,8 @@
     "eqeqeq": "off",
     "no-unused-expressions": "off",
     "import/no-cycle": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "no-else-return": "off"
   },
   "overrides": [
     {

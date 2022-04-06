@@ -37,13 +37,14 @@ class CreateNodeUseCase {
       node_num
     );
     if (node_num === 0 && nodeAlreadyExits) return nodeAlreadyExits;
-    if (nodeAlreadyExits) throw new Error('Node Already Exists');
+    else if (nodeAlreadyExits) throw new Error('Node Already Exists');
+    else {
+      const nodeModel = new NodeModel();
 
-    const nodeModel = new NodeModel();
+      Object.assign(nodeModel, { node_num, farm_id, is_gprs, gateway });
 
-    Object.assign(nodeModel, { node_num, farm_id, is_gprs, gateway });
-
-    return await this.applyQueryCreateNodes(nodeModel);
+      return await this.applyQueryCreateNodes(nodeModel);
+    }
   }
 }
 
