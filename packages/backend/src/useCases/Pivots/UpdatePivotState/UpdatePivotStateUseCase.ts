@@ -170,11 +170,8 @@ class UpdatePivotStateUseCase {
             timestamp: new Date(timestamp)
           });
 
-          if (stateVariable) {
+          if (stateVariable)
             console.log('STATE VARIABLE IS CREATED IN DATABASE');
-            console.log(stateVariable);
-            console.log('');
-          }
         }
       }
     }
@@ -203,8 +200,6 @@ class UpdatePivotStateUseCase {
 
         if (radioVariable) {
           console.log('RADIO VARIABLE IS CREATED IN DATABASE');
-          console.log(radioVariable);
-          console.log('');
         }
       }
     }

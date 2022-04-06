@@ -185,7 +185,6 @@ class IoTDevice {
     } = json;
 
     if (this.type === 'Cloud') {
-      console.log(`Chego ${json.pivot_num}`);
       if (json.type === 'status') {
         const { farm_id, node_num } = await handleResultString(id);
         // Se possui um pivot_num, é um concentrador
@@ -206,7 +205,6 @@ class IoTDevice {
             rssi
           } = payload;
 
-          console.log(`Payload Concentrador: ${JSON.stringify(payload)}`);
           await updatePivotUseCase.execute(
             `${farm_id}_${pivot_num}`,
             connection,
@@ -293,7 +291,7 @@ class IoTDevice {
   setupQueue = async () => {
     if (this.type === 'Raspberry') {
       emitter.on('status', (status) => {
-        const idStrip: string[] = status.payload.pivot_id.strip('_');
+        const idStrip: string[] = status.payload.pivot_id.split('_');
         const pivot_num = Number(idStrip.pop());
 
         this.queue.enqueue({

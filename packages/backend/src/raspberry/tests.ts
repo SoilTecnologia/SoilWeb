@@ -39,6 +39,7 @@ const activeQueue: GenericQueue<ActionData> = new GenericQueue<ActionData>(); //
 const idleQueue: GenericQueue<IdleData> = new GenericQueue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
 
 let ready = true;
+let trySendData = 0;
 
 export const sendData = async (radio_id: number, data: string) => {
   const bodyFormData = new FormData();

@@ -138,19 +138,19 @@ class HandleActionActive {
         `Sending Action to radio ${this.action.radio_id}: ${actionString}`
       );
 
-      const { result, data } = await sendData(
-        this.action.radio_id,
-        actionString
-      );
+      const response = await sendData(this.action.radio_id, actionString);
 
-      const verifyResponseData = result && this.checkResponse(result);
-      const radioIsEquals = this.action.radio_id == data.id;
-      const allDataValids = verifyResponseData && radioIsEquals && result;
+      if (response) {
+        const { data, result } = response;
+        const verifyResponseData = result && this.checkResponse(result);
+        const radioIsEquals = this.action.radio_id == data.id;
+        const allDataValids = verifyResponseData && radioIsEquals && result;
 
-      if (allDataValids) this.updateActionWithCondicionsValid(result);
-      else {
-        this.attempts++;
-        await this.startHandleAction();
+        if (allDataValids) this.updateActionWithCondicionsValid(result);
+        else {
+          this.attempts++;
+          await this.startHandleAction();
+        }
       }
     } catch (err) {
       console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
