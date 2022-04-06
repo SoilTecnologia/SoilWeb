@@ -1,4 +1,5 @@
 import knex from '../..';
+import { ActionsResult } from '../../../types/actionsType';
 import { ActionModel } from '../../model/Action';
 import { CreateAction } from '../../model/types/action';
 import { IActionRepository } from './IActionRepository';
@@ -11,7 +12,7 @@ class ActionRepository implements IActionRepository {
       .first();
   }
 
-  async getNotSucess(): Promise<any[]> {
+  async getNotSucess(): Promise<ActionsResult[]> {
     return await knex<ActionModel>('actions')
       .select('*')
       .where({ success: null })

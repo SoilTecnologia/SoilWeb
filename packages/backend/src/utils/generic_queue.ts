@@ -27,10 +27,6 @@ class Queue<T> {
     }
     return null;
   }
-
-  // _cleanupValue(val: T) {
-
-  // }
 }
 
 export default Queue;

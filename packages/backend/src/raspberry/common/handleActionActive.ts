@@ -1,5 +1,5 @@
 import { container } from 'tsyringe';
-import { ActionModel } from '../../database/model/Action';
+import { ActionsResult } from '../../types/actionsType';
 import { DeleteActionUseCase } from '../../useCases/Actions/DeleteAction/DeleteACtionUseCase';
 import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase';
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
@@ -9,7 +9,7 @@ import { sendData } from '../tests';
 import { objectToActionString } from './objectToActionString';
 
 type ActionData = {
-  action: ActionModel;
+  action: ActionsResult;
   timestamp: Date;
   attempts: number;
 };
@@ -17,7 +17,7 @@ type ActionData = {
 class HandleActionActive {
   private attempts: number;
 
-  private action: ActionModel;
+  private action: ActionsResult;
 
   private activeQueue: GenericQueue<ActionData>;
 
@@ -128,10 +128,10 @@ class HandleActionActive {
       const { power, water, direction, percentimeter } = this.action;
 
       const actionString = objectToActionString(
-        power,
-        water,
-        direction,
-        percentimeter
+        power!!,
+        water!!,
+        direction!!,
+        percentimeter!!
       );
 
       console.log(

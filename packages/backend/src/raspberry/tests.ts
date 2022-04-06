@@ -4,10 +4,12 @@ import { FormData } from 'formdata-node';
 import 'reflect-metadata';
 import { Readable } from 'stream';
 import { container } from 'tsyringe';
-import { ActionModel } from '../database/model/Action';
-import { PivotsRepository } from '../database/repositories/Pivots/PivotsRepository';
+import { PivotModel } from '../database/model/Pivot';
 import '../shared/container';
+import { ActionsResult } from '../types/actionsType';
 import { GetAllActionsUseCase } from '../useCases/Actions/GetAllActions/GetAllActionUseCase';
+import { GetOneNodeUseCase } from '../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
+import { FindAllUseCase } from '../useCases/Pivots/FindAll/FindAllUseCase';
 import emitter from '../utils/eventBus';
 import GenericQueue from '../utils/generic_queue';
 import { CheckStatusRadio } from './common/checkStatusRadio';
@@ -17,7 +19,7 @@ import { payloadToString } from './common/payloadToString';
 const TIMEOUT = 10000;
 
 type ActionData = {
-  action: ActionModel;
+  action: ActionsResult;
   timestamp: Date;
   attempts: number;
 };
@@ -41,6 +43,30 @@ const idleQueue: GenericQueue<IdleData> = new GenericQueue<IdleData>(); // Guard
 let ready = true;
 0;
 
+const filterPivotsGateway = async (
+  pivots: PivotModel[]
+): Promise<PivotModel[]> => {
+  const getNode = container.resolve(GetOneNodeUseCase);
+  const allPivots: PivotModel[] = [];
+  for (const pivot of pivots) {
+    const node = await getNode.execute(pivot.node_id!!);
+    if (node?.node_num === 0) allPivots.push(pivot);
+  }
+
+  return allPivots;
+};
+
+const filterActionGateway = async (actions: ActionsResult[]) => {
+  const getNode = container.resolve(GetOneNodeUseCase);
+  const allActions: ActionsResult[] = [];
+  for (const action of actions) {
+    const node = await getNode.execute(action.node_id!!);
+    if (node?.node_num === 0) allActions.push(action);
+  }
+
+  return allActions;
+};
+
 export const sendData = async (radio_id: number, data: string) => {
   const bodyFormData = new FormData();
 
@@ -62,16 +88,20 @@ export const sendData = async (radio_id: number, data: string) => {
 
 export const loadActions = async () => {
   const readPivots = container.resolve(GetAllActionsUseCase);
-  const allActions = await readPivots.execute();
+  const actions = await readPivots.execute();
+  const allActions = await filterActionGateway(actions!!);
 
   for (const action of allActions!!) {
+    console.log(action);
     activeQueue.enqueue({ action, attempts: 1, timestamp: new Date() });
   }
 };
 
 export const loadPivots = async () => {
-  const getAllPivots = new PivotsRepository();
-  const allPivots = await getAllPivots.findAll();
+  const getAllPivots = container.resolve(FindAllUseCase);
+  const pivots = await getAllPivots.execute();
+
+  const allPivots = await filterPivotsGateway(pivots!!);
 
   for (const pivot of allPivots) {
     idleQueue.enqueue({
