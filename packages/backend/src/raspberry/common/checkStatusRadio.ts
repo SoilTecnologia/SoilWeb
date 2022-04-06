@@ -18,8 +18,6 @@ type RadioResponse = {
 };
 
 class CheckStatusRadio {
-  private attempts: number;
-
   private current: IdleData;
 
   private pivot_id: string;
@@ -99,15 +97,11 @@ class CheckStatusRadio {
 
     try {
       const { data, result } = await sendData(this.radio_id, '000-000');
-      // if(stateResult){
 
       const radioDataIsEquals = this.radio_id == data.id;
 
       if (result && radioDataIsEquals) this.updateStateChageIsTrue(result);
-      else {
-        this.current.attempts++;
-        await this.startChechStatusRadio();
-      }
+      else this.current.attempts++;
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
       console.log('.......................................................');
