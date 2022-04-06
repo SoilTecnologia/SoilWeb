@@ -96,6 +96,7 @@ class CheckStatusRadio {
     console.log(
       `Checking radio ${this.radio_id} of the Pivot ${this.pivot_id}`
     );
+    console.log('...');
 
     try {
       const { data, result } = await sendData(this.radio_id, '000-000');
