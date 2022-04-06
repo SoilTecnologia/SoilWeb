@@ -100,6 +100,8 @@ class HandleActionActive {
       );
 
       try {
+        console.log(`Action: ${JSON.stringify(this.action)}`);
+        console.log(`Action Id : ${this.action.action_id}`);
         await this.deleteActionUseCase.execute(this.action.action_id);
       } catch (err) {
         console.log('ERROR IN DELETE ACTIONS');
@@ -108,6 +110,12 @@ class HandleActionActive {
 
       this.current = this.activeQueue.dequeue()!;
       this.activeQueue.remove(this.current);
+
+      console.log(
+        `Removi p ${JSON.stringify(
+          this.current
+        )} do ActiveQueue: ${JSON.stringify(this.activeQueue)}`
+      );
 
       // Enviar mensagem para nuvem dizendo que o pivo falhou na atualização
     }
@@ -150,7 +158,6 @@ class HandleActionActive {
         }
       }
     } catch (err) {
-      console.log(this.current.attempts);
       this.current.attempts && this.current.attempts++;
       if (this.current.attempts > 2) await this.returnFailled();
       console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);

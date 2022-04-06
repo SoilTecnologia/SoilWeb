@@ -1,8 +1,9 @@
+import { ActionsResult } from '../../../types/actionsType';
 import { ActionModel } from '../../model/Action';
 import { CreateAction } from '../../model/types/action';
 
 interface IActionRepository {
-  getNotSucess(): Promise<any[]>;
+  getNotSucess(): Promise<ActionsResult[]>;
   findById(
     action_id: ActionModel['action_id']
   ): Promise<ActionModel | undefined>;
