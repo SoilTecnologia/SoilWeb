@@ -18,6 +18,10 @@ class SchedulingRepository implements ISchedulingRepository {
         .first()
     }
 
+    async getAllSchedulings(): Promise<SchedulingModel[]> {
+        return await knex<SchedulingModel>('schedulings').select();
+      }
+
     async create(
         scheduling: Omit<SchedulingModel, "scheduling_id">
     ): Promise<SchedulingModel | undefined> {

@@ -9,6 +9,8 @@ interface ISchedulingRepository{
 
     findById(scheduling_id: SchedulingModel['scheduling_id']) : Promise<SchedulingModel | undefined>
 
+    getAllSchedulings(): Promise<SchedulingModel[]>;
+
     create(scheduling: Omit<SchedulingModel, 'scheduling_id'>) : Promise<SchedulingModel | undefined>
 
     delete(scheduling_id: SchedulingModel['scheduling_id']) : Promise<SchedulingModel | undefined>
