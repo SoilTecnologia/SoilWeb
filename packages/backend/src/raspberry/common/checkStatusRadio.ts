@@ -91,9 +91,8 @@ class CheckStatusRadio {
 
   startChechStatusRadio = async () => {
     if (this.attempts > 3) await this.sendFaillureRadio();
-    console.log(this.idleQueue);
-    console.log(`Ǹumero de tentativa ${this.attempts}`);
     console.log('CHECKING IDLE');
+    console.log(`Ǹumero de tentativa ${this.attempts}`);
     console.log(
       `Checking radio ${this.radio_id} of the Pivot ${this.pivot_id}`
     );
@@ -116,7 +115,7 @@ class CheckStatusRadio {
       this.configData();
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
-      console.log('');
+      console.log('.......................................................');
       this.attempts++;
       await this.startChechStatusRadio();
     } finally {
