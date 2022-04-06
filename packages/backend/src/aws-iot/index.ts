@@ -302,7 +302,7 @@ class IoTDevice {
             ...status.payload,
             timestamp: status.payload.timestamp.toString()
           },
-          attempts: 0
+          attempts: 1
         });
         console.log(
           `[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`
@@ -349,6 +349,7 @@ class IoTDevice {
     if (this.ready && !this.queue.isEmpty()) {
       this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
       const current = this.queue.peek();
+      console.log(`Current: ${current}`)
       const { farm_id, node_num } = await handleResultString(current.id);
 
       if (current.attempts && current.attempts > 3) {

@@ -136,7 +136,7 @@ export const start = async () => {
     activeQueue.enqueue({
       action: action.payload,
       timestamp: new Date(),
-      attempts: 0
+      attempts: 1
     });
   });
 

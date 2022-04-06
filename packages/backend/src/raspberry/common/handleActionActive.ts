@@ -106,8 +106,8 @@ class HandleActionActive {
         console.log(err.message);
       }
 
-      this.current.attempts = 0;
-      this.activeQueue.dequeue()!;
+      this.current = this.activeQueue.dequeue()!;
+      this.activeQueue.remove(this.current);
 
       // Enviar mensagem para nuvem dizendo que o pivo falhou na atualização
     }
@@ -117,7 +117,6 @@ class HandleActionActive {
     console.log(`Numero de Tentativas ${this.current.attempts}`);
     if (this.current.attempts > 2) {
       await this.returnFailled();
-      return;
     }
     console.log(
       `CHECKING ACTIVE IN ${this.action.radio_id} of the Pivot ${this.action.pivot_id}`
@@ -151,12 +150,11 @@ class HandleActionActive {
         }
       }
     } catch (err) {
+      console.log(this.current.attempts);
+      this.current.attempts && this.current.attempts++;
+      if (this.current.attempts > 2) await this.returnFailled();
       console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
       console.log('');
-      this.current.attempts++;
-
-      await this.startHandleAction();
-      this.current.attempts > 3 && (await this.returnFailled());
     }
   };
 }
