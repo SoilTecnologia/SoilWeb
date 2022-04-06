@@ -41,7 +41,8 @@
     "no-unused-expressions": "off",
     "import/no-cycle": "off",
     "no-underscore-dangle": "off",
-    "no-else-return": "off"
+    "no-else-return": "off",
+    "no-use-before-define": "off"
   },
   "overrides": [
     {

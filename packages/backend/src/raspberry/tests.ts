@@ -90,11 +90,12 @@ const checkPool = async () => {
   if (!actionIsActive) {
     const startAction = new HandleActionActive(activeQueue);
     await startAction.startHandleAction();
+    ready = true;
   } else if (!checkStatus) {
     const startCheckState = new CheckStatusRadio(idleQueue);
     await startCheckState.startChechStatusRadio();
+    ready = true;
   }
-  ready = true;
 };
 
 export const start = async () => {
