@@ -39,7 +39,7 @@ const activeQueue: GenericQueue<ActionData> = new GenericQueue<ActionData>(); //
 const idleQueue: GenericQueue<IdleData> = new GenericQueue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
 
 let ready = true;
-let trySendData = 0;
+0;
 
 export const sendData = async (radio_id: number, data: string) => {
   const bodyFormData = new FormData();
@@ -65,7 +65,7 @@ export const loadActions = async () => {
   const allActions = await readPivots.execute();
 
   for (const action of allActions!!) {
-    activeQueue.enqueue({ action, attempts: 0, timestamp: new Date() });
+    activeQueue.enqueue({ action, attempts: 1, timestamp: new Date() });
   }
 };
 
@@ -77,7 +77,7 @@ export const loadPivots = async () => {
     idleQueue.enqueue({
       pivot_id: pivot.pivot_id,
       radio_id: pivot.radio_id,
-      attempts: 0
+      attempts: 1
     });
   }
 };

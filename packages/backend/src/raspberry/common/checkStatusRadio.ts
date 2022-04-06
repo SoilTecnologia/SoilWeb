@@ -41,7 +41,7 @@ class CheckStatusRadio {
   private configData() {
     const current: IdleData = this.idleQueue.peek();
 
-    this.attempts = current.attempts++;
+    this.attempts = current.attempts;
     this.pivot_id = current.pivot_id;
     this.radio_id = current.radio_id;
   }
@@ -60,6 +60,10 @@ class CheckStatusRadio {
       null
     );
     this.attempts = 0;
+    const current = this.idleQueue.dequeue()!;
+    current.attempts = 0;
+    this.idleQueue.enqueue(current);
+    this.configData();
     console.log('........................................................');
   }
 
@@ -84,6 +88,7 @@ class CheckStatusRadio {
 
       this.attempts = 0;
       const current = this.idleQueue.dequeue()!;
+      current.attempts = 0;
       this.idleQueue.enqueue(current);
       this.configData();
     }
@@ -112,6 +117,7 @@ class CheckStatusRadio {
       }
 
       const current = this.idleQueue.dequeue()!;
+      current.attempts = 0;
       this.idleQueue.enqueue(current);
       this.configData();
     } catch (err) {

@@ -62,10 +62,10 @@ class IoTDevice {
     this.queue = new MessageQueue();
     if (type === 'Raspberry' && topic) {
       this.subTopic = `${topic}`;
-      this.pubTopic = `cloud3`;
+      this.pubTopic = `cloudHenrique`;
       this.clientId = topic;
     } else {
-      this.subTopic = 'cloud3';
+      this.subTopic = 'cloudHenrique';
       this.clientId = 'soil-henrique';
     }
   }
