@@ -1,5 +1,6 @@
 import { container } from 'tsyringe';
 import { ActionModel } from '../../database/model/Action';
+import { DeleteActionUseCase } from '../../useCases/Actions/DeleteAction/DeleteACtionUseCase';
 import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase';
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
@@ -14,9 +15,9 @@ type ActionData = {
 };
 
 class HandleActionActive {
-  private action: ActionModel;
-
   private attempts: number;
+
+  private action: ActionModel;
 
   private activeQueue: GenericQueue<ActionData>;
 
@@ -24,12 +25,16 @@ class HandleActionActive {
 
   private updateActionUseCase: UpdateActionsUseCase;
 
+  private deleteActionUseCase: DeleteActionUseCase;
+
   constructor(activeQueue: GenericQueue<ActionData>) {
     this.activeQueue = activeQueue;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
     this.updateActionUseCase = container.resolve(UpdateActionsUseCase);
-    const current: ActionData = activeQueue.peek();
+    this.deleteActionUseCase = container.resolve(DeleteActionUseCase);
+    const current = activeQueue.peek();
     this.action = current.action;
+
     this.attempts = current.attempts;
   }
 
@@ -77,8 +82,11 @@ class HandleActionActive {
   };
 
   returnFailled = async () => {
-    if (this.attempts > 4) {
-      console.log('Failing PIVOT');
+    if (this.attempts > 2) {
+      console.log(
+        `Failing PIVOT ${this.action.pivot_id} with Radio: ${this.action.radio_id}`
+      );
+
       await this.getUpdatePivotController.execute(
         this.action.pivot_id,
         false,
@@ -92,13 +100,30 @@ class HandleActionActive {
         null
       );
 
-      await this.updateActionUseCase.execute(this.action.action_id, false);
+      try {
+        await this.deleteActionUseCase.execute(this.action.action_id);
+      } catch (err) {
+        console.log('ERROR IN DELETE ACTIONS');
+        console.log(err.message);
+      }
+
+      // await this.updateActionUseCase.execute(this.action.action_id, false);
+      this.attempts = 0;
       this.activeQueue.dequeue()!;
+
+      // Enviar mensagem para nuvem dizendo que o pivo falhou na atualização
     }
   };
 
   startHandleAction = async () => {
-    console.log('CHECKING ACTIVE');
+    console.log(`Numero de Tentativas ${this.attempts + 1}`);
+    if (this.attempts > 2) {
+      await this.returnFailled();
+      return;
+    }
+    console.log(
+      `CHECKING ACTIVE IN ${this.action.radio_id} of the Pivot ${this.action.pivot_id}`
+    );
     try {
       const { power, water, direction, percentimeter } = this.action;
 
@@ -122,14 +147,18 @@ class HandleActionActive {
       const radioIsEquals = this.action.radio_id == data.id;
       const allDataValids = verifyResponseData && radioIsEquals && result;
 
-      allDataValids
-        ? this.updateActionWithCondicionsValid(result)
-        : this.attempts++;
+      if (allDataValids) this.updateActionWithCondicionsValid(result);
+      else {
+        this.attempts++;
+        await this.startHandleAction();
+      }
     } catch (err) {
+      console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
+      console.log('');
       this.attempts++;
-      console.log(`[ERROR - RASPBERRY.TEST]: ${err}`);
-    } finally {
-      await this.returnFailled();
+
+      await this.startHandleAction();
+      this.attempts > 2 && (await this.returnFailled());
     }
   };
 }

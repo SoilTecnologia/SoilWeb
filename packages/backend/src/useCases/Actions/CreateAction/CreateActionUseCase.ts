@@ -74,6 +74,10 @@ class CreateActionUseCase {
 
     const { farm_id, node_num, is_gprs } = node;
 
+    console.log(
+      `Action inserida no banco de dados:  ${JSON.stringify(actionResult)}`
+    );
+
     emitter.emit('action', {
       farm_id,
       is_gprs,
@@ -90,8 +94,6 @@ class CreateActionUseCase {
         timestamp: newTimestamp
       }
     });
-
-    return actionResult ? true : false;
   }
 }
 

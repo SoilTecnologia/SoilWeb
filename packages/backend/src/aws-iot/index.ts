@@ -1,6 +1,10 @@
 import { iot, mqtt } from 'aws-iot-device-sdk-v2';
 import { container } from 'tsyringe';
 import { TextDecoder } from 'util';
+import { ActionModel } from '../database/model/Action';
+import { FarmModel } from '../database/model/Farm';
+import { NodeModel } from '../database/model/Node';
+import { PivotModel } from '../database/model/Pivot';
 import { objectToActionString } from '../raspberry/common/objectToActionString';
 import { CreateActionUseCase } from '../useCases/Actions/CreateAction/CreateActionUseCase';
 import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
@@ -14,6 +18,23 @@ Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-
 Com ela, conseguimos fazer o envio de mensagens para o broker aws-iot-core, e, dependendo de como 
 inicializamos sua instância, decidimos como ela deve ser utilizada.
 */
+
+type ActionReceived = {
+  farm_id: FarmModel['farm_id'];
+  is_gprs: NodeModel['is_gprs'];
+  node_num: NodeModel['node_num'];
+  payload: {
+    action_id: ActionModel['action_id'];
+    pivot_id: PivotModel['pivot_id'];
+    radio_id: PivotModel['radio_id'];
+    author: ActionModel['author'];
+    power: ActionModel['power'];
+    water: ActionModel['water'];
+    direction: ActionModel['direction'];
+    percentimeter: ActionModel['percentimeter'];
+    timestamp: Date;
+  };
+};
 
 // A biblioteca pode ser inicializada utilizando algum desses dois types:
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
@@ -45,7 +66,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloud3';
-      this.clientId = 'HenriqueDev';
+      this.clientId = 'soil-henrique';
     }
   }
 
@@ -61,21 +82,21 @@ class IoTDevice {
     try {
       let configBuilder: iot.AwsIotMqttConnectionConfigBuilder;
       configBuilder =
-        iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(
+        await iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(
           certPath,
           keyPath
         );
 
-      configBuilder.with_clean_session(false);
-      configBuilder.with_client_id(this.clientId);
-      configBuilder.with_endpoint(endpoint);
+      await configBuilder.with_clean_session(false);
+      await configBuilder.with_client_id(this.clientId);
+      await configBuilder.with_endpoint(endpoint);
       // configBuilder.with_keep_alive_seconds(10);
       // configBuilder.with_ping_timeout_ms(1000);
 
-      const config = configBuilder.build();
+      const config = await configBuilder.build();
       const client = new mqtt.MqttClient();
 
-      this.connection = client.new_connection(config);
+      this.connection = await client.new_connection(config);
 
       /*
       Aqui fazemos a conexão com o broker e o subscribe de um tópico dependendo do tipo de dispositivo.
@@ -116,7 +137,6 @@ class IoTDevice {
         v === undefined ? null : v
       );
       console.log(`[IOT] ${finalTopic} Enviando mensagem... `);
-      console.log(string);
       console.log('');
       const result = await this.connection.publish(
         finalTopic!,
@@ -164,9 +184,8 @@ class IoTDevice {
       payload: any;
     } = json;
 
-    console.log(`JSON: ${JSON.stringify(json)}`);
-
     if (this.type === 'Cloud') {
+      console.log(`Chego ${json.pivot_num}`);
       if (json.type === 'status') {
         const { farm_id, node_num } = await handleResultString(id);
         // Se possui um pivot_num, é um concentrador
@@ -257,10 +276,7 @@ class IoTDevice {
         };
         const newTimestamp = new Date(timestamp);
 
-        const action = await createActionUseCase.execute(
-          newAction,
-          newTimestamp
-        );
+        await createActionUseCase.execute(newAction, newTimestamp);
         console.log(
           `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
         );
@@ -277,11 +293,8 @@ class IoTDevice {
   setupQueue = async () => {
     if (this.type === 'Raspberry') {
       emitter.on('status', (status) => {
-        let results: null | { farm_id: string; node_num: string } = null;
-        handleResultString(status.payload.pivot_id).then((result) => {
-          results = result;
-        });
-        const pivot_num = Number(results!!.node_num);
+        const idStrip: string[] = status.payload.pivot_id.strip('_');
+        const pivot_num = Number(idStrip.pop());
 
         this.queue.enqueue({
           type: 'status',
@@ -299,9 +312,11 @@ class IoTDevice {
         this.processQueue();
       });
     } else {
-      emitter.on('action', async (action) => {
+      emitter.on('action', async (action: ActionReceived) => {
         const id = action.payload.pivot_id;
+
         const { node_num } = await handleResultString(id);
+
         // const pivotId = action.payload.pivot_id.split('_');
         if (action.is_gprs) {
           this.queue.enqueue({
@@ -319,27 +334,24 @@ class IoTDevice {
           console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
           this.processQueue();
         } else {
-          // this.queue.enqueue({
-          //   type: 'action',
-          //   farm_id: action.farm_id,
-          //   node_num: action.node_num,
-          //   pivot_num: action.pivot_num,
-          //   is_gprs: false,
-          //   payload: {
-          //     ...action.payload,
-          //     timestamp: action.payload.timestamp.toString()
-          //   }
-          // });
+          this.queue.enqueue({
+            type: 'action',
+            id: action.payload.pivot_id, // TODO status ta vindo node_num?
+            pivot_num: Number(node_num),
+            payload: action.payload,
+            attempts: 0
+          });
+          this.processQueue();
         }
       });
     }
   };
 
-  processQueue = () => {
+  processQueue = async () => {
     if (this.ready && !this.queue.isEmpty()) {
       this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
       const current = this.queue.peek();
-      const [farm_id, node_num] = current.id.split('_');
+      const { farm_id, node_num } = await handleResultString(current.id);
 
       if (current.attempts && current.attempts > 3) {
         console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
@@ -356,6 +368,7 @@ class IoTDevice {
 
       try {
         const pivotId = `${farm_id}_${node_num}`;
+
         const raspOrCloud = this.type === 'Raspberry' ? this.pubTopic : pivotId;
 
         this.publish(current, raspOrCloud);

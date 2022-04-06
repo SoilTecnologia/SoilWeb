@@ -59,7 +59,9 @@ class CheckStatusRadio {
 
   async sendFaillureRadio() {
     if (this.attempts >= 4) {
-      console.log('Mais de 4 tentativas');
+      console.log(
+        `More 3 attempts in ${this.radio_id}_id of the Pivot ${this.pivot_id}`
+      );
       console.log('Failing PIVOT');
       // Tratar de enviar esse stats de falha de conexão com pivo para nuvem
       // E a nuvem mandar confirmação para o concentrador *ACK
@@ -77,7 +79,6 @@ class CheckStatusRadio {
       );
 
       this.attempts = 0;
-      this.idleQueue.dequeue()!;
     }
   }
 
@@ -99,13 +100,11 @@ class CheckStatusRadio {
       if (result && radioDataIsEquals) this.updateStateChageIsTrue(result);
       else {
         this.attempts++;
-        setTimeout(() => {
-          this.startChechStatusRadio();
-        }, 2000);
+        this.startChechStatusRadio();
       }
 
       const current = this.idleQueue.dequeue()!;
-      this.attempts < 4 && this.idleQueue.enqueue(current);
+      this.idleQueue.enqueue(current);
     } catch (err) {
       console.log(`[ERROR]: ${err}`);
       this.attempts++;
