@@ -15,7 +15,7 @@ type ActionData = {
 };
 
 class HandleActionActive {
-  private attempts: number;
+  private current: ActionData;
 
   private action: ActionsResult;
 
@@ -32,10 +32,8 @@ class HandleActionActive {
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
     this.updateActionUseCase = container.resolve(UpdateActionsUseCase);
     this.deleteActionUseCase = container.resolve(DeleteActionUseCase);
-    const current = activeQueue.peek();
-    this.action = current.action;
-
-    this.attempts = current.attempts;
+    this.current = activeQueue.peek();
+    this.action = this.current.action;
   }
 
   checkResponse = (payload: StatusObject) => {
@@ -71,18 +69,19 @@ class HandleActionActive {
       null
     );
 
-    this.attempts = 0;
+    this.current.attempts = 1;
 
     await this.updateActionUseCase.execute(this.action.action_id, true);
     console.log('UPDATING ACTION:', this.action.action_id);
 
     // Verificar se está deletando essa ação do array
     // Se não estiver procurar uma solução para isso
-    this.activeQueue.dequeue();
+    this.current = this.activeQueue.dequeue()!;
+    this.activeQueue.remove(this.current);
   };
 
   returnFailled = async () => {
-    if (this.attempts > 2) {
+    if (this.current.attempts > 3) {
       console.log(
         `Failing PIVOT ${this.action.pivot_id} with Radio: ${this.action.radio_id}`
       );
@@ -107,8 +106,7 @@ class HandleActionActive {
         console.log(err.message);
       }
 
-      // await this.updateActionUseCase.execute(this.action.action_id, false);
-      this.attempts = 0;
+      this.current.attempts = 0;
       this.activeQueue.dequeue()!;
 
       // Enviar mensagem para nuvem dizendo que o pivo falhou na atualização
@@ -116,8 +114,8 @@ class HandleActionActive {
   };
 
   startHandleAction = async () => {
-    console.log(`Numero de Tentativas ${this.attempts + 1}`);
-    if (this.attempts > 2) {
+    console.log(`Numero de Tentativas ${this.current.attempts}`);
+    if (this.current.attempts > 2) {
       await this.returnFailled();
       return;
     }
@@ -148,17 +146,17 @@ class HandleActionActive {
 
         if (allDataValids) this.updateActionWithCondicionsValid(result);
         else {
-          this.attempts++;
+          this.current.attempts++;
           await this.startHandleAction();
         }
       }
     } catch (err) {
       console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
       console.log('');
-      this.attempts++;
+      this.current.attempts++;
 
       await this.startHandleAction();
-      this.attempts > 2 && (await this.returnFailled());
+      this.current.attempts > 3 && (await this.returnFailled());
     }
   };
 }

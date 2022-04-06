@@ -134,6 +134,7 @@ class UpdatePivotStateUseCase {
 
       const createStateUseCase = container.resolve(CreateStateUseCase);
 
+      console.log(pivot_id);
       this.state = await createStateUseCase.execute({
         pivot_id,
         connection: newState.connection,
@@ -217,6 +218,7 @@ class UpdatePivotStateUseCase {
     father: RadioVariableModel['father'],
     rssi: RadioVariableModel['rssi']
   ) {
+    console.log(`Pivo Id: ${pivot_id}`);
     const oldState = await this.applyQueryGetStateByPivot(pivot_id);
     this.state = oldState;
 
