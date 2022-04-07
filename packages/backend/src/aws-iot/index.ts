@@ -140,7 +140,7 @@ class IoTDevice {
   }
 
   private async checkPivots() {
-    const timeout = 10000;
+    const timeout = 10000 * 6 * 15;
 
     setInterval(async () => {
       const pivots = await this.checkGprs.starting();
