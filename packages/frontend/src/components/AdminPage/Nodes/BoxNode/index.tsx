@@ -13,7 +13,7 @@ type boxNodeprops = {
 };
 const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
   //Contexts
-  const { getAllPivots, deleteNode } = useContextActionCrud();
+  const { deleteNode } = useContextActionCrud();
 
   //States
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,7 +30,7 @@ const BoxNode = ({ nodeData, farmRelation }: boxNodeprops) => {
 
   const okDeleteNode = () => {
     setIsDeletedNode(false);
-    deleteNode(nodeData.node_id, farmRelation);
+    deleteNode(nodeData.node_id, farmRelation.farm_id);
   };
 
   const notDeleteNode = () => {
