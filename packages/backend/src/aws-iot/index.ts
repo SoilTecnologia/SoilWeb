@@ -70,8 +70,8 @@ class IoTDevice {
       this.pubTopic = `cloudHenrique`;
       this.clientId = topic;
     } else {
-      this.subTopic = 'cloudHenrique';
-      this.clientId = 'cloudHenrique';
+      this.subTopic = 'cloud3';
+      this.clientId = 'cloudSoil1';
     }
   }
 
@@ -131,7 +131,7 @@ class IoTDevice {
     const hour = catchDate.getHours();
     const min = catchDate.getMinutes();
     const minute = min < 10 ? `0${min}` : min;
-    const fullHours = `${hour}:${minute}`;
+    const fullHours = `${hour - 3}:${minute}`;
     const date = `${catchDate.getDate()}-${
       catchDate.getMonth() + 1
     }-${catchDate.getFullYear()}`;
