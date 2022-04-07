@@ -141,7 +141,7 @@ class UpdatePivotStateUseCase {
         power: newState.power,
         water: newState.water,
         direction: newState.direction,
-        timestamp
+        timestamp: new Date()
       });
 
       console.log('STATE IS CREATED IN DATABASE');
@@ -168,7 +168,7 @@ class UpdatePivotStateUseCase {
             state_id: this.state.state_id,
             angle,
             percentimeter,
-            timestamp: new Date(timestamp)
+            timestamp: new Date()
           });
 
           if (stateVariable)

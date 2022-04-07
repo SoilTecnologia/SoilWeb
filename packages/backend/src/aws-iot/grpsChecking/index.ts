@@ -28,8 +28,8 @@ class CheckGprs {
     this.allPivots = allPivots;
   };
 
-  starting(): PivotModel[] {
-    this.loadPivots();
+  async starting(): Promise<PivotModel[]> {
+    await this.loadPivots();
 
     return this.allPivots;
   }

@@ -70,8 +70,8 @@ class IoTDevice {
       this.pubTopic = `cloudHenrique`;
       this.clientId = topic;
     } else {
-      this.subTopic = 'cloud3';
-      this.clientId = 'cloudSoil3';
+      this.subTopic = 'cloudHenrique';
+      this.clientId = 'cloudHenrique';
     }
   }
 
@@ -140,7 +140,7 @@ class IoTDevice {
   }
 
   private async checkPivots() {
-    const timeout = 10000 * 6 * 15;
+    const timeout = 10000;
 
     setInterval(async () => {
       const pivots = await this.checkGprs.starting();
