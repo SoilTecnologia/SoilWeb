@@ -12,6 +12,7 @@ import { statusPayloadStringToObject } from '../utils/conversions';
 import emitter from '../utils/eventBus';
 import { handleResultString } from '../utils/handleFarmIdWithUndescores';
 import MessageQueue from '../utils/message_queue';
+import { CheckGprs } from './grpsChecking';
 
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
@@ -56,17 +57,21 @@ class IoTDevice {
 
   private queue: MessageQueue; // Fila de mensagens à serem enviadas
 
+  private checkGprs: CheckGprs;
+
   constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
     this.type = type;
     this.qos = qos;
     this.queue = new MessageQueue();
+    this.checkGprs = new CheckGprs();
+
     if (type === 'Raspberry' && topic) {
       this.subTopic = `${topic}`;
       this.pubTopic = `cloudHenrique`;
       this.clientId = topic;
     } else {
-      this.subTopic = 'cloudHenrique';
-      this.clientId = 'soil-henrique';
+      this.subTopic = 'cloud3';
+      this.clientId = 'cloudSoil3';
     }
   }
 
@@ -113,6 +118,7 @@ class IoTDevice {
       Aqui criamos a queue e o loop que irá ficar verificando se há mensagens na fila e enviando para o broker.
       */
       console.log(`${this.type} connected to AWS IoT Core!`);
+      await this.checkPivots();
       await this.setupQueue();
     } catch (err) {
       console.log('Aws does not connected'.toUpperCase());
@@ -120,6 +126,40 @@ class IoTDevice {
     }
   }
 
+  private getDate() {
+    const catchDate = new Date();
+    const hour = catchDate.getHours();
+    const min = catchDate.getMinutes();
+    const minute = min < 10 ? `0${min}` : min;
+    const fullHours = `${hour}:${minute}`;
+    const date = `${catchDate.getDate()}-${
+      catchDate.getMonth() + 1
+    }-${catchDate.getFullYear()}`;
+
+    return { fullHours, date };
+  }
+
+  private async checkPivots() {
+    const timeout = 10000 * 6 * 15;
+
+    setInterval(async () => {
+      const pivots = await this.checkGprs.starting();
+      const { fullHours, date } = this.getDate();
+
+      if (pivots && pivots.length > 0) {
+        console.log(
+          `Checagem de Conexão inciada as ${fullHours} do dia ${date}`
+        );
+        for (const pivot of pivots) {
+          const payload = { payload: '000-000' };
+          this.publish(payload, pivot.pivot_id);
+        }
+        console.log('Finalizando Checagem de Conexão');
+      }
+
+      console.log('');
+    }, timeout);
+  }
   /*
   Função que faz a publicação de mensagens e respostas.
   A função JSON.stringify() customizada converte o objeto em uma string, além de converter campos especiais como null para string. Isso é importante pois a resposta deve ser exatamente igual ao que o cliente enviou, e campos null normalmente são apagados quando se usa a função JSON.stringify() original.
@@ -136,15 +176,11 @@ class IoTDevice {
       const string = JSON.stringify(payload, (k, v) =>
         v === undefined ? null : v
       );
-      console.log(`[IOT] ${finalTopic} Enviando mensagem... `);
-      console.log('');
-      const result = await this.connection.publish(
-        finalTopic!,
-        string,
-        0,
-        false
+      console.log(
+        `[IOT] Pivo ${finalTopic} Enviando mensagem...  ${payload.payload} `
       );
-      console.log(result);
+      console.log('.......................');
+      await this.connection.publish(finalTopic!, string, 0, false);
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`
@@ -228,8 +264,7 @@ class IoTDevice {
           console.log('Received status from GPRS');
           const statusObject = statusPayloadStringToObject(payload);
 
-          const pivotNum = `${farm_id}_${pivot_num}`;
-          console.log(`Pivo Num:  ${pivotNum}`);
+          // const pivotNum = `${farm_id}_${pivot_num}`;
 
           if (statusObject) {
             const { power, direction, water, percentimeter, angle, timestamp } =
@@ -349,7 +384,7 @@ class IoTDevice {
     if (this.ready && !this.queue.isEmpty()) {
       this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
       const current = this.queue.peek();
-      console.log(`Current: ${current}`)
+      console.log(`Current: ${current}`);
       const { farm_id, node_num } = await handleResultString(current.id);
 
       if (current.attempts && current.attempts > 3) {

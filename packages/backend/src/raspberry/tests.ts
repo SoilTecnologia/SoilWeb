@@ -41,7 +41,6 @@ const activeQueue: GenericQueue<ActionData> = new GenericQueue<ActionData>(); //
 const idleQueue: GenericQueue<IdleData> = new GenericQueue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
 
 let ready = true;
-0;
 
 const filterPivotsGateway = async (
   pivots: PivotModel[]

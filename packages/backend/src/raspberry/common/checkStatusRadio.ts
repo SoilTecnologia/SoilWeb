@@ -93,6 +93,7 @@ class CheckStatusRadio {
     console.log(
       `Checking radio ${this.radio_id} of the Pivot ${this.pivot_id}`
     );
+
     console.log('...');
 
     try {
