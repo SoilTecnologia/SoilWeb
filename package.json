@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.26.0",
     "nookies": "^2.5.2",
-    "tsyringe": "^4.6.0"
+    "tsyringe": "^4.6.0",
+    "uuid": "^8.3.2"
   }
 }

@@ -1,15 +1,19 @@
 /* eslint-disable no-unneeded-ternary */
 import { inject, injectable } from 'tsyringe';
+import { v4 as uuid } from 'uuid';
 import { CreateAction } from '../../../database/model/types/action';
+import { UserModel } from '../../../database/model/User';
 import { IActionRepository } from '../../../database/repositories/Action/IActionRepository';
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
+import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class CreateActionUseCase {
   constructor(
+    @inject('UsersRepository') private usersRepository: IUsersRepository,
     @inject('ActionsRepository') private actionRepository: IActionRepository,
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository,
     @inject('NodesRepository') private nodeRepository: INodesRepository
@@ -41,11 +45,48 @@ class CreateActionUseCase {
     }
   }
 
+  private async applyQueryGetUserById(user_id: string) {
+    try {
+      return await this.usersRepository.findById(user_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        CreateActionUseCase.name,
+        'Get User By Id'
+      );
+    }
+  }
+
+  private async applyQueryCreateUser(user: UserModel) {
+    try {
+      return await this.usersRepository.create(user);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        CreateActionUseCase.name,
+        'Get User By Id'
+      );
+    }
+  }
+
   async execute(
     action: Omit<CreateAction, 'timestamp_sent'>,
     timestamp: CreateAction['timestamp_sent'] | null
   ) {
     const newTimestamp = timestamp ? timestamp : new Date();
+
+    const userAlreadyExists = await this.applyQueryGetUserById(action.author);
+
+    if (!userAlreadyExists) {
+      await this.applyQueryCreateUser({
+        user_id: action.author,
+        login: `name_${uuid()}`,
+        password: '1234',
+        user_type: 'USER'
+      });
+    }
 
     const actionResult = await this.applyQueryCreatedAction({
       ...action,
