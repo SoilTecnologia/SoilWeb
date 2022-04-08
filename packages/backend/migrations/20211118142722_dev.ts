@@ -149,15 +149,7 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('success').defaultTo(null);
       table.datetime('timestamp_sent').notNullable();
       table.datetime('timestamp_success');
-
-      table
-        .uuid('author')
-        .references('user_id')
-        .inTable('users')
-        .index()
-        .notNullable()
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE');
+      table.string('author');
 
       table
         .string('pivot_id')
@@ -169,7 +161,7 @@ export async function up(knex: Knex): Promise<void> {
         .onDelete('CASCADE');
     })
 
-    .createTable('schedulings',(table) =>{
+    .createTable('schedulings', (table) => {
       table
         .uuid('scheduling_id')
         .primary()
@@ -186,12 +178,12 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('water');
       table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);
       table.float('start_angle');
-      table.float('end_angle')
+      table.float('end_angle');
       table.float('percentimeter');
       table.dateTime('start_timestamp');
       table.dateTime('end_timestamp');
       table.dateTime('timestamp').notNullable();
-    })
+    });
 }
 
 export async function down(knex: Knex): Promise<void> {
@@ -226,7 +218,7 @@ export async function down(knex: Knex): Promise<void> {
       table.dropPrimary();
       table.dropForeign('user_id');
     })
-    .alterTable('schedulings', (table)=>{
+    .alterTable('schedulings', (table) => {
       table.dropPrimary();
       table.dropForeign('pivot_id');
     })

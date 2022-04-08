@@ -1,6 +1,5 @@
 /* eslint-disable no-unneeded-ternary */
 import { inject, injectable } from 'tsyringe';
-import { ActionModel } from '../../../database/model/Action';
 import { CreateAction } from '../../../database/model/types/action';
 import { IActionRepository } from '../../../database/repositories/Action/IActionRepository';
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
@@ -42,51 +41,17 @@ class CreateActionUseCase {
     }
   }
 
-  private async applyQueryGetACtionAuthor(author: string) {
-    try {
-      return await this.actionRepository.findByAuthorId(author);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        CreateActionUseCase.name,
-        'Get Action By Id'
-      );
-    }
-  }
-
-  private async applyQueryGetNodeByNode(node_id: string) {
-    try {
-      return await this.nodeRepository.findById(node_id);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        CreateActionUseCase.name,
-        'Get Node By Node Id'
-      );
-    }
-  }
-
   async execute(
     action: Omit<CreateAction, 'timestamp_sent'>,
     timestamp: CreateAction['timestamp_sent'] | null
   ) {
     const newTimestamp = timestamp ? timestamp : new Date();
-    let getAction: ActionModel;
-    const actionAlreadyExists = await this.applyQueryGetACtionAuthor(
-      action.author
-    );
 
-    if (actionAlreadyExists) getAction = actionAlreadyExists;
-    else {
-      const actionResult = await this.applyQueryCreatedAction({
-        ...action,
-        timestamp_sent: newTimestamp
-      });
-      if (!actionResult) throw new Error('Does Not Create Action');
-      else getAction = actionResult[0];
-    }
+    const actionResult = await this.applyQueryCreatedAction({
+      ...action,
+      timestamp_sent: newTimestamp
+    });
+    if (!actionResult) throw new Error('Does Not Create Action');
 
     const pivot = await this.applyQueryGetPivotByPivot(action.pivot_id);
     if (!pivot) throw new Error('Does Not Find Pivot');
@@ -97,7 +62,7 @@ class CreateActionUseCase {
     const { farm_id, node_num, is_gprs } = node;
 
     console.log(
-      `Action inserida no banco de dados:  ${JSON.stringify(getAction)}`
+      `Action inserida no banco de dados:  ${JSON.stringify(actionResult[0])}`
     );
 
     emitter.emit('action', {
@@ -105,7 +70,7 @@ class CreateActionUseCase {
       is_gprs,
       node_num,
       payload: {
-        action_id: getAction.action_id!!,
+        action_id: actionResult[0].action_id!!,
         pivot_id: pivot.pivot_id,
         radio_id: pivot.radio_id,
         author: action.author,
