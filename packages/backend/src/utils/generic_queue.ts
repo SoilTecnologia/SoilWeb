@@ -20,11 +20,8 @@ class Queue<T> {
   }
 
   remove(value: T): T[] | null {
-    for (let i = 0; i < this._store.length; i++) {
-      if (_.isEqual(this._store[i], value)) {
-        return this._store.splice(i, 1);
-      }
-    }
+    const newStore = this._store.filter((item) => item !== value);
+    this._store = newStore;
     return null;
   }
 }

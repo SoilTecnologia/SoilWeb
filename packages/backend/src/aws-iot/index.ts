@@ -71,7 +71,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloud3';
-      this.clientId = 'cloudHenrique';
+      this.clientId = 'cloudRaspberry1';
     }
   }
 

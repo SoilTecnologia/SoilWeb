@@ -5,5 +5,7 @@ export const convertData = (date: Date) => {
   const timeZone = 'America/Sao_Paulo'; // Vamos ver que horas são Lá Embaixo
   const timeInBrisbane = utcToZonedTime(date, timeZone);
 
+  console.log(timeInBrisbane);
+
   return timeInBrisbane;
 };

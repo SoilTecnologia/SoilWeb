@@ -28,8 +28,11 @@ class CheckStatusRadio {
 
   private getUpdatePivotController: UpdatePivotStateUseCase;
 
-  constructor(idleQueue: GenericQueue<IdleData>) {
+  private ready: boolean;
+
+  constructor(idleQueue: GenericQueue<IdleData>, ready: boolean) {
     this.idleQueue = idleQueue;
+    this.ready = ready;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
     this.current = this.idleQueue.peek();
 

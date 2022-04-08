@@ -27,8 +27,11 @@ class HandleActionActive {
 
   private deleteActionUseCase: DeleteActionUseCase;
 
-  constructor(activeQueue: GenericQueue<ActionData>) {
+  private ready: boolean;
+
+  constructor(activeQueue: GenericQueue<ActionData>, ready: boolean) {
     this.activeQueue = activeQueue;
+    this.ready = ready;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
     this.updateActionUseCase = container.resolve(UpdateActionsUseCase);
     this.deleteActionUseCase = container.resolve(DeleteActionUseCase);
@@ -56,6 +59,7 @@ class HandleActionActive {
   };
 
   updateActionWithCondicionsValid = async (payload: StatusObject) => {
+    this.ready = false;
     await this.getUpdatePivotController.execute(
       this.action.pivot_id,
       true,
@@ -78,6 +82,7 @@ class HandleActionActive {
     // Se não estiver procurar uma solução para isso
     this.current = this.activeQueue.dequeue()!;
     this.activeQueue.remove(this.current);
+    this.ready = true;
   };
 
   returnFailled = async () => {
@@ -85,9 +90,14 @@ class HandleActionActive {
       console.log(
         `Failing PIVOT ${this.action.pivot_id} with Radio: ${this.action.radio_id}`
       );
+      this.ready = false;
+      const pivot_id = this.action.pivot_id;
+
+      this.current = this.activeQueue.dequeue()!;
+      this.activeQueue.remove(this.current);
 
       await this.getUpdatePivotController.execute(
-        this.action.pivot_id,
+        pivot_id,
         false,
         null,
         null,
@@ -100,30 +110,19 @@ class HandleActionActive {
       );
 
       try {
-        console.log(`Action: ${JSON.stringify(this.action)}`);
-        console.log(`Action Id : ${this.action.action_id}`);
         await this.deleteActionUseCase.execute(this.action.action_id);
       } catch (err) {
         console.log('ERROR IN DELETE ACTIONS');
         console.log(err.message);
       }
-
-      this.current = this.activeQueue.dequeue()!;
-      this.activeQueue.remove(this.current);
-
-      console.log(
-        `Removi p ${JSON.stringify(
-          this.current
-        )} do ActiveQueue: ${JSON.stringify(this.activeQueue)}`
-      );
-
+      this.ready = true;
       // Enviar mensagem para nuvem dizendo que o pivo falhou na atualização
     }
   };
 
   startHandleAction = async () => {
     console.log(`Numero de Tentativas ${this.current.attempts}`);
-    if (this.current.attempts > 2) {
+    if (this.current.attempts > 3) {
       await this.returnFailled();
     }
     console.log(
@@ -158,8 +157,8 @@ class HandleActionActive {
         }
       }
     } catch (err) {
-      this.current.attempts && this.current.attempts++;
-      if (this.current.attempts > 2) await this.returnFailled();
+      this.current && this.current.attempts && this.current.attempts++;
+      if (this.current.attempts > 3) await this.returnFailled();
       console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
       console.log('');
     }

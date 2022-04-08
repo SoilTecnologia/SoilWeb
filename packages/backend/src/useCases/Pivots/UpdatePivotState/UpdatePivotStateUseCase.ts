@@ -56,19 +56,6 @@ class UpdatePivotStateUseCase {
     }
   }
 
-  private async applyQueryGetPivotByPivot(pivot_id: string) {
-    try {
-      return await this.pivotRepository.findById(pivot_id);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        UpdatePivotStateUseCase.name,
-        'Find Pivot By pivot Id'
-      );
-    }
-  }
-
   private async applyQueryGetNodeByNode(node_id: string) {
     try {
       return await this.nodesRepository.findById(node_id);
@@ -218,7 +205,6 @@ class UpdatePivotStateUseCase {
     father: RadioVariableModel['father'],
     rssi: RadioVariableModel['rssi']
   ) {
-    console.log(`Pivo Id: ${pivot_id}`);
     const oldState = await this.applyQueryGetStateByPivot(pivot_id);
     this.state = oldState;
 

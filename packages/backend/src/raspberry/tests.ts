@@ -117,11 +117,11 @@ const checkPool = async () => {
   const checkStatus = idleQueue.isEmpty();
 
   if (!actionIsActive) {
-    const startAction = new HandleActionActive(activeQueue);
+    const startAction = new HandleActionActive(activeQueue, ready);
     await startAction.startHandleAction();
     ready = true;
   } else if (!checkStatus) {
-    const startCheckState = new CheckStatusRadio(idleQueue);
+    const startCheckState = new CheckStatusRadio(idleQueue, ready);
     await startCheckState.startChechStatusRadio();
     ready = true;
   }
