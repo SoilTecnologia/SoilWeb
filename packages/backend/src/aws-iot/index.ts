@@ -71,7 +71,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloud3';
-      this.clientId = 'cloudSoil1';
+      this.clientId = 'cloudHenrique';
     }
   }
 
@@ -128,28 +128,25 @@ class IoTDevice {
 
   private getDate() {
     const catchDate = new Date();
-    const hour = catchDate.getHours();
-    const min = catchDate.getMinutes();
-    const minute = min < 10 ? `0${min}` : min;
-    const fullHours = `${hour - 3}:${minute}`;
-    const date = `${catchDate.getDate()}-${
-      catchDate.getMonth() + 1
-    }-${catchDate.getFullYear()}`;
+    const dateString = catchDate.toLocaleString('pt-BR', {
+      timeZone: 'America/Sao_Paulo'
+    });
+    const [date, hours] = dateString.split(' ');
 
-    return { fullHours, date };
+    return { hours, date };
   }
 
   private async checkPivots() {
-    const timeout = 10000 * 6 * 15;
+    this.getDate();
+    const timeout = 10000;
+    // const timeout = 10000 * 6 * 15;
 
     setInterval(async () => {
       const pivots = await this.checkGprs.starting();
-      const { fullHours, date } = this.getDate();
+      const { hours, date } = this.getDate();
 
       if (pivots && pivots.length > 0) {
-        console.log(
-          `Checagem de Conexão inciada as ${fullHours} do dia ${date}`
-        );
+        console.log(`Checagem de Conexão inciada as ${hours} do dia ${date}`);
         for (const pivot of pivots) {
           const payload = { payload: '000-000' };
           this.publish(payload, pivot.pivot_id);
