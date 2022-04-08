@@ -70,7 +70,7 @@ class IoTDevice {
       this.pubTopic = `cloudHenrique`;
       this.clientId = topic;
     } else {
-      this.subTopic = 'cloud3';
+      this.subTopic = 'cloudHenrique';
       this.clientId = 'cloudRaspberry1';
     }
   }
@@ -152,9 +152,11 @@ class IoTDevice {
           this.publish(payload, pivot.pivot_id);
         }
         console.log('Finalizando Checagem de Conexão');
+      } else {
+        console.log('Does Not Found Pivots GPRS');
       }
 
-      console.log('');
+      console.log('...');
     }, timeout);
   }
   /*
@@ -378,45 +380,50 @@ class IoTDevice {
   };
 
   processQueue = async () => {
-    if (this.ready && !this.queue.isEmpty()) {
-      this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
-      const current = this.queue.peek();
-      console.log(`Current: ${JSON.stringify(current)}`);
-      const { farm_id, node_num } = await handleResultString(current.id);
+    if (!this.queue.isEmpty()) {
+      // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
 
-      if (current.attempts && current.attempts > 3) {
-        console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
+      for (const queue of this.queue._store) {
+        const { farm_id, node_num } = await handleResultString(queue.id);
 
-        emitter.emit('action-ack-not-received', current);
+        if (queue.attempts && queue.attempts > 3) {
+          console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
 
-        console.log('');
-        console.log('              ACK not received in Action...             ');
+          emitter.emit('action-ack-not-received', queue);
 
-        const valueCurrent = this.queue.dequeue()!;
-        this.queue.remove(valueCurrent);
-        this.ready = true;
-        return;
+          console.log('');
+          console.log(
+            '              ACK not received in Action...             '
+          );
+          this.queue.remove(queue);
+        } else {
+          try {
+            const pivotId = `${farm_id}_${node_num}`;
+
+            const raspOrCloud =
+              this.type === 'Raspberry' ? this.pubTopic : pivotId;
+
+            await this.publish(queue, raspOrCloud);
+            this.queue.remove(queue);
+          } catch (err) {
+            console.log('ERROR AWS publish');
+            console.log(err.message);
+            queue.attempts!!++;
+            if (queue.attempts!! > 3) {
+              console.log('Error to received ACK');
+              this.queue.remove(queue);
+            } else {
+              const currentQueue = this.queue.dequeue()!;
+              this.queue.enqueue(currentQueue);
+            }
+          }
+        }
       }
-
-      try {
-        const pivotId = `${farm_id}_${node_num}`;
-
-        const raspOrCloud = this.type === 'Raspberry' ? this.pubTopic : pivotId;
-
-        this.publish(current, raspOrCloud);
-
-        current.attempts!!++;
-
-        this.ready = true;
-      } catch (err) {
-        console.log('ERROR AWS publish');
-        console.log(err.message);
-      }
-
-      setTimeout(() => {
-        if (this.ready) this.processQueue();
-      }, 10.0 * 1000);
     }
+
+    setTimeout(async () => {
+      await this.processQueue();
+    }, 10000);
   };
 }
 

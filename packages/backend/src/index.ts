@@ -104,7 +104,7 @@ try {
 }
 
 raspberry.start();
-const iotDevice = new IoTDevice('Raspberry', 0, 'IGM_1/0');
+const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
 // const iotDevice = new IoTDevice('Cloud', 0);
 
 iotDevice.start();

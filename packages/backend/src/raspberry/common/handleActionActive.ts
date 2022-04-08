@@ -29,8 +29,6 @@ class HandleActionActive {
 
   private deleteActionUseCase: DeleteActionUseCase;
 
-  private intervalState: interval;
-
   constructor(activeQueue: GenericQueue<ActionData>) {
     this.activeQueue = activeQueue;
     // this.intervalState = intervalState;
@@ -60,10 +58,13 @@ class HandleActionActive {
     return false;
   };
 
-  updateActionWithCondicionsValid = async (payload: StatusObject) => {
+  updateActionWithCondicionsValid = async (
+    payload: StatusObject,
+    active: ActionData
+  ) => {
     // this.intervalState(false);
     await this.getUpdatePivotController.execute(
-      this.action.pivot_id,
+      active.action.pivot_id,
       true,
       payload.power,
       payload.water,
@@ -82,23 +83,19 @@ class HandleActionActive {
 
     // Verificar se está deletando essa ação do array
     // Se não estiver procurar uma solução para isso
-    this.current = this.activeQueue.dequeue()!;
     this.activeQueue.remove(this.current);
     await checkPool();
   };
 
-  returnFailled = async () => {
-    if (this.current.attempts > 3) {
+  returnFailled = async (active: ActionData) => {
+    if (active.attempts > 3) {
       // this.intervalState(false);
       console.log('');
       console.log(
         `Failing PIVOT ${this.action.pivot_id} with Radio: ${this.action.radio_id}`
       );
 
-      const pivot_id = this.action.pivot_id;
-
-      this.current = this.activeQueue.dequeue()!;
-      this.activeQueue.remove(this.current);
+      const pivot_id = active.action.pivot_id;
 
       await this.getUpdatePivotController.execute(
         pivot_id,
@@ -114,60 +111,79 @@ class HandleActionActive {
       );
 
       try {
-        await this.deleteActionUseCase.execute(this.action.action_id);
+        await this.deleteActionUseCase.execute(active.action.action_id);
       } catch (err) {
         console.log('ERROR IN DELETE ACTIONS');
         console.log(err.message);
+      } finally {
+        this.activeQueue.remove(this.current);
+        await checkPool();
       }
 
       // Enviar mensagem para nuvem dizendo que o pivo falhou na atualização
     }
-
-    await checkPool();
   };
 
-  startHandleAction = async () => {
+  async sendItem(active: ActionData) {
     console.log(`Numero de Tentativas ${this.current.attempts}`);
-    if (this.current.attempts > 3) {
-      await this.returnFailled();
-    }
     console.log(
       `CHECKING ACTIVE IN ${this.action.radio_id} of the Pivot ${this.action.pivot_id}`
     );
-    try {
-      const { power, water, direction, percentimeter } = this.action;
+    const { power, water, direction, percentimeter } = active.action;
 
-      const actionString = objectToActionString(
-        power!!,
-        water!!,
-        direction!!,
-        percentimeter!!
-      );
+    const actionString = objectToActionString(
+      power!!,
+      water!!,
+      direction!!,
+      percentimeter!!
+    );
 
-      console.log(
-        `Sending Action to radio ${this.action.radio_id}: ${actionString}`
-      );
+    console.log(
+      `Sending Action to radio ${active.action.radio_id}: ${actionString}`
+    );
 
-      const response = await sendData(this.action.radio_id, actionString);
+    const response = await sendData(active.action.radio_id, actionString);
 
-      if (response) {
-        const { data, result } = response;
-        const verifyResponseData = result && this.checkResponse(result);
-        const radioIsEquals = this.action.radio_id == data.id;
-        const allDataValids = verifyResponseData && radioIsEquals && result;
+    return response;
+  }
 
-        if (allDataValids) this.updateActionWithCondicionsValid(result);
-        else {
-          this.current.attempts++;
-          await this.startHandleAction();
+  startHandleAction = async () => {
+    for (const active of this.activeQueue._store) {
+      try {
+        const resultSendItem = await this.sendItem(active);
+
+        if (resultSendItem) {
+          const { data, result } = resultSendItem;
+
+          const verifyResponseData = result && this.checkResponse(result);
+          const radioIsEquals = active.action.radio_id == data.id;
+          const allDataValids = verifyResponseData && radioIsEquals && result;
+
+          if (allDataValids)
+            this.updateActionWithCondicionsValid(result, active);
+          else {
+            this.current && this.current.attempts && this.current.attempts++;
+            console.log('Failled in communication');
+            console.log('');
+            if (active.attempts && active.attempts > 3)
+              await this.returnFailled(active);
+            else
+              setTimeout(async () => {
+                await this.sendItem(active);
+              }, 5000);
+          }
         }
+      } catch (err) {
+        active.attempts && active.attempts++;
+        console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
+        console.log('');
+        if (active.attempts && this.current.attempts > 3)
+          await this.returnFailled(active);
+        else
+          setTimeout(async () => {
+            await this.sendItem(active);
+          }, 5000);
       }
-    } catch (err) {
-      this.current && this.current.attempts && this.current.attempts++;
-      if (this.current && this.current.attempts > 3) await this.returnFailled();
-      console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
-      console.log('');
-      await this.startHandleAction();
     }
   };
 }
