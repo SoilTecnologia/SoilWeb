@@ -5,13 +5,17 @@ import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
 import GenericQueue from '../../utils/generic_queue';
-import { checkPool, sendData } from '../tests';
+import { checkPool, RadioResponse, sendData } from '../tests';
 import { objectToActionString } from './objectToActionString';
 
 type ActionData = {
   action: ActionsResult;
   timestamp: Date;
   attempts: number;
+};
+type responseSendData = {
+  result: StatusObject | null;
+  data: RadioResponse;
 };
 
 export type interval = (onOff: boolean) => void;
@@ -143,36 +147,35 @@ class HandleActionActive {
     );
 
     const response = await sendData(active.action.radio_id, actionString);
+    await this.treatsResponses(response, active);
+  }
 
-    return response;
+  async treatsResponses(response: responseSendData, active: ActionData) {
+    if (response) {
+      const { data, result } = response;
+      const verifyResponseData = result && this.checkResponse(result);
+      const radioIsEquals = active.action.radio_id == data.id;
+      const allDataValids = verifyResponseData && radioIsEquals && result;
+
+      if (allDataValids) this.updateActionWithCondicionsValid(result, active);
+      else {
+        this.current && this.current.attempts && this.current.attempts++;
+        console.log('Failled in communication');
+        console.log('');
+        if (active.attempts && active.attempts > 3)
+          await this.returnFailled(active);
+        else
+          setTimeout(async () => {
+            await this.sendItem(active);
+          }, 5000);
+      }
+    }
   }
 
   startHandleAction = async () => {
     for (const active of this.activeQueue._store) {
       try {
-        const resultSendItem = await this.sendItem(active);
-
-        if (resultSendItem) {
-          const { data, result } = resultSendItem;
-
-          const verifyResponseData = result && this.checkResponse(result);
-          const radioIsEquals = active.action.radio_id == data.id;
-          const allDataValids = verifyResponseData && radioIsEquals && result;
-
-          if (allDataValids)
-            this.updateActionWithCondicionsValid(result, active);
-          else {
-            this.current && this.current.attempts && this.current.attempts++;
-            console.log('Failled in communication');
-            console.log('');
-            if (active.attempts && active.attempts > 3)
-              await this.returnFailled(active);
-            else
-              setTimeout(async () => {
-                await this.sendItem(active);
-              }, 5000);
-          }
-        }
+        await this.sendItem(active);
       } catch (err) {
         active.attempts && active.attempts++;
         console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
