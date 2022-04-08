@@ -179,6 +179,7 @@ class IoTDevice {
         `[IOT] Pivo ${finalTopic} Enviando mensagem...  ${payload.payload} `
       );
       console.log('.......................');
+      console.log(finalTopic);
       await this.connection.publish(finalTopic!, string, 0, false);
     } catch (err) {
       console.log(
@@ -345,6 +346,8 @@ class IoTDevice {
       });
     } else {
       emitter.on('action', async (action: ActionReceived) => {
+        console.log('Action received in AWS IOT ');
+        console.log(action);
         const id = action.payload.pivot_id;
 
         const { node_num } = await handleResultString(id);
@@ -366,9 +369,10 @@ class IoTDevice {
           console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
           this.processQueue();
         } else {
+          const numId = action.node_num === 0 ? action.node_num : node_num;
           this.queue.enqueue({
             type: 'action',
-            id: action.payload.pivot_id, // TODO status ta vindo node_num?
+            id: `${action.farm_id}_${numId}`, // TODO status ta vindo node_num?
             pivot_num: Number(node_num),
             payload: action.payload,
             attempts: 0
