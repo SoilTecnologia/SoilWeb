@@ -5,7 +5,7 @@ import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
 import GenericQueue from '../../utils/generic_queue';
-import { sendData } from '../tests';
+import { checkPool, sendData } from '../tests';
 import { objectToActionString } from './objectToActionString';
 
 type ActionData = {
@@ -13,6 +13,8 @@ type ActionData = {
   timestamp: Date;
   attempts: number;
 };
+
+export type interval = (onOff: boolean) => void;
 
 class HandleActionActive {
   private current: ActionData;
@@ -27,11 +29,11 @@ class HandleActionActive {
 
   private deleteActionUseCase: DeleteActionUseCase;
 
-  private ready: boolean;
+  private intervalState: interval;
 
-  constructor(activeQueue: GenericQueue<ActionData>, ready: boolean) {
+  constructor(activeQueue: GenericQueue<ActionData>) {
     this.activeQueue = activeQueue;
-    this.ready = ready;
+    // this.intervalState = intervalState;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
     this.updateActionUseCase = container.resolve(UpdateActionsUseCase);
     this.deleteActionUseCase = container.resolve(DeleteActionUseCase);
@@ -59,7 +61,7 @@ class HandleActionActive {
   };
 
   updateActionWithCondicionsValid = async (payload: StatusObject) => {
-    this.ready = false;
+    // this.intervalState(false);
     await this.getUpdatePivotController.execute(
       this.action.pivot_id,
       true,
@@ -82,15 +84,17 @@ class HandleActionActive {
     // Se não estiver procurar uma solução para isso
     this.current = this.activeQueue.dequeue()!;
     this.activeQueue.remove(this.current);
-    this.ready = true;
+    await checkPool();
   };
 
   returnFailled = async () => {
     if (this.current.attempts > 3) {
+      // this.intervalState(false);
+      console.log('');
       console.log(
         `Failing PIVOT ${this.action.pivot_id} with Radio: ${this.action.radio_id}`
       );
-      this.ready = false;
+
       const pivot_id = this.action.pivot_id;
 
       this.current = this.activeQueue.dequeue()!;
@@ -115,9 +119,11 @@ class HandleActionActive {
         console.log('ERROR IN DELETE ACTIONS');
         console.log(err.message);
       }
-      this.ready = true;
+
       // Enviar mensagem para nuvem dizendo que o pivo falhou na atualização
     }
+
+    await checkPool();
   };
 
   startHandleAction = async () => {
@@ -158,9 +164,10 @@ class HandleActionActive {
       }
     } catch (err) {
       this.current && this.current.attempts && this.current.attempts++;
-      if (this.current.attempts > 3) await this.returnFailled();
+      if (this.current && this.current.attempts > 3) await this.returnFailled();
       console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
       console.log('');
+      await this.startHandleAction();
     }
   };
 }

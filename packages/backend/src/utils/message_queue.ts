@@ -33,16 +33,19 @@ class MessageQueue {
   }
 
   remove(value: MessageQueueType): MessageQueueType[] | null {
-    for (let i = 0; i < this._store.length; i++) {
-      let inQueue = this._store[i];
-      let newValue = value;
+    const newStore = this._store.filter((item) => item.id !== value.id);
+    this._store = newStore;
 
-      delete inQueue.attempts;
-      delete newValue.attempts;
-      if (_.isEqual(inQueue, newValue)) {
-        return this._store.splice(i, 1);
-      }
-    }
+    // for (let i = 0; i < this._store.length; i++) {
+    //   let inQueue = this._store[i];
+    //   let newValue = value;
+
+    //   delete inQueue.attempts;
+    //   delete newValue.attempts;
+    //   if (_.isEqual(inQueue, newValue)) {
+    //     return this._store.splice(i, 1);
+    //   }
+    // }
     return null;
   }
 }

@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
 import GenericQueue from '../../utils/generic_queue';
-import { sendData } from '../tests';
+import { checkPool, sendData } from '../tests';
 
 type IdleData = {
   pivot_id: string;
@@ -17,6 +17,8 @@ type RadioResponse = {
   status: string;
 };
 
+export type interval = (onOff: boolean) => void;
+
 class CheckStatusRadio {
   private current: IdleData;
 
@@ -28,11 +30,11 @@ class CheckStatusRadio {
 
   private getUpdatePivotController: UpdatePivotStateUseCase;
 
-  private ready: boolean;
+  private intervalState: interval;
 
-  constructor(idleQueue: GenericQueue<IdleData>, ready: boolean) {
+  constructor(idleQueue: GenericQueue<IdleData>) {
     this.idleQueue = idleQueue;
-    this.ready = ready;
+    // this.intervalState = intervalState;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
     this.current = this.idleQueue.peek();
 
@@ -87,10 +89,16 @@ class CheckStatusRadio {
     }
 
     this.resetCurrent();
+    setTimeout(() => {
+      checkPool();
+    }, 5000);
+    // this.intervalState(true);
+
     // this.resetCurrent();
   }
 
   startChechStatusRadio = async () => {
+    // this.intervalState(false);
     console.log('CHECKING IDLE');
     console.log(`Ǹumero de tentativa ${this.current.attempts}`);
     console.log(
@@ -107,6 +115,7 @@ class CheckStatusRadio {
       if (result && radioDataIsEquals) this.updateStateChageIsTrue(result);
       else this.current.attempts++;
     } catch (err) {
+      // this.intervalState(false);
       console.log(`[ERROR]: ${err}`);
       console.log('.......................................................');
       this.current.attempts++;

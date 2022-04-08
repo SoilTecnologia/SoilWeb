@@ -40,8 +40,6 @@ export type RadioResponse = {
 const activeQueue: GenericQueue<ActionData> = new GenericQueue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
 const idleQueue: GenericQueue<IdleData> = new GenericQueue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
 
-let ready = true;
-
 const filterPivotsGateway = async (
   pivots: PivotModel[]
 ): Promise<PivotModel[]> => {
@@ -111,25 +109,22 @@ export const loadPivots = async () => {
   }
 };
 
-const checkPool = async () => {
-  ready = false;
+export const checkPool = async () => {
   const actionIsActive = activeQueue.isEmpty();
   const checkStatus = idleQueue.isEmpty();
 
   if (!actionIsActive) {
-    const startAction = new HandleActionActive(activeQueue, ready);
+    const startAction = new HandleActionActive(activeQueue);
     await startAction.startHandleAction();
-    ready = true;
   } else if (!checkStatus) {
-    const startCheckState = new CheckStatusRadio(idleQueue, ready);
+    const startCheckState = new CheckStatusRadio(idleQueue);
     await startCheckState.startChechStatusRadio();
-    ready = true;
   }
 };
 
 export const start = async () => {
-  loadActions();
-  loadPivots();
+  await loadActions();
+  await loadPivots();
 
   emitter.on('action', (action) => {
     activeQueue.enqueue({
@@ -141,7 +136,6 @@ export const start = async () => {
 
   // Seta um intervalo para ficar checando a pool
   // Dentro da checkPool existe uma flag ready para ver se ja posso checar o proximo
-  setInterval(() => {
-    if (ready) checkPool();
-  }, 5000);
+
+  await checkPool();
 };

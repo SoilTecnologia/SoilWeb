@@ -260,7 +260,7 @@ class IoTDevice {
 
           console.log('Received status from GPRS');
           const statusObject = statusPayloadStringToObject(payload);
-
+          console.log(JSON.stringify(statusObject));
           // const pivotNum = `${farm_id}_${pivot_num}`;
 
           if (statusObject) {
@@ -381,7 +381,7 @@ class IoTDevice {
     if (this.ready && !this.queue.isEmpty()) {
       this.ready = false; // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
       const current = this.queue.peek();
-      console.log(`Current: ${current}`);
+      console.log(`Current: ${JSON.stringify(current)}`);
       const { farm_id, node_num } = await handleResultString(current.id);
 
       if (current.attempts && current.attempts > 3) {
@@ -392,7 +392,8 @@ class IoTDevice {
         console.log('');
         console.log('              ACK not received in Action...             ');
 
-        this.queue.remove(current);
+        const valueCurrent = this.queue.dequeue()!;
+        this.queue.remove(valueCurrent);
         this.ready = true;
         return;
       }
@@ -413,7 +414,7 @@ class IoTDevice {
       }
 
       setTimeout(() => {
-        this.processQueue();
+        if (this.ready) this.processQueue();
       }, 10.0 * 1000);
     }
   };

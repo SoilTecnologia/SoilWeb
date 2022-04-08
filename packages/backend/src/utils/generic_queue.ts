@@ -15,6 +15,10 @@ class Queue<T> {
     return this._store[0];
   }
 
+  delete() {
+    this._store = [];
+  }
+
   isEmpty(): boolean {
     return this._store.length === 0;
   }
