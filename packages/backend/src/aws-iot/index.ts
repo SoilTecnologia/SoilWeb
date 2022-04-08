@@ -118,7 +118,7 @@ class IoTDevice {
       Aqui criamos a queue e o loop que irá ficar verificando se há mensagens na fila e enviando para o broker.
       */
       console.log(`${this.type} connected to AWS IoT Core!`);
-      await this.checkPivots();
+      this.type === 'Cloud' && (await this.checkPivots());
       await this.setupQueue();
     } catch (err) {
       console.log('Aws does not connected'.toUpperCase());
