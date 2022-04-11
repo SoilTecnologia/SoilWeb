@@ -297,9 +297,10 @@ class IoTDevice {
         const { author, power, water, direction, percentimeter, timestamp } =
           json.payload;
         const { farm_id } = json;
+        console.log('Actiondo Payload: ${');
 
         const newAction = {
-          pivot_id: `${farm_id}_${pivot_num}`,
+          pivot_id: json.payload.pivot_id,
           author,
           power,
           water,
@@ -325,6 +326,7 @@ class IoTDevice {
   setupQueue = async () => {
     if (this.type === 'Raspberry') {
       emitter.on('status', (status) => {
+        console.log(status);
         const idStrip: string[] = status.payload.pivot_id.split('_');
         const pivot_num = Number(idStrip.pop());
 

@@ -89,6 +89,7 @@ class CreateActionUseCase {
     timestamp: CreateAction['timestamp_sent'] | null
   ) {
     const newTimestamp = timestamp ? timestamp : new Date();
+    console.log(`Action: ${JSON.stringify(action)}`);
 
     const userAlreadyExists = await this.applyQueryGetUserById(action.author);
 

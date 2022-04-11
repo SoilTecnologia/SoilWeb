@@ -67,7 +67,7 @@ class HandleActionActive {
     active: ActionData
   ) => {
     // this.intervalState(false);
-    await this.getUpdatePivotController.execute(
+    const action = await this.getUpdatePivotController.execute(
       active.action.pivot_id,
       true,
       payload.power,
@@ -79,6 +79,10 @@ class HandleActionActive {
       '',
       null
     );
+
+    action
+      ? console.log('Action Atualizada com Sucesso')
+      : console.log('Action não Atualizada');
 
     this.current.attempts = 1;
 
@@ -147,6 +151,8 @@ class HandleActionActive {
     );
 
     const response = await sendData(active.action.radio_id, actionString);
+    console.log(`Radio Response: ${response.cmdResponse.data}`);
+    console.log('......');
     await this.treatsResponses(response, active);
   }
 

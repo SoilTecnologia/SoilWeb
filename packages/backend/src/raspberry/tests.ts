@@ -78,9 +78,11 @@ export const sendData = async (radio_id: number, data: string) => {
     { headers: encoder.headers, timeout: TIMEOUT }
   );
 
+  const cmdResponse = await Axios.get('http://192.168.100.100:3031/cmd');
+
   const result = payloadToString(response.data.payload);
 
-  return { result, data: response.data };
+  return { result, data: response.data, cmdResponse };
 };
 
 export const loadActions = async () => {
@@ -89,7 +91,6 @@ export const loadActions = async () => {
   const allActions = await filterActionGateway(actions!!);
 
   for (const action of allActions!!) {
-    console.log(action);
     activeQueue.enqueue({ action, attempts: 1, timestamp: new Date() });
   }
 };

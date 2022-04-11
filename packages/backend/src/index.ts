@@ -75,6 +75,7 @@ try {
     });
 
     emitter.on('action-ack-received', async (action) => {
+      console.log(action);
       const { user_id, farm_name, pivot_num } = await handleResultAction(
         action.id
       );

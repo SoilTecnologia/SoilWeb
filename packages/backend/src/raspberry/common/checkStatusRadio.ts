@@ -105,10 +105,13 @@ class CheckStatusRadio {
       `Checking radio ${this.radio_id} of the Pivot ${this.pivot_id}`
     );
 
-    console.log('...');
-
     try {
-      const { data, result } = await sendData(this.radio_id, '000-000');
+      const { data, result, cmdResponse } = await sendData(
+        this.radio_id,
+        '000-000'
+      );
+      console.log(`Radio Response: ${cmdResponse}`);
+      console.log('......');
 
       const radioDataIsEquals = this.radio_id == data.id;
 
