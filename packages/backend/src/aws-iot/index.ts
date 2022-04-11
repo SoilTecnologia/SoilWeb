@@ -12,8 +12,7 @@ import { statusPayloadStringToObject } from '../utils/conversions';
 import emitter from '../utils/eventBus';
 import { handleResultString } from '../utils/handleFarmIdWithUndescores';
 import MessageQueue from '../utils/message_queue';
-import { CheckGprs } from './grpsChecking';
-
+import { CheckGprs } from './gprsChecking';
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
 Com ela, conseguimos fazer o envio de mensagens para o broker aws-iot-core, e, dependendo de como 
@@ -71,7 +70,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = 'cloudRaspberry1';
+      this.clientId = 'cloudRaspberry55';
     }
   }
 

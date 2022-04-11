@@ -82,6 +82,19 @@ class UpdatePivotStateUseCase {
     }
   }
 
+  private async applyQueryGetPivotById(pivot_id: string) {
+    try {
+      return await this.pivotRepository.findById(pivot_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdatePivotStateUseCase.name,
+        'Find Pivot By Pivot Id'
+      );
+    }
+  }
+
   private async applyQueryGetRadioVariable(pivot_id: string) {
     try {
       return await this.radioVariableRepository.findByPivotId(pivot_id);
@@ -91,6 +104,21 @@ class UpdatePivotStateUseCase {
         true,
         UpdatePivotStateUseCase.name,
         'Find RadioVariable By Pivot Id'
+      );
+    }
+  }
+
+  private async applyQueryCreateRadioVariable(
+    radio: Omit<RadioVariableModel, 'radio_variable_id'>
+  ) {
+    try {
+      return await this.radioVariableRepository.create(radio);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdatePivotStateUseCase.name,
+        'Create RadioVariable '
       );
     }
   }
@@ -108,6 +136,21 @@ class UpdatePivotStateUseCase {
     }
   }
 
+  private async applyQueryCreateStateVariable(
+    state: Omit<StateVariableModel, 'state_variable_id'>
+  ) {
+    try {
+      return await this.stateVariableRepository.create(state);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdatePivotStateUseCase.name,
+        'Create State Variable '
+      );
+    }
+  }
+
   // Methods Actions
   private createStateIfNotExists = async (
     pivot_id: StateModel['pivot_id'],
@@ -121,7 +164,6 @@ class UpdatePivotStateUseCase {
 
       const createStateUseCase = container.resolve(CreateStateUseCase);
 
-      console.log(pivot_id);
       this.state = await createStateUseCase.execute({
         pivot_id,
         connection: newState.connection,
@@ -151,7 +193,7 @@ class UpdatePivotStateUseCase {
           isStateVariableDifferent(oldStateVariable, { angle, percentimeter })
         ) {
           this.shouldNotifyUpdate = true;
-          const stateVariable = await this.stateVariableRepository.create({
+          const stateVariable = await this.applyQueryCreateStateVariable({
             state_id: this.state.state_id,
             angle,
             percentimeter,
@@ -178,7 +220,7 @@ class UpdatePivotStateUseCase {
         isRadioVariableDifferent(oldRadioVariable, { father, rssi })
       ) {
         this.shouldNotifyUpdate = true;
-        const radioVariable = await this.radioVariableRepository.create({
+        const radioVariable = await this.applyQueryCreateRadioVariable({
           pivot_id,
           state_id: this.state!.state_id,
           father,
@@ -217,7 +259,7 @@ class UpdatePivotStateUseCase {
     // teste
 
     if (this.shouldNotifyUpdate) {
-      const pivot = await this.pivotRepository.findById(pivot_id);
+      const pivot = await this.applyQueryGetPivotById(pivot_id);
       if (!pivot) throw new Error('Pivot Does Not Find');
       const node = await this.applyQueryGetNodeByNode(pivot.node_id!!);
       const farm = await this.applyQueryGetFarmByFarm(pivot.farm_id!!);

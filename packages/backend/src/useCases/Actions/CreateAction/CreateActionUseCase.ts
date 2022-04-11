@@ -58,6 +58,19 @@ class CreateActionUseCase {
     }
   }
 
+  private async applyQueryGetNodeById(node_id: string) {
+    try {
+      return await this.nodeRepository.findById(node_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        CreateActionUseCase.name,
+        'Get Node By Id'
+      );
+    }
+  }
+
   private async applyQueryCreateUser(user: UserModel) {
     try {
       return await this.usersRepository.create(user);
@@ -97,7 +110,7 @@ class CreateActionUseCase {
     const pivot = await this.applyQueryGetPivotByPivot(action.pivot_id);
     if (!pivot) throw new Error('Does Not Find Pivot');
 
-    const node = await this.nodeRepository.findById(pivot?.node_id);
+    const node = await this.applyQueryGetNodeById(pivot?.node_id!!);
     if (!node) throw new Error('Does Not find Node');
 
     const { farm_id, node_num, is_gprs } = node;

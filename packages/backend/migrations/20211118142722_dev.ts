@@ -149,7 +149,14 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('success').defaultTo(null);
       table.datetime('timestamp_sent').notNullable();
       table.datetime('timestamp_success');
-      table.string('author');
+      table
+        .uuid('author')
+        .references('user_id')
+        .inTable('users')
+        .index()
+        .notNullable()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
 
       table
         .string('pivot_id')
