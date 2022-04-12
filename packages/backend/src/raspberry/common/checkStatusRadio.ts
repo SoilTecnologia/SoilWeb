@@ -1,6 +1,10 @@
 import { container } from 'tsyringe';
+import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
+import { GetPivotByIdUseCase } from '../../useCases/Pivots/GetById/GetByIdUseCase';
+import { GetOnePivotUseCase } from '../../useCases/Pivots/GetOnePivot/GetOnePivotUseCase';
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
+import emitter from '../../utils/eventBus';
 import GenericQueue from '../../utils/generic_queue';
 import { checkPool, sendData } from '../tests';
 
@@ -30,12 +34,18 @@ class CheckStatusRadio {
 
   private getUpdatePivotController: UpdatePivotStateUseCase;
 
+  private getPivot: GetPivotByIdUseCase;
+
+  private getNode: GetOneNodeUseCase;
+
   private intervalState: interval;
 
   constructor(idleQueue: GenericQueue<IdleData>) {
     this.idleQueue = idleQueue;
     // this.intervalState = intervalState;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
+    this.getPivot = container.resolve(GetPivotByIdUseCase);
+    this.getNode = container.resolve(GetOneNodeUseCase);
     this.current = this.idleQueue.peek();
 
     this.pivot_id = this.current.pivot_id;
@@ -74,16 +84,25 @@ class CheckStatusRadio {
       await this.getUpdatePivotController.execute(
         this.pivot_id,
         false,
-        null,
-        null,
-        null,
-        null,
-        null,
+        false,
+        false,
+        'CLOCKWISE',
+        0,
+        0,
         new Date(),
-        null,
-        null
+        '',
+        0
       );
 
+      const pivot = await this.getPivot.execute(this.pivot_id);
+      const node = await this.getNode.execute(pivot?.node_id!!);
+      pivot &&
+        node &&
+        emitter.emit('fail', {
+          id: `${pivot.farm_id}_${node.node_num}`,
+          pivot_id: this.pivot_id,
+          pivot_num: pivot.pivot_num
+        });
       this.current.attempts = 1;
       this.resetCurrent();
     }
@@ -110,7 +129,7 @@ class CheckStatusRadio {
         this.radio_id,
         '000-000'
       );
-      console.log(`Radio Response: ${cmdResponse}`);
+      console.log(`Radio Response: ${cmdResponse.data}`);
       console.log('......');
 
       const radioDataIsEquals = this.radio_id == data.id;

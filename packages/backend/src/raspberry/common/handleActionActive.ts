@@ -1,9 +1,12 @@
 import { container } from 'tsyringe';
+import IoTDevice from '../../aws-iot';
 import { ActionsResult } from '../../types/actionsType';
 import { DeleteActionUseCase } from '../../useCases/Actions/DeleteAction/DeleteACtionUseCase';
 import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase';
+import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
+import emitter from '../../utils/eventBus';
 import GenericQueue from '../../utils/generic_queue';
 import { checkPool, RadioResponse, sendData } from '../tests';
 import { objectToActionString } from './objectToActionString';
@@ -33,12 +36,15 @@ class HandleActionActive {
 
   private deleteActionUseCase: DeleteActionUseCase;
 
+  private getNodeUseCase: GetOneNodeUseCase;
+
   constructor(activeQueue: GenericQueue<ActionData>) {
     this.activeQueue = activeQueue;
     // this.intervalState = intervalState;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
     this.updateActionUseCase = container.resolve(UpdateActionsUseCase);
     this.deleteActionUseCase = container.resolve(DeleteActionUseCase);
+    this.getNodeUseCase = container.resolve(GetOneNodeUseCase);
     this.current = activeQueue.peek();
     this.action = this.current.action;
   }
@@ -103,25 +109,32 @@ class HandleActionActive {
         `Failing PIVOT ${this.action.pivot_id} with Radio: ${this.action.radio_id}`
       );
 
-      const pivot_id = active.action.pivot_id;
-
-      await this.getUpdatePivotController.execute(
-        pivot_id,
-        false,
-        false,
-        null,
-        null,
-        null,
-        null,
-        new Date(),
-        null,
-        null
-      );
-
       try {
+        await this.getUpdatePivotController.execute(
+          active.action.pivot_id,
+          false,
+          false,
+          false,
+          'CLOCKWISE',
+          0,
+          0,
+          new Date(),
+          '',
+          0
+        );
+        await this.updateActionUseCase.execute(active.action.action_id, false);
+
+        const { pivot_id, pivot_num } = active.action;
         await this.deleteActionUseCase.execute(active.action.action_id);
+        const node = await this.getNodeUseCase.execute(active.action.node_id!!);
+        node &&
+          emitter.emit('fail', {
+            id: `${active.action.farm_id}_${node.node_num}`,
+            pivot_id,
+            pivot_num
+          });
       } catch (err) {
-        console.log('ERROR IN DELETE ACTIONS');
+        console.log('ERROR IN Returns Failled');
         console.log(err.message);
       } finally {
         this.activeQueue.remove(this.current);

@@ -166,7 +166,7 @@ class IoTDevice {
   A função JSON.stringify() customizada converte o objeto em uma string, além de converter campos especiais como null para string. Isso é importante pois a resposta deve ser exatamente igual ao que o cliente enviou, e campos null normalmente são apagados quando se usa a função JSON.stringify() original.
  */
 
-  async publish(payload: any, topic?: string) {
+  public async publish(payload: any, topic?: string) {
     const finalTopic = this.type === 'Cloud' ? topic : this.pubTopic;
     // let finalTopic;
     // finalTopi
@@ -176,11 +176,7 @@ class IoTDevice {
     try {
       const string = JSON.stringify(payload);
 
-      console.log(
-        `[IOT] Pivo ${finalTopic} Enviando mensagem...  ${JSON.stringify(
-          payload.payload
-        )} `
-      );
+      console.log(`[IOT] Pivo ${finalTopic} Enviando mensagem... `);
       console.log('.......................');
       await this.connection.publish(finalTopic!, string, 0, false);
     } catch (err) {
@@ -205,8 +201,6 @@ class IoTDevice {
   ) => {
     const updatePivotUseCase = container.resolve(UpdatePivotStateUseCase);
     const createActionUseCase = container.resolve(CreateActionUseCase);
-
-    console.log('Message  ', message);
 
     const decoder = new TextDecoder('utf8', { fatal: false });
     // const filteredMessage = messageToString.substring(0, messageToString.indexOf('}'))
@@ -306,8 +300,6 @@ class IoTDevice {
         const { author, power, water, direction, percentimeter, timestamp } =
           json.payload;
 
-        console.log(json);
-
         const newAction = {
           pivot_id: json.payload.pivot_id,
           author,
@@ -358,7 +350,17 @@ class IoTDevice {
         );
         this.processQueue();
       });
+      emitter.on('fail', async (action) => {
+        console.log('em fail', action);
+        this.queue.enqueue({ type: 'status', ...action, connection: false });
+        this.processQueue();
+      });
     } else {
+      emitter.on('fail', async (action) => {
+        console.log('em fail', action);
+        this.queue.enqueue({ type: 'status', ...action, connection: false });
+        this.processQueue();
+      });
       emitter.on('action', async (action: ActionReceived) => {
         const id = action.payload.pivot_id;
 
@@ -413,10 +415,10 @@ class IoTDevice {
           this.queue.remove(queue);
         } else {
           try {
-            console.log(`Queue: ${JSON.stringify(queue)}`);
-
             const raspOrCloud =
               this.type === 'Raspberry' ? this.pubTopic : queue.id;
+
+            console.log();
 
             this.queue.remove(queue);
             await this.publish(queue, raspOrCloud);

@@ -89,8 +89,6 @@ class CreateActionUseCase {
     timestamp: CreateAction['timestamp_sent'] | null
   ) {
     const newTimestamp = timestamp ? timestamp : new Date();
-    console.log(`Action: ${JSON.stringify(action)}`);
-
     const userAlreadyExists = await this.applyQueryGetUserById(action.author);
 
     if (!userAlreadyExists) {
@@ -120,6 +118,7 @@ class CreateActionUseCase {
     console.log(
       `Action inserida no banco de dados:  ${JSON.stringify(actionResult[0])}`
     );
+    console.log('...');
 
     emitter.emit('action', {
       farm_id,

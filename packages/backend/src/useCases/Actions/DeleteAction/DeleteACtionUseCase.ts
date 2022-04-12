@@ -43,6 +43,7 @@ class DeleteActionUseCase {
 
     console.log(`action excluded for exceeding the limits of attempts`);
     console.log('');
+    return del;
   }
 }
 
