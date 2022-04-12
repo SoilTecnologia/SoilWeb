@@ -12,7 +12,9 @@ import { statusPayloadStringToObject } from '../utils/conversions';
 import emitter from '../utils/eventBus';
 import { handleResultString } from '../utils/handleFarmIdWithUndescores';
 import MessageQueue from '../utils/message_queue';
+import { messageErrorTryAction } from '../utils/types';
 import { CheckGprs } from './gprsChecking';
+import { socketIo } from './socketIo';
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
 Com ela, conseguimos fazer o envio de mensagens para o broker aws-iot-core, e, dependendo de como 
@@ -70,7 +72,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = 'cloudRaspberry55';
+      this.clientId = 'cloudHenrique23';
     }
   }
 
@@ -171,15 +173,21 @@ class IoTDevice {
     // else finalTopic = this.pubTopic;
 
     try {
-      const string = JSON.stringify(payload, (k, v) =>
-        v === undefined ? null : v
-      );
+      const string = JSON.stringify(payload, (k, v) => v || null);
+
       console.log(
-        `[IOT] Pivo ${finalTopic} Enviando mensagem...  ${payload.payload} `
+        `[IOT] Pivo ${finalTopic} Enviando mensagem...  ${JSON.stringify(
+          payload.payload
+        )} `
       );
       console.log('.......................');
-      console.log(finalTopic);
-      await this.connection.publish(finalTopic!, string, 0, false);
+      const result = await this.connection.publish(
+        finalTopic!,
+        string,
+        0,
+        false
+      );
+      console.log(result, 'AWS');
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`
@@ -240,18 +248,22 @@ class IoTDevice {
             rssi
           } = payload;
 
-          await updatePivotUseCase.execute(
-            `${farm_id}_${pivot_num}`,
-            connection,
-            power,
-            water,
-            direction,
-            angle,
-            percentimeter,
-            timestamp,
-            father,
-            rssi
-          );
+          try {
+            await updatePivotUseCase.execute(
+              `${farm_id}_${pivot_num}`,
+              connection,
+              power,
+              water,
+              direction,
+              angle,
+              percentimeter,
+              timestamp,
+              father,
+              rssi
+            );
+          } catch (err) {
+            messageErrorTryAction(err, false, IoTDevice.name, 'Update Pivot');
+          }
           /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
           this.publish(json, `${farm_id}_${node_num}`);
           console.log(
@@ -283,9 +295,9 @@ class IoTDevice {
           }
         }
       } else if (json.type === 'action') {
-        console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
-        emitter.emit('action-ack-received', json);
         this.queue.remove(json);
+        console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
+        socketIo('ackReceived', json);
       }
     } else if (this.type === 'Raspberry') {
       if (type === 'status') {
@@ -296,8 +308,8 @@ class IoTDevice {
       } else if (type === 'action') {
         const { author, power, water, direction, percentimeter, timestamp } =
           json.payload;
-        const { farm_id } = json;
-        console.log('Actiondo Payload: ${');
+
+        console.log(json);
 
         const newAction = {
           pivot_id: json.payload.pivot_id,
@@ -309,7 +321,11 @@ class IoTDevice {
         };
         const newTimestamp = new Date(timestamp);
 
-        await createActionUseCase.execute(newAction, newTimestamp);
+        try {
+          await createActionUseCase.execute(newAction, newTimestamp);
+        } catch (err) {
+          messageErrorTryAction(err, false, IoTDevice.name, 'Create Action');
+        }
         console.log(
           `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
         );
@@ -368,6 +384,7 @@ class IoTDevice {
             attempts: 0
           });
           console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
+          emitter.off('action', () => {});
           this.processQueue();
         } else {
           const numId = action.node_num === 0 ? action.node_num : node_num;

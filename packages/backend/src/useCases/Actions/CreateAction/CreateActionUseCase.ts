@@ -104,6 +104,7 @@ class CreateActionUseCase {
 
     const actionResult = await this.applyQueryCreatedAction({
       ...action,
+      power: action.power || false,
       timestamp_sent: newTimestamp
     });
     if (!actionResult) throw new Error('Does Not Create Action');

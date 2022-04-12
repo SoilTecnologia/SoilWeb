@@ -108,7 +108,7 @@ class HandleActionActive {
       await this.getUpdatePivotController.execute(
         pivot_id,
         false,
-        null,
+        false,
         null,
         null,
         null,
