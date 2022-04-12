@@ -42,7 +42,7 @@ type ActionReceived = {
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 
 class IoTDevice {
-  private type: IoTDeviceType; // Tipo do dispositivo
+  private type: IoTDeviceType = 'Cloud'; // Tipo do dispositivo
 
   private qos: mqtt.QoS; // Qualidade do serviço
 
@@ -67,6 +67,7 @@ class IoTDevice {
     this.checkGprs = new CheckGprs();
 
     if (type === 'Raspberry' && topic) {
+      console.log(topic, 'araxa topico');
       this.subTopic = `${topic}`;
       this.pubTopic = `cloudHenrique`;
       this.clientId = topic;
@@ -173,7 +174,7 @@ class IoTDevice {
     // else finalTopic = this.pubTopic;
 
     try {
-      const string = JSON.stringify(payload, (k, v) => v || null);
+      const string = JSON.stringify(payload);
 
       console.log(
         `[IOT] Pivo ${finalTopic} Enviando mensagem...  ${JSON.stringify(
@@ -181,13 +182,7 @@ class IoTDevice {
         )} `
       );
       console.log('.......................');
-      const result = await this.connection.publish(
-        finalTopic!,
-        string,
-        0,
-        false
-      );
-      console.log(result, 'AWS');
+      await this.connection.publish(finalTopic!, string, 0, false);
     } catch (err) {
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`
@@ -201,7 +196,7 @@ class IoTDevice {
   O que acontece apartir disso, depende do tipo do dispositivo e do tipo da mensagem.
   */
 
-  processMessage = async (
+  private processMessage = async (
     topic: string,
     message: ArrayBuffer,
     dup: boolean,
@@ -210,6 +205,8 @@ class IoTDevice {
   ) => {
     const updatePivotUseCase = container.resolve(UpdatePivotStateUseCase);
     const createActionUseCase = container.resolve(CreateActionUseCase);
+
+    console.log('Message  ', message);
 
     const decoder = new TextDecoder('utf8', { fatal: false });
     // const filteredMessage = messageToString.substring(0, messageToString.indexOf('}'))
@@ -226,7 +223,7 @@ class IoTDevice {
       pivot_num: number;
       payload: any;
     } = json;
-
+    console.log(this.type);
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
         const { farm_id, node_num } = await handleResultString(id);
@@ -363,8 +360,6 @@ class IoTDevice {
       });
     } else {
       emitter.on('action', async (action: ActionReceived) => {
-        console.log('Action received in AWS IOT ');
-        console.log(action);
         const id = action.payload.pivot_id;
 
         const { node_num } = await handleResultString(id);
@@ -393,7 +388,7 @@ class IoTDevice {
             id: `${action.farm_id}_${numId}`, // TODO status ta vindo node_num?
             pivot_num: Number(node_num),
             payload: action.payload,
-            attempts: 0
+            attempts: 1
           });
           this.processQueue();
         }
@@ -406,8 +401,6 @@ class IoTDevice {
       // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
 
       for (const queue of this.queue._store) {
-        const { farm_id, node_num } = await handleResultString(queue.id);
-
         if (queue.attempts && queue.attempts > 3) {
           console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
 
@@ -420,13 +413,13 @@ class IoTDevice {
           this.queue.remove(queue);
         } else {
           try {
-            const pivotId = `${farm_id}_${node_num}`;
+            console.log(`Queue: ${JSON.stringify(queue)}`);
 
             const raspOrCloud =
-              this.type === 'Raspberry' ? this.pubTopic : pivotId;
+              this.type === 'Raspberry' ? this.pubTopic : queue.id;
 
-            await this.publish(queue, raspOrCloud);
             this.queue.remove(queue);
+            await this.publish(queue, raspOrCloud);
           } catch (err) {
             console.log('ERROR AWS publish');
             console.log(err.message);
