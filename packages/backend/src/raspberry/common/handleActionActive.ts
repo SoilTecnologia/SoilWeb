@@ -150,10 +150,17 @@ class HandleActionActive {
       `Sending Action to radio ${active.action.radio_id}: ${actionString}`
     );
 
-    const response = await sendData(active.action.radio_id, actionString);
-    console.log(`Radio Response: ${response.cmdResponse.data}`);
-    console.log('......');
-    await this.treatsResponses(response, active);
+    try {
+      const response = await sendData(active.action.radio_id, actionString);
+      console.log(`Radio Response: ${response.cmdResponse.data}`);
+      console.log('......');
+      await this.treatsResponses(response, active);
+    } catch (err) {
+      active.attempts++;
+      if (active.attempts > 3) await this.returnFailled(active);
+      await this.sendItem(active);
+      console.log(err.message);
+    }
   }
 
   async treatsResponses(response: responseSendData, active: ActionData) {

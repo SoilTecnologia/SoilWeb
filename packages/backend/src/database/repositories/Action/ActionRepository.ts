@@ -44,6 +44,13 @@ class ActionRepository implements IActionRepository {
       .where({ action_id })
       .del();
   }
+
+  async deleteAll(user_id: string | undefined): Promise<number> {
+    return await knex<ActionModel>('actions')
+      .select()
+      .where({ author: user_id })
+      .del();
+  }
 }
 
 export { ActionRepository };

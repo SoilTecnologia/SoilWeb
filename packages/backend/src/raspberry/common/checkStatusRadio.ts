@@ -89,8 +89,8 @@ class CheckStatusRadio {
     }
 
     this.resetCurrent();
-    setTimeout(() => {
-      checkPool();
+    setTimeout(async () => {
+      await checkPool();
     }, 5000);
     // this.intervalState(true);
 

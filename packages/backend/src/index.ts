@@ -13,7 +13,7 @@ import 'reflect-metadata';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import IoTDevice from './aws-iot';
-// import * as raspberry from './raspberry/tests';
+import * as raspberry from './raspberry/tests';
 import router from './routes';
 import './shared/container';
 import emitter from './utils/eventBus';
@@ -117,9 +117,9 @@ try {
   console.log(err.message);
 }
 
-// raspberry.start();
-// const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
-const iotDevice = new IoTDevice('Cloud', 0);
+raspberry.start();
+const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
+// const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
 
 // e5ce95e1-277d-40a7-b843-6d2cb51d1e8f
