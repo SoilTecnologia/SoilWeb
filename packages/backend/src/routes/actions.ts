@@ -19,7 +19,7 @@ router.post(
 );
 
 router.get('/read', getAllActionController.handle);
-router.delete('/del', deleteActionController.handle);
-router.delete('/delAll', deleteAllActionController.handle);
+router.delete('/del/:action_id', deleteActionController.handle);
+router.delete('/delAll/:user_id', deleteAllActionController.handle);
 
 export default router;
