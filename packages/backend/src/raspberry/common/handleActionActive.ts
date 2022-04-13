@@ -165,7 +165,10 @@ class HandleActionActive {
 
     try {
       const response = await sendData(active.action.radio_id, actionString);
-      console.log(`Radio Response: ${response.cmdResponse.data}`);
+      const cmdSplit = response.cmdResponse.data.split('#');
+      console.log(
+        `Radio Response: ${cmdSplit[0]}, Status: ${response.data.status}`
+      );
       console.log('......');
       await this.treatsResponses(response, active);
     } catch (err) {

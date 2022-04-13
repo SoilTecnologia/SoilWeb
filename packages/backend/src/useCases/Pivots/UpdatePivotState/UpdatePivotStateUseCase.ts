@@ -200,8 +200,9 @@ class UpdatePivotStateUseCase {
             timestamp: new Date()
           });
 
-          if (stateVariable)
+          if (stateVariable) {
             console.log('STATE VARIABLE IS CREATED IN DATABASE');
+          }
         }
       }
     }
@@ -295,7 +296,8 @@ class UpdatePivotStateUseCase {
           connection,
           percentimeter
         });
-      } else {
+      }
+      if (this.shouldNotifyUpdate) {
         emitter.emit('variable-change', {
           user_id: farm?.user_id,
           pivot_id,

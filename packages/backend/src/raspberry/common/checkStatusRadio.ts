@@ -154,7 +154,10 @@ class CheckStatusRadio {
         this.radio_id,
         '000-000'
       );
-      console.log(`Radio Response: ${cmdResponse.data}`);
+      const responseSplit = cmdResponse.data.split('#');
+      console.log(
+        `Radio Response: ${responseSplit[0]}, Status: ${data.status}`
+      );
       console.log('......');
 
       const radioDataIsEquals = this.radio_id == data.id;

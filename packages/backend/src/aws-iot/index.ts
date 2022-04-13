@@ -225,22 +225,8 @@ class IoTDevice {
 
         if (node_num === '0') {
           // Concentrador
-          const {
-            pivot_id,
-            connection,
-            power,
-            water,
-            direction,
-            angle,
-            percentimeter,
-            timestamp,
-            father,
-            rssi
-          } = payload;
-
-          try {
-            await updatePivotUseCase.execute(
-              `${farm_id}_${pivot_num}`,
+          if (payload) {
+            const {
               connection,
               power,
               water,
@@ -250,38 +236,69 @@ class IoTDevice {
               timestamp,
               father,
               rssi
+            } = payload;
+
+            try {
+              await updatePivotUseCase.execute(
+                `${farm_id}_${pivot_num}`,
+                connection,
+                power,
+                water,
+                direction,
+                angle,
+                percentimeter,
+                timestamp,
+                father,
+                rssi
+              );
+            } catch (err) {
+              messageErrorTryAction(err, false, IoTDevice.name, 'Update Pivot');
+            }
+            /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
+            this.publish(json, `${farm_id}_${node_num}`);
+            console.log(
+              `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
             );
-          } catch (err) {
-            messageErrorTryAction(err, false, IoTDevice.name, 'Update Pivot');
+          } else {
+            console.log('Status Changed Connection Received from Aws');
+            console.log(json);
+            console.log('........');
           }
-          /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
-          this.publish(json, `${farm_id}_${node_num}`);
-          console.log(
-            `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
-          );
         } else {
           // GPRS
+          if (payload) {
+            console.log('Received status from GPRS');
+            const statusObject = statusPayloadStringToObject(payload);
+            console.log(JSON.stringify(statusObject));
 
-          console.log('Received status from GPRS');
-          const statusObject = statusPayloadStringToObject(payload);
-          console.log(JSON.stringify(statusObject));
-          // const pivotNum = `${farm_id}_${pivot_num}`;
+            // const pivotNum = `${farm_id}_${pivot_num}`;
 
-          if (statusObject) {
-            const { power, direction, water, percentimeter, angle, timestamp } =
-              statusObject;
-            await updatePivotUseCase.execute(
-              id, // Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
-              true,
-              power,
-              water,
-              direction,
-              angle,
-              percentimeter,
-              timestamp,
-              null,
-              null
-            );
+            if (statusObject) {
+              const {
+                power,
+                direction,
+                water,
+                percentimeter,
+                angle,
+                timestamp
+              } = statusObject;
+              await updatePivotUseCase.execute(
+                id, // Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
+                true,
+                power,
+                water,
+                direction,
+                angle,
+                percentimeter,
+                timestamp,
+                null,
+                null
+              );
+            }
+          } else {
+            console.log('Status Changed Connection Received from Aws');
+            console.log(json);
+            console.log('........');
           }
         }
       } else if (json.type === 'action') {
@@ -330,7 +347,6 @@ class IoTDevice {
   setupQueue = async () => {
     if (this.type === 'Raspberry') {
       emitter.on('status', (status) => {
-        console.log(status);
         const idStrip: string[] = status.payload.pivot_id.split('_');
         const pivot_num = Number(idStrip.pop());
 

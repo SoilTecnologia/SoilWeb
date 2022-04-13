@@ -87,7 +87,6 @@ try {
     });
 
     emitter.on('action-received-ack', async (action) => {
-      console.log('Cheguei');
       console.log(emitter.listeners('action-received-ack'));
       const { user_id, farm_name, pivot_num } = await handleResultAction(
         action.id
@@ -117,9 +116,9 @@ try {
   console.log(err.message);
 }
 
-raspberry.start();
-const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
-// const iotDevice = new IoTDevice('Cloud', 0);
+// raspberry.start();
+// const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
+const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
 
 // e5ce95e1-277d-40a7-b843-6d2cb51d1e8f
