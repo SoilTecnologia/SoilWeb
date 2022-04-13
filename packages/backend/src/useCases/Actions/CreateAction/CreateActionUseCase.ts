@@ -116,9 +116,9 @@ class CreateActionUseCase {
     const { farm_id, node_num, is_gprs } = node;
 
     console.log(
-      `Action inserida no banco de dados:  ${JSON.stringify(actionResult[0])}`
+      `Action inserida no banco de dados .... 
+      .............`
     );
-    console.log('...');
 
     emitter.emit('action', {
       farm_id,

@@ -16,9 +16,8 @@ export const isStateDifferent = (
     oldState.water !== newState.water ||
     oldState.direction !== newState.direction
   ) {
-    console.log('Mudança de estado: ');
-    console.log(oldState);
-    console.log(newState);
+    console.log('Mudança de estado ');
+    console.log('.....');
     return true;
   }
   return false;

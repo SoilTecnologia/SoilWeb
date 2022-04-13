@@ -1,3 +1,4 @@
+import { response } from 'express';
 import { container } from 'tsyringe';
 import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
 import { GetPivotByIdUseCase } from '../../useCases/Pivots/GetById/GetByIdUseCase';
@@ -13,6 +14,7 @@ type IdleData = {
   pivot_id: string;
   radio_id: number;
   attempts: number;
+  cmdResponse?: string;
 };
 
 type RadioResponse = {
@@ -114,9 +116,7 @@ class CheckStatusRadio {
     await this.getStatePivot(true, payload);
     this.current.attempts = 1;
     this.resetCurrent();
-    setTimeout(async () => {
-      await checkPool();
-    }, 5000);
+
     console.log('........................................................');
   }
 
@@ -162,8 +162,21 @@ class CheckStatusRadio {
 
       const radioDataIsEquals = this.radio_id == data.id;
 
-      if (result && radioDataIsEquals) this.updateStateChageIsTrue(result);
-      else this.current.attempts++;
+      if (
+        this.current.cmdResponse &&
+        responseSplit === this.current.cmdResponse
+      ) {
+        console.log(`Radio Response is Equal a old Response`);
+        console.log('....');
+        this.current.cmdResponse = responseSplit;
+        this.current.attempts++;
+      } else if (result && radioDataIsEquals) {
+        this.current.cmdResponse = responseSplit;
+        this.updateStateChageIsTrue(result);
+      } else {
+        this.current.cmdResponse = responseSplit;
+        this.current.attempts++;
+      }
     } catch (err) {
       // this.intervalState(false);
       console.log(`[ERROR]: ${err}`);

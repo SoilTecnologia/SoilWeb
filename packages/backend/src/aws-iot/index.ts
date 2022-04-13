@@ -54,8 +54,6 @@ class IoTDevice {
 
   private connection: mqtt.MqttClientConnection; // A conexão com o broker
 
-  private ready: boolean = true; // Variavel auxiliar do loop da fila
-
   private queue: MessageQueue; // Fila de mensagens à serem enviadas
 
   private checkGprs: CheckGprs;
@@ -139,8 +137,8 @@ class IoTDevice {
 
   private async checkPivots() {
     this.getDate();
-    const timeout = 10000;
-    // const timeout = 10000 * 6 * 15;
+    // const timeout = 10000;
+    const timeout = 10000 * 6 * 15;
 
     setInterval(async () => {
       const pivots = await this.checkGprs.starting();
@@ -216,7 +214,7 @@ class IoTDevice {
       pivot_num: number;
       payload: any;
     } = json;
-    console.log(this.type);
+
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
         const { farm_id, node_num } = await handleResultString(id);
@@ -308,33 +306,45 @@ class IoTDevice {
       }
     } else if (this.type === 'Raspberry') {
       if (type === 'status') {
-        console.log(`Type: ${JSON.stringify(type)}`);
+        if (json.payload) {
+          console.log(`Type: ${JSON.stringify(type)}`);
 
-        console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
-        this.queue.remove(json);
-      } else if (type === 'action') {
-        const { author, power, water, direction, percentimeter, timestamp } =
-          json.payload;
-
-        const newAction = {
-          pivot_id: json.payload.pivot_id,
-          author,
-          power,
-          water,
-          direction,
-          percentimeter
-        };
-        const newTimestamp = new Date(timestamp);
-
-        try {
-          await createActionUseCase.execute(newAction, newTimestamp);
-        } catch (err) {
-          messageErrorTryAction(err, false, IoTDevice.name, 'Create Action');
+          console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
+          this.queue.remove(json);
+        } else {
+          console.log('Status Changed Connection Received from Aws');
+          console.log(json);
+          console.log('........');
         }
-        console.log(
-          `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
-        );
-        this.publish(json);
+      } else if (type === 'action') {
+        if (json.payload) {
+          const { author, power, water, direction, percentimeter, timestamp } =
+            json.payload;
+
+          const newAction = {
+            pivot_id: json.payload.pivot_id,
+            author,
+            power,
+            water,
+            direction,
+            percentimeter
+          };
+          const newTimestamp = new Date(timestamp);
+
+          try {
+            await createActionUseCase.execute(newAction, newTimestamp);
+          } catch (err) {
+            messageErrorTryAction(err, false, IoTDevice.name, 'Create Action');
+          }
+          console.log(
+            `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
+          );
+          this.publish(json);
+        } else {
+          console.log('Status Changed Connection Received from Aws');
+          console.log(json);
+          console.log('........');
+        }
       }
     }
   };

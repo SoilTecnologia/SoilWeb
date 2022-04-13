@@ -4,6 +4,7 @@ import { ActionsResult } from '../../types/actionsType';
 import { DeleteActionUseCase } from '../../useCases/Actions/DeleteAction/DeleteACtionUseCase';
 import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase';
 import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
+import { GetPivotByIdUseCase } from '../../useCases/Pivots/GetById/GetByIdUseCase';
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
 import emitter from '../../utils/eventBus';
@@ -36,6 +37,8 @@ class HandleActionActive {
 
   private deleteActionUseCase: DeleteActionUseCase;
 
+  private getPivotUseCase: GetPivotByIdUseCase;
+
   private getNodeUseCase: GetOneNodeUseCase;
 
   constructor(activeQueue: GenericQueue<ActionData>) {
@@ -45,6 +48,7 @@ class HandleActionActive {
     this.updateActionUseCase = container.resolve(UpdateActionsUseCase);
     this.deleteActionUseCase = container.resolve(DeleteActionUseCase);
     this.getNodeUseCase = container.resolve(GetOneNodeUseCase);
+    this.getPivotUseCase = container.resolve(GetPivotByIdUseCase);
     this.current = activeQueue.peek();
     this.action = this.current.action;
   }
@@ -126,7 +130,12 @@ class HandleActionActive {
 
         const { pivot_id, pivot_num } = active.action;
         await this.deleteActionUseCase.execute(active.action.action_id);
-        const node = await this.getNodeUseCase.execute(active.action.node_id!!);
+
+        // Pega dados para enviar notificação para nuvem
+        const pivot = await this.getPivotUseCase.execute(
+          active.action.pivot_id
+        );
+        const node = await this.getNodeUseCase.execute(pivot?.node_id!!);
         node &&
           emitter.emit('fail', {
             id: `${active.action.farm_id}_${node.node_num}`,
