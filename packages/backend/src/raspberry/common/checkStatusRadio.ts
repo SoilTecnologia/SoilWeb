@@ -3,6 +3,7 @@ import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUse
 import { GetPivotByIdUseCase } from '../../useCases/Pivots/GetById/GetByIdUseCase';
 import { GetOnePivotUseCase } from '../../useCases/Pivots/GetOnePivot/GetOnePivotUseCase';
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
+import { GetPivotStateUseCase } from '../../useCases/States/GetPivotState/GetPivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
 import emitter from '../../utils/eventBus';
 import GenericQueue from '../../utils/generic_queue';
@@ -38,12 +39,14 @@ class CheckStatusRadio {
 
   private getNode: GetOneNodeUseCase;
 
-  private intervalState: interval;
+  private getStateUseCase: GetPivotStateUseCase;
 
   constructor(idleQueue: GenericQueue<IdleData>) {
     this.idleQueue = idleQueue;
     // this.intervalState = intervalState;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
+    this.getStateUseCase = container.resolve(GetPivotStateUseCase);
+
     this.getPivot = container.resolve(GetPivotByIdUseCase);
     this.getNode = container.resolve(GetOneNodeUseCase);
     this.current = this.idleQueue.peek();
@@ -53,25 +56,67 @@ class CheckStatusRadio {
   }
 
   private resetCurrent() {
-    this.current = this.idleQueue.dequeue()!;
+    this.idleQueue.remove(this.current)!;
     this.idleQueue.enqueue(this.current);
   }
 
-  async updateStateChageIsTrue(payload: StatusObject) {
-    await this.getUpdatePivotController.execute(
-      this.pivot_id,
-      true,
-      payload.power,
-      payload.water,
-      payload.direction,
-      payload.angle,
-      payload.percentimeter,
-      new Date(),
-      null,
-      null
-    );
+  getStatePivot = async (connection: boolean, payload?: StatusObject) => {
+    const oldState = await this.getStateUseCase.execute(this.pivot_id);
+    const power = payload ? payload.power : false;
+    const water = payload ? payload.water : false;
+    const direction = payload ? payload.direction : 'CLOCKWISE';
+    const angle = payload ? payload.angle : null;
+    const percentimeter = payload ? payload.percentimeter : null;
 
-    // this.resetCurrent();
+    if (oldState) {
+      if (oldState.connection !== connection) {
+        await this.getUpdatePivotController.execute(
+          this.pivot_id,
+          connection,
+          power,
+          water,
+          direction,
+          angle,
+          percentimeter,
+          new Date(),
+          null,
+          null
+        );
+
+        const pivot = await this.getPivot.execute(this.pivot_id);
+        const node = await this.getNode.execute(pivot?.node_id!!);
+        pivot &&
+          node &&
+          emitter.emit('connection-pivot', {
+            id: `${pivot.farm_id}_${node.node_num}`,
+            pivot_id: this.pivot_id,
+            pivot_num: pivot.pivot_num,
+            connection
+          });
+      }
+    } else {
+      await this.getUpdatePivotController.execute(
+        this.pivot_id,
+        connection,
+        power,
+        water,
+        direction,
+        angle,
+        percentimeter,
+        new Date(),
+        null,
+        null
+      );
+    }
+  };
+
+  async updateStateChageIsTrue(payload: StatusObject) {
+    await this.getStatePivot(true, payload);
+    this.current.attempts = 1;
+    this.resetCurrent();
+    setTimeout(async () => {
+      await checkPool();
+    }, 5000);
     console.log('........................................................');
   }
 
@@ -81,28 +126,8 @@ class CheckStatusRadio {
       console.log('........................................................');
       // Tratar de enviar esse stats de falha de conexão com pivo para nuvem
       // E a nuvem mandar confirmação para o concentrador *ACK
-      await this.getUpdatePivotController.execute(
-        this.pivot_id,
-        false,
-        false,
-        false,
-        'CLOCKWISE',
-        0,
-        0,
-        new Date(),
-        '',
-        0
-      );
+      await this.getStatePivot(false);
 
-      const pivot = await this.getPivot.execute(this.pivot_id);
-      const node = await this.getNode.execute(pivot?.node_id!!);
-      pivot &&
-        node &&
-        emitter.emit('fail', {
-          id: `${pivot.farm_id}_${node.node_num}`,
-          pivot_id: this.pivot_id,
-          pivot_num: pivot.pivot_num
-        });
       this.current.attempts = 1;
       this.resetCurrent();
     }

@@ -67,13 +67,12 @@ class IoTDevice {
     this.checkGprs = new CheckGprs();
 
     if (type === 'Raspberry' && topic) {
-      console.log(topic, 'araxa topico');
-      this.subTopic = `${topic}`;
+      this.subTopic = topic;
       this.pubTopic = `cloudHenrique`;
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = 'cloudHenrique23';
+      this.clientId = 'cloudHenrique0807';
     }
   }
 
@@ -350,15 +349,14 @@ class IoTDevice {
         );
         this.processQueue();
       });
-      emitter.on('fail', async (action) => {
-        console.log('em fail', action);
-        this.queue.enqueue({ type: 'status', ...action, connection: false });
+      emitter.on('connection-pivot', async (action) => {
+        this.queue.enqueue({ type: 'status', ...action });
         this.processQueue();
       });
     } else {
-      emitter.on('fail', async (action) => {
+      emitter.on('connection-pivot', async (action) => {
         console.log('em fail', action);
-        this.queue.enqueue({ type: 'status', ...action, connection: false });
+        this.queue.enqueue({ type: 'status', ...action });
         this.processQueue();
       });
       emitter.on('action', async (action: ActionReceived) => {
