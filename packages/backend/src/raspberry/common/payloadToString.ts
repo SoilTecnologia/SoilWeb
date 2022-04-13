@@ -1,8 +1,8 @@
 import { StatusObject } from '../../utils/conversions';
 
 export const statusStringToObject = (status: string) => {
-  let [match, direction, water, power, percentimeter, angle, timestamp] =
-    /(\d{1})-(\d{1})-(\d{1})-(\d+)-(\d+)-(\d+)/.exec(`${status}`) || [];
+  let [direction, water, power, percentimeter, angle, timestamp] =
+    status.split('-');
 
   let response: StatusObject = {
     power: null,
@@ -35,7 +35,7 @@ export const statusStringToObject = (status: string) => {
   response.angle = Number(angle);
   response.timestamp = new Date(Number(timestamp));
 
-  return match ? response : null;
+  return response;
 };
 
 export const payloadToString = (response: number[]) => {
