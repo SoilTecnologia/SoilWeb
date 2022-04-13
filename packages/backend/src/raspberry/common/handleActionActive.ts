@@ -53,20 +53,23 @@ class HandleActionActive {
     this.action = this.current.action;
   }
 
-  checkResponse = (payload: StatusObject) => {
+  checkResponse = (payload: StatusObject, active: ActionData) => {
     if (payload) {
-      const actionPower =
-        this.action.power &&
-        payload.power == this.action.power &&
-        payload.water == this.action.water &&
-        payload.direction == this.action.direction;
-
-      const actionNotPower =
-        !this.action.power &&
-        payload.power == this.action.power &&
-        payload.water == this.action.water;
-
-      if (actionNotPower && actionPower) return true;
+      if (active.action.power) {
+        if (
+          payload.power == active.action.power &&
+          payload.water == active.action.water &&
+          payload.direction == active.action.direction
+        ) {
+          return true;
+        } else {
+          if (
+            payload.power == active.action.power &&
+            payload.water == active.action.water
+          )
+            return true;
+        }
+      }
     }
 
     return false;
@@ -191,9 +194,9 @@ class HandleActionActive {
   async treatsResponses(response: responseSendData, active: ActionData) {
     if (response) {
       const { data, result } = response;
-      const verifyResponseData = result && this.checkResponse(result);
+      const verifyResponseData = result && this.checkResponse(result, active);
       const radioIsEquals = active.action.radio_id == data.id;
-      const allDataValids = verifyResponseData && radioIsEquals && result;
+      const allDataValids = verifyResponseData && radioIsEquals;
 
       if (allDataValids) this.updateActionWithCondicionsValid(result, active);
       else {

@@ -161,20 +161,23 @@ class CheckStatusRadio {
       console.log('......');
 
       const radioDataIsEquals = this.radio_id == data.id;
+      console.log(
+        `Resposta antiga: ${this.current.cmdResponse}, Nova Resposta: ${responseSplit[0]}`
+      );
 
       if (
         this.current.cmdResponse &&
-        responseSplit === this.current.cmdResponse
+        responseSplit[0] === this.current.cmdResponse
       ) {
         console.log(`Radio Response is Equal a old Response`);
         console.log('....');
-        this.current.cmdResponse = responseSplit;
+        this.current.cmdResponse = responseSplit[0];
         this.current.attempts++;
       } else if (result && radioDataIsEquals) {
-        this.current.cmdResponse = responseSplit;
+        this.current.cmdResponse = responseSplit[0];
         this.updateStateChageIsTrue(result);
       } else {
-        this.current.cmdResponse = responseSplit;
+        this.current.cmdResponse = responseSplit[0];
         this.current.attempts++;
       }
     } catch (err) {
