@@ -180,19 +180,20 @@ class HandleActionActive {
 
     try {
       const response = await sendData(active.action.radio_id, actionString);
-
-      if (response.data.status === 'Ok') {
-        console.log('......');
-        await this.treatsResponses(response, active);
-      } else {
+      const { data } = response;
+      if (data.status === 'Fail') {
         const logReponse =
-          response.data.status === 'Fail'
+          data.status === 'Fail'
             ? `Radio ${active.action.radio_id} Not Connect`
             : `Failled in the Motherboard`;
 
         console.log(logReponse);
         console.log('.....');
         await this.logErrorTry(active);
+      } else {
+        console.log(`Radio: ${active.action.radio_id} received Status "Ok" `);
+        console.log('......');
+        await this.treatsResponses(response, active);
       }
     } catch (err) {
       console.log(err.message);
