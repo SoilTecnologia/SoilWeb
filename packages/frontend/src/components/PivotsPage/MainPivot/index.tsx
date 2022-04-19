@@ -12,7 +12,7 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
   const handleFarms = () => {
     Router.push("/farms");
   }
-  const handleMapa = () => {
+  const handleMap = () => {
     Router.push("/map")
   }
 
@@ -29,7 +29,7 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
             </S.Text>
           </S.Button>
           <S.Button
-            onClick={handleMapa}
+            onClick={handleMap}
           >
             <S.MapIcon />
             <S.Text >

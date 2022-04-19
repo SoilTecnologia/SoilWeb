@@ -21,7 +21,8 @@ import {
   requestUpdateUser,
   requestSendPivotIntent,
   requestPivotStatus,
-  requestGetAllPivotsForMapWithFarmId
+  requestGetAllPivotsForMapWithFarmId,
+  requestPivotHistoric
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
@@ -62,6 +63,7 @@ interface actionCrudProps {
   sendPivotIntent: (pivotId: string, intent: Intent) => void;
   getPivotState: (pivot_id: Pivot['pivot_id']) => void;
   getGetPivotsListForMapWithFarmId: (farm_id: Farm["farm_id"]) => Promise<void>;
+  getPivotHistoric: (pivot_id: Pivot["pivot_id"], start_date: Date, end_date: Date) => Promise<void>
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -79,7 +81,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     setPivotMapList
   } = useContextData();
   const { user } = useContextAuth();
-  const { setPivot } = useContextUserData()
+  const { setPivot,setHistoric } = useContextUserData()
   //CRUD USER
   const getAllUser = async (
     tokenState?: string
@@ -187,6 +189,10 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     await requestDeletePivot(pivot.pivot_id, user?.token);
     await getAllPivots(pivot.farm_id);
   };
+  const getPivotHistoric = async (pivot_id: Pivot["pivot_id"], start_date: Date, end_date: Date) => {
+    const result = await requestPivotHistoric(pivot_id, start_date, end_date, user?.token);
+    result && setHistoric(result)
+  };
   //Rota page user
   const getAllPivotWithFarmId = async (farm_id: Farm["farm_id"]) => {
     const result = await requestGetAllPivotsWithFarmId(farm_id, user?.token);
@@ -228,6 +234,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         sendPivotIntent,
         getPivotState,
         getGetPivotsListForMapWithFarmId,
+        getPivotHistoric,
       }}
     >
       {children}

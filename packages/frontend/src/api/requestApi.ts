@@ -382,6 +382,24 @@ export const requestGetPivotsListWithFarmId = async (
       console.log(err);
     });
 };
+export const requestPivotHistoric = async (
+  pivot_id: Pivot["pivot_id"],
+  start_date:Date,
+  end_date:Date,
+  tokenId: tokenState
+) => {
+  console.log(pivot_id,start_date,end_date)
+  return await api
+  //////////TROCAR PARA /CYCLES APENAS
+    .get(`pivots/cycles/${pivot_id}/${start_date}/${end_date}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar pivos");
+      console.log(err);
+    });
+};
 
 /// WEB CRUD
 //  export const requestPivotStatus = async (pivo_id:string) => {

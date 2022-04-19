@@ -46,7 +46,7 @@ const MainIntent = () => {
         subHeaderText={getTimestamp() == null ? 'Nunca foi Atualizado' : `${getTimestamp()}`}
       />
       <S.Body>
-        <S.ScheduleButton>
+        {/* <S.ScheduleButton>
           <Icon>
             <ImCalendar />
           </Icon>
@@ -54,7 +54,7 @@ const MainIntent = () => {
           <S.ButtonText>
             Realizar agendamento
           </S.ButtonText>
-        </S.ScheduleButton>
+        </S.ScheduleButton> */}
 
         <S.CurrentStateContainer>
 
