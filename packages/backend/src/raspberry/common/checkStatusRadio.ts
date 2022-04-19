@@ -150,35 +150,20 @@ class CheckStatusRadio {
     );
 
     try {
-      const { data, result, cmdResponse } = await sendData(
-        this.radio_id,
-        '000-000'
-      );
-      const responseSplit = cmdResponse.data.split('#');
-      console.log(
-        `Radio Response: ${responseSplit[0]}, Status: ${data.status}`
-      );
-      console.log('......');
+      const { data, result } = await sendData(this.radio_id, '000-000');
 
       const radioDataIsEquals = this.radio_id == data.id;
-      console.log(
-        `Resposta antiga: ${this.current.cmdResponse}, Nova Resposta: ${responseSplit[0]}`
-      );
-
-      if (
-        this.current.cmdResponse &&
-        responseSplit[0] === this.current.cmdResponse
-      ) {
-        console.log(`Radio Response is Equal a old Response`);
-        console.log('....');
-        this.current.cmdResponse = responseSplit[0];
-        this.current.attempts++;
-      } else if (result && radioDataIsEquals) {
-        this.current.cmdResponse = responseSplit[0];
+      if (result && radioDataIsEquals && data.status === 'OK') {
         this.updateStateChageIsTrue(result);
       } else {
-        this.current.cmdResponse = responseSplit[0];
         this.current.attempts++;
+        const logReponse =
+          data.status === 'Fail'
+            ? `Radio ${this.radio_id} Not Connect`
+            : `Failled in the Motherboard`;
+
+        console.log(logReponse);
+        console.log('.....');
       }
     } catch (err) {
       // this.intervalState(false);

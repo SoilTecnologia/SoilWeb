@@ -71,18 +71,17 @@ export const sendData = async (radio_id: number, data: string) => {
   // bodyFormData.set('CMD', '40');
   bodyFormData.set('intencao', data);
   const encoder = new FormDataEncoder(bodyFormData);
+  const dataSend = Readable.from(encoder);
 
   const response = await Axios.post<RadioResponse>(
     'http://192.168.100.100:3031/comands',
-    Readable.from(encoder),
+    dataSend,
     { headers: encoder.headers, timeout: TIMEOUT }
   );
 
-  const cmdResponse = await Axios.get('http://192.168.100.100:3031/cmd');
-
   const result = payloadToString(response.data.payload);
 
-  return { result, data: response.data, cmdResponse };
+  return { result, data: response.data };
 };
 
 export const loadActions = async () => {

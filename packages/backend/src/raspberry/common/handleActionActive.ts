@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios';
 import { container } from 'tsyringe';
 import IoTDevice from '../../aws-iot';
 import { ActionsResult } from '../../types/actionsType';
@@ -6,6 +7,7 @@ import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase
 import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
 import { GetPivotByIdUseCase } from '../../useCases/Pivots/GetById/GetByIdUseCase';
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
+import { GetPivotStateUseCase } from '../../useCases/States/GetPivotState/GetPivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
 import emitter from '../../utils/eventBus';
 import GenericQueue from '../../utils/generic_queue';
@@ -16,9 +18,10 @@ type ActionData = {
   action: ActionsResult;
   timestamp: Date;
   attempts: number;
+  cmdResponse?: string;
 };
 type responseSendData = {
-  result: StatusObject | null;
+  result: StatusObject | undefined;
   data: RadioResponse;
 };
 
@@ -41,6 +44,8 @@ class HandleActionActive {
 
   private getNodeUseCase: GetOneNodeUseCase;
 
+  private getStateUseCase: GetPivotStateUseCase;
+
   constructor(activeQueue: GenericQueue<ActionData>) {
     this.activeQueue = activeQueue;
     // this.intervalState = intervalState;
@@ -49,45 +54,25 @@ class HandleActionActive {
     this.deleteActionUseCase = container.resolve(DeleteActionUseCase);
     this.getNodeUseCase = container.resolve(GetOneNodeUseCase);
     this.getPivotUseCase = container.resolve(GetPivotByIdUseCase);
+    this.getStateUseCase = container.resolve(GetPivotStateUseCase);
     this.current = activeQueue.peek();
     this.action = this.current.action;
   }
-
-  checkResponse = (payload: StatusObject, active: ActionData) => {
-    if (payload) {
-      if (active.action.power) {
-        if (
-          payload.power == active.action.power &&
-          payload.water == active.action.water &&
-          payload.direction == active.action.direction
-        ) {
-          return true;
-        } else {
-          if (
-            payload.power == active.action.power &&
-            payload.water == active.action.water
-          )
-            return true;
-        }
-      }
-    }
-
-    return false;
-  };
 
   updateActionWithCondicionsValid = async (
     payload: StatusObject,
     active: ActionData
   ) => {
     // this.intervalState(false);
+
     const action = await this.getUpdatePivotController.execute(
       active.action.pivot_id,
       true,
-      payload.power,
-      payload.water,
-      payload.direction,
+      active.action.power,
+      active.action.water,
+      active.action.direction,
       payload.angle,
-      payload.percentimeter,
+      active.action.percentimeter,
       payload.timestamp,
       '',
       null
@@ -98,13 +83,14 @@ class HandleActionActive {
       : console.log('Action não Atualizada');
 
     this.current.attempts = 1;
+    active.attempts = 1;
 
     await this.updateActionUseCase.execute(this.action.action_id, true);
     console.log('UPDATING ACTION:', this.action.action_id);
 
     // Verificar se está deletando essa ação do array
     // Se não estiver procurar uma solução para isso
-    this.activeQueue.remove(this.current);
+    this.activeQueue.remove(active);
     await checkPool();
   };
 
@@ -138,13 +124,20 @@ class HandleActionActive {
         const pivot = await this.getPivotUseCase.execute(
           active.action.pivot_id
         );
+
+        // Checa se a conexão é falsa para enviar para nuvem
         const node = await this.getNodeUseCase.execute(pivot?.node_id!!);
-        node &&
-          emitter.emit('fail', {
-            id: `${active.action.farm_id}_${node.node_num}`,
-            pivot_id,
-            pivot_num
-          });
+        const oldState = await this.getStateUseCase.execute(pivot?.pivot_id);
+
+        if (oldState.connection !== false) {
+          node &&
+            emitter.emit('connection-pivot', {
+              id: `${active.action.farm_id}_${node.node_num}`,
+              pivot_id,
+              pivot_num,
+              connection: false
+            });
+        }
       } catch (err) {
         console.log('ERROR IN Returns Failled');
         console.log(err.message);
@@ -156,6 +149,16 @@ class HandleActionActive {
       // Enviar mensagem para nuvem dizendo que o pivo falhou na atualização
     }
   };
+
+  async logErrorTry(active: ActionData) {
+    active.attempts && active.attempts++;
+    if (active.attempts && this.current.attempts > 3)
+      await this.returnFailled(active);
+    else
+      setTimeout(async () => {
+        await this.sendItem(active);
+      }, 5000);
+  }
 
   async sendItem(active: ActionData) {
     console.log(`Numero de Tentativas ${this.current.attempts}`);
@@ -177,38 +180,38 @@ class HandleActionActive {
 
     try {
       const response = await sendData(active.action.radio_id, actionString);
-      const cmdSplit = response.cmdResponse.data.split('#');
-      console.log(
-        `Radio Response: ${cmdSplit[0]}, Status: ${response.data.status}`
-      );
-      console.log('......');
-      await this.treatsResponses(response, active);
+
+      if (response.data.status === 'Ok') {
+        console.log('......');
+        await this.treatsResponses(response, active);
+      } else {
+        const logReponse =
+          response.data.status === 'Fail'
+            ? `Radio ${active.action.radio_id} Not Connect`
+            : `Failled in the Motherboard`;
+
+        console.log(logReponse);
+        console.log('.....');
+        await this.logErrorTry(active);
+      }
     } catch (err) {
-      active.attempts++;
-      if (active.attempts > 3) await this.returnFailled(active);
-      await this.sendItem(active);
       console.log(err.message);
+      await this.logErrorTry(active);
     }
   }
 
   async treatsResponses(response: responseSendData, active: ActionData) {
-    if (response) {
+    if (response && response.result) {
       const { data, result } = response;
-      const verifyResponseData = result && this.checkResponse(result, active);
+
       const radioIsEquals = active.action.radio_id == data.id;
-      const allDataValids = verifyResponseData && radioIsEquals;
+      const allDataValids = radioIsEquals && result;
 
       if (allDataValids) this.updateActionWithCondicionsValid(result, active);
       else {
-        this.current && this.current.attempts && this.current.attempts++;
         console.log('Failled in communication');
         console.log('');
-        if (active.attempts && active.attempts > 3)
-          await this.returnFailled(active);
-        else
-          setTimeout(async () => {
-            await this.sendItem(active);
-          }, 5000);
+        await this.logErrorTry(active);
       }
     }
   }
@@ -218,15 +221,9 @@ class HandleActionActive {
       try {
         await this.sendItem(active);
       } catch (err) {
-        active.attempts && active.attempts++;
         console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
         console.log('');
-        if (active.attempts && this.current.attempts > 3)
-          await this.returnFailled(active);
-        else
-          setTimeout(async () => {
-            await this.sendItem(active);
-          }, 5000);
+        await this.logErrorTry(active);
       }
     }
   };

@@ -161,6 +161,8 @@ class UpdatePivotStateUseCase {
     if (!oldState || isStateDifferent(oldState, newState)) {
       this.shouldNotifyUpdate = true;
       this.shouldNotifyState = true;
+      console.log(oldState);
+      console.log(newState);
 
       const createStateUseCase = container.resolve(CreateStateUseCase);
 
