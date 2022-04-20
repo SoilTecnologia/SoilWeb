@@ -3,6 +3,7 @@ import Pivot from "utils/models/pivot";
 import PivotStatusComponent from "../PivotStatusComponent";
 import { useContextUserData } from "hooks/useContextUserData";
 import * as S from "./styles";
+import { setCookie } from "nookies";
 
 interface PivotProps {
   pivot: Pivot;
@@ -21,6 +22,8 @@ const PivotsContainer = ({ pivot }: PivotProps) => {
     }
   }
   const handleIntent = () => {
+    const propsCookie = { maxAge: 60 * 60 * 2 };
+    setCookie(undefined, "user-pivot-id", pivot.pivot_id, propsCookie);
     setPivot(pivot);
     Router.push("/intent");
   };

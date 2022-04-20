@@ -40,9 +40,9 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html lang="pt-BR">
-        <Head >
+        <Head>
           <link rel="shortcut icon" href="/favicon.png" />
-          </Head>
+        </Head>
 
         <body>
           <Main />

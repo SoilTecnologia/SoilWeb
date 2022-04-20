@@ -8,12 +8,10 @@ import { UseContextProvider } from "hooks/useContextData";
 import { UseCrudContextProvider } from "hooks/useActionsCrud";
 import { UseLoginProvider } from "hooks/useLoginAuth";
 import { UserDataProvider } from "hooks/useContextUserData";
-import { IntentsDataProvider } from "hooks/useContextIntentData"
+import { IntentsDataProvider } from "hooks/useContextIntentData";
 import Socket from "api/socket";
 
 function App({ Component, pageProps }: AppProps) {
-
-
   return (
     <ThemeProvider theme={theme}>
       <UseLoginProvider>
@@ -34,7 +32,6 @@ function App({ Component, pageProps }: AppProps) {
                 </Head>
                 <Component {...pageProps} />
                 <GlobalStyles />
-
               </UseCrudContextProvider>
             </IntentsDataProvider>
           </UserDataProvider>

@@ -24,7 +24,9 @@ const UserPivots = () => {
     if (isAdm) {
       findAllPivots();
     } else {
-      farm && getGetPivotsListWithFarmId(farm.farm_id);
+      const { "user-farm-id": farm_id } = parseCookies();
+      const farmId = farm ? farm.farm_id : farm_id;
+      farmId && getGetPivotsListWithFarmId(farmId);
     }
   };
 

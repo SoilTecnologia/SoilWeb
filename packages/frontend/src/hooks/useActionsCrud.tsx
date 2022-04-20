@@ -26,6 +26,7 @@ import {
   requestPivotStatus,
   requestGetAllPivotsForMapWithFarmId,
   requestPivotHistoric,
+  requestGetByPivotId,
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
@@ -60,6 +61,7 @@ interface actionCrudProps {
   getAllPivots: (farm_id: Farm["farm_id"]) => void;
   findAllPivots: () => void;
   getOnePivot: (pivot: PivotCreate) => Promise<Pivot | null | undefined>;
+  getByPivotId: (pivot_id: string) => Promise<void>;
   createPivot: (pivot: PivotCreate) => void;
   updatePivot: (pivot: Pivot) => void;
   deletePivot: (pivot: Pivot) => void;
@@ -201,6 +203,12 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
 
   const getOnePivot = async (pivot: PivotCreate) =>
     await requestOnePivot(pivot, user?.token);
+
+  const getByPivotId = async (pivot_id: string) => {
+    const pivot = await requestGetByPivotId(pivot_id, user?.token);
+    pivot && setPivot(pivot);
+  };
+
   const createPivot = async (pivot: PivotCreate) => {
     await requestCreateNewPivot(pivot, user?.token);
     getAllPivots(pivot.farm_id);
@@ -271,6 +279,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         getAllPivots,
         findAllPivots,
         getOnePivot,
+        getByPivotId,
         createNode,
         updateNode,
         deleteNode,
