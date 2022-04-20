@@ -150,10 +150,13 @@ class CheckStatusRadio {
     );
 
     try {
-      const { data, result } = await sendData(this.radio_id, '000-000', false);
+      const { data, result } = await sendData(this.radio_id, '000-000');
 
       const radioDataIsEquals = this.radio_id == data.id;
       if (result && radioDataIsEquals && data.status === 'OK') {
+        console.log(
+          `RadioResponse: ${data.cmdResponse}, Status: ${data.status}`
+        );
         this.updateStateChageIsTrue(result);
       } else {
         this.current.attempts++;

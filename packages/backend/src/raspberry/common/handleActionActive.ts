@@ -179,11 +179,7 @@ class HandleActionActive {
     );
 
     try {
-      const response = await sendData(
-        active.action.radio_id,
-        actionString,
-        true
-      );
+      const response = await sendData(active.action.radio_id, actionString);
       const { data } = response;
       if (data.status === 'Fail') {
         const logReponse =
