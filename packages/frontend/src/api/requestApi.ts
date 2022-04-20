@@ -290,7 +290,7 @@ export const requestSendPivotIntent = async (
   tokenId: tokenState
 ) => {
   return await api
-    .post(`actions/crea te/${pivotId}`, intents, {
+    .post(`actions/create/${pivotId}`, intents, {
       headers: { Authorization: tokenId ? tokenId : token },
     })
     .then((response) => response.data)
