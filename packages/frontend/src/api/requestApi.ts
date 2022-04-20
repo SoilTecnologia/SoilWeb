@@ -1,7 +1,9 @@
 import { parseCookies } from "nookies";
 import Farm, { FarmCreate } from "utils/models/farm";
+import Intent from "utils/models/intent";
 import Node, { NodeCreate } from "utils/models/node";
 import Pivot, { PivotCreate } from "utils/models/pivot";
+import State from "utils/models/state";
 import User, { UserCreate } from "utils/models/user";
 import { api } from "./api";
 
@@ -282,6 +284,21 @@ export const requestUpdatePivot = async (
       console.log(err);
     });
 };
+export const requestSendPivotIntent = async (
+  pivotId: Pivot["pivot_id"],
+  intents: Intent,
+  tokenId: tokenState
+) => {
+  return await api
+    .post(`actions/crea te/${pivotId}`, intents, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log(err);
+    });
+};
 
 export const requestGetNodeWithPivotNum = async (
   node: NodeCreate,
@@ -308,6 +325,20 @@ export const requestGetAllPivotsWithFarmId = async (
       console.log(err);
     });
 };
+export const requestGetAllPivotsForMapWithFarmId = async (
+  farm_id: Farm["farm_id"],
+  tokenId: tokenState
+) => {
+  return await api
+    .get(`pivots/map/${farm_id}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar pivos");
+      console.log(err);
+    });
+};
 
 export const requestOnePivot = async (
   pivot: PivotCreate,
@@ -324,13 +355,43 @@ export const requestOnePivot = async (
       console.log(err);
     });
 };
-
+export const requestPivotStatus = async (
+  pivot_id: Pivot["pivot_id"],
+  tokenId: tokenState
+) => {
+  return await api
+    .get(`pivots/state/${pivot_id}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar pivô");
+      console.log(err);
+    });
+};
 export const requestGetPivotsListWithFarmId = async (
   farm_id: Farm["farm_id"],
   tokenId: tokenState
 ) => {
   return await api
     .get(`pivots/list/${farm_id}`, tokenHeader(tokenId))
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao salvar pivos");
+      console.log(err);
+    });
+};
+export const requestPivotHistoric = async (
+  pivot_id: Pivot["pivot_id"],
+  start_date: Date,
+  end_date: Date,
+  tokenId: tokenState
+) => {
+  console.log(pivot_id, start_date, end_date);
+  return await api
+    .get(`cycles/${pivot_id}/${start_date}/${end_date}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar pivos");

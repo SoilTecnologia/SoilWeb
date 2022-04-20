@@ -8,6 +8,7 @@ import React, {
 import Farm from "utils/models/farm";
 import Node from "utils/models/node";
 import Pivot from "utils/models/pivot";
+import PivotList from "utils/models/pivotlist";
 import User, { requestUser } from "utils/models/user";
 
 export type stateContentProps = {
@@ -40,6 +41,8 @@ type dataContextProps = {
   setPivotList: Dispatch<SetStateAction<Pivot[]>>;
   pivotList: Pivot[];
   nodeList: Node[];
+  pivotMapList: PivotList;
+  setPivotMapList: React.Dispatch<React.SetStateAction<PivotList>>;
 };
 
 interface UserProviderProps {
@@ -69,7 +72,7 @@ function UseContextProvider({ children }: UserProviderProps) {
   const [farmList, setFarmList] = useState<Farm[]>([] as Farm[]);
   const [nodeList, setNodeList] = useState<Node[]>([] as Node[]);
   const [pivotList, setPivotList] = useState<Pivot[]>([] as Pivot[]);
-
+  const [pivotMapList, setPivotMapList] = useState<PivotList>({} as PivotList);
   return (
     <UserDataContext.Provider
       value={{
@@ -84,6 +87,8 @@ function UseContextProvider({ children }: UserProviderProps) {
         pivotList,
         farmList,
         setFarmList,
+        pivotMapList,
+        setPivotMapList
       }}
     >
       {children}

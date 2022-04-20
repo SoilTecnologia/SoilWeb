@@ -1,8 +1,8 @@
 import MainFarm from "components/FarmsPage/MainFarm";
 import { Loading } from "components/globalComponents/Loading/Loading";
 import { useContextActionCrud } from "hooks/useActionsCrud";
-import { useContextAuth } from "hooks/useLoginAuth";
 import { useEffect } from "react";
+import { useContextAuth } from "hooks/useLoginAuth";
 
 const UserFarms = () => {
   const { user, isUserAuth } = useContextAuth();

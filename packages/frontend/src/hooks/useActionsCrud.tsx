@@ -22,16 +22,21 @@ import {
   requestUpdateNode,
   requestUpdatePivot,
   requestUpdateUser,
+  requestSendPivotIntent,
+  requestPivotStatus,
+  requestGetAllPivotsForMapWithFarmId,
+  requestPivotHistoric,
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
 import Farm, { FarmCreate } from "utils/models/farm";
+import Intent from "utils/models/intent";
 import Node, { NodeCreate } from "utils/models/node";
 import Pivot, { PivotCreate } from "utils/models/pivot";
 import User, { requestUser, UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 import { useContextAuth } from "./useLoginAuth";
-
+import { useContextUserData } from "./useContextUserData";
 interface UserProviderProps {
   children: React.ReactNode;
 }
@@ -60,6 +65,14 @@ interface actionCrudProps {
   deletePivot: (pivot: Pivot) => void;
   getGetPivotsListWithFarmId: (farm_id: Farm["farm_id"]) => void;
   getAllPivotWithFarmId: (farm_id: Farm["farm_id"]) => void;
+  sendPivotIntent: (pivotId: string, intent: Intent) => void;
+  getPivotState: (pivot_id: Pivot["pivot_id"]) => void;
+  getGetPivotsListForMapWithFarmId: (farm_id: Farm["farm_id"]) => Promise<void>;
+  getPivotHistoric: (
+    pivot_id: Pivot["pivot_id"],
+    start_date: Date,
+    end_date: Date
+  ) => Promise<void>;
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -70,14 +83,14 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     stateAdmin,
     setData,
     stateDefault,
-
     setUsersList,
     setFarmList,
     setNodeList,
     setPivotList,
+    setPivotMapList,
   } = useContextData();
   const { user } = useContextAuth();
-
+  const { setPivot, setHistoric } = useContextUserData();
   //CRUD USER
   const getAllUser = async (
     tokenState?: string
@@ -181,6 +194,11 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     result && setPivotList(result);
   };
 
+  const getPivotState = async (pivot_id: Pivot["pivot_id"]) => {
+    const result = await requestPivotStatus(pivot_id, user?.token);
+    result && setPivot(result);
+  };
+
   const getOnePivot = async (pivot: PivotCreate) =>
     await requestOnePivot(pivot, user?.token);
   const createPivot = async (pivot: PivotCreate) => {
@@ -191,9 +209,28 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const newPivot = await requestUpdatePivot(pivot, user?.token);
     newPivot && (await getAllPivots(pivot.farm_id));
   };
+  const sendPivotIntent = async (
+    pivotId: Pivot["pivot_id"],
+    intent: Intent
+  ) => {
+    await requestSendPivotIntent(pivotId, intent, user?.token);
+  };
   const deletePivot = async (pivot: Pivot) => {
     await requestDeletePivot(pivot.pivot_id, user?.token);
     await getAllPivots(pivot.farm_id);
+  };
+  const getPivotHistoric = async (
+    pivot_id: Pivot["pivot_id"],
+    start_date: Date,
+    end_date: Date
+  ) => {
+    const result = await requestPivotHistoric(
+      pivot_id,
+      start_date,
+      end_date,
+      user?.token
+    );
+    result && setHistoric(result);
   };
   //Rota page user
   const getAllPivotWithFarmId = async (farm_id: Farm["farm_id"]) => {
@@ -203,9 +240,14 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
 
   const getGetPivotsListWithFarmId = async (farm_id: Farm["farm_id"]) => {
     const result = await requestGetPivotsListWithFarmId(farm_id, user?.token);
-    console.log("Todas os Pivos da fazenda");
-    console.log(result);
     result && setPivotList(result);
+  };
+  const getGetPivotsListForMapWithFarmId = async (farm_id: Farm["farm_id"]) => {
+    const result = await requestGetAllPivotsForMapWithFarmId(
+      farm_id,
+      user?.token
+    );
+    result && setPivotMapList(result);
   };
 
   return (
@@ -234,6 +276,10 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         deleteNode,
         getAllPivotWithFarmId,
         getGetPivotsListWithFarmId,
+        sendPivotIntent,
+        getPivotState,
+        getGetPivotsListForMapWithFarmId,
+        getPivotHistoric,
       }}
     >
       {children}

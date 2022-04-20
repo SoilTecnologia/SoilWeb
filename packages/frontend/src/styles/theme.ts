@@ -16,6 +16,7 @@ export default {
     primary_gradient: "#1d543e",
 
     secondary: "#edffcd",
+
     light: "#e1e1e1",
     dark: "#1e1e1e",
 

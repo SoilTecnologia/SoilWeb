@@ -1,18 +1,30 @@
-import Image from "next/image";
-import Pivot from "utils/models/pivot";
-import WaterOnIcon from "../../../../public/icons/Com_agua.png";
-import ErrorIcon from "../../../../public/icons/Exclamação.png";
-import WaterOffIcon from "../../../../public/icons/Sem_agua.png";
-import AntiClockwiseIcon from "../../../../public/icons/Sentido_antihorario.png";
-import ClockwiseIcon from "../../../../public/icons/Sentido_horario.png";
 import * as S from "./styles";
+import Pivot from "utils/models/pivot";
+import { format } from "date-fns";
+import WaterOnIcon from "../../../../public/icons/Com_agua.png";
+import WaterOffIcon from "../../../../public/icons/Sem_agua.png";
+import ErrorIcon from "../../../../public/icons/Exclamação.png";
+import ClockwiseIcon from "../../../../public/icons/Sentido_horario.png";
+import AntiClockwiseIcon from "../../../../public/icons/Sentido_antihorario.png";
 
+import Image from "next/image";
 interface PivotProps {
   pivot: Pivot;
 }
 
 const PivotStatusComponent = ({ pivot }: PivotProps) => {
-  return pivot.connection == true ? ( // trocar != para  ==
+  const updatedDateFormater = (timestamp: Date | undefined) => {
+    if (timestamp) {
+      const formatedUpdatedDate = format(
+        new Date(timestamp),
+        "dd / MM / yyyy' às 'hh:mm"
+      );
+      return formatedUpdatedDate;
+    }
+    return "Nunca foi Atualizado";
+  };
+
+  return pivot.connection == true ? (
     <S.Container>
       <S.StatusWrapper>
         <S.StatusView>
@@ -42,7 +54,7 @@ const PivotStatusComponent = ({ pivot }: PivotProps) => {
         </S.StatusView>
 
         <S.StatusView>
-          <S.StatusName>statusName</S.StatusName>
+          <S.StatusName>Percentímetro:</S.StatusName>
           <S.PivotCurrentPercent>
             {pivot.percentimeter == null ? "0%" : `${pivot.percentimeter}%`}
           </S.PivotCurrentPercent>
@@ -52,9 +64,7 @@ const PivotStatusComponent = ({ pivot }: PivotProps) => {
       <S.LastUpdateWrapper>
         <S.StatusName>Última Atualização:</S.StatusName>
 
-        <S.LastUpdate>
-          {pivot.timestamp == null ? "Nunca foi Atualizado" : pivot.timestamp}
-        </S.LastUpdate>
+        <S.LastUpdate>{updatedDateFormater(pivot.timestamp)}</S.LastUpdate>
       </S.LastUpdateWrapper>
     </S.Container>
   ) : (
@@ -70,9 +80,7 @@ const PivotStatusComponent = ({ pivot }: PivotProps) => {
       <S.LastUpdateWrapper>
         <S.StatusName>Última Atualização:</S.StatusName>
 
-        <S.LastUpdate>
-          {pivot.timestamp == null ? "Nunca foi Atualizado" : pivot.timestamp}
-        </S.LastUpdate>
+        <S.LastUpdate>{updatedDateFormater(pivot.timestamp)}</S.LastUpdate>
       </S.LastUpdateWrapper>
     </S.Container>
   );

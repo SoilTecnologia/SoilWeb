@@ -1,7 +1,7 @@
 import Header from "components/globalComponents/Header";
-import { default as Router, default as router } from "next/router";
 import Pivot from "utils/models/pivot";
-import PivotsContainer from "../PivotCard";
+import PivotsContainer from "../PivotContainer";
+import Router from "next/router";
 import * as S from "./styles";
 
 type PivotListProps = {
@@ -12,8 +12,8 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
   const handleFarms = () => {
     Router.push("/farms");
   };
-  const handleMapa = () => {
-    router.push("/map");
+  const handleMap = () => {
+    Router.push("/map");
   };
 
   return (
@@ -25,7 +25,8 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
             <S.BackIcon />
             <S.Text>Voltar</S.Text>
           </S.Button>
-          <S.Button onClick={handleMapa}>
+          <S.Button onClick={handleMap}>
+            <S.MapIcon />
             <S.Text>Mapa</S.Text>
           </S.Button>
         </S.ButtonsView>
