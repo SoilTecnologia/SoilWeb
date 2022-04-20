@@ -280,10 +280,8 @@ export const requestSendPivotIntent = async (
   intents: Intent,
   tokenId: tokenState
 ) => {
-  ///// actions/create
-  ///// pivots/update
   return await api
-    .post(`pivots/update/${pivotId}`,
+    .post(`actions/crea te/${pivotId}`,
     intents
     , {
       headers: { Authorization: tokenId ? tokenId : token },
@@ -390,8 +388,7 @@ export const requestPivotHistoric = async (
 ) => {
   console.log(pivot_id,start_date,end_date)
   return await api
-  //////////TROCAR PARA /CYCLES APENAS
-    .get(`pivots/cycles/${pivot_id}/${start_date}/${end_date}`, {
+    .get(`cycles/${pivot_id}/${start_date}/${end_date}`, {
       headers: { Authorization: tokenId ? tokenId : token },
     })
     .then((response) => response.data)
