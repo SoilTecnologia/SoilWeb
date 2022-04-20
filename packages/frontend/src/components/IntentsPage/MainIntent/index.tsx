@@ -23,14 +23,7 @@ const MainIntent = () => {
   const { pivot } = useContextUserData()
   const { pivotList } = useContextData()
 
-  const getTimestamp = () => {
-    if (pivot && pivotList) {
-      const pivotsFiltered = pivotList.filter((pivots) => pivots.pivot_id == pivot.pivot_id)
-      const timeStamp = pivotsFiltered[0].timestamp;
-      return timeStamp
-    }
-    return null
-  }
+
 
   const handleMap = () => {
     Router.push('/map')
@@ -43,7 +36,7 @@ const MainIntent = () => {
     <S.Container>
       <Header
         text={`Pivô ${pivot?.pivot_num}`}
-        subHeaderText={getTimestamp() == null ? 'Nunca foi Atualizado' : `${getTimestamp()}`}
+        subHeaderText={pivot.timestamp == null ? 'Nunca foi Atualizado' : pivot.timestamp}
       />
       <S.Body>
         {/* <S.ScheduleButton>
@@ -68,27 +61,27 @@ const MainIntent = () => {
 
         <S.ButtonsView>
 
-          <S.Button onClick={handleMap} >
+          <S.Button href='/map' >
+            <S.AnchorButton>
+              <S.MapIcon />
 
-            <S.MapIcon />
-
-            <S.Text>
-              Mapa
-            </S.Text>
-
+              <S.Text>
+                Mapa
+              </S.Text>
+            </S.AnchorButton>
           </S.Button>
 
-          <S.Button onClick={handleHistoric}>
+          <S.Button href='/historic'>
+            <S.AnchorButton>
+              <S.ClockIcon />
 
-            <S.ClockIcon />
+              <S.Text >
+                Histórico
+              </S.Text>
+            </S.AnchorButton>
+          </S.Button >
 
-            <S.Text >
-              Histórico
-            </S.Text>
-
-          </S.Button>
-
-        </S.ButtonsView>
+        </S.ButtonsView >
 
 
 
@@ -97,9 +90,9 @@ const MainIntent = () => {
 
 
 
-      </S.Body>
+      </S.Body >
 
-    </S.Container>
+    </S.Container >
 
   );
 

@@ -33,29 +33,27 @@ const MainHistoric = () => {
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber)
   };
-  const handleIntent = () => {
-    Router.push("/intent");
-  };
-  const handleMap = () => {
-    Router.push("/map")
-  };
 
   return (
     <S.Container>
       <Header text={'Histórico'} />
 
       <S.ButtonsView>
-        <S.Button onClick={handleIntent}>
-          <S.BackIcon />
-          <S.Text>
-            Voltar
-          </S.Text>
+        <S.Button href='/intent'>
+          <S.ButtonAnchor>
+            <S.BackIcon />
+            <S.Text>
+              Voltar
+            </S.Text>
+          </S.ButtonAnchor>
         </S.Button>
-        <S.Button onClick={handleMap}>
-          <S.MapIcon />
-          <S.Text >
-            Mapa
-          </S.Text>
+        <S.Button href='/map'>
+          <S.ButtonAnchor>
+            <S.MapIcon />
+            <S.Text >
+              Mapa
+            </S.Text>
+          </S.ButtonAnchor>
         </S.Button>
       </S.ButtonsView>
 

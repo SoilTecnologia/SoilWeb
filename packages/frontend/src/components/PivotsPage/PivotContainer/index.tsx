@@ -17,7 +17,7 @@ const PivotsContainer = ({ pivot }: PivotProps) => {
       if (pivot.power === true) {
         return "Ligado";
       }
-      return "Delisgado";
+      return "Desligado";
     }
   }
   const handleIntent = () => {

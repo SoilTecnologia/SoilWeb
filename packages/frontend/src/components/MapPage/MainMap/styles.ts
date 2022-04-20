@@ -1,6 +1,7 @@
 import styled, {css} from "styled-components";
 import { ImArrowLeft2 } from "react-icons/im";
 import {BsList}from "react-icons/bs";
+import Link from "next/link";
 
 export const Container =styled.div`
 ${({theme})=> css`
@@ -21,8 +22,9 @@ export const ButtonsContainer=styled.div`
     top:20px;
   `}
 `;
-
-export const FarmsButton = styled.button`
+export const FarmsButton = styled(Link)`
+`
+export const FarmsButtonAnchor = styled.a`
  ${({theme})=> css`
   display:flex;
   padding: ${theme.spacings.xxsmall} ${theme.spacings.small};
@@ -68,8 +70,9 @@ ${({theme})=> css`
   font-family:${theme.font.family.Montserrat_bold};
 `}
 `;
-
-export const PivotsButton = styled.button`
+export const PivotsButton = styled(Link)`
+`
+export const PivotsButtonAnchor = styled.a`
  ${({theme})=> css`
   display:flex;
   padding: ${theme.spacings.xxsmall} ${theme.spacings.small};
@@ -131,15 +134,12 @@ export const CaptionRowAlign=styled.div`
   flex-direction:row;
   align-items:center;
 `
-
-
 export const WetDot = styled.div`
 ${({theme})=> css`
   height: ${theme.font.sizes.xlarge};
   width: ${theme.font.sizes.xlarge};
   background:${theme.colors.wet};
   border-radius:100%;
-
   `}
 `
 export const DryDot = styled.div`
@@ -148,7 +148,6 @@ ${({theme})=> css`
   width: ${theme.font.sizes.xlarge};
   background:${theme.colors.dry};
   border-radius:100%;
-
   `}
 `
 export const OffDot = styled.div`
@@ -157,7 +156,6 @@ ${({theme})=> css`
   width: ${theme.font.sizes.xlarge};
   background:${theme.colors.off};
   border-radius:100%;
-
   `}
 `
 export const OfflineDot = styled.div`
@@ -166,7 +164,6 @@ ${({theme})=> css`
   width: ${theme.font.sizes.xlarge};
   background:${theme.colors.offline};
   border-radius:100%;
-
   `}
 `
 

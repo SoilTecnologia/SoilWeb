@@ -21,7 +21,7 @@ function App({ Component, pageProps }: AppProps) {
           <UserDataProvider>
             <IntentsDataProvider>
               <UseCrudContextProvider>
-                {/* <Socket /> */}
+                <Socket />
                 <Head>
                   <title>SoilTech</title>
                   <link rel="shortcut icon" href="/logos/logo.png" />

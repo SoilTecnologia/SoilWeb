@@ -16,7 +16,6 @@ import Router from "next/router";
 import IndicadorAH from '../../../../public/icons/indicadorAH.png'
 import IndicadorH from '../../../../public/icons/indicadorH.png'
 import IndicadorIddle from '../../../../public/icons/inicialpos.png'
-import PivotList from "utils/models/pivotlist";
 import Pivot from "utils/models/pivot";
 
 
@@ -30,6 +29,7 @@ const MapComponent = () => {
   const { farm, setPivot } = useContextUserData()
   const { pivotMapList } = useContextData()
   const [map, setMap] = useState(null);
+  const [pivotMapListCopy, setPivotMapListCopy] = useState(pivotMapList)
   const mapContainer = useRef('');
 
   // const metersToPixelsAtMaxZoom = (meters, latitude) =>
@@ -116,6 +116,9 @@ const MapComponent = () => {
   const pivotPathDraw = (pivot: Pivot) => {
 
   }
+
+
+
   useEffect(() => {
     mapboxgl.accessToken = "pk.eyJ1IjoiZWR1YXJkb3BtOTgiLCJhIjoiY2wxNnBmM2R4MDlwMTNibGxxcGk1ZmJ1NyJ9.32_foZvLX17jQIypXtYmCg";
 
@@ -214,6 +217,11 @@ const MapComponent = () => {
 
     if (!map) initializeMap({ setMap, mapContainer })
 
+
+    if (map && pivotMapListCopy != pivotMapList) {
+      setPivotMapListCopy(pivotMapList)
+      initializeMap({ setMap, mapContainer })
+    }
 
 
   }, [map, pivotMapList]);

@@ -2,6 +2,7 @@ import styled, {css} from "styled-components";
 import { FaHistory } from "react-icons/fa";
 import { GrMap } from "react-icons/gr";
 import { RiRoadMapLine } from "react-icons/ri";
+import Link from 'next/link'
 
 export const Container =styled.div`
 ${({theme})=> css`
@@ -64,8 +65,7 @@ export const ButtonsView = styled.div`
   justify-content:space-around;
   margin: 30px ;
 `;
-
-export const Button = styled.button`
+export const AnchorButton = styled.a`
 ${({theme})=> css`
   display:flex;
   width:30%;
@@ -85,6 +85,9 @@ ${({theme})=> css`
 `}
 
 `;
+export const Button= styled(Link)`
+`;
+
 
 export const ButtonText=styled.h1`
 ${({theme})=> css`

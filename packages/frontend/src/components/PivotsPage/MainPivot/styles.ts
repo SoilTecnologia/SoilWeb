@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { ImArrowLeft2 } from "react-icons/im";
 import { RiRoadMapLine } from "react-icons/ri";
+import Link from 'next/link'
 
 export const Container =styled.div`
   display: flex;
@@ -23,8 +24,7 @@ export const ButtonsView = styled.div`
   justify-content:space-evenly;
   margin: 30px 210px;
 `;
-
-export const Button= styled.button`
+export const AnchorButton = styled.a`
   display:flex;
   align-items:center;
   justify-content:center;
@@ -36,9 +36,11 @@ export const Button= styled.button`
   border-radius: 1.5rem;
 
   &:hover{
-    cursor: pointer;
+   cursor: pointer;
     opacity: 0.85;
   }
+`
+export const Button= styled(Link)`
 `;
 
 export const Text=styled.h1`

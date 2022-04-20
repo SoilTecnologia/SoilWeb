@@ -33,22 +33,29 @@ const MainMap = () => {
 
       <S.ButtonsContainer>
 
-        <S.FarmsButton onClick={handleFarms}>
-          <S.BackIcon />
-          <S.FarmButtonText>
-            Fazendas
-          </S.FarmButtonText>
+        <S.FarmsButton href='/farms'>
+          <S.FarmsButtonAnchor>
+
+            <S.BackIcon />
+            <S.FarmButtonText>
+              Fazendas
+            </S.FarmButtonText>
+
+          </S.FarmsButtonAnchor>
         </S.FarmsButton>
 
-        <S.PivotsButton onClick={handlePivots}>
-          <S.ListIcon />
-          <S.PivotButtonText>
-            Pivôs
-          </S.PivotButtonText>
+        <S.PivotsButton href='/pivots'>
+          <S.PivotsButtonAnchor>
+
+            <S.ListIcon />
+            <S.PivotButtonText>
+              Pivôs
+            </S.PivotButtonText>
+
+          </S.PivotsButtonAnchor>
         </S.PivotsButton>
 
       </S.ButtonsContainer>
-
 
 
       <S.CaptionContainer onClick={handleToggle}>
