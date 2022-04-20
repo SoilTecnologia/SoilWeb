@@ -120,6 +120,3 @@ try {
 // const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
 const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
-
-// e5ce95e1-277d-40a7-b843-6d2cb51d1e8f
-// cae38681-5734-4629-b564-31764fef9b97/1

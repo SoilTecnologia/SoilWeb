@@ -70,7 +70,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = 'cloudHenrique0807';
+      this.clientId = 'cloudSoil3218';
     }
   }
 
@@ -250,7 +250,7 @@ class IoTDevice {
                 rssi
               );
             } catch (err) {
-              messageErrorTryAction(err, false, IoTDevice.name, 'Update Pivot');
+              messageErrorTryAction(err, false, IoTDevice.name, 'UpdatePivot');
             }
             /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
             this.publish(json, `${farm_id}_${node_num}`);
