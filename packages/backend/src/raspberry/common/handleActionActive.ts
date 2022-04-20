@@ -152,7 +152,7 @@ class HandleActionActive {
 
   async logErrorTry(active: ActionData) {
     active.attempts && active.attempts++;
-    if (active.attempts && this.current.attempts > 3)
+    if (active.attempts && active.attempts > 3)
       await this.returnFailled(active);
     else
       setTimeout(async () => {
@@ -161,7 +161,7 @@ class HandleActionActive {
   }
 
   async sendItem(active: ActionData) {
-    console.log(`Numero de Tentativas ${this.current.attempts}`);
+    console.log(`Numero de Tentativas ${active.attempts}`);
     console.log(
       `CHECKING ACTIVE IN ${this.action.radio_id} of the Pivot ${this.action.pivot_id}`
     );
@@ -179,7 +179,11 @@ class HandleActionActive {
     );
 
     try {
-      const response = await sendData(active.action.radio_id, actionString);
+      const response = await sendData(
+        active.action.radio_id,
+        actionString,
+        true
+      );
       const { data } = response;
       if (data.status === 'Fail') {
         const logReponse =

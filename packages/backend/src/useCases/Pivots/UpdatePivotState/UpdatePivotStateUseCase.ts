@@ -168,8 +168,8 @@ class UpdatePivotStateUseCase {
 
       this.state = await createStateUseCase.execute({
         pivot_id,
-        connection: newState.connection,
-        power: newState.power,
+        connection: newState.connection || false,
+        power: newState.power || false,
         water: newState.water,
         direction: newState.direction,
         timestamp: new Date()
@@ -253,7 +253,12 @@ class UpdatePivotStateUseCase {
     const oldState = await this.applyQueryGetStateByPivot(pivot_id);
     this.state = oldState;
 
-    const newState = { connection, power, water, direction };
+    const newState = {
+      connection: connection || false,
+      power: power || false,
+      water,
+      direction
+    };
 
     await this.createStateIfNotExists(pivot_id, oldState, newState, timestamp);
     await this.alterStateVariable(angle, percentimeter, timestamp);

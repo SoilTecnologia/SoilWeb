@@ -64,7 +64,11 @@ const filterActionGateway = async (actions: ActionsResult[]) => {
   return allActions;
 };
 
-export const sendData = async (radio_id: number, data: string) => {
+export const sendData = async (
+  radio_id: number,
+  data: string,
+  action: boolean
+) => {
   const bodyFormData = new FormData();
 
   bodyFormData.set('ID', radio_id);
@@ -73,8 +77,9 @@ export const sendData = async (radio_id: number, data: string) => {
   const encoder = new FormDataEncoder(bodyFormData);
   const dataSend = Readable.from(encoder);
 
+  const routSend = action ? 'actions' : 'comands';
   const response = await Axios.post<RadioResponse>(
-    'http://192.168.100.100:3031/comands',
+    `http://192.168.100.100:3031/${routSend}`,
     dataSend,
     { headers: encoder.headers, timeout: TIMEOUT }
   );

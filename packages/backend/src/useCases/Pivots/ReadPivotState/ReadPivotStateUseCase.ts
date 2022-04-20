@@ -66,7 +66,8 @@ class ReadPivotStateUseCase {
       start_angle: stateAndVariable ? variables[0]!.angle : null,
       end_angle: stateAndVariable
         ? variables[variables.length - 1]!.angle
-        : null
+        : null,
+      timestamp: state ? state.timestamp : null
     };
 
     return result;

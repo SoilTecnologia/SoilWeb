@@ -18,9 +18,14 @@ class CreateStateUseCase {
   }
 
   async execute(state: Omit<StateModel, 'state_id'>) {
+    const newState = {
+      ...state,
+      connection: state.connection || false,
+      power: state.power || false
+    };
     const stateModel = new StateModel();
     Object.assign(stateModel, {
-      ...state,
+      ...newState,
       timestamp: new Date()
     });
 

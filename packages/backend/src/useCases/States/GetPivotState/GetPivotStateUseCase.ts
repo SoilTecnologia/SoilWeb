@@ -67,7 +67,10 @@ class GetPivotStateUseCase {
         ? variables[variables.length - 1]!.percentimeter
         : 0,
       start_angle: stateAnVariabes ? variables[0]!.angle : null,
-      end_angle: stateAnVariabes ? variables[variables.length - 1]!.angle : null
+      end_angle: stateAnVariabes
+        ? variables[variables.length - 1]!.angle
+        : null,
+      timestamp: state?.timestamp
     };
   }
 }

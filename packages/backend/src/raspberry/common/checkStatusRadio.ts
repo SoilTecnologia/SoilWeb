@@ -150,7 +150,7 @@ class CheckStatusRadio {
     );
 
     try {
-      const { data, result } = await sendData(this.radio_id, '000-000');
+      const { data, result } = await sendData(this.radio_id, '000-000', false);
 
       const radioDataIsEquals = this.radio_id == data.id;
       if (result && radioDataIsEquals && data.status === 'OK') {
