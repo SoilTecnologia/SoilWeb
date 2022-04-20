@@ -12,7 +12,7 @@ const ListContainer = ({ currentHistorics }: PropsProvider) => {
   const { historic } = useContextUserData()
 
   const formatDate = (date: Date) => {
-    const formatedDate = format(addHours(new Date(date), 3), `dd/MM/yyy`) + 'as' + format(addHours(new Date(date), 3), ` hh:mm`)
+    const formatedDate = format(addHours(new Date(date), 3), `dd/MM/yyy`) + ' às ' + format(addHours(new Date(date), 3), ` hh:mm`)
     return formatedDate
   }
 

@@ -16,7 +16,7 @@ const PivotStatusComponent = ({ pivot }: PivotProps) => {
 
   const updatedDateFormater = (timestamp: Date | undefined) => {
     if (timestamp) {
-      const formatedUpdatedDate = format(new Date(timestamp), "dd / MM / yyyy' às 'kk:mm")
+      const formatedUpdatedDate = format(new Date(timestamp), "dd / MM / yyyy' às 'hh:mm")
       return formatedUpdatedDate;
     }
     return 'Nunca foi Atualizado';
@@ -107,7 +107,7 @@ const PivotStatusComponent = ({ pivot }: PivotProps) => {
           </S.StatusName>
 
           <S.LastUpdate>
-            {pivot.timestamp == null ? 'Nunca foi Atualizado' : pivot.timestamp}
+            {updatedDateFormater(pivot.timestamp)}
           </S.LastUpdate>
 
         </S.LastUpdateWrapper>
