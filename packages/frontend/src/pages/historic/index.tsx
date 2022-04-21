@@ -4,8 +4,6 @@ import { useContextUserData } from "hooks/useContextUserData";
 import { useEffect } from "react";
 
 export const Historic = () => {
-
-  return <MainHistoric />
-
-}
+  return <MainHistoric />;
+};
 export default Historic;
