@@ -19,10 +19,8 @@ const MapPage = () => {
 
   useEffect(() => {
     if (farm && farm.farm_id) {
-      console.log("Tem farm");
       getGetPivotsListForMapWithFarmId(farm.farm_id);
     } else {
-      console.log("Não tem farm");
       const { "user-farm-id": farm_id } = parseCookies();
       getFarm(farm_id);
 
