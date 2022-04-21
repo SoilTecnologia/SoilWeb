@@ -23,23 +23,12 @@ const MainIntent = () => {
   const { pivot } = useContextUserData();
   const { pivotList } = useContextData();
 
-  const getTimestamp = () => {
-    if (pivot && pivotList) {
-      const pivotsFiltered = pivotList.filter(
-        (pivots) => pivots.pivot_id == pivot.pivot_id
-      );
-      const timeStamp = pivotsFiltered && pivotsFiltered[0]?.timestamp;
-      return timeStamp;
-    }
-    return null;
-  };
-
   return (
     <S.Container>
       <Header
         text={`Pivô ${pivot?.pivot_num}`}
         subHeaderText={
-          getTimestamp() == null ? "Nunca foi Atualizado" : `${getTimestamp()}`
+          pivot.timestamp == null ? "Nunca foi Atualizado" : pivot.timestamp
         }
       />
       <S.Body>
@@ -60,7 +49,7 @@ const MainIntent = () => {
         </S.CurrentStateContainer>
 
         <S.ButtonsView>
-          <S.Button href="/map" passHref>
+          <S.Button href="/map">
             <S.AnchorButton>
               <S.MapIcon />
 

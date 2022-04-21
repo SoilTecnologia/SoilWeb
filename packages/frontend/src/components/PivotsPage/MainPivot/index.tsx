@@ -9,26 +9,30 @@ type PivotListProps = {
 };
 
 const MainPivot = ({ pivotList }: PivotListProps) => {
-  const handleFarms = () => {
-    Router.push("/farms");
-  };
-  const handleMap = () => {
-    Router.push("/map");
-  };
+
 
   return (
     <>
       <Header text={"Pivôs"} />
       <S.Container>
         <S.ButtonsView>
-          <S.Button onClick={handleFarms}>
-            <S.BackIcon />
-            <S.Text>Voltar</S.Text>
+          <S.Button href='/farms'>
+            <S.AnchorButton>
+
+              <S.BackIcon />
+              <S.Text>Voltar</S.Text>
+
+            </S.AnchorButton>
+
           </S.Button>
-          <S.Button onClick={handleMap}>
-            <S.MapIcon />
-            <S.Text>Mapa</S.Text>
+
+          <S.Button href='/map'>
+            <S.AnchorButton>
+              <S.MapIcon />
+              <S.Text>Mapa</S.Text>
+            </S.AnchorButton>
           </S.Button>
+
         </S.ButtonsView>
 
         <S.Grid>

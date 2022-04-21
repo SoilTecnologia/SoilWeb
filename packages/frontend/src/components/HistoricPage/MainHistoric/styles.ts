@@ -1,6 +1,7 @@
+import styled, {css} from "styled-components";
 import { ImArrowLeft2 } from "react-icons/im";
 import { RiRoadMapLine } from "react-icons/ri";
-import styled, {css} from "styled-components";
+import Link from "next/link";
 
 
 export const Container =styled.div`
@@ -20,7 +21,8 @@ export const ButtonsView = styled.div`
   margin: 30px 210px;
 `;
 
-export const Button= styled.button`
+export const Button= styled(Link)``
+export const ButtonAnchor= styled.a`
   display:flex;
   align-items:center;
   justify-content:center;

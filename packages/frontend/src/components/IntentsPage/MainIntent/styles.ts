@@ -67,7 +67,6 @@ export const ButtonsView = styled.div`
   justify-content: space-around;
   margin: 30px;
 `;
-
 export const AnchorButton = styled.a`
   ${({ theme }) => css`
     display: flex;
