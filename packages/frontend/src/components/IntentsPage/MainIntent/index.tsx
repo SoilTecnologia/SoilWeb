@@ -6,31 +6,22 @@ import React, { useState } from "react";
 import Intent from "utils/models/intent";
 
 //Icons
-import { ImCalendar } from "react-icons/im";
-
+// import { ImCalendar } from "react-icons/im";
 
 import StatusComponent from "../StatusComponent";
 import IntentBlock from "../IntentBlock";
 import { useContextData } from "hooks/useContextData";
-import Router from "next/router";
+
 
 type iconProps = {
-  children: React.ReactNode
-}
+  children: React.ReactNode;
+};
 
-const Icon = ({ children }: iconProps) => (<S.Icon>{children}</S.Icon>)
+const Icon = ({ children }: iconProps) => <S.Icon>{children}</S.Icon>;
+
 const MainIntent = () => {
-  const { pivot } = useContextUserData()
-  const { pivotList } = useContextData()
-
-
-
-  const handleMap = () => {
-    Router.push('/map')
-  }
-  const handleHistoric = () => {
-    Router.push('/historic')
-  }
+  const { pivot } = useContextUserData();
+  const { pivotList } = useContextData();
 
   return (
     <S.Container>
@@ -50,16 +41,13 @@ const MainIntent = () => {
         </S.ScheduleButton> */}
 
         <S.CurrentStateContainer>
-
-          <S.StateText>
-            ESTADO ATUAL:
-          </S.StateText>
-
+          <S.StateText>ESTADO ATUAL:</S.StateText>
 
           <StatusComponent />
         </S.CurrentStateContainer>
 
         <S.ButtonsView>
+
 
           <S.Button href='/map' >
             <S.AnchorButton>
@@ -83,8 +71,6 @@ const MainIntent = () => {
 
         </S.ButtonsView >
 
-
-
         <IntentBlock />
 
 
@@ -95,7 +81,6 @@ const MainIntent = () => {
     </S.Container >
 
   );
-
 };
 
 export default MainIntent;

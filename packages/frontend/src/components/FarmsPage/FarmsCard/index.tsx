@@ -1,5 +1,6 @@
 import { useContextUserData } from "hooks/useContextUserData";
 import Router from "next/router";
+import { setCookie } from "nookies";
 import Farm from "utils/models/farm";
 import * as S from "./styles";
 interface FarmProps {
@@ -10,6 +11,8 @@ const FarmsContainer = ({ farm }: FarmProps) => {
   const { setFarm } = useContextUserData();
 
   const handlePivotsPage = () => {
+    const propsCookie = { maxAge: 60 * 60 * 2 };
+    setCookie(undefined, "user-farm-id", farm.farm_id, propsCookie);
     setFarm(farm);
     Router.push("/pivots");
   };

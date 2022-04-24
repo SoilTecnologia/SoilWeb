@@ -88,7 +88,7 @@ function UseContextProvider({ children }: UserProviderProps) {
         farmList,
         setFarmList,
         pivotMapList,
-        setPivotMapList
+        setPivotMapList,
       }}
     >
       {children}

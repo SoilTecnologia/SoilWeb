@@ -3,6 +3,7 @@ import { Grid } from 'gridjs-react';
 import { useContextUserData } from "hooks/useContextUserData";
 import Historic from "utils/models/historic";
 import { format, addHours } from 'date-fns'
+import HistoricCard from "../HistoricCard";
 
 type PropsProvider = {
   currentHistorics: Historic[],
@@ -20,22 +21,8 @@ const ListContainer = ({ currentHistorics }: PropsProvider) => {
     <S.Container>
       {historic && (
         currentHistorics.map((historic, index) => (
-          <S.HistoricList key={index}>
-            <S.Wrapper>
-              <S.Text>Inicio: {formatDate(historic.start_date)}</S.Text>
+          <HistoricCard historic={historic} key={index} />
 
-              <S.InitialStatus>
-              </S.InitialStatus>
-
-            </S.Wrapper>
-            {!historic.is_running && (
-              <S.Wrapper>
-                <S.Text>Término:{formatDate(historic.end_date)}</S.Text>
-                <S.StopIcon />
-              </S.Wrapper>
-            )}
-
-          </S.HistoricList>
         ), [])
       )}
 

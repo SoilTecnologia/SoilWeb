@@ -2,7 +2,6 @@ import { response } from 'express';
 import { container } from 'tsyringe';
 import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
 import { GetPivotByIdUseCase } from '../../useCases/Pivots/GetById/GetByIdUseCase';
-import { GetOnePivotUseCase } from '../../useCases/Pivots/GetOnePivot/GetOnePivotUseCase';
 import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
 import { GetPivotStateUseCase } from '../../useCases/States/GetPivotState/GetPivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
@@ -150,10 +149,13 @@ class CheckStatusRadio {
     );
 
     try {
-      const { data, result } = await sendData(this.radio_id, '000-000', false);
+      const { data, result } = await sendData(this.radio_id, '000-000');
 
       const radioDataIsEquals = this.radio_id == data.id;
       if (result && radioDataIsEquals && data.status === 'OK') {
+        console.log(
+          `RadioResponse: ${data.cmdResponse}, Status: ${data.status}`
+        );
         this.updateStateChageIsTrue(result);
       } else {
         this.current.attempts++;

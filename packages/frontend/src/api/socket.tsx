@@ -6,7 +6,8 @@ import { io } from 'socket.io-client'
 
 const Socket = () => {
   const { user } = useContextAuth()
-  const { farm, pivot } = useContextUserData()
+  const { farm, pivot, socketPayload, setSocketPayload } = useContextUserData()
+
   const {
     getPivotState,
     getGetPivotsListWithFarmId,
@@ -17,18 +18,21 @@ const Socket = () => {
     VariableSocket: false
   })
 
-  const socket = io('http://localhost:3308', { transports: ['websocket'] })
+  const socket = io("http://localhost:3308", { transports: ["websocket"] });
 
   useEffect(() => {
 
-    if (user?.user_id && farm?.farm_id ) {
-      socket.on(`${user.user_id}-status`, (payload) => {
+    if (user?.user_id && farm?.farm_id) {
 
+      socket.on(`${user.user_id}-status`, (payload) => {
         setSocketIsOpen(prevState => ({ ...prevState, ['StatusSocket']: true }))
 
         if (payload.type === 'status' && farm?.farm_name == payload.farm_name) {
           getGetPivotsListWithFarmId(farm.farm_id)
           getGetPivotsListForMapWithFarmId(farm?.farm_id)
+          setSocketPayload(() => [socketPayload, payload])
+        } else {
+          setSocketPayload(() => [socketPayload, payload])
         }
 
       })
@@ -36,12 +40,13 @@ const Socket = () => {
     }
     return () => {
       socket.close()
+      console.log('fechou')
     }
   }, [user, farm])
 
   useEffect(() => {
 
-    if (user?.user_id && farm?.farm_id && pivot?.pivot_id ) {
+    if (user?.user_id && farm?.farm_id && pivot?.pivot_id) {
       socket.on(`${user.user_id}-status`, (payload) => {
 
         setSocketIsOpen(prevState => ({ ...prevState, ['VariableSocket']: true }))
@@ -56,12 +61,11 @@ const Socket = () => {
     }
 
     return () => {
-      socket.close()
-    }
+      socket.close();
+    };
+  }, [pivot]);
 
-  }, [pivot])
+  return <></>;
+};
 
-  return (<></>)
-}
-
-export default Socket
+export default Socket;

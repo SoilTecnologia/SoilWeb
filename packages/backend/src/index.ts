@@ -87,7 +87,6 @@ try {
     });
 
     emitter.on('action-received-ack', async (action) => {
-      console.log(emitter.listeners('action-received-ack'));
       const { user_id, farm_name, pivot_num } = await handleResultAction(
         action.id
       );

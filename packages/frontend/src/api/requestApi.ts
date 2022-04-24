@@ -355,6 +355,21 @@ export const requestOnePivot = async (
       console.log(err);
     });
 };
+export const requestGetByPivotId = async (
+  pivot_id: string,
+  tokenId: tokenState
+) => {
+  return await api
+    .get(`pivots/pivotById/${pivot_id}`, tokenHeader(tokenId))
+    .then((response) => {
+      console.log(response.data);
+      return response.data;
+    })
+    .catch((err) => {
+      console.log("[ERROR] Falha ao buscar pivo");
+      console.log(err);
+    });
+};
 export const requestPivotStatus = async (
   pivot_id: Pivot["pivot_id"],
   tokenId: tokenState
@@ -383,8 +398,8 @@ export const requestGetPivotsListWithFarmId = async (
 };
 export const requestPivotHistoric = async (
   pivot_id: Pivot["pivot_id"],
-  start_date: Date,
-  end_date: Date,
+  start_date: string,
+  end_date: string,
   tokenId: tokenState
 ) => {
   console.log(pivot_id, start_date, end_date);

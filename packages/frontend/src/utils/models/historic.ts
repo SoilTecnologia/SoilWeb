@@ -5,7 +5,7 @@ interface Historic {
   percentimeters: PercentimetersInterface[];
   start_date: Date;
   is_running: boolean;
-  start_state: Date;
+  start_state: State;
   end_date: Date;
 }
 

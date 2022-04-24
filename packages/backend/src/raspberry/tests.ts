@@ -35,6 +35,7 @@ export type RadioResponse = {
   id: number;
   payload: Array<number>;
   status: string;
+  cmdResponse: string;
 };
 
 const activeQueue: GenericQueue<ActionData> = new GenericQueue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
@@ -64,11 +65,7 @@ const filterActionGateway = async (actions: ActionsResult[]) => {
   return allActions;
 };
 
-export const sendData = async (
-  radio_id: number,
-  data: string,
-  action: boolean
-) => {
+export const sendData = async (radio_id: number, data: string) => {
   const bodyFormData = new FormData();
 
   bodyFormData.set('ID', radio_id);
@@ -77,9 +74,8 @@ export const sendData = async (
   const encoder = new FormDataEncoder(bodyFormData);
   const dataSend = Readable.from(encoder);
 
-  const routSend = action ? 'actions' : 'comands';
   const response = await Axios.post<RadioResponse>(
-    `http://192.168.100.100:3031/${routSend}`,
+    `http://192.168.100.100:3031/comands`,
     dataSend,
     { headers: encoder.headers, timeout: TIMEOUT }
   );

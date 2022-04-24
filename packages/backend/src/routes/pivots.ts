@@ -4,7 +4,8 @@ import { CreatePivotController } from '../useCases/Pivots/CreatePivots/CreatePiv
 import { DeletePivotController } from '../useCases/Pivots/DeletePivot/DeletePivotController';
 import { FindAllController } from '../useCases/Pivots/FindAll/FindAllController';
 import { GetAllPivotsController } from '../useCases/Pivots/GetAllPivots/GetAllPivotsController';
-import { GetOnePivotController } from '../useCases/Pivots/GetOnePivot/GetOnePivotController';
+import { GetByPivotIdController } from '../useCases/Pivots/GetByPivotId/GetByPivotIdController';
+import { GetOnePivotController } from '../useCases/Pivots/GetOnePivots/GetOnePivotController';
 import { ReadAllController } from '../useCases/Pivots/ReadAll/ReadAllController';
 import { ReadListController } from '../useCases/Pivots/ReadList/ReadListController';
 import { ReadMapController } from '../useCases/Pivots/ReadMap/ReadMapController';
@@ -25,6 +26,7 @@ const readListPivotController = new ReadListController();
 const readPivotStateController = new ReadPivotStateController();
 const updatePivotStateController = new UpdateStatePivotController();
 const findAllController = new FindAllController();
+const getByPivotId = new GetByPivotIdController();
 
 router.get('/readAll/:farm_id', authMiddleware(), readAllController.handle);
 
@@ -37,6 +39,7 @@ router.get(
 );
 router.get('/list/:farm_id', authMiddleware(), readListPivotController.handle);
 router.get('/findAll', authMiddleware(), findAllController.handle);
+router.get('/pivotById/:pivot_id', authMiddleware(), getByPivotId.handle);
 
 router.post(
   '/update/:pivot_id',
