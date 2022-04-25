@@ -8,51 +8,46 @@ import ListContainer from "../ListContainer";
 import Pagination from "../Pagination";
 
 const MainHistoric = () => {
-
-  const { pivot, historic, setHistoric } = useContextUserData()
-  const { getPivotHistoric } = useContextActionCrud()
-
-
+  const { pivot, historic, setHistoric } = useContextUserData();
+  const { getPivotHistoric } = useContextActionCrud();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [historicsPerPage] = useState(5);
-
 
   //trocar de pivots/cycles para cycles/ apenas
 
   useEffect(() => {
     if (pivot) {
-      getPivotHistoric(pivot.pivot_id, '01-03-2022', '11-04-2022')
+      getPivotHistoric(pivot.pivot_id, "01-03-2022", "11-04-2022");
     }
-  }, [pivot])
+  }, [pivot]);
 
   const indexOfLastHistoric = currentPage * historicsPerPage;
   const indexOfFirstHistoric = indexOfLastHistoric - historicsPerPage;
-  const currentHistorics = historic.slice(indexOfFirstHistoric, indexOfLastHistoric);
+  const currentHistorics = historic.slice(
+    indexOfFirstHistoric,
+    indexOfLastHistoric
+  );
 
   const paginate = (pageNumber: number) => {
-    setCurrentPage(pageNumber)
+    setCurrentPage(pageNumber);
   };
 
   return (
     <S.Container>
-      <Header text={'Histórico'} />
+      <Header text={"Histórico"} />
 
       <S.ButtonsView>
-        <S.Button href='/intent'>
+        <S.Button href="/intent">
           <S.ButtonAnchor>
             <S.BackIcon />
-            <S.Text>
-              Voltar
-            </S.Text>
+            <S.Text>Voltar</S.Text>
           </S.ButtonAnchor>
         </S.Button>
-        <S.Button href='/map'>
+        <S.Button href="/map">
           <S.ButtonAnchor>
             <S.MapIcon />
-            <S.Text >
-              Mapa
-            </S.Text>
+            <S.Text>Mapa</S.Text>
           </S.ButtonAnchor>
         </S.Button>
       </S.ButtonsView>
@@ -63,10 +58,8 @@ const MainHistoric = () => {
         dataLength={historic.length}
         paginate={paginate}
       />
-
-
     </S.Container>
-  )
-}
+  );
+};
 
 export default MainHistoric;

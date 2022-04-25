@@ -9,30 +9,24 @@ type PivotListProps = {
 };
 
 const MainPivot = ({ pivotList }: PivotListProps) => {
-
-
   return (
     <>
       <Header text={"Pivôs"} />
       <S.Container>
         <S.ButtonsView>
-          <S.Button href='/farms'>
+          <S.Button href="/farms">
             <S.AnchorButton>
-
               <S.BackIcon />
               <S.Text>Voltar</S.Text>
-
             </S.AnchorButton>
-
           </S.Button>
 
-          <S.Button href='/map'>
+          <S.Button href="/map">
             <S.AnchorButton>
               <S.MapIcon />
               <S.Text>Mapa</S.Text>
             </S.AnchorButton>
           </S.Button>
-
         </S.ButtonsView>
 
         <S.Grid>

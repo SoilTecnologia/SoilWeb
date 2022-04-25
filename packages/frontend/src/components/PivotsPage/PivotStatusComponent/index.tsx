@@ -1,7 +1,7 @@
 import * as S from "./styles";
 import Pivot from "utils/models/pivot";
 import { format } from "date-fns";
-import OffIcon from "../../../../public/icons/Parar.png"
+import OffIcon from "../../../../public/icons/Parar.png";
 import WaterOnIcon from "../../../../public/icons/Com_agua.png";
 import WaterOffIcon from "../../../../public/icons/Sem_agua.png";
 import ErrorIcon from "../../../../public/icons/Exclamação.png";
@@ -14,7 +14,7 @@ interface PivotProps {
 }
 
 const PivotStatusComponent = ({ pivot }: PivotProps) => {
-  const updatedDateFormater = (timestamp: Date | undefined) => {
+  const updatedDateFormater = (timestamp: string | Date | undefined) => {
     if (timestamp) {
       const formatedUpdatedDate = format(
         new Date(timestamp),
@@ -39,7 +39,9 @@ const PivotStatusComponent = ({ pivot }: PivotProps) => {
                     ? ClockwiseIcon
                     : AntiClockwiseIcon
                 }
-                alt={pivot.direction === "CLOCKWISE" ? "Horário" : "Anti Horário"}
+                alt={
+                  pivot.direction === "CLOCKWISE" ? "Horário" : "Anti Horário"
+                }
               />
             </S.ImageContainer>
           </S.StatusView>
@@ -63,18 +65,12 @@ const PivotStatusComponent = ({ pivot }: PivotProps) => {
           </S.StatusView>
         </S.StatusWrapper>
       ) : (
-
         <S.StatusView>
           <S.StatusName>Estado:</S.StatusName>
           <S.ImageContainer>
-            <Image
-              layout="responsive"
-              src={OffIcon}
-              alt={'pivo desligado'}
-            />
+            <Image layout="responsive" src={OffIcon} alt={"pivo desligado"} />
           </S.ImageContainer>
         </S.StatusView>
-
       )}
 
       <S.LastUpdateWrapper>

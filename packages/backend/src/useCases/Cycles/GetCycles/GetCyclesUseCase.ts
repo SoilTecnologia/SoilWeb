@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { StateModel } from '../../../database/model/State';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
+import { createDate } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 type PartialCycleResponse = {
@@ -18,9 +19,9 @@ type PartialCycleResponse = {
     water: StateModel['water'];
     direction: StateModel['direction'];
     connection: StateModel['connection'];
-    timestamp: Date;
+    timestamp: Date | string;
   }>;
-  percentimeters: Array<{ value: number; timestamp: Date }>;
+  percentimeters: Array<{ value: number; timestamp: Date | string }>;
 };
 type fullCycleResponse = Array<PartialCycleResponse>;
 
@@ -94,7 +95,7 @@ class GetCyclesUseCase {
             power: state.power,
             water: state.water,
             direction: state.direction,
-            timestamp: state.timestamp,
+            timestamp: createDate(state.timestamp),
             connection: state.connection
           });
 
@@ -109,7 +110,7 @@ class GetCyclesUseCase {
             power: state.power,
             water: state.water,
             direction: state.direction,
-            timestamp: state.timestamp,
+            timestamp: createDate(state.timestamp),
             connection: state.connection
           });
         }
@@ -127,7 +128,7 @@ class GetCyclesUseCase {
             power: state.power,
             water: state.water,
             direction: state.direction,
-            timestamp: state.timestamp,
+            timestamp: createDate(state.timestamp),
             connection: state.connection
           });
         }
@@ -141,7 +142,7 @@ class GetCyclesUseCase {
         if (variable)
           this.currentCycle!.percentimeters.push({
             value: variable.percentimeter!,
-            timestamp: variable.timestamp!
+            timestamp: createDate(variable.timestamp!)
           });
       }
     }

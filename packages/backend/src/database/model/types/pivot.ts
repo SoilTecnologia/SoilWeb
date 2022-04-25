@@ -65,7 +65,7 @@ export type PartialListResponse = {
   percentimeter: StateVariableModel['percentimeter'];
   rssi: RadioVariableModel['rssi'];
   father: RadioVariableModel['father'];
-  timestamp: RadioVariableModel['timestamp'] | null;
+  timestamp: RadioVariableModel['timestamp'] | string | null;
 };
 
 export default Pivot;

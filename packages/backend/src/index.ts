@@ -6,9 +6,8 @@ this file is responsible for:
   - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)
   - Setting up the event emitter to be used on other systems
 */
-import express from 'express';
 import cors from 'cors';
-
+import express from 'express';
 import { createServer } from 'http';
 import 'reflect-metadata';
 import { Server, Socket } from 'socket.io';

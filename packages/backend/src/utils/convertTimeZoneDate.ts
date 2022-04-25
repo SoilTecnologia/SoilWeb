@@ -9,3 +9,13 @@ export const convertData = (date: Date) => {
 
   return timeInBrisbane;
 };
+
+export const createDate = (date?: Date) => {
+  if (date) {
+    return date.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+  } else {
+    return new Date().toLocaleString('pt-BR', {
+      timeZone: 'America/Sao_Paulo'
+    });
+  }
+};

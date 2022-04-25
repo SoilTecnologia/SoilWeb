@@ -88,7 +88,7 @@ class CreateActionUseCase {
     action: Omit<CreateAction, 'timestamp_sent'>,
     timestamp: CreateAction['timestamp_sent'] | null
   ) {
-    const newTimestamp = timestamp ? timestamp : new Date();
+    const newTimestamp = timestamp || new Date();
     const userAlreadyExists = await this.applyQueryGetUserById(action.author);
 
     if (!userAlreadyExists) {
@@ -105,6 +105,7 @@ class CreateActionUseCase {
       power: action.power || false,
       timestamp_sent: newTimestamp
     });
+
     if (!actionResult) throw new Error('Does Not Create Action');
 
     const pivot = await this.applyQueryGetPivotByPivot(action.pivot_id);

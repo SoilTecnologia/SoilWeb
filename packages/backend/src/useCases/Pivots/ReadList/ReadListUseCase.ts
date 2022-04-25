@@ -4,6 +4,7 @@ import { PartialListResponse } from '../../../database/model/types/pivot';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
+import { createDate } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -76,7 +77,7 @@ class ReadListPivotUseCase {
           percentimeter: state && variable ? variable.percentimeter : null,
           rssi: null,
           father: null,
-          timestamp: state && variable ? new Date(variable.timestamp) : null
+          timestamp: state && variable ? createDate(variable.timestamp) : null
         };
 
         response.push(result);
