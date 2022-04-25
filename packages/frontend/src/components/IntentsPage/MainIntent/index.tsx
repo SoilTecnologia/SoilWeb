@@ -11,7 +11,6 @@ import Intent from "utils/models/intent";
 import StatusComponent from "../StatusComponent";
 import IntentBlock from "../IntentBlock";
 import { useContextData } from "hooks/useContextData";
-// import Router from "next/router";
 
 type iconProps = {
   children: React.ReactNode;

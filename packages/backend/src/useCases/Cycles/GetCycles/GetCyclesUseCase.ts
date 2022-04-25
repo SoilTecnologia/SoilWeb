@@ -6,8 +6,8 @@ import { createDate } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 type PartialCycleResponse = {
-  start_date: Date;
-  end_date: Date;
+  start_date: string;
+  end_date: string;
   is_running: boolean;
   start_state: {
     power: StateModel['power'];
@@ -90,7 +90,7 @@ class GetCyclesUseCase {
       if (this.foundStart) {
         if (state.power === false) {
           this.currentCycle!.is_running = false;
-          this.currentCycle!.end_date = state.timestamp;
+          this.currentCycle!.end_date = createDate(state.timestamp);
           this.currentCycle!.states.push({
             power: state.power,
             water: state.water,
@@ -117,7 +117,7 @@ class GetCyclesUseCase {
       } else {
         if (state.power) {
           this.foundStart = true;
-          this.currentCycle!.start_date = state.timestamp;
+          this.currentCycle!.start_date = createDate(state.timestamp);
           this.currentCycle!.is_running = true;
           this.currentCycle!.start_state = {
             power: state.power,

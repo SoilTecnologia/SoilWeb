@@ -280,18 +280,27 @@ class IoTDevice {
                 angle,
                 timestamp
               } = statusObject;
-              await updatePivotUseCase.execute(
-                id, // Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
-                true,
-                power,
-                water,
-                direction,
-                angle,
-                percentimeter,
-                timestamp,
-                null,
-                null
-              );
+              try {
+                await updatePivotUseCase.execute(
+                  id, // Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
+                  true,
+                  power,
+                  water,
+                  direction,
+                  angle,
+                  percentimeter,
+                  timestamp,
+                  null,
+                  null
+                );
+              } catch (err) {
+                messageErrorTryAction(
+                  err,
+                  false,
+                  IoTDevice.name,
+                  'Update State in Aws message'
+                );
+              }
             }
           } else {
             console.log('Status Changed Connection Received from Aws');

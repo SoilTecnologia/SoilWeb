@@ -15,13 +15,8 @@ interface PivotProps {
 
 const PivotStatusComponent = ({ pivot }: PivotProps) => {
   const updatedDateFormater = (timestamp: string | Date | undefined) => {
-    if (timestamp) {
-      const formatedUpdatedDate = format(
-        new Date(timestamp),
-        "dd / MM / yyyy' às 'HH:mm"
-      );
-      return formatedUpdatedDate;
-    }
+    if (timestamp) return timestamp;
+
     return "Nunca foi Atualizado";
   };
 

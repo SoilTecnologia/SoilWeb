@@ -72,8 +72,8 @@ interface actionCrudProps {
   getGetPivotsListForMapWithFarmId: (farm_id: Farm["farm_id"]) => Promise<void>;
   getPivotHistoric: (
     pivot_id: Pivot["pivot_id"],
-    start_date: Date,
-    end_date: Date
+    start_date: string,
+    end_date: string
   ) => Promise<void>;
 }
 
@@ -229,8 +229,8 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   };
   const getPivotHistoric = async (
     pivot_id: Pivot["pivot_id"],
-    start_date: Date,
-    end_date: Date
+    start_date: string,
+    end_date: string
   ) => {
     const result = await requestPivotHistoric(
       pivot_id,
@@ -238,6 +238,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
       end_date,
       user?.token
     );
+    console.log(result);
     result && setHistoric(result);
   };
   //Rota page user

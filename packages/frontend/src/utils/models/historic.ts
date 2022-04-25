@@ -3,10 +3,10 @@ import State from "./state";
 interface Historic {
   states: State[];
   percentimeters: PercentimetersInterface[];
-  start_date: Date;
+  start_date: string;
   is_running: boolean;
-  start_state: Date;
-  end_date: Date;
+  start_state: State;
+  end_date: string;
 }
 
 export interface PercentimetersInterface {
@@ -14,4 +14,4 @@ export interface PercentimetersInterface {
   timestamp: string;
 }
 
-export default Historic
+export default Historic;

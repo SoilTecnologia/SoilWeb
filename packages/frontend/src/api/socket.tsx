@@ -6,7 +6,8 @@ import { io } from "socket.io-client";
 
 const Socket = () => {
   const { user } = useContextAuth();
-  const { farm, pivot } = useContextUserData();
+  const { farm, pivot, socketPayload, setSocketPayload } = useContextUserData();
+
   const {
     getPivotState,
     getGetPivotsListWithFarmId,
@@ -30,11 +31,15 @@ const Socket = () => {
         if (payload.type === "status" && farm?.farm_name == payload.farm_name) {
           getGetPivotsListWithFarmId(farm.farm_id);
           getGetPivotsListForMapWithFarmId(farm?.farm_id);
+          setSocketPayload(() => [socketPayload, payload]);
+        } else {
+          setSocketPayload(() => [socketPayload, payload]);
         }
       });
     }
     return () => {
       socket.close();
+      console.log("fechou");
     };
   }, [user, farm]);
 

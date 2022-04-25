@@ -18,6 +18,8 @@ type UserDataContexProps = {
   setPivot: React.Dispatch<React.SetStateAction<Pivot>>;
   historic: Historic[];
   setHistoric: React.Dispatch<React.SetStateAction<ContextHistoricData>>;
+  socketPayload: any[] | null;
+  setSocketPayload: React.Dispatch<React.SetStateAction<any[] | null>>;
 };
 
 const UserDataContext = createContext({} as UserDataContexProps);
@@ -25,6 +27,7 @@ const UserDataContext = createContext({} as UserDataContexProps);
 function UserDataProvider({ children }: UserProviderProps) {
   const [farm, setFarm] = useState<ContextFarmData>(null);
   const [pivot, setPivot] = useState<ContextPivotData>({} as Pivot);
+  const [socketPayload, setSocketPayload] = useState<any[] | null>([]);
   const [historic, setHistoric] = useState<ContextHistoricData>([]);
 
   return (
@@ -36,6 +39,8 @@ function UserDataProvider({ children }: UserProviderProps) {
         setPivot,
         historic: historic,
         setHistoric,
+        socketPayload: socketPayload,
+        setSocketPayload,
       }}
     >
       {children}

@@ -7,7 +7,7 @@ import {
   MutableRefObject,
 } from "react";
 import * as S from "./styles";
-import mapboxgl from "mapbox-gl";
+import mapboxgl, { GeoJSONSourceRaw } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useContextUserData } from "hooks/useContextUserData";
 import { useContextData } from "hooks/useContextData";
@@ -16,20 +16,22 @@ import Router from "next/router";
 import IndicadorAH from "../../../../public/icons/indicadorAH.png";
 import IndicadorH from "../../../../public/icons/indicadorH.png";
 import IndicadorIddle from "../../../../public/icons/inicialpos.png";
+import PivotList from "utils/models/pivotlist";
 import Pivot from "utils/models/pivot";
 import { setCookie } from "nookies";
 
 type InitializeMapProps = {
-  setMap: Dispatch<SetStateAction<null>> | null;
-  mapContainer: MutableRefObject<string>;
+  setMap: Dispatch<SetStateAction<null | mapboxgl.Map>>;
+  mapContainer: MutableRefObject<HTMLElement | null>;
 };
 
 const MapComponent = () => {
-  const { farm, setPivot } = useContextUserData();
+  const { farm, setPivot, socketPayload, setSocketPayload } =
+    useContextUserData();
   const { pivotMapList } = useContextData();
-  const [map, setMap] = useState(null);
+  const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [pivotMapListCopy, setPivotMapListCopy] = useState(pivotMapList);
-  const mapContainer = useRef("");
+  const mapContainer: InitializeMapProps["mapContainer"] = useRef(null);
 
   // const metersToPixelsAtMaxZoom = (meters, latitude) =>
   //   meters / 0.019 / Math.cos(latitude * Math.PI / 180)
@@ -72,7 +74,7 @@ const MapComponent = () => {
           },
         ],
       },
-    };
+    } as GeoJSONSourceRaw;
   };
   const createGeoJSON = (pivot: Pivot) => {
     return {
@@ -89,7 +91,7 @@ const MapComponent = () => {
           },
         ],
       },
-    };
+    } as GeoJSONSourceRaw;
   };
   const stateSelector = (pivot: Pivot) => {
     if (pivot.connection) {
@@ -108,7 +110,6 @@ const MapComponent = () => {
     }
     return "Iddle";
   };
-  const pivotPathDraw = (pivot: Pivot) => {};
 
   useEffect(() => {
     mapboxgl.accessToken =
@@ -117,7 +118,7 @@ const MapComponent = () => {
     const initializeMap = ({ setMap, mapContainer }: InitializeMapProps) => {
       if (farm) {
         const map = new mapboxgl.Map({
-          container: mapContainer.current,
+          container: mapContainer.current || "",
           style: "mapbox://styles/mapbox/satellite-streets-v11", // stylesheet location
           center: [farm?.farm_lng, farm?.farm_lat],
           zoom: 13.5,
@@ -134,15 +135,15 @@ const MapComponent = () => {
           map.once("load", () => {
             map.loadImage(IndicadorH.src, (error, image) => {
               if (error) throw error;
-              map.addImage("Clockwise", image);
+              image && map.addImage("Clockwise", image);
             });
             map.loadImage(IndicadorAH.src, (error, image) => {
               if (error) throw error;
-              map.addImage("Anti_Clockwise", image);
+              image && map.addImage("Anti_Clockwise", image);
             });
             map.loadImage(IndicadorIddle.src, (error, image) => {
               if (error) throw error;
-              map.addImage("Iddle", image);
+              image && map.addImage("Iddle", image);
             });
 
             if (pivotMapList.pivots) {
@@ -187,7 +188,7 @@ const MapComponent = () => {
                     ],
                     "icon-allow-overlap": true,
                     "icon-rotation-alignment": "map",
-                    "icon-rotate": pivot.end_angle,
+                    "icon-rotate": pivot.end_angle + 180,
                   },
                 });
 
@@ -223,11 +224,40 @@ const MapComponent = () => {
 
     if (!map) initializeMap({ setMap, mapContainer });
 
-    if (map && pivotMapListCopy != pivotMapList) {
-      setPivotMapListCopy(pivotMapList);
-      initializeMap({ setMap, mapContainer });
+    const update = async () => {
+      socketPayload?.map(async (payload: any) => {
+        if (payload) {
+          const findUpdatedPivot = pivotMapList.pivots?.find((pivot) =>
+            pivot.pivot_id == payload.pivot_id ? pivot : null
+          );
+          console.log(payload.type, socketPayload);
+          if (payload.type == "status") {
+            await map?.setPaintProperty(
+              `${payload.pivot_id}`,
+              "fill-color",
+              stateSelector(payload)
+            );
+            await map?.setLayoutProperty(
+              `${payload.pivot_id}+image`,
+              "icon-image",
+              directionIndicator(payload)
+            );
+          } else if (payload.type == "variable") {
+            await map?.setLayoutProperty(
+              `${payload.pivot_id}+image`,
+              "icon-rotate",
+              payload.angle + 180
+            );
+          }
+        }
+      });
+      setSocketPayload(null);
+    };
+
+    if (map && pivotMapList && socketPayload) {
+      update();
     }
-  }, [map, pivotMapList]);
+  }, [map, pivotMapList, socketPayload]);
 
   return <S.Container ref={(el) => (mapContainer.current = el)} />;
 };

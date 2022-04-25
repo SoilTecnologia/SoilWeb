@@ -19,7 +19,7 @@ interface Pivot extends PivotCreate {
   power?: boolean | null;
   water?: boolean | null;
   direction?: "CLOCKWISE" | "ANTI_CLOCKWISE" | null;
-  timestamp?: Date;
+  timestamp?: string;
   percentimeter?: number | null;
   // last_communication: Date | string;
 }

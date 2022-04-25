@@ -5,18 +5,23 @@ import { ReactChild } from "react";
 
 type HeaderProps = {
   text: string | number | undefined;
-  subHeaderText?: string | Date;
+  subHeaderText?: string;
   children?: ReactChild;
 };
 
 const Header = ({ text, subHeaderText, children }: HeaderProps) => {
   const dateFormater = () => {
     if (subHeaderText !== "Nunca foi Atualizado" && subHeaderText) {
-      const updatedDate = format(
-        new Date(subHeaderText),
-        "dd/MM/yyyy' às 'kk:mm"
-      );
-      return updatedDate;
+      // const updatedDate = format(
+      //   new Date(subHeaderText),
+      //   "dd/MM/yyyy' às 'kk:mm"
+      // );
+      // const date = subHeaderText.split("T");
+      // const hours = date[1].split(".");
+      // const dateBrasil = date[0].split("-");
+      // const newDate = `${dateBrasil[2]}-${dateBrasil[1]}-${dateBrasil[0]}`;
+      // const dateString = `${newDate} as ${hours[0]}`;
+      return subHeaderText;
     }
     return "Nunca foi Atualizado";
   };
