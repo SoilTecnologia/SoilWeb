@@ -6,6 +6,19 @@ export type CustomState = Pick<
   StateModel,
   'connection' | 'power' | 'water' | 'direction'
 >;
+
+export const stateVariableIsDiferent = (
+  oldPercent: number,
+  newPercent: number
+) => {
+  const arrayIntervalValids = [-5, -4, -3, -2 - 1, 0, 1, 2, 3, 4, 5];
+  const intervalInPercents = oldPercent - newPercent;
+  const resultValidate = arrayIntervalValids.includes(intervalInPercents);
+  const dataEquals = oldPercent === newPercent;
+
+  return !!(resultValidate || dataEquals);
+};
+
 export const isStateDifferent = (
   oldState: CustomState,
   newState: CustomState
@@ -24,24 +37,6 @@ export const isStateDifferent = (
 };
 
 type CustomStateVariable = Pick<StateVariableModel, 'angle' | 'percentimeter'>;
-export const isStateVariableDifferent = (
-  oldStateVariable: CustomStateVariable,
-  newStateVariable: CustomStateVariable
-): boolean => {
-  if (
-    oldStateVariable.angle! <= newStateVariable.angle! - 5 ||
-    oldStateVariable.angle! >= newStateVariable.angle! + 5 ||
-    oldStateVariable.percentimeter! <= newStateVariable.percentimeter! - 5 ||
-    oldStateVariable.percentimeter! >= newStateVariable.percentimeter! + 5
-  ) {
-    console.log('atualização de variavel');
-    console.log(oldStateVariable);
-    console.log(newStateVariable);
-    return true;
-  }
-
-  return false;
-};
 
 type CustomRadioVariable = Pick<RadioVariableModel, 'father' | 'rssi'>;
 export const isRadioVariableDifferent = (

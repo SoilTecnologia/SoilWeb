@@ -1,8 +1,10 @@
 import { inject, injectable } from 'tsyringe';
 import { StateModel } from '../../../database/model/State';
+import { StateVariableModel } from '../../../database/model/StateVariables';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
 import { createDate } from '../../../utils/convertTimeZoneDate';
+import { stateVariableIsDiferent } from '../../../utils/isDifferent';
 import { messageErrorTryAction } from '../../../utils/types';
 
 type PartialCycleResponse = {
@@ -22,6 +24,7 @@ type PartialCycleResponse = {
     timestamp: Date | string;
   }>;
   percentimeters: Array<{ value: number; timestamp: Date | string }>;
+  angles?: { value: number; timestamp: Date | string }[];
 };
 type fullCycleResponse = Array<PartialCycleResponse>;
 
@@ -33,7 +36,8 @@ class GetCyclesUseCase {
 
   private currentCycle: PartialCycleResponse = {
     states: [],
-    percentimeters: []
+    percentimeters: [],
+    angles: []
   } as unknown as PartialCycleResponse;
 
   constructor(
@@ -136,14 +140,39 @@ class GetCyclesUseCase {
 
       const variables = await this.applyQueryGetVariableGroupBt(state.state_id);
 
-      if (!variables) throw new Error('Does Not Find Variables');
+      if (!variables) console.log('Does not found variables');
+      else {
+        let oldValuePercent: number = 0;
+        let oldAngle: number = 0;
+        for (let variable of variables) {
+          if (variable) {
+            const newPercent = variable.percentimeter || 0;
+            const newAngle = variable.angle || 0;
+            // Check dados de percent e angulos antigos com os novos
+            const percentIsEquals = stateVariableIsDiferent(
+              oldValuePercent,
+              newPercent
+            );
+            const angleIsEquals = stateVariableIsDiferent(oldAngle, newAngle);
+            if (!percentIsEquals) {
+              this.currentCycle!.percentimeters.push({
+                value: variable.percentimeter || 0,
+                timestamp: createDate(variable.timestamp!)
+              });
+              oldValuePercent = newPercent;
+            } else {
+              oldValuePercent = newPercent;
+            }
 
-      for (let variable of variables) {
-        if (variable)
-          this.currentCycle!.percentimeters.push({
-            value: variable.percentimeter!,
-            timestamp: createDate(variable.timestamp!)
-          });
+            if (!angleIsEquals) {
+              this.currentCycle!.angles!.push({
+                value: newAngle,
+                timestamp: createDate(variable.timestamp!)
+              });
+              oldAngle = newAngle;
+            }
+          }
+        }
       }
     }
 
