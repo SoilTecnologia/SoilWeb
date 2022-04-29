@@ -24,7 +24,7 @@ type PartialCycleResponse = {
     timestamp: Date | string;
   }>;
   percentimeters: Array<{ value: number; timestamp: Date | string }>;
-  angles?: { value: number; timestamp: Date | string }[];
+  angles: Array<{ value: number; timestamp: Date | string }>;
 };
 type fullCycleResponse = Array<PartialCycleResponse>;
 
@@ -144,16 +144,21 @@ class GetCyclesUseCase {
       else {
         let oldValuePercent: number = 0;
         let oldAngle: number = 0;
+        this.currentCycle.angles = [];
+        this.currentCycle.percentimeters = [];
         for (let variable of variables) {
           if (variable) {
             const newPercent = variable.percentimeter || 0;
             const newAngle = variable.angle || 0;
             // Check dados de percent e angulos antigos com os novos
-            const percentIsEquals = stateVariableIsDiferent(
+            const percentIsEquals = await stateVariableIsDiferent(
               oldValuePercent,
               newPercent
             );
-            const angleIsEquals = stateVariableIsDiferent(oldAngle, newAngle);
+            const angleIsEquals = await stateVariableIsDiferent(
+              oldAngle,
+              newAngle
+            );
             if (!percentIsEquals) {
               this.currentCycle!.percentimeters.push({
                 value: variable.percentimeter || 0,
@@ -165,7 +170,7 @@ class GetCyclesUseCase {
             }
 
             if (!angleIsEquals) {
-              this.currentCycle!.angles!.push({
+              this.currentCycle.angles.push({
                 value: newAngle,
                 timestamp: createDate(variable.timestamp!)
               });

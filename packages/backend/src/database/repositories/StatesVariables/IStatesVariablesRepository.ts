@@ -20,13 +20,9 @@ interface IStatesVariableRepository {
     Pick<StateVariableModel, 'angle' | 'percentimeter' | 'timestamp'>[]
   >;
 
-  updateAngle(
+  updateVariables(
     state_id: StateVariableModel['state_variable_id'],
-    angle: StateVariableModel['angle']
-  ): Promise<StateVariableModel>;
-
-  updatePercentimeter(
-    state_id: StateVariableModel['state_variable_id'],
+    angle: StateVariableModel['angle'],
     percentimeter: StateVariableModel['percentimeter']
   ): Promise<StateVariableModel>;
 }

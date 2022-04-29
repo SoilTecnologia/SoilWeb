@@ -396,6 +396,7 @@ class IoTDevice {
       });
       emitter.on('action', async (action: ActionReceived) => {
         const id = action.payload.pivot_id;
+        console.log(action);
 
         const { node_num } = await handleResultString(id);
 
@@ -450,8 +451,6 @@ class IoTDevice {
           try {
             const raspOrCloud =
               this.type === 'Raspberry' ? this.pubTopic : queue.id;
-
-            console.log();
 
             this.queue.remove(queue);
             await this.publish(queue, raspOrCloud);

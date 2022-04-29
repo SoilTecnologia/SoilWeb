@@ -7,16 +7,18 @@ export type CustomState = Pick<
   'connection' | 'power' | 'water' | 'direction'
 >;
 
-export const stateVariableIsDiferent = (
+export const stateVariableIsDiferent = async (
   oldPercent: number,
   newPercent: number
 ) => {
   const arrayIntervalValids = [-5, -4, -3, -2 - 1, 0, 1, 2, 3, 4, 5];
   const intervalInPercents = oldPercent - newPercent;
   const resultValidate = arrayIntervalValids.includes(intervalInPercents);
-  const dataEquals = oldPercent === newPercent;
+  const isValid = resultValidate ? 'Yes' : 'Não';
+  console.log(`Inclui no Intervalo de 5: ${isValid} `);
+  const dataEquals = oldPercent !== newPercent;
 
-  return !!(resultValidate || dataEquals);
+  return dataEquals && !resultValidate;
 };
 
 export const isStateDifferent = (

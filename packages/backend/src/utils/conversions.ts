@@ -35,17 +35,21 @@ export const statusPayloadStringToObject = (payload: string) => {
       response.direction = 'CLOCKWISE';
     } else if (direction == '4') {
       response.direction = 'ANTI_CLOCKWISE';
+    } else if (direction !== '3' && direction !== '4') {
+      response.direction = null;
     }
 
     if (water == '5') {
       response.water = false;
     } else if (water == '6') {
       response.water = true;
+    } else if (water !== '5' && water !== '6') {
+      response.water = null;
     }
 
     if (power == '1') {
       response.power = true;
-    } else if (power == '2') {
+    } else if (power == '2' || (power !== '1' && power !== '2')) {
       response.power = false;
     }
 

@@ -42,24 +42,18 @@ class StatesVariablesRepository implements IStatesVariableRepository {
       .orderBy('timestamp', 'asc');
   }
 
-  async updateAngle(
+  async updateVariables(
     state_id: string,
-    angle: number | null
-  ): Promise<StateVariableModel> {
-    return await knex<StateVariableModel>('state-variable')
-      .select('angle')
-      .where('state_variable_id', state_id)
-      .update({ angle });
-  }
-
-  async updatePercentimeter(
-    state_id: string,
+    angle: number | null,
     percentimeter: number | null
   ): Promise<StateVariableModel> {
-    return await knex<StateVariableModel>('state-variable')
-      .select('percentimeter')
+    const stateVariable = await knex<StateVariableModel>('state_variables')
+      .select('angle')
       .where('state_variable_id', state_id)
-      .update({ percentimeter });
+      .update({ angle, percentimeter })
+      .returning('*')
+      .orderBy('timestamp', 'desc');
+    return stateVariable[0];
   }
 }
 

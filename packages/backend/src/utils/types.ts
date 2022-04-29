@@ -28,7 +28,7 @@ export const messageErrorTryAction = (
     : `${ERROR_INTERNAL} --> ${className} in ${message}`;
   console.log(messageLog);
   console.log('ERROR: ');
-  console.log(err.message);
+  console.log(err);
   console.log('');
   console.log('Server is Running');
 };

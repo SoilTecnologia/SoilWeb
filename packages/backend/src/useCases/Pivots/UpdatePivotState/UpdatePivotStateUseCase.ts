@@ -138,20 +138,15 @@ class UpdatePivotStateUseCase {
 
   private async applyQueryUpdateStateVariable(
     state_variable_id: string,
-    isAnglePercent: 'angle' | 'percentimeter',
-    dataNum: number
+    angle: number,
+    percentimeter: number
   ) {
     try {
-      const isAngle = isAnglePercent === 'angle';
-      return isAngle
-        ? await this.stateVariableRepository.updateAngle(
-            state_variable_id,
-            dataNum
-          )
-        : await this.stateVariableRepository.updatePercentimeter(
-            state_variable_id,
-            dataNum
-          );
+      return await this.stateVariableRepository.updateVariables(
+        state_variable_id,
+        angle,
+        percentimeter
+      );
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -225,9 +220,10 @@ class UpdatePivotStateUseCase {
             percentimeter,
             timestamp: new Date()
           });
-
+          console.log('Do not a have old state, creating a new....');
           if (stateVariable) {
             console.log('STATE VARIABLE IS CREATED IN DATABASE');
+            console.log('...');
           }
         } else {
           const oldAngle = oldStateVariable.angle || 0;
@@ -235,13 +231,17 @@ class UpdatePivotStateUseCase {
           const state_variable_id = oldStateVariable.state_variable_id;
 
           // verifica se o percentimetro e o vangulo são iguais ao seus respectivos itens
-          const angleDiferent = stateVariableIsDiferent(oldAngle, angle);
-          const percentDiferent = stateVariableIsDiferent(
+          const angleDiferent = oldAngle !== angle;
+          console.log(
+            `Antigo percent ${oldPercentimer}, Novo Percentimeter: ${percentimeter}`
+          );
+          const percentDiferent = await stateVariableIsDiferent(
             oldPercentimer,
             percentimeter || 0
           );
+          const percentIsNotEqual = oldPercentimer !== percentimeter;
 
-          if (!angleDiferent && !percentDiferent) {
+          if (angleDiferent || percentDiferent) {
             this.shouldNotifyUpdate = true;
             const stateVariable = await this.applyQueryCreateStateVariable({
               state_id: this.state.state_id,
@@ -250,30 +250,30 @@ class UpdatePivotStateUseCase {
               timestamp: new Date()
             });
 
+            console.log(
+              'States Variables is diferent and range is granted than five, creating a new state Variable....'
+            );
             if (stateVariable) {
               console.log('STATE VARIABLE IS CREATED IN DATABASE');
+              console.log('....');
             }
-          } else if (!angleDiferent && percentDiferent) {
+          } else if (!angleDiferent && !percentDiferent && percentIsNotEqual) {
             this.shouldNotifyUpdate = true;
             const stateVariable = await this.applyQueryUpdateStateVariable(
               state_variable_id,
-              'angle',
-              angle
-            );
-
-            if (stateVariable) {
-              console.log('STATE VARIABLE IS UPDATE ANGLE IN DATABASE');
-            }
-          } else if (angleDiferent && !percentDiferent) {
-            this.shouldNotifyUpdate = true;
-            const stateVariable = await this.applyQueryUpdateStateVariable(
-              state_variable_id,
-              'percentimeter',
+              angle,
               percentimeter
             );
-
+            console.log(
+              'State Variable is diferent, range is less than five, updating state variable...'
+            );
             if (stateVariable) {
-              console.log('STATE VARIABLE IS UPDATE ANGLE IN DATABASE');
+              console.log(`State ANtigo: ${JSON.stringify(
+                oldStateVariable,
+                null,
+                2
+              )}, 
+              Novo State: ${JSON.stringify(stateVariable, null, 2)}`);
             }
           }
         }

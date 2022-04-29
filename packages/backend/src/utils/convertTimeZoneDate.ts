@@ -15,7 +15,6 @@ export const createDate = (date?: Date) => {
     const newDate = date.toLocaleString('pt-BR', {
       timeZone: 'America/Sao_Paulo'
     });
-    console.log(`Nova data: ${newDate}`);
     return newDate;
   } else {
     return new Date().toLocaleString('pt-BR', {
