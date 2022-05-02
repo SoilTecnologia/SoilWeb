@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  soil_postgres:
+    image: postgres:alpine
+    container_name: soil_db
+    restart: always
+    ports:
+      - 5434:5432
+    environment:
+      - POSTGRES_USER=soil
+      - POSTGRES_PASSWORD=soil2021
+      - POSTGRES_DB=soildb
+    volumes:
+      - ./backend/scripts:/docker-entrypoint-initdb.d
+
+  soil_backend:
+    build: ./backend
+    container_name: soil_backend
+    restart: always
+    environment:
+      - DATABASE_URL="mysql://soil:password@localhost:3306/newsoildb"
+      - TOKEN_SECRET=suadighui3gui4gb32ui4g23u4g23
+      - DB_HOST=soil_postgres
+      - DB_PASS=soil2021
+      - DB_USER=soil
+      - DB_PORT=5432
+      - DB_DATABASE=soildb
+    ports:
+      - 3308:3308
+      - 9229:9229
+    volumes:
+      - ./backend:/usr/soil/backend
+    links:
+      - soil_postgres
+    depends_on:
+      - soil_postgres
+
+  soil_frontend:
+    build: ./frontend
+    container_name: soil_frontend
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/usr/soil/volume/frontend
+    links:
+      - soil_backend
+    depends_on:
+      - soil_backend
+
+volumes:
+  pgdata:
+    driver: local
