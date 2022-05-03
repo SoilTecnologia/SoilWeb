@@ -1,0 +1,26 @@
+{
+    "sourceFile": "docker-compose.yml",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1651584768289,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1651585795079,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,9 +42,9 @@\n     restart: always\n     ports:\n       - 3000:3000\n     volumes:\n-      - ./frontend:/usr/soil/volume/frontend\n+      - ./frontend:/usr/soil/frontend\n     links:\n       - soil_backend\n     depends_on:\n       - soil_backend\n"
+                },
+                {
+                    "date": 1651586136958,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,13 +20,8 @@\n     restart: always\n     environment:\n       - DATABASE_URL=\"mysql://soil:password@localhost:3306/newsoildb\"\n       - TOKEN_SECRET=suadighui3gui4gb32ui4g23u4g23\n-      - DB_HOST=soil_postgres\n-      - DB_PASS=soil2021\n-      - DB_USER=soil\n-      - DB_PORT=5432\n-      - DB_DATABASE=soildb\n     ports:\n       - 3308:3308\n       - 9229:9229\n     volumes:\n"
+                }
+            ],
+            "date": 1651584768289,
+            "name": "Commit-0",
+            "content": "version: \"3.9\"\n\nservices:\n  soil_postgres:\n    image: postgres:alpine\n    container_name: soil_db\n    restart: always\n    ports:\n      - 5434:5432\n    environment:\n      - POSTGRES_USER=soil\n      - POSTGRES_PASSWORD=soil2021\n      - POSTGRES_DB=soildb\n    volumes:\n      - ./backend/scripts:/docker-entrypoint-initdb.d\n\n  soil_backend:\n    build: ./backend\n    container_name: soil_backend\n    restart: always\n    environment:\n      - DATABASE_URL=\"mysql://soil:password@localhost:3306/newsoildb\"\n      - TOKEN_SECRET=suadighui3gui4gb32ui4g23u4g23\n      - DB_HOST=soil_postgres\n      - DB_PASS=soil2021\n      - DB_USER=soil\n      - DB_PORT=5432\n      - DB_DATABASE=soildb\n    ports:\n      - 3308:3308\n      - 9229:9229\n    volumes:\n      - ./backend:/usr/soil/backend\n    links:\n      - soil_postgres\n    depends_on:\n      - soil_postgres\n\n  soil_frontend:\n    build: ./frontend\n    container_name: soil_frontend\n    restart: always\n    ports:\n      - 3000:3000\n    volumes:\n      - ./frontend:/usr/soil/volume/frontend\n    links:\n      - soil_backend\n    depends_on:\n      - soil_backend\n\nvolumes:\n  pgdata:\n    driver: local\n"
+        }
+    ]
+}

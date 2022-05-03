@@ -32,7 +32,7 @@ app.use(express.json());
 app.use(router);
 
 httpServer.listen(PORT, () => {
-  console.log(`Server Listening on PORT ${PORT} `);
+  console.log(`Server Listening on PORT ${PORT} backend `);
 });
 
 class SocketIoConnect {

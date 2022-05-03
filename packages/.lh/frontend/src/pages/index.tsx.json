@@ -1,0 +1,30 @@
+{
+    "sourceFile": "frontend/src/pages/index.tsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1651586278099,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1651586309261,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,8 +2,8 @@\n import { useEffect } from \"react\";\n \n export default function Home() {\n   useEffect(() => {\n-    console.log(\"Get frontend\");\n+    console.log(\"Santos não tem torcida\");\n   }, []);\n   return <MainLogin />;\n }\n"
+                },
+                {
+                    "date": 1651586470124,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,9 +1,6 @@\n import MainLogin from \"components/LoginPage/MainLogin\";\n import { useEffect } from \"react\";\n \n export default function Home() {\n-  useEffect(() => {\n-    console.log(\"Santos não tem torcida\");\n-  }, []);\n   return <MainLogin />;\n }\n"
+                },
+                {
+                    "date": 1651587813748,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,5 @@\n import MainLogin from \"components/LoginPage/MainLogin\";\n-import { useEffect } from \"react\";\n \n export default function Home() {\n   return <MainLogin />;\n }\n"
+                }
+            ],
+            "date": 1651586278099,
+            "name": "Commit-0",
+            "content": "import MainLogin from \"components/LoginPage/MainLogin\";\nimport { useEffect } from \"react\";\n\nexport default function Home() {\n  useEffect(() => {\n    console.log(\"Get frontend\");\n  }, []);\n  return <MainLogin />;\n}\n"
+        }
+    ]
+}
