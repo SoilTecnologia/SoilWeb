@@ -1,0 +1,18 @@
+{
+    "sourceFile": "backend/src/routes/scheduling.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1651588414321,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1651588414321,
+            "name": "Commit-0",
+            "content": "import express from 'express';\nimport authMiddleware from '../middlewares/auth';\nimport { CreateSchedulingController } from '../useCases/Scheduling/CreateScheduling/CreateSchedulingController';\nimport { DeleteSchedulingController } from '../useCases/Scheduling/DeleteScheduling/DeleteSchedulingController';\nimport { UpdateSchedulingController } from '../useCases/Scheduling/UpdateScheduling/UpdateSchedulingController';\nimport { GetSchedulingController } from '../useCases/Scheduling/GetScheduling/GetSchedulingController';\nimport { GetAllSchedulingController } from '../useCases/Scheduling/GetAllScheduling/GetAllSchedulingController';\n\nconst router = express.Router();\n\nconst createSchedulingController = new CreateSchedulingController();\nconst deleteSchedulingController = new DeleteSchedulingController();\nconst updateSchedulingController = new UpdateSchedulingController();\nconst getSchedulingController = new GetSchedulingController();\nconst getAllSchedulingController = new GetAllSchedulingController();\n\nrouter.post(\n  '/addScheduling',\n  authMiddleware(),\n  createSchedulingController.handle\n);\nrouter.delete(\n  '/deleteScheduling/:id',\n  authMiddleware(),\n  deleteSchedulingController.handle\n);\nrouter.put(\n  '/updateScheduling/',\n  authMiddleware(),\n  updateSchedulingController.handle\n);\nrouter.get(\n  '/getScheduling/:id',\n  authMiddleware(),\n  getSchedulingController.handle\n);\nrouter.get(\n  '/getAllScheduling',\n  authMiddleware(),\n  getAllSchedulingController.handle\n);\n\nexport default router;\n"
+        }
+    ]
+}

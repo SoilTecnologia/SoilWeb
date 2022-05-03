@@ -1,0 +1,22 @@
+{
+    "sourceFile": "backend/src/useCases/Scheduling/CreateScheduling/CreateSchedulingUseCase.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1651591730750,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1651591763217,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -52,13 +52,13 @@\n       end_timestamp,\n       timestamp\n     });\n \n-    const schedulling = await this.applyQueryCreate(schedulingModel);\n+    const newScheduling = await this.applyQueryCreate(schedulingModel);\n \n-    if (scheduling) emitter.emit('schedulling', scheduling);\n+    if (newScheduling) emitter.emit('scheduling', newScheduling);\n \n-    return scheduling;\n+    return newScheduling;\n   }\n }\n \n export { CreateSchedulingUseCase };\n"
+                }
+            ],
+            "date": 1651591730750,
+            "name": "Commit-0",
+            "content": "import { inject, injectable } from 'tsyringe';\nimport { SchedulingModel } from '../../../database/model/Scheduling';\nimport { SchedulingRepository } from '../../../database/repositories/Scheduling/SchedulingRepository';\nimport emitter from '../../../utils/eventBus';\nimport { messageErrorTryAction } from '../../../utils/types';\n\n@injectable()\nclass CreateSchedulingUseCase {\n  constructor(\n    @inject('SchedulingRepository')\n    private schedulingRepository: SchedulingRepository\n  ) {}\n\n  private async applyQueryCreate(scheduling: SchedulingModel) {\n    try {\n      return await this.schedulingRepository.create(scheduling);\n    } catch (err) {\n      messageErrorTryAction(\n        err,\n        true,\n        CreateSchedulingUseCase.name,\n        'CreateSchedulling'\n      );\n    }\n  }\n\n  async execute(scheduling: Omit<SchedulingModel, 'scheduling_id'>) {\n    const {\n      pivot_id,\n      power,\n      water,\n      direction,\n      start_angle,\n      end_angle,\n      percentimeter,\n      start_timestamp,\n      end_timestamp,\n      timestamp\n    } = scheduling;\n\n    const schedulingModel = new SchedulingModel();\n\n    Object.assign(schedulingModel, {\n      pivot_id,\n      power,\n      water,\n      direction,\n      start_angle,\n      end_angle,\n      percentimeter,\n      start_timestamp,\n      end_timestamp,\n      timestamp\n    });\n\n    const schedulling = await this.applyQueryCreate(schedulingModel);\n\n    if (scheduling) emitter.emit('schedulling', scheduling);\n\n    return scheduling;\n  }\n}\n\nexport { CreateSchedulingUseCase };\n"
+        }
+    ]
+}

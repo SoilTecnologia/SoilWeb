@@ -1,0 +1,18 @@
+{
+    "sourceFile": "backend/src/schedule/manage-schedule.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1651590486668,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1651590486668,
+            "name": "Commit-0",
+            "content": "const SendAction = require('./SendAction');\n\nclass ManageSchedule {\n  constructor() {\n    this.jobs = [SendAction];\n  }\n\n  run() {\n    this.jobs.forEach((job) => job.start());\n  }\n}\n\nexport const manageSchedule = new ManageSchedule();\n"
+        }
+    ]
+}

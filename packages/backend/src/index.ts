@@ -15,6 +15,7 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import IoTDevice from './aws-iot';
 import * as raspberry from './raspberry/tests';
 import router from './routes';
+import { manageSchedule } from './schedule/manage-schedule';
 import './shared/container';
 import emitter from './utils/eventBus';
 import { handleResultAction } from './utils/handleFarmIdWithUndescores';
@@ -32,7 +33,7 @@ app.use(express.json());
 app.use(router);
 
 httpServer.listen(PORT, () => {
-  console.log(`Server Listening on PORT ${PORT} `);
+  console.info(`Server Listening on PORT ${PORT}`);
 });
 
 class SocketIoConnect {
@@ -119,3 +120,4 @@ try {
 // const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
 const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
+manageSchedule.start();

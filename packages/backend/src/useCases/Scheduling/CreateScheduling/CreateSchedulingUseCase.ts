@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { SchedulingModel } from '../../../database/model/Scheduling';
 import { SchedulingRepository } from '../../../database/repositories/Scheduling/SchedulingRepository';
+import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -52,7 +53,11 @@ class CreateSchedulingUseCase {
       timestamp
     });
 
-    return await this.applyQueryCreate(schedulingModel);
+    const newScheduling = await this.applyQueryCreate(schedulingModel);
+
+    if (newScheduling) emitter.emit('scheduling', newScheduling);
+
+    return newScheduling;
   }
 }
 

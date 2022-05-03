@@ -1,0 +1,26 @@
+{
+    "sourceFile": "backend/src/index.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1651588370917,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1651595978119,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -33,10 +33,8 @@\n app.use(router);\n \n httpServer.listen(PORT, () => {\n   console.info(`Server Listening on PORT ${PORT}`);\n-\n-  manageSchedule.run();\n });\n \n class SocketIoConnect {\n   socketIo: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;\n"
+                },
+                {
+                    "date": 1651596018371,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,8 +14,9 @@\n import { DefaultEventsMap } from 'socket.io/dist/typed-events';\n import IoTDevice from './aws-iot';\n import * as raspberry from './raspberry/tests';\n import router from './routes';\n+import { manageSchedule } from './schedule/manage-schedule';\n import './shared/container';\n import emitter from './utils/eventBus';\n import { handleResultAction } from './utils/handleFarmIdWithUndescores';\n \n@@ -25,9 +26,8 @@\n const app = express();\n const httpServer = createServer(app);\n const io = new Server(httpServer);\n export const ioConnect = io;\n-const manageSchedule = require('./schedule/manage-schedule');\n \n app.use(cors());\n app.use(express.json());\n app.use(router);\n@@ -119,4 +119,5 @@\n // raspberry.start();\n // const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');\n const iotDevice = new IoTDevice('Cloud', 0);\n iotDevice.start();\n+manageSchedule.start();\n"
+                }
+            ],
+            "date": 1651588370917,
+            "name": "Commit-0",
+            "content": "/* eslint-disable camelcase */\n/* \nThis is the entry point of the application,\nthis file is responsible for:\n  - Setting up the Express Server\n  - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)\n  - Setting up the event emitter to be used on other systems\n*/\nimport cors from 'cors';\nimport express from 'express';\nimport { createServer } from 'http';\nimport 'reflect-metadata';\nimport { Server, Socket } from 'socket.io';\nimport { DefaultEventsMap } from 'socket.io/dist/typed-events';\nimport IoTDevice from './aws-iot';\nimport * as raspberry from './raspberry/tests';\nimport router from './routes';\nimport './shared/container';\nimport emitter from './utils/eventBus';\nimport { handleResultAction } from './utils/handleFarmIdWithUndescores';\n\nrequire('dotenv').config();\n\nconst PORT = 3308;\nconst app = express();\nconst httpServer = createServer(app);\nconst io = new Server(httpServer);\nexport const ioConnect = io;\nconst manageSchedule = require('./schedule/manage-schedule');\n\napp.use(cors());\napp.use(express.json());\napp.use(router);\n\nhttpServer.listen(PORT, () => {\n  console.info(`Server Listening on PORT ${PORT}`);\n\n  manageSchedule.run();\n});\n\nclass SocketIoConnect {\n  socketIo: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;\n\n  constructor() {\n    this.socketIo = io;\n  }\n}\n\nexport const socketsIoConnect = new SocketIoConnect();\n\ntry {\n  io.on('connection', (socket: Socket) => {\n    emitter.on('state-change', (status: any) => {\n      const {\n        user_id,\n        pivot_num,\n        farm_name,\n        pivot_id,\n        connection,\n        power,\n        water,\n        direction,\n        percentimeter\n      } = status;\n      socket.emit(`${user_id}-status`, {\n        type: 'status',\n        pivot_id,\n        pivot_num,\n        farm_name,\n        power,\n        water,\n        direction,\n        connection,\n        percentimeter\n      });\n\n      // console.log(`socket de state: `, status);\n    });\n\n    emitter.on('variable-change', (status: any) => {\n      const { user_id, pivot_id, angle, percentimeter } = status;\n      socket.emit(`${user_id}-status`, {\n        type: 'variable',\n        pivot_id,\n        angle,\n        percentimeter\n      });\n\n      // console.log(`socket de variavel: `, status);\n    });\n\n    emitter.on('action-received-ack', async (action) => {\n      const { user_id, farm_name, pivot_num } = await handleResultAction(\n        action.id\n      );\n\n      socket.emit(`${user_id}-ackreceived`, {\n        type: 'ack',\n        pivot_num,\n        farm_name\n      });\n    });\n\n    emitter.on('action-ack-not-received', async (action) => {\n      const { user_id, farm_name, pivot_num } = await handleResultAction(\n        action.id\n      );\n\n      socket.emit(`${user_id}-acknotreceived`, {\n        type: 'ack',\n        pivot_num,\n        farm_name\n      });\n    });\n  });\n} catch (err) {\n  console.log('Error to connect Io');\n  console.log(err.message);\n}\n\n// raspberry.start();\n// const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');\nconst iotDevice = new IoTDevice('Cloud', 0);\niotDevice.start();\n"
+        }
+    ]
+}
