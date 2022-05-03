@@ -9,6 +9,7 @@ import pivotRoute from './pivots';
 import schedulingRoute from './scheduling';
 import stateRoute from './state';
 import userRoute from './users';
+import pumpRoute from './pump';
 
 const router = express.Router();
 
@@ -42,6 +43,7 @@ router.use('/actions', actionRoute);
 router.use('/cycles', cycleRoute);
 router.use('/states', stateRoute);
 router.use('/scheduling', schedulingRoute);
+router.use('/pump', pumpRoute);
 router.use('/api-status', (req, res, next) => {
   res.sendStatus(200);
 });

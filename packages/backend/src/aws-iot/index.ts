@@ -70,7 +70,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = 'cloudHehe2345';
+      this.clientId = 'cloud45';
     }
   }
 

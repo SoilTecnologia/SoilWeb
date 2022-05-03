@@ -190,6 +190,25 @@ export async function up(knex: Knex): Promise<void> {
       table.dateTime('start_timestamp');
       table.dateTime('end_timestamp');
       table.dateTime('timestamp').notNullable();
+    })
+
+    .createTable('pumps', (table) =>{
+      table
+        .uuid('pump_id')
+        .primary()
+        .defaultTo(knex.raw('(uuid_generate_v4())'));
+      table
+        .string('pivot_id')
+        .references('pivot_id')
+        .inTable('pivots')
+        .index()
+        .notNullable()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+      table.boolean('pump_power');
+      table.float('startpump_angle');
+      table.float('endpump_angle');
+
     });
 }
 

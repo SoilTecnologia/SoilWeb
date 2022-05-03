@@ -17,6 +17,9 @@ import { IUsersRepository } from '../../database/repositories/Users/IUsersReposi
 import { UsersRepository } from '../../database/repositories/Users/UserRepository';
 import { ISchedulingRepository } from '../../database/repositories/Scheduling/ISchedulingRepository';
 import { SchedulingRepository } from '../../database/repositories/Scheduling/SchedulingRepository';
+import { PumpRepository } from '../../database/repositories/Pump/PumpRepository';
+import { IPumpRepository } from '../../database/repositories/Pump/IPumpRepository';
+
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',
@@ -60,5 +63,10 @@ container.registerSingleton<IActionRepository>(
 container.registerSingleton<ISchedulingRepository>(
   'SchedulingRepository',
   delay(() => SchedulingRepository)
+);
+
+container.registerSingleton<IPumpRepository>(
+  'PumpRepository',
+  delay(()=> PumpRepository)
 );
 
