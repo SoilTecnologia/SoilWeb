@@ -6,7 +6,7 @@ import { messageErrorTryAction } from '../../../utils/types';
 @injectable()
 class UpdatePumpUseCase {
   constructor(
-    @inject('SchedulingRepository')
+    @inject('PumpRepository')
     private pumpRepository: IPumpRepository
   ) {} 
 
@@ -40,7 +40,7 @@ class UpdatePumpUseCase {
     const getPump = await this.applyQueryFindById(
         pump.pump_id
     );
-    console.log("xxxxx",pump.pump_id)
+    
 
     if (!getPump) throw new Error('Pumps Does Not Exists');
 
