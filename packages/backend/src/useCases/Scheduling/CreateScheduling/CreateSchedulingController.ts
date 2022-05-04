@@ -7,6 +7,7 @@ class CreateSchedulingController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const {
       pivot_id,
+      author,
       power,
       water,
       direction,
@@ -25,14 +26,15 @@ class CreateSchedulingController {
     try {
       const allScheduling = await createSchedulingUseCase.execute({
         pivot_id,
+        author,
         power,
         water,
         direction,
         start_angle,
         end_angle,
         percentimeter,
-        start_timestamp: new Date(2022, 5, 4, 15, 40),
-        end_timestamp: new Date(2022, 5, 4, 15, 40, 30),
+        start_timestamp: new Date(2022, 5, 4, 17, 14),
+        end_timestamp: new Date(2022, 5, 4, 17, 14, 30),
         timestamp: new Date()
       });
 

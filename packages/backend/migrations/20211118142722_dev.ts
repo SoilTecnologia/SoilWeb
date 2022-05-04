@@ -180,6 +180,7 @@ export async function up(knex: Knex): Promise<void> {
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
+      table.string('author').notNullable();
       table.boolean('power');
       table.boolean('water');
       table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);

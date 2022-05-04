@@ -450,9 +450,6 @@ class IoTDevice {
           try {
             const raspOrCloud =
               this.type === 'Raspberry' ? this.pubTopic : queue.id;
-
-            console.log();
-
             this.queue.remove(queue);
             await this.publish(queue, raspOrCloud);
           } catch (err) {

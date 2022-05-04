@@ -1,26 +1,27 @@
 class SchedulingModel {
-   scheduling_id: string; 
+  scheduling_id: string;
 
-   pivot_id: string;
+  pivot_id: string;
 
-   power: boolean | null;
+  author: string;
 
-   water: boolean | null;
+  power: boolean | null;
 
-   direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE' | null;
+  water: boolean | null;
 
-   start_angle: number | null;
+  direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE' | null;
 
-   end_angle: number | null;
+  start_angle: number | null;
 
-   percentimeter: number | null;
+  end_angle: number | null;
 
-   start_timestamp: Date | null;
+  percentimeter: number | null;
 
-   end_timestamp: Date | null;
+  start_timestamp: Date | null;
 
-   timestamp: Date | null;
+  end_timestamp: Date | null;
 
+  timestamp: Date | null;
 }
 
-export {SchedulingModel}
+export { SchedulingModel };

@@ -1,6 +1,5 @@
 /* eslint-disable no-unneeded-ternary */
 import { inject, injectable } from 'tsyringe';
-// import { v4 as uuid } from 'uuid';
 import { CreateAction } from '../../../database/model/types/action';
 import { UserModel } from '../../../database/model/User';
 import { IActionRepository } from '../../../database/repositories/Action/IActionRepository';

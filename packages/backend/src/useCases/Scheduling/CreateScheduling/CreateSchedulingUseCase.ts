@@ -28,6 +28,7 @@ class CreateSchedulingUseCase {
   async execute(scheduling: Omit<SchedulingModel, 'scheduling_id'>) {
     const {
       pivot_id,
+      author,
       power,
       water,
       direction,
@@ -43,6 +44,7 @@ class CreateSchedulingUseCase {
 
     Object.assign(schedulingModel, {
       pivot_id,
+      author,
       power,
       water,
       direction,
@@ -57,7 +59,7 @@ class CreateSchedulingUseCase {
     const newScheduling = await this.applyQueryCreate(schedulingModel);
 
     if (newScheduling) {
-      console.log('Emitindo novo Agendamento....');
+      console.log(`Agendamento criado em ${newScheduling.timestamp}`);
       emitter.emit('scheduling', newScheduling);
     }
 

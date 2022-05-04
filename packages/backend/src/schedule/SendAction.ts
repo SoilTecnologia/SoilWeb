@@ -3,6 +3,8 @@ import { SchedulingModel } from '../database/model/Scheduling';
 import dayjs from 'dayjs';
 import { container } from 'tsyringe';
 import { DeleteSchedulingUseCase } from '../useCases/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
+import { CreateActionUseCase } from '../useCases/Actions/CreateAction/CreateActionUseCase';
+import { CreateAction } from '../database/model/types/action';
 
 type callbackProps = (job: any) => void;
 
@@ -18,7 +20,7 @@ class SendSchedulingListening {
     this.job = newJob;
   }
 
-  getOptionsDate(dateReceived: Date) {
+  private getOptionsDate(dateReceived: Date) {
     const newDate = dayjs(dateReceived)
       .subtract(1, 'month')
       .add(3, 'hour')
@@ -26,7 +28,7 @@ class SendSchedulingListening {
     return newDate;
   }
 
-  configJobWithDate(date: Date, callback: callbackProps) {
+  private configJob(date: Date, callback: callbackProps) {
     try {
       this.scheduleJob = schedule.scheduleJob(
         date,
@@ -43,12 +45,25 @@ class SendSchedulingListening {
     }
   }
 
-  sendJob({ job, scheduleObjectJob }: jobActionProps) {
-    console.log('INICIANDO O TRABALHO');
-    console.log('...');
+  private async sendJob({ job }: jobActionProps) {
+    const createActionUseCase = container.resolve(CreateActionUseCase);
+    const action: Omit<CreateAction, 'timestamp_sent'> = {
+      pivot_id: job.pivot_id,
+      author: job.author,
+      power: job.power || false,
+      water: job.water || false,
+      direction: job.direction || 'CLOCKWISE',
+      percentimeter: job.percentimeter || 0
+    };
+    try {
+      await createActionUseCase.execute(action, job.timestamp);
+    } catch (err) {
+      console.log('INICIANDO O TRABALHO');
+      console.log('...');
+    }
   }
 
-  async removeJob({ job, scheduleObjectJob }: jobActionProps) {
+  private async removeJob({ job, scheduleObjectJob }: jobActionProps) {
     try {
       // Separando nome do agendamento
       const nameJobSplit = scheduleObjectJob.name.split(' ');
@@ -77,8 +92,8 @@ class SendSchedulingListening {
     const initDate = start_timestamp && this.getOptionsDate(start_timestamp!!);
     const finalDate = end_timestamp && this.getOptionsDate(end_timestamp!!);
     // Enviar para iniciar o agendamento
-    initDate && this.configJobWithDate(initDate, this.sendJob);
-    finalDate && this.configJobWithDate(finalDate, this.removeJob);
+    initDate && this.configJob(initDate, this.sendJob);
+    finalDate && this.configJob(finalDate, this.removeJob);
   }
 }
 
