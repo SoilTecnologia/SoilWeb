@@ -13,6 +13,7 @@ class CreateSchedulingUseCase {
 
   private async applyQueryCreate(scheduling: SchedulingModel) {
     try {
+      console.log(scheduling);
       return await this.schedulingRepository.create(scheduling);
     } catch (err) {
       messageErrorTryAction(
@@ -55,7 +56,10 @@ class CreateSchedulingUseCase {
 
     const newScheduling = await this.applyQueryCreate(schedulingModel);
 
-    if (newScheduling) emitter.emit('scheduling', newScheduling);
+    if (newScheduling) {
+      console.log('Emitindo novo Agendamento....');
+      emitter.emit('scheduling', newScheduling);
+    }
 
     return newScheduling;
   }

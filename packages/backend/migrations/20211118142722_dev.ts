@@ -167,7 +167,6 @@ export async function up(knex: Knex): Promise<void> {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
     })
-
     .createTable('schedulings', (table) => {
       table
         .uuid('scheduling_id')

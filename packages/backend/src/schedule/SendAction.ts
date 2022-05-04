@@ -1,75 +1,85 @@
-import cron from 'node-cron';
+import schedule from 'node-schedule';
 import { SchedulingModel } from '../database/model/Scheduling';
+import dayjs from 'dayjs';
+import { container } from 'tsyringe';
+import { DeleteSchedulingUseCase } from '../useCases/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
 
-type optionsSchedule = {
-  day: string;
-  month: string;
-  year: string;
-  hour: string;
-  minute: string;
-  second: string;
+type callbackProps = (job: any) => void;
+
+type jobActionProps = {
+  job: SchedulingModel;
+  scheduleObjectJob: schedule.Job;
 };
-
-type callbackProps = () => void;
-
 class SendSchedulingListening {
   private job: SchedulingModel;
+  private scheduleJob: schedule.Job;
 
-  getDateSchedulling(date: Date) {
-    const dateString = date.toLocaleString('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      dateStyle: 'short',
-      timeStyle: 'full'
-    });
-
-    const dateSplit = dateString.split(' ');
-    const dateFull = dateSplit[0].split('/');
-    const timeFull = dateSplit[1].split(':');
-
-    const [day, month, year] = dateFull;
-    const [hour, minute, second] = timeFull;
-
-    return { day, month, year, hour, minute, second };
+  constructor(newJob: SchedulingModel) {
+    this.job = newJob;
   }
 
-  configJob(options: optionsSchedule, callback: callbackProps) {
-    const second = options.second || '*';
-    const minute = options.minute || '*';
-    const hour = options.hour || '*';
-    const day = options.day || '*';
-    const month = options.month || '*';
+  getOptionsDate(dateReceived: Date) {
+    const newDate = dayjs(dateReceived)
+      .subtract(1, 'month')
+      .add(3, 'hour')
+      .toDate();
+    return newDate;
+  }
 
-    const cronArg = `${second} ${minute} ${hour} ${day} ${month} *`;
-
+  configJobWithDate(date: Date, callback: callbackProps) {
     try {
-      const jobRuning = cron.schedule(cronArg, callback, {
-        scheduled: false,
-        timezone: 'America/Sao_Paulo'
-      });
-
-      jobRuning.start();
+      this.scheduleJob = schedule.scheduleJob(
+        date,
+        callback.bind(null, {
+          job: this.job,
+          scheduleObjectJob: this.scheduleJob
+        })
+      );
     } catch (err) {
       const error = err as Error;
       console.log(`Error in ${SendSchedulingListening.name}, configJob `);
-      console.log(err.message);
+      console.log(error.message);
       console.log('....');
     }
   }
 
-  sendJob() {}
+  sendJob({ job, scheduleObjectJob }: jobActionProps) {
+    console.log('INICIANDO O TRABALHO');
+    console.log('...');
+  }
 
-  removeJob() {}
+  async removeJob({ job, scheduleObjectJob }: jobActionProps) {
+    try {
+      // Separando nome do agendamento
+      const nameJobSplit = scheduleObjectJob.name.split(' ');
+      const [_, __, numJob, dateCreateJob] = nameJobSplit;
+      console.log(
+        `Cancelando Agendamento n° ${numJob} criado em ${dateCreateJob}...`
+      );
+      // Cancelando Agendamento
+      schedule.cancelJob(scheduleObjectJob);
+      //Excluindo do banco de dados
+      const deleteSchedule = container.resolve(DeleteSchedulingUseCase);
+      await deleteSchedule.execute(job.scheduling_id);
+      console.log(`Agendamento excluído com sucesso do banco de dados....`);
+      console.log('....');
+    } catch (err) {
+      const error = err as Error;
+      console.log(`Error in ${SendSchedulingListening.name} of removeJob`);
+      console.log(error.message);
+      console.log('....');
+    }
+  }
 
-  async addListening(newJob: SchedulingModel) {
-    const initDate =
-      newJob.start_timestamp && this.getDateSchedulling(newJob.start_timestamp);
-    const endDate =
-      newJob.end_timestamp && this.getDateSchedulling(newJob.end_timestamp);
-
-    initDate && this.configJob(initDate, this.sendJob);
-    endDate && this.configJob(endDate, this.removeJob);
+  async addListening() {
+    const { start_timestamp, end_timestamp } = this.job;
+    // Manipula data atual
+    const initDate = start_timestamp && this.getOptionsDate(start_timestamp!!);
+    const finalDate = end_timestamp && this.getOptionsDate(end_timestamp!!);
+    // Enviar para iniciar o agendamento
+    initDate && this.configJobWithDate(initDate, this.sendJob);
+    finalDate && this.configJobWithDate(finalDate, this.removeJob);
   }
 }
 
-const listenerSchedule = new SendSchedulingListening();
-export { listenerSchedule };
+export { SendSchedulingListening };

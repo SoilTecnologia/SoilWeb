@@ -18,6 +18,8 @@ class CreateSchedulingController {
       timestamp
     } = req.body;
 
+    console.log(pivot_id);
+    console.log('....');
     const createSchedulingUseCase = container.resolve(CreateSchedulingUseCase);
 
     try {
@@ -29,13 +31,12 @@ class CreateSchedulingController {
         start_angle,
         end_angle,
         percentimeter,
-        start_timestamp,
-        end_timestamp,
-        timestamp
+        start_timestamp: new Date(2022, 5, 4, 15, 40),
+        end_timestamp: new Date(2022, 5, 4, 15, 40, 30),
+        timestamp: new Date()
       });
 
       res.send(allScheduling);
-      console.log('seeend', allScheduling);
     } catch (err) {
       messageErrorTryAction(
         err,
