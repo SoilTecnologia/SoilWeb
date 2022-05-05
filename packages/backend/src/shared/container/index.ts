@@ -17,6 +17,8 @@ import { IUsersRepository } from '../../database/repositories/Users/IUsersReposi
 import { UsersRepository } from '../../database/repositories/Users/UserRepository';
 import { ISchedulingRepository } from '../../database/repositories/Scheduling/ISchedulingRepository';
 import { SchedulingRepository } from '../../database/repositories/Scheduling/SchedulingRepository';
+import { ISchedulingAngleRepository } from '../../database/repositories/SchedulingAngle/ISchedulingAngleRepository';
+import { SchedulingAngleRepository } from '../../database/repositories/SchedulingAngle/SchedulingAngleRepository';
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',
@@ -60,5 +62,10 @@ container.registerSingleton<IActionRepository>(
 container.registerSingleton<ISchedulingRepository>(
   'SchedulingRepository',
   delay(() => SchedulingRepository)
+);
+
+container.registerSingleton<ISchedulingAngleRepository>(
+  'SchedulingAngleRepository',
+  delay(() => SchedulingAngleRepository)
 );
 

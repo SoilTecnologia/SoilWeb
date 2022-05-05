@@ -8,6 +8,7 @@ import nodeRoute from './nodes';
 import pivotRoute from './pivots';
 import userRoute from './users';
 import schedulingRoute from './scheduling';
+import schedulingangleRoute from './schedulingangle';
 
 const router = express.Router();
 
@@ -40,6 +41,7 @@ router.use('/nodes', nodeRoute);
 router.use('/actions', actionRoute);
 router.use('/cycles', cycleRoute);
 router.use('/scheduling', schedulingRoute)
+router.use('/schedulingangle', schedulingangleRoute)
 router.use('/api-status', (req, res, next) => {
   res.sendStatus(200);
 });
