@@ -1,23 +1,23 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { CreateSchedulingAngleController } from '../useCases/SchedulingAngle/CreateSchedulingAngle/CreateSchedulingAngleController'
-// import { DeleteSchedulingController } from '../useCases/Scheduling/DeleteScheduling/DeleteSchedulingController';
-// import { UpdateSchedulingController } from '../useCases/Scheduling/UpdateScheduling/UpdateSchedulingController';
-// import { GetSchedulingController } from '../useCases/Scheduling/GetScheduling/GetSchedulingController';
-// import { GetAllSchedulingController } from '../useCases/Scheduling/GetAllScheduling/GetAllSchedulingController';
+import { DeleteSchedulingAngleController } from '../useCases/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleController';
+// import { UpdateSchedulingController } from '../useCases/SchedulingAngle/UpdateSchedulingAngle/UpdateSchedulingAngleController';
+// import { GetSchedulingAngleController } from '../useCases/SchedulingAngle/GetSchedulingAngle/GetSchedulingAngleController';
+// import { GetAllSchedulingAngleController } from '../useCases/SchedulingAngle/GetAllSchedulingAngle/GetAllSchedulingAngleController';
 
 const router = express.Router();
 
 const createSchedulingAngleController = new CreateSchedulingAngleController();
-// const deleteSchedulingController = new DeleteSchedulingController();
-// const updateSchedulingController = new UpdateSchedulingController();
-// const getSchedulingController = new GetSchedulingController();
-// const getAllSchedulingController = new GetAllSchedulingController();
+const deleteSchedulingAngleController = new DeleteSchedulingAngleController();
+// const updateSchedulingAngleController = new UpdateSchedulingAngleController();
+// const getSchedulingAngleController = new GetSchedulingAngleController();
+// const getAllSchedulingAngleController = new GetAllSchedulingAngleController();
 
 router.post('/addSchedulingAngle', authMiddleware(), createSchedulingAngleController.handle);
-// router.delete('/deleteScheduling/:id', authMiddleware(), deleteSchedulingController.handle)
-// router.put('/updateScheduling/', authMiddleware(), updateSchedulingController.handle)
-// router.get('/getScheduling/:id', authMiddleware(), getSchedulingController.handle)
-// router.get('/getAllScheduling', authMiddleware(), getAllSchedulingController.handle)
+router.delete('/deleteSchedulingAngle/:id', authMiddleware(), deleteSchedulingAngleController.handle)
+// router.put('/updateSchedulingAngle/', authMiddleware(), updateSchedulingAngleController.handle)
+// router.get('/getSchedulingAngle/:id', authMiddleware(), getSchedulingAngleController.handle)
+// router.get('/getAllSchedulingAngle', authMiddleware(), getAllSchedulingAngleController.handle)
 
 export default router;
