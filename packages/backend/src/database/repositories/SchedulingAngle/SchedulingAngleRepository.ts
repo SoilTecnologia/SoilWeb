@@ -45,7 +45,6 @@ class SchedulingAngleRepository implements ISchedulingAngleRepository {
             .where({schedulingangle_id: schedulingangle.schedulingangle_id})
             .update(schedulingangle)
             .returning('*');
-            console.log("aquiiii")
             return results[0];
         
     }
