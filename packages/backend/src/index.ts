@@ -23,7 +23,6 @@ const PORT = 3308;
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
-const manageSchedule = require('./schedule/manage-schedule')
 
 app.use(cors());
 app.use(express.json());
@@ -32,7 +31,6 @@ app.use(router);
 httpServer.listen(PORT, () => {
   console.info(`Server Listening on PORT ${PORT}`);
 
-  manageSchedule.run()
 });
 
 io.on('connection', (socket: Socket) => {

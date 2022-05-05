@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { CreateSchedulingUseCase } from './CreateSchedulingUseCase'
+import { CreateSchedulingAngleUseCase } from './CreateSchedulingAngleUseCase'
 
-class CreateSchedulingController {
+class CreateSchedulingAngleController {
     async handle(req: Request, res: Response, next: NextFunction) {
         const{
             pivot_id,
@@ -10,34 +10,33 @@ class CreateSchedulingController {
             water,
             direction,
             percentimeter,
-            start_timestamp,
-            end_timestamp,
+            start_angle,
+            end_angle,
             timestamp
         } = req.body
         
-        const createSchedulingUseCase = container.resolve(CreateSchedulingUseCase);
+        const createSchedulingAngleUseCase = container.resolve(CreateSchedulingAngleUseCase);
         
         try{
-            const allScheduling = await createSchedulingUseCase.execute({
+            const allSchedulingAngle = await createSchedulingAngleUseCase.execute({
             pivot_id,
             power,
             water,
             direction,
             percentimeter,
-            start_timestamp,
-            end_timestamp,
+            start_angle,
+            end_angle,
             timestamp
             });
 
-            res.send(allScheduling)
-           
+            res.send(allSchedulingAngle)
 
         }   catch (err) {
-            console.log(`[ERROR] Server 500 on /scheduling/createScheduling`);
+            console.log(`[ERROR] Server 500 on /schedulingAngle/createSchedulingAngle`);
             console.log(err);
             next(err);
           }
     }
 }
 
-export { CreateSchedulingController }
+export { CreateSchedulingAngleController }

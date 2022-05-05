@@ -1,5 +1,5 @@
-class SchedulingModel {
-   scheduling_id: string; 
+class SchedulingAngleModel {
+   schedulingangle_id: string; 
 
    pivot_id: string;
 
@@ -11,12 +11,12 @@ class SchedulingModel {
 
    percentimeter: number | null;
 
-   start_timestamp: Date | null;
+   start_angle: number | null;
 
-   end_timestamp: Date | null;
+   end_angle: number | null;
 
    timestamp: Date | null;
 
 }
 
-export {SchedulingModel}
+export {SchedulingAngleModel}

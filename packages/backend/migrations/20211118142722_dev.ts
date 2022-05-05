@@ -185,8 +185,6 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('power');
       table.boolean('water');
       table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);
-      table.float('start_angle');
-      table.float('end_angle')
       table.float('percentimeter');
       table.dateTime('start_timestamp');
       table.dateTime('end_timestamp');
