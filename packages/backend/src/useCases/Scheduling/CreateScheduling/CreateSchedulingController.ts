@@ -6,14 +6,12 @@ import { CreateSchedulingUseCase } from './CreateSchedulingUseCase';
 class CreateSchedulingController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const {
-      is_stop,
       pivot_id,
       author,
+      is_stop,
       power,
       water,
       direction,
-      start_angle,
-      end_angle,
       percentimeter,
       start_timestamp,
       end_timestamp,
@@ -30,8 +28,6 @@ class CreateSchedulingController {
         power,
         water,
         direction,
-        start_angle,
-        end_angle,
         percentimeter,
         start_timestamp,
         end_timestamp,

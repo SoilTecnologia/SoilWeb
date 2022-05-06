@@ -185,11 +185,31 @@ export async function up(knex: Knex): Promise<void> {
       table.boolean('power');
       table.boolean('water');
       table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);
-      table.float('start_angle');
-      table.float('end_angle');
-      table.float('percentimeter');
+      table.integer('percentimeter');
       table.dateTime('start_timestamp');
       table.dateTime('end_timestamp');
+      table.dateTime('timestamp').notNullable();
+    })
+    .createTable('scheduling_angles', (table) => {
+      table
+        .uuid('schedulingangle_id')
+        .primary()
+        .defaultTo(knex.raw('(uuid_generate_v4())'));
+      table
+        .string('pivot_id')
+        .references('pivot_id')
+        .inTable('pivots')
+        .index()
+        .notNullable()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+      table.string('author');
+      table.boolean('power');
+      table.boolean('water');
+      table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);
+      table.float('percentimeter');
+      table.float('start_angle');
+      table.float('end_angle');
       table.dateTime('timestamp').notNullable();
     });
 }
@@ -230,9 +250,14 @@ export async function down(knex: Knex): Promise<void> {
       table.dropPrimary();
       table.dropForeign('pivot_id');
     })
+    .alterTable('scheduling_angles', (table) => {
+      table.dropPrimary();
+      table.dropForeign('pivot_id');
+    })
     .alterTable('users', (table) => {
       table.dropPrimary();
     })
+
     .dropTable('actions')
     .dropTable('radio_variables')
     .dropTable('states')
@@ -241,5 +266,6 @@ export async function down(knex: Knex): Promise<void> {
     .dropTable('nodes')
     .dropTable('farms')
     .dropTable('users')
-    .dropTable('schedulings');
+    .dropTable('schedulings')
+    .dropTable('scheduling_angles');
 }

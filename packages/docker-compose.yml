@@ -43,7 +43,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./frontend:/usr/soil/volume/frontend
+      - ./frontend:/usr/soil/frontend
     links:
       - soil_backend
     depends_on:

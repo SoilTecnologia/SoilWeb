@@ -1,3 +1,5 @@
+import { StateModel } from './State';
+
 class SchedulingModel {
   scheduling_id: string;
 
@@ -9,13 +11,9 @@ class SchedulingModel {
 
   power: boolean | null;
 
-  water: boolean | null;
+  water: boolean;
 
-  direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE' | null;
-
-  start_angle: number | null;
-
-  end_angle: number | null;
+  direction: StateModel['direction'];
 
   percentimeter: number | null;
 

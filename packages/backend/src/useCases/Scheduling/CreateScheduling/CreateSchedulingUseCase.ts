@@ -4,11 +4,6 @@ import { SchedulingModel } from '../../../database/model/Scheduling';
 import { SchedulingRepository } from '../../../database/repositories/Scheduling/SchedulingRepository';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
-
-type scheduleServiceProps = {
-  scheduling: Omit<SchedulingModel, 'scheduling_id'>;
-  is_stop: boolean;
-};
 @injectable()
 class CreateSchedulingUseCase {
   constructor(
@@ -39,8 +34,6 @@ class CreateSchedulingUseCase {
       power,
       water,
       direction,
-      start_angle,
-      end_angle,
       percentimeter,
       start_timestamp,
       end_timestamp,
@@ -59,8 +52,6 @@ class CreateSchedulingUseCase {
       power: is_stop ? false : power,
       water: is_stop ? false : water,
       direction: is_stop ? 'CLOCKWISE' : direction,
-      start_angle: is_stop ? 0 : start_angle,
-      end_angle: is_stop ? 0 : end_angle,
       percentimeter: is_stop ? 0 : percentimeter,
       start_timestamp: newStartTimeStamp,
       end_timestamp: newEndTimeStamp,
