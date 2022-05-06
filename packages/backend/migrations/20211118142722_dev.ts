@@ -181,6 +181,7 @@ export async function up(knex: Knex): Promise<void> {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
       table.string('author').notNullable();
+      table.boolean('is_stop');
       table.boolean('power');
       table.boolean('water');
       table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);

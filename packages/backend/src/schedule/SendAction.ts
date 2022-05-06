@@ -46,7 +46,6 @@ class SendSchedulingListening {
   }
 
   private async sendJob({ job }: jobActionProps) {
-    const createActionUseCase = container.resolve(CreateActionUseCase);
     const action: Omit<CreateAction, 'timestamp_sent'> = {
       pivot_id: job.pivot_id,
       author: job.author,
@@ -56,15 +55,32 @@ class SendSchedulingListening {
       percentimeter: job.percentimeter || 0
     };
     try {
+      console.log(`Iniciando ação agendada as: ${new Date()}`);
+      console.log('.....');
+      const createActionUseCase = container.resolve(CreateActionUseCase);
       await createActionUseCase.execute(action, job.timestamp);
-    } catch (err) {
-      console.log('INICIANDO O TRABALHO');
-      console.log('...');
-    }
+    } catch (err) {}
   }
 
   private async removeJob({ job, scheduleObjectJob }: jobActionProps) {
     try {
+      const createActionUseCase = container.resolve(CreateActionUseCase);
+      //Excluindo do banco de dados
+      const deleteSchedule = container.resolve(DeleteSchedulingUseCase);
+      await deleteSchedule.execute(job.scheduling_id);
+      // MDesliga o estado
+      await createActionUseCase.execute(
+        {
+          pivot_id: job.pivot_id,
+          author: job.author,
+          power: false,
+          water: false,
+          direction: 'CLOCKWISE',
+          percentimeter: 0
+        },
+        job.timestamp
+      );
+
       // Separando nome do agendamento
       const nameJobSplit = scheduleObjectJob.name.split(' ');
       const [_, __, numJob, dateCreateJob] = nameJobSplit;
@@ -73,11 +89,6 @@ class SendSchedulingListening {
       );
       // Cancelando Agendamento
       schedule.cancelJob(scheduleObjectJob);
-      //Excluindo do banco de dados
-      const deleteSchedule = container.resolve(DeleteSchedulingUseCase);
-      await deleteSchedule.execute(job.scheduling_id);
-      console.log(`Agendamento excluído com sucesso do banco de dados....`);
-      console.log('....');
     } catch (err) {
       const error = err as Error;
       console.log(`Error in ${SendSchedulingListening.name} of removeJob`);
@@ -87,13 +98,10 @@ class SendSchedulingListening {
   }
 
   async addListening() {
-    const { start_timestamp, end_timestamp } = this.job;
-    // Manipula data atual
-    const initDate = start_timestamp && this.getOptionsDate(start_timestamp!!);
-    const finalDate = end_timestamp && this.getOptionsDate(end_timestamp!!);
+    const { start_timestamp, end_timestamp, is_stop } = this.job;
     // Enviar para iniciar o agendamento
-    initDate && this.configJob(initDate, this.sendJob);
-    finalDate && this.configJob(finalDate, this.removeJob);
+    !is_stop && this.configJob(start_timestamp!!, this.sendJob);
+    this.configJob(end_timestamp!!, this.removeJob);
   }
 }
 

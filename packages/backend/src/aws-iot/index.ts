@@ -7,12 +7,11 @@ import { NodeModel } from '../database/model/Node';
 import { PivotModel } from '../database/model/Pivot';
 import { objectToActionString } from '../raspberry/common/objectToActionString';
 import { CreateActionUseCase } from '../useCases/Actions/CreateAction/CreateActionUseCase';
-import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
-import { statusPayloadStringToObject } from '../utils/conversions';
 import emitter from '../utils/eventBus';
 import { handleResultString } from '../utils/handleFarmIdWithUndescores';
 import MessageQueue from '../utils/message_queue';
 import { messageErrorTryAction } from '../utils/types';
+import { handleCloudMessage } from './cloudMessage';
 import { CheckGprs } from './gprsChecking';
 import { socketIo } from './socketIo';
 /*
@@ -147,8 +146,19 @@ class IoTDevice {
       if (pivots && pivots.length > 0) {
         console.log(`Checagem de Conexão inciada as ${hours} do dia ${date}`);
         for (const pivot of pivots) {
-          const payload = { payload: '000-000' };
-          this.publish(payload, pivot.pivot_id);
+          if (
+            pivot.pivot_id === 'agrishow_1' ||
+            pivot.pivot_id === 'agrishow_2'
+          ) {
+            console.log('Agrishow 1');
+          } else {
+            const payload = {
+              payload: '000-000',
+              type: 'status',
+              id: pivot.pivot_id
+            };
+            await this.publish(payload, pivot.pivot_id);
+          }
         }
         console.log('Finalizando Checagem de Conexão');
       } else {
@@ -196,7 +206,6 @@ class IoTDevice {
     qos: mqtt.QoS,
     retain: boolean
   ) => {
-    const updatePivotUseCase = container.resolve(UpdatePivotStateUseCase);
     const createActionUseCase = container.resolve(CreateActionUseCase);
 
     const decoder = new TextDecoder('utf8', { fatal: false });
@@ -217,96 +226,16 @@ class IoTDevice {
 
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
-        const { farm_id, node_num } = await handleResultString(id);
-        // Se possui um pivot_num, é um concentrador
-        // Caso contrário podemos assumir que é um GPRS
+        const result = await handleCloudMessage.receivedStatus({
+          pivot_id: id,
+          payload
+        });
 
-        if (node_num === '0') {
-          // Concentrador
-          if (payload) {
-            const {
-              connection,
-              power,
-              water,
-              direction,
-              angle,
-              percentimeter,
-              timestamp,
-              father,
-              rssi
-            } = payload;
-
-            try {
-              await updatePivotUseCase.execute(
-                `${farm_id}_${pivot_num}`,
-                connection,
-                power,
-                water,
-                direction,
-                angle,
-                percentimeter,
-                timestamp,
-                father,
-                rssi
-              );
-            } catch (err) {
-              messageErrorTryAction(err, false, IoTDevice.name, 'UpdatePivot');
-            }
-            /* Assim que recebe o novo status, publica o mesmo payload pra baixo pra avisar que recebeu */
-            this.publish(json, `${farm_id}_${node_num}`);
-            console.log(
-              `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
-            );
-          } else {
-            console.log('Status Changed Connection Received from Aws');
-            console.log(json);
-            console.log('........');
-          }
-        } else {
-          // GPRS
-          if (payload) {
-            console.log('Received status from GPRS');
-            const statusObject = statusPayloadStringToObject(payload);
-            console.log(JSON.stringify(statusObject));
-
-            // const pivotNum = `${farm_id}_${pivot_num}`;
-
-            if (statusObject) {
-              const {
-                power,
-                direction,
-                water,
-                percentimeter,
-                angle,
-                timestamp
-              } = statusObject;
-              try {
-                await updatePivotUseCase.execute(
-                  id, // Como node_num == pivot_num, seria o mesmo que colocar farm_id_pivot_num
-                  true,
-                  power,
-                  water,
-                  direction,
-                  angle,
-                  percentimeter,
-                  timestamp,
-                  null,
-                  null
-                );
-              } catch (err) {
-                messageErrorTryAction(
-                  err,
-                  false,
-                  IoTDevice.name,
-                  'Update State in Aws message'
-                );
-              }
-            }
-          } else {
-            console.log('Status Changed Connection Received from Aws');
-            console.log(json);
-            console.log('........');
-          }
+        if (result) {
+          this.publish(json, id);
+          console.log(
+            `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
+          );
         }
       } else if (json.type === 'action') {
         this.queue.remove(json);
@@ -383,20 +312,22 @@ class IoTDevice {
           `[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`
         );
         this.processQueue();
+        emitter.off('status', () => {});
       });
       emitter.on('connection-pivot', async (action) => {
         this.queue.enqueue({ type: 'status', ...action });
         this.processQueue();
+        emitter.off('connection-pivot', () => {});
       });
     } else {
       emitter.on('connection-pivot', async (action) => {
         console.log('em fail', action);
         this.queue.enqueue({ type: 'status', ...action });
         this.processQueue();
+        emitter.off('connection-pivot', () => {});
       });
       emitter.on('action', async (action: ActionReceived) => {
         const id = action.payload.pivot_id;
-
         const { node_num } = await handleResultString(id);
 
         // const pivotId = action.payload.pivot_id.split('_');
@@ -417,6 +348,8 @@ class IoTDevice {
           emitter.off('action', () => {});
           this.processQueue();
         } else {
+          console.log('action is gateway');
+
           const numId = action.node_num === 0 ? action.node_num : node_num;
           this.queue.enqueue({
             type: 'action',
@@ -426,11 +359,11 @@ class IoTDevice {
             attempts: 1
           });
           this.processQueue();
+          emitter.off('action', () => {});
         }
       });
     }
   };
-
   processQueue = async () => {
     if (!this.queue.isEmpty()) {
       // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui

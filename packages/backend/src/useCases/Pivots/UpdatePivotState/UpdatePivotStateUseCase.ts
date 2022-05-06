@@ -268,7 +268,7 @@ class UpdatePivotStateUseCase {
 
     if (this.shouldNotifyUpdate) {
       const pivot = await this.applyQueryGetPivotById(pivot_id);
-      if (!pivot) console.log(`Pivot: ${pivot_id} Doe not found in database`);
+      if (!pivot) console.log(`Pivot: ${pivot_id} Does not found in database`);
       const node = await this.applyQueryGetNodeByNode(pivot!!.node_id!!);
       const farm = await this.applyQueryGetFarmByFarm(pivot!!.farm_id!!);
 

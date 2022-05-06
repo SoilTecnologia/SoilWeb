@@ -6,6 +6,7 @@ import { CreateSchedulingUseCase } from './CreateSchedulingUseCase';
 class CreateSchedulingController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const {
+      is_stop,
       pivot_id,
       author,
       power,
@@ -19,23 +20,22 @@ class CreateSchedulingController {
       timestamp
     } = req.body;
 
-    console.log(pivot_id);
-    console.log('....');
     const createSchedulingUseCase = container.resolve(CreateSchedulingUseCase);
 
     try {
       const allScheduling = await createSchedulingUseCase.execute({
         pivot_id,
         author,
+        is_stop: true,
         power,
         water,
         direction,
         start_angle,
         end_angle,
         percentimeter,
-        start_timestamp: new Date(2022, 5, 4, 17, 14),
-        end_timestamp: new Date(2022, 5, 4, 17, 14, 30),
-        timestamp: new Date()
+        start_timestamp,
+        end_timestamp,
+        timestamp
       });
 
       res.send(allScheduling);

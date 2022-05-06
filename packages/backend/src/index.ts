@@ -71,6 +71,7 @@ try {
         connection,
         percentimeter
       });
+      emitter.off('connection', () => {});
 
       // console.log(`socket de state: `, status);
     });
@@ -83,6 +84,7 @@ try {
         angle,
         percentimeter
       });
+      emitter.off('variable-change', () => {});
 
       // console.log(`socket de variavel: `, status);
     });
@@ -97,6 +99,7 @@ try {
         pivot_num,
         farm_name
       });
+      emitter.off('action-received-ack', () => {});
     });
 
     emitter.on('action-ack-not-received', async (action) => {
@@ -109,6 +112,7 @@ try {
         pivot_num,
         farm_name
       });
+      emitter.off('action-ack-not-received', () => {});
     });
   });
 } catch (err) {

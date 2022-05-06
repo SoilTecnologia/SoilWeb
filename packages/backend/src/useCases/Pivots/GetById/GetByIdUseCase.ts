@@ -24,7 +24,7 @@ class GetPivotByIdUseCase {
   async execute(pivot_id: string) {
     const pivot = await this.applyQuerGetById(pivot_id);
 
-    if (!pivot) throw new Error('Does not found Pivot');
+    if (!pivot) throw new Error(`Does not found ${pivot_id} in database`);
 
     return pivot;
   }

@@ -5,6 +5,8 @@ class SchedulingModel {
 
   author: string;
 
+  is_stop: boolean;
+
   power: boolean | null;
 
   water: boolean | null;

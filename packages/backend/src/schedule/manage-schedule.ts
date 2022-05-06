@@ -1,4 +1,4 @@
-import { ScheduledTask } from 'node-cron';
+import dayjs from 'dayjs';
 import { container } from 'tsyringe';
 import { SchedulingModel } from '../database/model/Scheduling';
 import { GetAllSchedulingUseCase } from '../useCases/Scheduling/GetAllScheduling/GetAllSchedulingUseCase';
@@ -31,9 +31,7 @@ class ManageSchedule {
   private async enqueueJob() {
     if (this.jobs && this.jobs.length > 0) {
       for (const job of this.jobs) {
-        console.log(
-          `Adicionando novo agendamento ao listener ${JSON.stringify(job)}`
-        );
+        console.log('Adicionando novo agendamento ao listener....');
         console.log('...');
         const listenerSchedule = new SendSchedulingListening(job);
 
@@ -42,14 +40,36 @@ class ManageSchedule {
     }
   }
 
+  private async enqueueOneJob(job: SchedulingModel) {
+    console.log('Adicionando novo agendamento ao listener....');
+    console.log('...');
+    const listenerSchedule = new SendSchedulingListening(job);
+
+    await listenerSchedule.addListening();
+  }
+
   async start() {
     await this.getScheduling();
     await this.enqueueJob();
 
-    emitter.on('scheduling', async (scheduleJob: SchedulingModel) => {
-      console.log('Novo Agendamento Recebido....');
-      this.addJob(scheduleJob);
-      await this.enqueueJob();
+    emitter.on('scheduling', async (scheduling: SchedulingModel) => {
+      const newStartTimeStamp = dayjs(scheduling.start_timestamp)
+        .add(3, 'hour')
+        .toDate();
+      const newEndTimeStamp = dayjs(scheduling.end_timestamp)
+        .add(3, 'hour')
+        .toDate();
+      const newTimeStamp = dayjs(scheduling.timestamp).add(3, 'hour').toDate();
+
+      const newScheduling: SchedulingModel = {
+        ...scheduling,
+        start_timestamp: newStartTimeStamp,
+        end_timestamp: newEndTimeStamp,
+        timestamp: newTimeStamp
+      };
+      console.log(`Novo Agendamento Recebido... `);
+      this.addJob(newScheduling);
+      await this.enqueueOneJob(newScheduling);
     });
   }
 }

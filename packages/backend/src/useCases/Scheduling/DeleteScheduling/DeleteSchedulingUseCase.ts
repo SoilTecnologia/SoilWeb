@@ -40,7 +40,11 @@ class DeleteSchedulingUseCase {
     const scheduling = await this.applyQueryFindById(scheduling_id);
 
     if (!scheduling) throw new Error('Scheduling does not exist');
-    return await this.applyQueryDelete(scheduling_id);
+    const deletedSchedule = await this.applyQueryDelete(scheduling_id);
+    console.log(`Agendamento excluído com sucesso do banco de dados....`);
+    console.log('....');
+
+    return deletedSchedule;
   }
 }
 
