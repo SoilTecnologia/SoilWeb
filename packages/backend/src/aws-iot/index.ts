@@ -1,4 +1,5 @@
 import { iot, mqtt } from 'aws-iot-device-sdk-v2';
+import { attempt } from 'lodash';
 import { container } from 'tsyringe';
 import { TextDecoder } from 'util';
 import { ActionModel } from '../database/model/Action';
@@ -7,6 +8,11 @@ import { NodeModel } from '../database/model/Node';
 import { PivotModel } from '../database/model/Pivot';
 import { objectToActionString } from '../raspberry/common/objectToActionString';
 import { CreateActionUseCase } from '../useCases/Actions/CreateAction/CreateActionUseCase';
+import { GetOneNodeUseCase } from '../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
+import { GetPivotByIdUseCase } from '../useCases/Pivots/GetById/GetByIdUseCase';
+import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
+import { GetPivotStateUseCase } from '../useCases/States/GetPivotState/GetPivotStateUseCase';
+import { StatusObject } from '../utils/conversions';
 import emitter from '../utils/eventBus';
 import { handleResultString } from '../utils/handleFarmIdWithUndescores';
 import MessageQueue from '../utils/message_queue';
@@ -37,6 +43,12 @@ type ActionReceived = {
   };
 };
 
+interface responseActive {
+  id: string;
+}
+interface responseNotActiveProps extends responseActive {
+  attempts: number;
+}
 // A biblioteca pode ser inicializada utilizando algum desses dois types:
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 
@@ -57,11 +69,16 @@ class IoTDevice {
 
   private checkGprs: CheckGprs;
 
+  private responseActives: responseActive[];
+  private responseNotActive: responseNotActiveProps[];
+
   constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
     this.type = type;
     this.qos = qos;
     this.queue = new MessageQueue();
     this.checkGprs = new CheckGprs();
+    this.responseActives = [{} as responseActive];
+    this.responseNotActive = [{} as responseNotActiveProps];
 
     if (type === 'Raspberry' && topic) {
       this.subTopic = topic;
@@ -69,14 +86,12 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = 'cloudHehe2345';
+      this.clientId = 'cloud45';
     }
   }
-
   /*
   Nessa função fazemos a inicialização da conexão usando a biblioteca aws-iot-device-sdk-v2.
   */
-
   async start() {
     const certPath = './src/aws-iot/device.pem.crt';
     const keyPath = './src/aws-iot/private.pem.key';
@@ -134,10 +149,123 @@ class IoTDevice {
     return { hours, date };
   }
 
+  getStatePivot = async (pivot_id: string, connection: boolean) => {
+    const getStateUseCase = container.resolve(GetPivotStateUseCase);
+    const getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
+    const getPivot = container.resolve(GetPivotByIdUseCase);
+    const getNode = container.resolve(GetOneNodeUseCase);
+    try {
+      const oldState = await getStateUseCase.execute(pivot_id);
+
+      if (oldState) {
+        if (oldState.connection !== connection) {
+          await getUpdatePivotController.execute(
+            pivot_id,
+            connection,
+            false,
+            false,
+            'CLOCKWISE',
+            0,
+            0,
+            new Date(),
+            null,
+            null
+          );
+
+          const pivot = await getPivot.execute(pivot_id);
+          const node = await getNode.execute(pivot?.node_id!!);
+          pivot &&
+            node &&
+            emitter.emit('connection-pivot', {
+              id: `${pivot.farm_id}_${node.node_num}`,
+              pivot_id,
+              pivot_num: pivot.pivot_num,
+              connection
+            });
+        } else {
+        }
+      } else {
+        await getUpdatePivotController.execute(
+          pivot_id,
+          connection,
+          false,
+          false,
+          'CLOCKWISE',
+          0,
+          0,
+          new Date(),
+          null,
+          null
+        );
+      }
+    } catch (err) {
+      messageErrorTryAction(err, false, IoTDevice.name, 'Atualizando Estado');
+    }
+  };
+
+  private async checkResponseActive(pivot_id: string) {
+    const existsPivot = this.responseActives.find((res) => res.id === pivot_id);
+    if (existsPivot) {
+      console.log(`Recebido resposta de ${pivot_id} enviando mensagem ativa`);
+      this.responseActives = this.responseActives.filter(
+        (res) => res.id !== pivot_id
+      );
+      await this.getStatePivot(pivot_id, true);
+    } else {
+      console.log(`Pivo fora do ar: ...${pivot_id}, `);
+      const existsNotActive = this.responseNotActive.find(
+        (res) => res.id === pivot_id
+      );
+      if (!existsNotActive) {
+        console.log('Tentativas 1...');
+        this.responseNotActive.push({ id: pivot_id, attempts: 1 });
+        const payload = {
+          payload: '000-000',
+          type: 'status',
+          id: pivot_id
+        };
+        await this.publish(payload, pivot_id);
+        setTimeout(async () => {
+          await this.checkResponseActive(pivot_id);
+        }, 2000);
+      } else {
+        console.log(`Tentativa de conexão n° ${existsNotActive.attempts}`);
+        if (existsNotActive.attempts >= 3) {
+          await this.getStatePivot(pivot_id, false);
+          this.responseNotActive = this.responseNotActive.filter(
+            (res) => res.id !== pivot_id
+          );
+          console.log(
+            `Tentativas excedidas no pivo ${pivot_id}, verificando estado...`
+          );
+          console.log('....');
+        } else {
+          const responseWithoutThis = this.responseNotActive.filter(
+            (res) => res.id !== pivot_id
+          );
+          responseWithoutThis.push({
+            id: existsNotActive.id,
+            attempts: existsNotActive.attempts + 1
+          });
+          this.responseNotActive = responseWithoutThis;
+          const payload = {
+            payload: '000-000',
+            type: 'status',
+            id: pivot_id
+          };
+          await this.publish(payload, pivot_id);
+          setTimeout(async () => {
+            await this.checkResponseActive(pivot_id);
+          }, 5000);
+        }
+      }
+      // await this.getStatePivot(pivot_id, false)
+    }
+  }
+
   private async checkPivots() {
     this.getDate();
-    // const timeout = 10000;
-    const timeout = 10000 * 6 * 15;
+    const timeout = 10000 * 6 * 10;
 
     setInterval(async () => {
       const pivots = await this.checkGprs.starting();
@@ -146,20 +274,18 @@ class IoTDevice {
       if (pivots && pivots.length > 0) {
         console.log(`Checagem de Conexão inciada as ${hours} do dia ${date}`);
         for (const pivot of pivots) {
-          if (
-            pivot.pivot_id === 'agrishow_1' ||
-            pivot.pivot_id === 'agrishow_2'
-          ) {
-            console.log('Agrishow 1');
-          } else {
-            const payload = {
-              payload: '000-000',
-              type: 'status',
-              id: pivot.pivot_id
-            };
-            await this.publish(payload, pivot.pivot_id);
-          }
+          const payload = {
+            payload: '000-000',
+            type: 'status',
+            id: pivot.pivot_id
+          };
+          await this.publish(payload, pivot.pivot_id);
+
+          setTimeout(() => {
+            this.checkResponseActive(pivot.pivot_id);
+          }, 2000);
         }
+
         console.log('Finalizando Checagem de Conexão');
       } else {
         console.log('Does Not Found Pivots GPRS');
@@ -175,10 +301,6 @@ class IoTDevice {
 
   public async publish(payload: any, topic?: string) {
     const finalTopic = this.type === 'Cloud' ? topic : this.pubTopic;
-    // let finalTopic;
-    // finalTopi
-    // if (this.type === 'Cloud') finalTopic = topic;
-    // else finalTopic = this.pubTopic;
 
     try {
       const string = JSON.stringify(payload);
@@ -223,6 +345,8 @@ class IoTDevice {
       pivot_num: number;
       payload: any;
     } = json;
+
+    this.responseActives.push({ id: json.id });
 
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
@@ -321,7 +445,6 @@ class IoTDevice {
       });
     } else {
       emitter.on('connection-pivot', async (action) => {
-        console.log('em fail', action);
         this.queue.enqueue({ type: 'status', ...action });
         this.processQueue();
         emitter.off('connection-pivot', () => {});
@@ -364,6 +487,7 @@ class IoTDevice {
       });
     }
   };
+
   processQueue = async () => {
     if (!this.queue.isEmpty()) {
       // Ready serve para parar qualquer outro loop de acessar a queue enquanto acessamos aqui
@@ -371,7 +495,6 @@ class IoTDevice {
       for (const queue of this.queue._store) {
         if (queue.attempts && queue.attempts > 3) {
           console.log('[REMOVING ACTION FROM QUEUE] - Too Many Attempts');
-
           emitter.emit('action-ack-not-received', queue);
 
           console.log('');

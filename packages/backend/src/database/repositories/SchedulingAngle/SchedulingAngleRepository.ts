@@ -25,7 +25,7 @@ class SchedulingAngleRepository implements ISchedulingAngleRepository {
   }
 
   async create(
-    scheduling_angle: Omit<SchedulingAngleModel, 'schedulingangle_id'>
+    scheduling_angle: Omit<SchedulingAngleModel, 'scheduling_angle_id'>
   ): Promise<SchedulingAngleModel | undefined> {
     const newSchedulingAngle = await knex<SchedulingAngleModel>(
       'scheduling_angles'

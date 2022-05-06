@@ -192,7 +192,7 @@ export async function up(knex: Knex): Promise<void> {
     })
     .createTable('scheduling_angles', (table) => {
       table
-        .uuid('schedulingangle_id')
+        .uuid('scheduling_angle_id')
         .primary()
         .defaultTo(knex.raw('(uuid_generate_v4())'));
       table
@@ -210,6 +210,25 @@ export async function up(knex: Knex): Promise<void> {
       table.float('percentimeter');
       table.float('start_angle');
       table.float('end_angle');
+      table.dateTime('timestamp').notNullable();
+    })
+    .createTable('pumps', (table) => {
+      table
+        .uuid('pump_id')
+        .primary()
+        .defaultTo(knex.raw('(uuid_generate_v4())'));
+      table
+        .string('pivot_id')
+        .references('pivot_id')
+        .inTable('pivots')
+        .index()
+        .notNullable()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+      table.string('author');
+      table.boolean('pump_power');
+      table.float('start_pump_angle');
+      table.float('end_pump_angle');
       table.dateTime('timestamp').notNullable();
     });
 }
@@ -254,6 +273,10 @@ export async function down(knex: Knex): Promise<void> {
       table.dropPrimary();
       table.dropForeign('pivot_id');
     })
+    .alterTable('pumps', (table) => {
+      table.dropPrimary();
+      table.dropForeign('pivot_id');
+    })
     .alterTable('users', (table) => {
       table.dropPrimary();
     })
@@ -267,5 +290,6 @@ export async function down(knex: Knex): Promise<void> {
     .dropTable('farms')
     .dropTable('users')
     .dropTable('schedulings')
-    .dropTable('scheduling_angles');
+    .dropTable('scheduling_angles')
+    .dropTable('pumps');
 }

@@ -21,11 +21,6 @@ services:
     environment:
       - DATABASE_URL="mysql://soil:password@localhost:3306/newsoildb"
       - TOKEN_SECRET=suadighui3gui4gb32ui4g23u4g23
-      - DB_HOST=soil_postgres
-      - DB_PASS=soil2021
-      - DB_USER=soil
-      - DB_PORT=5432
-      - DB_DATABASE=soildb
     ports:
       - 3308:3308
       - 9229:9229

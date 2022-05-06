@@ -12,6 +12,10 @@ class ManageSchedule {
     this.jobs = [];
   }
 
+  handleDate(date: Date) {
+    return dayjs(date).add(3, 'hour').toDate();
+  }
+
   addJob(schedulling: SchedulingModel) {
     this.jobs.push(schedulling);
   }
@@ -52,14 +56,10 @@ class ManageSchedule {
     await this.getScheduling();
     await this.enqueueJob();
 
-    emitter.on('scheduling', async (scheduling: SchedulingModel) => {
-      const newStartTimeStamp = dayjs(scheduling.start_timestamp)
-        .add(3, 'hour')
-        .toDate();
-      const newEndTimeStamp = dayjs(scheduling.end_timestamp)
-        .add(3, 'hour')
-        .toDate();
-      const newTimeStamp = dayjs(scheduling.timestamp).add(3, 'hour').toDate();
+    emitter.once('scheduling', async (scheduling: SchedulingModel) => {
+      const newStartTimeStamp = this.handleDate(scheduling.start_timestamp!!);
+      const newEndTimeStamp = this.handleDate(scheduling.end_timestamp!!);
+      const newTimeStamp = this.handleDate(scheduling.timestamp!!);
 
       const newScheduling: SchedulingModel = {
         ...scheduling,

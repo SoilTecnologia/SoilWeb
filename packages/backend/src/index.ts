@@ -72,7 +72,7 @@ try {
         percentimeter
       });
       emitter.off('connection', () => {});
-
+      emitter.removeAllListeners('connection');
       // console.log(`socket de state: `, status);
     });
 
@@ -85,6 +85,7 @@ try {
         percentimeter
       });
       emitter.off('variable-change', () => {});
+      emitter.removeAllListeners('variable-change');
 
       // console.log(`socket de variavel: `, status);
     });
@@ -100,6 +101,7 @@ try {
         farm_name
       });
       emitter.off('action-received-ack', () => {});
+      emitter.removeAllListeners('action-received-ack');
     });
 
     emitter.on('action-ack-not-received', async (action) => {
@@ -113,6 +115,7 @@ try {
         farm_name
       });
       emitter.off('action-ack-not-received', () => {});
+      emitter.removeAllListeners('action-ack-not-received');
     });
   });
 } catch (err) {

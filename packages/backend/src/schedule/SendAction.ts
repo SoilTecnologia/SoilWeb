@@ -68,7 +68,7 @@ class SendSchedulingListening {
       //Excluindo do banco de dados
       const deleteSchedule = container.resolve(DeleteSchedulingUseCase);
       await deleteSchedule.execute(job.scheduling_id);
-      // MDesliga o estado
+      // Desliga o estado
       await createActionUseCase.execute(
         {
           pivot_id: job.pivot_id,

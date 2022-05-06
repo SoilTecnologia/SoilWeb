@@ -3,23 +3,29 @@ import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
 import { ISchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/ISchedulingAngleRepository';
 
 @injectable()
-class DeleteSchedulingAngleUseCase{
-    constructor(
-        @inject('SchedulingAngleRepository') private schedulingangleRepository : ISchedulingAngleRepository
-    ) {}
+class DeleteSchedulingAngleUseCase {
+  constructor(
+    @inject('SchedulingAngleRepository')
+    private schedulingangleRepository: ISchedulingAngleRepository
+  ) {}
 
+  async execute(
+    schedulingangle_id: SchedulingAngleModel['scheduling_angle_id']
+  ) {
+    const schedulingangle = await this.schedulingangleRepository.findById(
+      schedulingangle_id
+    );
 
-async execute (schedulingangle_id: SchedulingAngleModel['schedulingangle_id']){
-    const schedulingangle = await this.schedulingangleRepository.findById(schedulingangle_id);
-    
-    if (schedulingangle){
-        const schedulingangle = await this.schedulingangleRepository.delete(schedulingangle_id);
+    if (schedulingangle) {
+      const schedulingangle = await this.schedulingangleRepository.delete(
+        schedulingangle_id
+      );
 
-        return schedulingangle;
+      return schedulingangle;
     }
 
-    throw new Error('Scheduling does not exist')
-}
+    throw new Error('Scheduling does not exist');
+  }
 }
 
-export { DeleteSchedulingAngleUseCase }
+export { DeleteSchedulingAngleUseCase };

@@ -17,14 +17,14 @@ class CreateSchedulingController {
       end_timestamp,
       timestamp
     } = req.body;
-
+    console.log(`Recebido: ${pivot_id}`);
     const createSchedulingUseCase = container.resolve(CreateSchedulingUseCase);
 
     try {
       const allScheduling = await createSchedulingUseCase.execute({
         pivot_id,
         author,
-        is_stop: true,
+        is_stop,
         power,
         water,
         direction,
