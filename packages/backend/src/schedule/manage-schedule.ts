@@ -56,7 +56,7 @@ class ManageSchedule {
     await this.getScheduling();
     await this.enqueueJob();
 
-    emitter.once('scheduling', async (scheduling: SchedulingModel) => {
+    emitter.on('scheduling', async (scheduling: SchedulingModel) => {
       const newStartTimeStamp = this.handleDate(scheduling.start_timestamp!!);
       const newEndTimeStamp = this.handleDate(scheduling.end_timestamp!!);
       const newTimeStamp = this.handleDate(scheduling.timestamp!!);
@@ -67,6 +67,7 @@ class ManageSchedule {
         end_timestamp: newEndTimeStamp,
         timestamp: newTimeStamp
       };
+
       console.log(`Novo Agendamento Recebido... `);
       this.addJob(newScheduling);
       await this.enqueueOneJob(newScheduling);
