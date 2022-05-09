@@ -7,7 +7,7 @@ class SchedulingAngleRepository implements ISchedulingAngleRepository {
     return await knex<SchedulingAngleModel>('scheduling_angles')
       .select('*')
       .where({ pivot_id })
-      .orderBy('timestamp', 'desc');
+      .orderBy('start_timestamp', 'asc');
   }
 
   async findById(
@@ -16,7 +16,7 @@ class SchedulingAngleRepository implements ISchedulingAngleRepository {
     return await knex<SchedulingAngleModel>('scheduling_angles')
       .select()
       .where({ scheduling_angle_id })
-      .orderBy('timestamp', 'desc')
+      .orderBy('start_timestamp', 'asc')
       .first();
   }
 

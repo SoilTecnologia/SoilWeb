@@ -21,6 +21,8 @@ import { ISchedulingAngleRepository } from '../../database/repositories/Scheduli
 import { SchedulingAngleRepository } from '../../database/repositories/SchedulingAngle/SchedulingAngleRepository';
 import { PumpRepository } from '../../database/repositories/Pump/PumpRepository';
 import { IPumpRepository } from '../../database/repositories/Pump/IPumpRepository';
+import { ISchedulingHistoryRepository} from '../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
+import { SchedulingHistoryRepository}from '../../database/repositories/SchedulingHistory/SchedulingHistoryRepository';
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',
@@ -73,4 +75,9 @@ container.registerSingleton<ISchedulingAngleRepository>(
 container.registerSingleton<IPumpRepository>(
   'PumpRepository',
   delay(() => PumpRepository)
+);
+
+container.registerSingleton<ISchedulingHistoryRepository>(
+  'SchedulingHistoryRepository',
+  delay(() => SchedulingHistoryRepository)
 );
