@@ -48,6 +48,18 @@ export const socketsIoConnect = new SocketIoConnect();
 
 try {
   io.on('connection', (socket: Socket) => {
+    emitter.on('action-update', (action) => {
+      socket.emit(`action-response-${action.id}`, {
+        type: 'sucess'
+      });
+    });
+
+    emitter.on('action-not-update', (action) => {
+      socket.emit(`action-response-${action.id}`, {
+        type: 'fail'
+      });
+    });
+
     emitter.on('state-change', (status: any) => {
       const {
         user_id,
@@ -95,11 +107,14 @@ try {
         action.id
       );
 
-      socket.emit(`${user_id}-ackreceived`, {
-        type: 'ack',
+      socket.emit(`ack-response-${action.id}`, {
+        type: 'sucess',
+        user_id: user_id,
+        pivot_id: action.id,
         pivot_num,
         farm_name
       });
+
       emitter.off('action-received-ack', () => {});
       emitter.removeAllListeners('action-received-ack');
     });
@@ -109,8 +124,10 @@ try {
         action.id
       );
 
-      socket.emit(`${user_id}-acknotreceived`, {
-        type: 'ack',
+      socket.emit(`ack-response-${action.id}`, {
+        user_id,
+        type: 'fail',
+        pivot_id: action.id,
         pivot_num,
         farm_name
       });

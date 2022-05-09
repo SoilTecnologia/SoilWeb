@@ -23,7 +23,7 @@ class UpdateActionsUseCase {
   }
 
   async execute(action_id: ActionModel['action_id'], success: boolean) {
-    return await this.applyQueryUpdateAction(action_id, success);
+    const action = await this.applyQueryUpdateAction(action_id, success);
   }
 }
 

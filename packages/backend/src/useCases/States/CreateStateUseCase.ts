@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { StateModel } from '../../database/model/State';
 import { IStateRepository } from '../../database/repositories/States/IState';
+import emitter from '../../utils/eventBus';
 import { messageErrorTryAction } from '../../utils/types';
 
 @injectable()
@@ -29,7 +30,12 @@ class CreateStateUseCase {
       timestamp: new Date()
     });
 
-    return await this.applyQueryCreateState(stateModel);
+    const action = await this.applyQueryCreateState(stateModel);
+
+    if (action) emitter.emit('action-update', { id: action.pivot_id });
+    else emitter.emit('action-not-update', { id: stateModel.pivot_id });
+
+    return action;
   }
 }
 

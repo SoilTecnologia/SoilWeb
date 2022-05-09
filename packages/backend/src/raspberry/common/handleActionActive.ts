@@ -87,6 +87,9 @@ class HandleActionActive {
 
     await this.updateActionUseCase.execute(this.action.action_id, true);
     console.log('UPDATING ACTION:', this.action.action_id);
+    emitter.emit('action-received-ack', {
+      id: active.action.pivot_id
+    });
 
     // Verificar se está deletando essa ação do array
     // Se não estiver procurar uma solução para isso
@@ -143,6 +146,7 @@ class HandleActionActive {
         console.log(err.message);
       } finally {
         this.activeQueue.remove(this.current);
+        emitter.emit('action-not-update', { id: active.action.pivot_id });
         await checkPool();
       }
 

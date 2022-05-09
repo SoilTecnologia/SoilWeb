@@ -72,6 +72,9 @@ class IoTDevice {
   private responseActives: responseActive[];
   private responseNotActive: responseNotActiveProps[];
 
+  private responseAction: responseActive[];
+  private notResponseAction: responseNotActiveProps[];
+
   constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
     this.type = type;
     this.qos = qos;
@@ -182,7 +185,6 @@ class IoTDevice {
               pivot_num: pivot.pivot_num,
               connection
             });
-        } else {
         }
       } else {
         await getUpdatePivotController.execute(
@@ -203,6 +205,20 @@ class IoTDevice {
     }
   };
 
+  emittResponse(pivot_id: string) {
+    const pivotExistsResponse = this.responseAction.find(
+      (res) => res.id === pivot_id
+    );
+
+    if (pivotExistsResponse)
+      emitter.emit('action-received-ack', { id: pivot_id });
+    else emitter.emit('action-ack-not-received', { id: pivot_id });
+
+    this.responseAction = this.responseAction.filter(
+      (item) => item.id !== pivot_id
+    );
+  }
+
   private async checkResponseActive(pivot_id: string) {
     const existsPivot = this.responseActives.find((res) => res.id === pivot_id);
     if (existsPivot) {
@@ -210,6 +226,7 @@ class IoTDevice {
       this.responseActives = this.responseActives.filter(
         (res) => res.id !== pivot_id
       );
+
       await this.getStatePivot(pivot_id, true);
     } else {
       console.log(`Pivo fora do ar: ...${pivot_id}, `);
@@ -315,7 +332,6 @@ class IoTDevice {
       console.log(err.message);
     }
   }
-
   /*
   Função que processa as mensagens recebidas do broker.
   O que acontece apartir disso, depende do tipo do dispositivo e do tipo da mensagem.
@@ -346,7 +362,9 @@ class IoTDevice {
       payload: any;
     } = json;
 
-    this.responseActives.push({ id: json.id });
+    type === 'status'
+      ? this.responseActives.push({ id: json.id })
+      : this.responseAction.push({ id: json.id });
 
     if (this.type === 'Cloud') {
       if (json.type === 'status') {
@@ -418,7 +436,7 @@ class IoTDevice {
 
   setupQueue = async () => {
     if (this.type === 'Raspberry') {
-      emitter.on('status', (status) => {
+      emitter.on('status', async (status) => {
         const idStrip: string[] = status.payload.pivot_id.split('_');
         const pivot_num = Number(idStrip.pop());
 
@@ -435,19 +453,19 @@ class IoTDevice {
         console.log(
           `[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`
         );
-        this.processQueue();
-        emitter.off('status', () => {});
+        await this.processQueue();
+        emitter.removeAllListeners('status');
       });
       emitter.on('connection-pivot', async (action) => {
         this.queue.enqueue({ type: 'status', ...action });
-        this.processQueue();
-        emitter.off('connection-pivot', () => {});
+        await this.processQueue();
+        emitter.removeAllListeners('connection-pivot');
       });
     } else {
       emitter.on('connection-pivot', async (action) => {
         this.queue.enqueue({ type: 'status', ...action });
-        this.processQueue();
-        emitter.off('connection-pivot', () => {});
+        await this.processQueue();
+        emitter.removeAllListeners('connection-pivot');
       });
       emitter.on('action', async (action: ActionReceived) => {
         const id = action.payload.pivot_id;
@@ -468,11 +486,9 @@ class IoTDevice {
             attempts: 0
           });
           console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
-          emitter.off('action', () => {});
-          this.processQueue();
+          await this.processQueue();
+          emitter.removeAllListeners('action');
         } else {
-          console.log('action is gateway');
-
           const numId = action.node_num === 0 ? action.node_num : node_num;
           this.queue.enqueue({
             type: 'action',
@@ -481,8 +497,8 @@ class IoTDevice {
             payload: action.payload,
             attempts: 1
           });
-          this.processQueue();
-          emitter.off('action', () => {});
+          await this.processQueue();
+          emitter.removeAllListeners('action');
         }
       });
     }
@@ -508,12 +524,16 @@ class IoTDevice {
               this.type === 'Raspberry' ? this.pubTopic : queue.id;
             this.queue.remove(queue);
             await this.publish(queue, raspOrCloud);
+            setTimeout(() => {
+              this.emittResponse(queue.id);
+            }, 3000);
           } catch (err) {
             console.log('ERROR AWS publish');
             console.log(err.message);
             queue.attempts!!++;
             if (queue.attempts!! > 3) {
               console.log('Error to received ACK');
+              emitter.emit('action-ack-not-received', queue);
               this.queue.remove(queue);
             } else {
               const currentQueue = this.queue.dequeue()!;
