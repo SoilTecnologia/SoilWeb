@@ -1,33 +1,33 @@
 import { inject, injectable } from 'tsyringe';
-import { PivotModel } from '../../../database/model/Pivot';
+import { UserModel } from '../../../database/model/User';
 import { ISchedulingHistoryRepository } from '../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
-class GetPivotSchedulingHistoryUseCase {
+class GetUserSchedulingHistoryUseCase {
   constructor(
     @inject('SchedulingHistoryRepository')
     private schedulingHistoryRepository: ISchedulingHistoryRepository
   ) {}
 
-  private async applyQueryGetByPivot(pivot_id: string) {
+  private async applyQueryGetByUser(user_id: string) {
     try {
-      return await this.schedulingHistoryRepository.findByPivotId(pivot_id);
+      return await this.schedulingHistoryRepository.findByUserId(user_id);
     } catch (err) {
       messageErrorTryAction(
         err,
         true,
-        GetPivotSchedulingHistoryUseCase.name,
-        'Get Scheduling History By Pivot Id'
+        GetUserSchedulingHistoryUseCase.name,
+        'Get Scheduling History By User Id'
       );
     }
   }
 
-  async execute(pivot_id: PivotModel['pivot_id']) {
-    const getSchedulingHistory = await this.applyQueryGetByPivot(pivot_id);
+  async execute(user_id: UserModel['password']) {
+    const getUserSchedulingHistory = await this.applyQueryGetByUser(user_id);
 
-    return getSchedulingHistory;
+    return getUserSchedulingHistory;
   }
 }
 
-export { GetPivotSchedulingHistoryUseCase };
+export { GetUserSchedulingHistoryUseCase };
