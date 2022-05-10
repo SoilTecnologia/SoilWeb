@@ -2,17 +2,17 @@ import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { CreateSchedulingHistoryController } from '../useCases/SchedulingHistory/CreateSchedulingHistory/CreateSchedulingHistoryController';
 import { DeleteSchedulingHistoryController } from '../useCases/SchedulingHistory/DeleteSchedulingHistory/DeleteSchedulingHistoryController';
+import { GetAllSchedulingHistoryController } from '../useCases/SchedulingHistory/GetAllSchedulingHistory/GetAllSchedulingHistoryController';
+import { GetPivotSchedulingHistoryController } from '../useCases/SchedulingHistory/GetPivotSchedulingHistory/GetPivotSchedulingHistoryController';
 //import { UpdateSchedulingController } from '../useCases/Scheduling/UpdateScheduling/UpdateSchedulingController';
-//import { GetSchedulingController } from '../useCases/Scheduling/GetScheduling/GetSchedulingController';
-//import { GetAllSchedulingController } from '../useCases/Scheduling/GetAllScheduling/GetAllSchedulingController';
 
 const router = express.Router();
 
 const createSchedulingHistoryController = new CreateSchedulingHistoryController();
 const deleteSchedulingHistoryController = new DeleteSchedulingHistoryController();
+const getAllSchedulingHistoryController = new GetAllSchedulingHistoryController();
+const getPivotSchedulingHistoryController = new GetPivotSchedulingHistoryController();
 //const updateSchedulingController = new UpdateSchedulingController();
-//const getSchedulingController = new GetSchedulingController();
-//const getAllSchedulingController = new GetAllSchedulingController();
   
 router.post(
   '/addSchedulingHistory',
@@ -29,15 +29,15 @@ router.delete(
 //   authMiddleware(),
 //   updateSchedulingController.handle
 // );
-// router.get(
-//   '/getScheduling/:id',
-//   authMiddleware(),
-//   getSchedulingController.handle
-// );
-// router.get(
-//   '/getAllScheduling',
-//   authMiddleware(),
-//   getAllSchedulingController.handle
-// );
+router.get(
+  '/getScheduling/:id',
+  authMiddleware(),
+  getPivotSchedulingHistoryController.handle
+);
+router.get(
+  '/getAllSchedulingHistory',
+  authMiddleware(),
+  getAllSchedulingHistoryController.handle
+);
 
 export default router;
