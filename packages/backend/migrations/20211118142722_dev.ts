@@ -203,14 +203,6 @@ export async function up(knex: Knex): Promise<void> {
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
-      table
-        .uuid('user_id')
-        .references('user_id')
-        .inTable('users')
-        .index()
-        .notNullable()
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE');
       table.string('author').notNullable();
       table.boolean('is_stop');
       table.boolean('power');
@@ -252,14 +244,6 @@ export async function up(knex: Knex): Promise<void> {
         .string('pivot_id')
         .references('pivot_id')
         .inTable('pivots')
-        .index()
-        .notNullable()
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE');
-      table
-        .uuid('user_id')
-        .references('user_id')
-        .inTable('users')
         .index()
         .notNullable()
         .onUpdate('CASCADE')
@@ -333,7 +317,6 @@ export async function down(knex: Knex): Promise<void> {
     .alterTable('scheduling_historys', (table) => {
       table.dropPrimary();
       table.dropForeign('pivot_id');
-      table.dropForeign('user_id');
     })
     .alterTable('scheduling_angles', (table) => {
       table.dropPrimary();
@@ -342,7 +325,6 @@ export async function down(knex: Knex): Promise<void> {
     .alterTable('scheduling_angle_hists', (table) => {
       table.dropPrimary();
       table.dropForeign('pivot_id');
-      table.dropForeign('user_id');
     })
     .alterTable('pumps', (table) => {
       table.dropPrimary();

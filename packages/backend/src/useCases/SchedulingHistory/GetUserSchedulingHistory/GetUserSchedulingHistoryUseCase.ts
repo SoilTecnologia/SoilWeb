@@ -10,9 +10,9 @@ class GetUserSchedulingHistoryUseCase {
     private schedulingHistoryRepository: ISchedulingHistoryRepository
   ) {}
 
-  private async applyQueryGetByUser(user_id: string) {
+  private async applyQueryGetByUser(author: string) {
     try {
-      return await this.schedulingHistoryRepository.findByUserId(user_id);
+      return await this.schedulingHistoryRepository.findByUserId(author);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -23,8 +23,8 @@ class GetUserSchedulingHistoryUseCase {
     }
   }
 
-  async execute(user_id: UserModel['password']) {
-    const getUserSchedulingHistory = await this.applyQueryGetByUser(user_id);
+  async execute(author: UserModel['password']) {
+    const getUserSchedulingHistory = await this.applyQueryGetByUser(author);
 
     return getUserSchedulingHistory;
   }

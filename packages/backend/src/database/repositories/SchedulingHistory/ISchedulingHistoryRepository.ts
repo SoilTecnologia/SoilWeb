@@ -5,7 +5,7 @@ import { SchedulingHistoryModel } from '../../model/SchedulingHistory';
 interface ISchedulingHistoryRepository {
   findByPivotId(pivot_id: PivotModel['pivot_id']): Promise<SchedulingHistoryModel[]>;
 
-  findByUserId(user_id: UserModel['user_id']): Promise<SchedulingHistoryModel[] | undefined>;
+  findByUserId(author: UserModel['user_id']): Promise<SchedulingHistoryModel[] | undefined>;
 
   findById(
     scheduling_history_id: SchedulingHistoryModel['scheduling_history_id']

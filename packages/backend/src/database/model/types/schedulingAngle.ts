@@ -1,7 +1,7 @@
 import { SchedulingAngleModel } from "../SchedulingAngle";
 
 export type SchedulingAngleAction = {
-    scheduling_id: SchedulingAngleModel['schedulingangle_id'];
+    scheduling_id: SchedulingAngleModel['scheduling_angle_id'];
     pivot_id: SchedulingAngleModel['pivot_id'];
     power: 'ON' | 'OFF' | 'NULL';
     water: 'WET' | 'DRY' | 'NULL';

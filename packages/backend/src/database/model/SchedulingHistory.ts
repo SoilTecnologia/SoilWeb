@@ -1,10 +1,7 @@
 import { StateModel } from './State';
-import { UserModel } from './User'
 
 class SchedulingHistoryModel {
   scheduling_history_id: string;
-
-  user_id: UserModel['user_id'];
 
   pivot_id: string;
 

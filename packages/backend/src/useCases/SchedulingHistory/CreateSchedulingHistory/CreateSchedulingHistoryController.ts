@@ -7,7 +7,6 @@ class CreateSchedulingHistoryController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const {
       pivot_id,
-      user_id,
       author,
       is_stop,
       power,
@@ -24,7 +23,6 @@ class CreateSchedulingHistoryController {
     try {
       const allSchedulingHistory = await createSchedulingHistoryUseCase.execute({
         pivot_id,
-        user_id,
         author,
         is_stop,
         power,

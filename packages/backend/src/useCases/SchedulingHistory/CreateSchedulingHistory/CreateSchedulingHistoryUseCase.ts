@@ -30,7 +30,6 @@ class CreateSchedulingHistoryUseCase {
     const {
       is_stop,
       pivot_id,
-      user_id,
       author,
       power,
       water,
@@ -48,7 +47,6 @@ class CreateSchedulingHistoryUseCase {
 
     Object.assign(schedulingHistoryModel, {
       pivot_id,
-      user_id,
       author,
       is_stop,
       power: is_stop ? false : power,
