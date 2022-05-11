@@ -7,6 +7,7 @@ class CreateSchedulingAngleController {
     const {
       author,
       pivot_id,
+      is_return,
       power,
       water,
       direction,
@@ -23,6 +24,7 @@ class CreateSchedulingAngleController {
     try {
       const allSchedulingAngle = await createSchedulingAngleUseCase.execute({
         pivot_id,
+        is_return,
         author,
         power,
         water,

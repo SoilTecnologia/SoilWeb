@@ -5,6 +5,8 @@ class SchedulingAngleModel {
 
   author: boolean;
 
+  is_return: boolean;
+
   power: boolean | null;
 
   water: boolean | null;
