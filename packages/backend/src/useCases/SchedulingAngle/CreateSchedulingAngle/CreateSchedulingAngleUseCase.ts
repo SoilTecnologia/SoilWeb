@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
 import { SchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/SchedulingAngleRepository';
+import emitter from '../../../utils/eventBus';
 
 @injectable()
 class CreateSchedulingAngleUseCase {
@@ -41,7 +42,10 @@ class CreateSchedulingAngleUseCase {
     const newSchedulingAngleData = await this.schedulingAngleRepository.create(
       schedulingAngleModel
     );
-
+    if (newSchedulingAngleData) {
+      console.log('Agendamento por angulo criado no banco de dados....');
+      emitter.emit('scheduling-angle', newSchedulingAngleData);
+    }
     return newSchedulingAngleData;
   }
 }

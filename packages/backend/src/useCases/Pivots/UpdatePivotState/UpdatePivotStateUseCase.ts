@@ -182,6 +182,7 @@ class UpdatePivotStateUseCase {
   private alterStateVariable = async (
     angle: StateVariableModel['angle'],
     percentimeter: StateVariableModel['percentimeter'],
+    pivot_id: string,
     timestamp: StateModel['timestamp']
   ) => {
     if (angle !== undefined && percentimeter !== undefined) {
@@ -192,7 +193,11 @@ class UpdatePivotStateUseCase {
 
         if (
           !oldStateVariable ||
-          isStateVariableDifferent(oldStateVariable, { angle, percentimeter })
+          isStateVariableDifferent(
+            oldStateVariable,
+            { angle, percentimeter },
+            pivot_id
+          )
         ) {
           this.shouldNotifyUpdate = true;
           const stateVariable = await this.applyQueryCreateStateVariable({
@@ -261,7 +266,7 @@ class UpdatePivotStateUseCase {
     };
 
     await this.createStateIfNotExists(pivot_id, oldState, newState, timestamp);
-    await this.alterStateVariable(angle, percentimeter, timestamp);
+    await this.alterStateVariable(angle, percentimeter, pivot_id, timestamp);
     await this.alterRadioVariable(pivot_id, father, rssi, timestamp);
 
     // teste

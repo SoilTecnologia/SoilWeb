@@ -1,10 +1,10 @@
 import schedule from 'node-schedule';
-import { SchedulingModel } from '../database/model/Scheduling';
+import { SchedulingModel } from '../../database/model/Scheduling';
 import dayjs from 'dayjs';
 import { container } from 'tsyringe';
-import { DeleteSchedulingUseCase } from '../useCases/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
-import { CreateActionUseCase } from '../useCases/Actions/CreateAction/CreateActionUseCase';
-import { CreateAction } from '../database/model/types/action';
+import { DeleteSchedulingUseCase } from '../../useCases/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
+import { CreateActionUseCase } from '../../useCases/Actions/CreateAction/CreateActionUseCase';
+import { CreateAction } from '../../database/model/types/action';
 
 type callbackProps = (job: any) => void;
 

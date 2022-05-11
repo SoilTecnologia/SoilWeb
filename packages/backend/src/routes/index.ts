@@ -44,7 +44,7 @@ router.use('/actions', actionRoute);
 router.use('/cycles', cycleRoute);
 router.use('/states', stateRoute);
 router.use('/schedulings', schedulingRoute);
-router.use('/schedulingangles', schedulingangleRoute);
+router.use('/scheduling-angles', schedulingangleRoute);
 router.use('/pumps', pumpRoute);
 router.use('/api-status', (req, res, next) => {
   res.sendStatus(200);

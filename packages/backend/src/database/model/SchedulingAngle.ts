@@ -3,7 +3,7 @@ class SchedulingAngleModel {
 
   pivot_id: string;
 
-  author: boolean;
+  author: string;
 
   power: boolean | null;
 

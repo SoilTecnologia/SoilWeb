@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
 import { container } from 'tsyringe';
-import { SchedulingModel } from '../database/model/Scheduling';
-import { GetAllSchedulingUseCase } from '../useCases/Scheduling/GetAllScheduling/GetAllSchedulingUseCase';
-import emitter from '../utils/eventBus';
+import { SchedulingModel } from '../../database/model/Scheduling';
+import { GetAllSchedulingUseCase } from '../../useCases/Scheduling/GetAllScheduling/GetAllSchedulingUseCase';
+import emitter from '../../utils/eventBus';
+import { messageErrorTryAction } from '../../utils/types';
 import { SendSchedulingListening } from './SendAction';
 
 class ManageSchedule {
@@ -26,9 +27,13 @@ class ManageSchedule {
 
   private async getScheduling() {
     const getAllSchedullingUseCase = container.resolve(GetAllSchedulingUseCase);
-    const schedulling = await getAllSchedullingUseCase.execute();
-    if (schedulling && schedulling.length > 0) {
-      for (const job of schedulling) this.addJob(job);
+    try {
+      const schedulling = await getAllSchedullingUseCase.execute();
+      if (schedulling && schedulling.length > 0) {
+        for (const job of schedulling) this.addJob(job);
+      }
+    } catch (err) {
+      messageErrorTryAction(err, false, ManageSchedule.name, 'GetSchedule');
     }
   }
 

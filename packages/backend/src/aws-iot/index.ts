@@ -1,54 +1,23 @@
 import { iot, mqtt } from 'aws-iot-device-sdk-v2';
-import { attempt } from 'lodash';
-import { container } from 'tsyringe';
 import { TextDecoder } from 'util';
-import { ActionModel } from '../database/model/Action';
-import { FarmModel } from '../database/model/Farm';
-import { NodeModel } from '../database/model/Node';
-import { PivotModel } from '../database/model/Pivot';
 import { objectToActionString } from '../raspberry/common/objectToActionString';
-import { CreateActionUseCase } from '../useCases/Actions/CreateAction/CreateActionUseCase';
-import { GetOneNodeUseCase } from '../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
-import { GetPivotByIdUseCase } from '../useCases/Pivots/GetById/GetByIdUseCase';
-import { UpdatePivotStateUseCase } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
-import { GetPivotStateUseCase } from '../useCases/States/GetPivotState/GetPivotStateUseCase';
-import { StatusObject } from '../utils/conversions';
 import emitter from '../utils/eventBus';
 import { handleResultString } from '../utils/handleFarmIdWithUndescores';
 import MessageQueue from '../utils/message_queue';
 import { messageErrorTryAction } from '../utils/types';
-import { handleCloudMessage } from './cloudMessage';
-import { CheckGprs } from './gprsChecking';
-import { socketIo } from './socketIo';
+import {
+  checkGprsInterval,
+  emitterResponse,
+  HandleCloudMessageTypeRaspberry,
+  HandleCloudMessageTypeCloud
+} from './data';
+import { ActionReceived } from './protocols';
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
 Com ela, conseguimos fazer o envio de mensagens para o broker aws-iot-core, e, dependendo de como 
 inicializamos sua instância, decidimos como ela deve ser utilizada.
 */
 
-type ActionReceived = {
-  farm_id: FarmModel['farm_id'];
-  is_gprs: NodeModel['is_gprs'];
-  node_num: NodeModel['node_num'];
-  payload: {
-    action_id: ActionModel['action_id'];
-    pivot_id: PivotModel['pivot_id'];
-    radio_id: PivotModel['radio_id'];
-    author: ActionModel['author'];
-    power: ActionModel['power'];
-    water: ActionModel['water'];
-    direction: ActionModel['direction'];
-    percentimeter: ActionModel['percentimeter'];
-    timestamp: Date;
-  };
-};
-
-interface responseActive {
-  id: string;
-}
-interface responseNotActiveProps extends responseActive {
-  attempts: number;
-}
 // A biblioteca pode ser inicializada utilizando algum desses dois types:
 export type IoTDeviceType = 'Raspberry' | 'Cloud';
 
@@ -67,21 +36,10 @@ class IoTDevice {
 
   private queue: MessageQueue; // Fila de mensagens à serem enviadas
 
-  private checkGprs: CheckGprs;
-
-  private responseActives: responseActive[];
-  private responseNotActive: responseNotActiveProps[];
-
-  private responseAction: responseActive[];
-  private notResponseAction: responseNotActiveProps[];
-
   constructor(type: IoTDeviceType, qos: 0 | 1, topic?: string) {
     this.type = type;
     this.qos = qos;
     this.queue = new MessageQueue();
-    this.checkGprs = new CheckGprs();
-    this.responseActives = [{} as responseActive];
-    this.responseNotActive = [{} as responseNotActiveProps];
 
     if (type === 'Raspberry' && topic) {
       this.subTopic = topic;
@@ -134,182 +92,12 @@ class IoTDevice {
       Aqui criamos a queue e o loop que irá ficar verificando se há mensagens na fila e enviando para o broker.
       */
       console.log(`${this.type} connected to AWS IoT Core!`);
-      this.type === 'Cloud' && (await this.checkPivots());
+      this.type === 'Cloud' && (await checkGprsInterval.checkPivots());
       await this.setupQueue();
     } catch (err) {
       console.log('Aws does not connected'.toUpperCase());
       console.log(err);
     }
-  }
-
-  private getDate() {
-    const catchDate = new Date();
-    const dateString = catchDate.toLocaleString('pt-BR', {
-      timeZone: 'America/Sao_Paulo'
-    });
-    const [date, hours] = dateString.split(' ');
-
-    return { hours, date };
-  }
-
-  getStatePivot = async (pivot_id: string, connection: boolean) => {
-    const getStateUseCase = container.resolve(GetPivotStateUseCase);
-    const getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
-    const getPivot = container.resolve(GetPivotByIdUseCase);
-    const getNode = container.resolve(GetOneNodeUseCase);
-    try {
-      const oldState = await getStateUseCase.execute(pivot_id);
-
-      if (oldState) {
-        if (oldState.connection !== connection) {
-          await getUpdatePivotController.execute(
-            pivot_id,
-            connection,
-            false,
-            false,
-            'CLOCKWISE',
-            0,
-            0,
-            new Date(),
-            null,
-            null
-          );
-
-          const pivot = await getPivot.execute(pivot_id);
-          const node = await getNode.execute(pivot?.node_id!!);
-          pivot &&
-            node &&
-            emitter.emit('connection-pivot', {
-              id: `${pivot.farm_id}_${node.node_num}`,
-              pivot_id,
-              pivot_num: pivot.pivot_num,
-              connection
-            });
-        }
-      } else {
-        await getUpdatePivotController.execute(
-          pivot_id,
-          connection,
-          false,
-          false,
-          'CLOCKWISE',
-          0,
-          0,
-          new Date(),
-          null,
-          null
-        );
-      }
-    } catch (err) {
-      messageErrorTryAction(err, false, IoTDevice.name, 'Atualizando Estado');
-    }
-  };
-
-  emittResponse(pivot_id: string) {
-    const pivotExistsResponse = this.responseAction.find(
-      (res) => res.id === pivot_id
-    );
-
-    if (pivotExistsResponse)
-      emitter.emit('action-received-ack', { id: pivot_id });
-    else emitter.emit('action-ack-not-received', { id: pivot_id });
-
-    this.responseAction = this.responseAction.filter(
-      (item) => item.id !== pivot_id
-    );
-  }
-
-  private async checkResponseActive(pivot_id: string) {
-    const existsPivot = this.responseActives.find((res) => res.id === pivot_id);
-    if (existsPivot) {
-      console.log(`Recebido resposta de ${pivot_id} enviando mensagem ativa`);
-      this.responseActives = this.responseActives.filter(
-        (res) => res.id !== pivot_id
-      );
-
-      await this.getStatePivot(pivot_id, true);
-    } else {
-      console.log(`Pivo fora do ar: ...${pivot_id}, `);
-      const existsNotActive = this.responseNotActive.find(
-        (res) => res.id === pivot_id
-      );
-      if (!existsNotActive) {
-        console.log('Tentativas 1...');
-        this.responseNotActive.push({ id: pivot_id, attempts: 1 });
-        const payload = {
-          payload: '000-000',
-          type: 'status',
-          id: pivot_id
-        };
-        await this.publish(payload, pivot_id);
-        setTimeout(async () => {
-          await this.checkResponseActive(pivot_id);
-        }, 2000);
-      } else {
-        console.log(`Tentativa de conexão n° ${existsNotActive.attempts}`);
-        if (existsNotActive.attempts >= 3) {
-          await this.getStatePivot(pivot_id, false);
-          this.responseNotActive = this.responseNotActive.filter(
-            (res) => res.id !== pivot_id
-          );
-          console.log(
-            `Tentativas excedidas no pivo ${pivot_id}, verificando estado...`
-          );
-          console.log('....');
-        } else {
-          const responseWithoutThis = this.responseNotActive.filter(
-            (res) => res.id !== pivot_id
-          );
-          responseWithoutThis.push({
-            id: existsNotActive.id,
-            attempts: existsNotActive.attempts + 1
-          });
-          this.responseNotActive = responseWithoutThis;
-          const payload = {
-            payload: '000-000',
-            type: 'status',
-            id: pivot_id
-          };
-          await this.publish(payload, pivot_id);
-          setTimeout(async () => {
-            await this.checkResponseActive(pivot_id);
-          }, 5000);
-        }
-      }
-      // await this.getStatePivot(pivot_id, false)
-    }
-  }
-
-  private async checkPivots() {
-    this.getDate();
-    const timeout = 10000 * 6 * 10;
-
-    setInterval(async () => {
-      const pivots = await this.checkGprs.starting();
-      const { hours, date } = this.getDate();
-
-      if (pivots && pivots.length > 0) {
-        console.log(`Checagem de Conexão inciada as ${hours} do dia ${date}`);
-        for (const pivot of pivots) {
-          const payload = {
-            payload: '000-000',
-            type: 'status',
-            id: pivot.pivot_id
-          };
-          await this.publish(payload, pivot.pivot_id);
-
-          setTimeout(() => {
-            this.checkResponseActive(pivot.pivot_id);
-          }, 2000);
-        }
-
-        console.log('Finalizando Checagem de Conexão');
-      } else {
-        console.log('Does Not Found Pivots GPRS');
-      }
-
-      console.log('...');
-    }, timeout);
   }
   /*
   Função que faz a publicação de mensagens e respostas.
@@ -332,6 +120,7 @@ class IoTDevice {
       console.log(err.message);
     }
   }
+
   /*
   Função que processa as mensagens recebidas do broker.
   O que acontece apartir disso, depende do tipo do dispositivo e do tipo da mensagem.
@@ -344,88 +133,58 @@ class IoTDevice {
     qos: mqtt.QoS,
     retain: boolean
   ) => {
-    const createActionUseCase = container.resolve(CreateActionUseCase);
+    try {
+      const decoder = new TextDecoder('utf8', { fatal: false });
+      // const filteredMessage = messageToString.substring(0, messageToString.indexOf('}'))
 
-    const decoder = new TextDecoder('utf8', { fatal: false });
-    // const filteredMessage = messageToString.substring(0, messageToString.indexOf('}'))
+      const json = JSON.parse(decoder.decode(message));
+      const {
+        type,
+        id,
+        pivot_num,
+        payload
+      }: {
+        type: 'status' | 'action';
+        id: string;
+        pivot_num: number;
+        payload: any;
+      } = json;
 
-    const json = JSON.parse(decoder.decode(message));
-    const {
-      type,
-      id,
-      pivot_num,
-      payload
-    }: {
-      type: 'status' | 'action';
-      id: string;
-      pivot_num: number;
-      payload: any;
-    } = json;
+      console.log(`Recebido ack ${JSON.stringify(json, null, 2)}`);
 
-    type === 'status'
-      ? this.responseActives.push({ id: json.id })
-      : this.responseAction.push({ id: json.id });
+      type === 'status'
+        ? checkGprsInterval.responseActives.push({ id: json.id })
+        : emitterResponse.responseAction.push({ id: json.id });
 
-    if (this.type === 'Cloud') {
-      if (json.type === 'status') {
-        const result = await handleCloudMessage.receivedStatus({
-          pivot_id: id,
-          payload
-        });
+      if (this.type === 'Cloud') {
+        if (json.type === 'status') {
+          const result = await HandleCloudMessageTypeCloud.receivedStatus({
+            pivot_id: id,
+            payload
+          });
 
-        if (result) {
-          this.publish(json, id);
-          console.log(
-            `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
-          );
-        }
-      } else if (json.type === 'action') {
-        this.queue.remove(json);
-        console.log('[EC2-IOT-ACTION-ACK] Resposta de action recebida');
-        socketIo('ackReceived', json);
-      }
-    } else if (this.type === 'Raspberry') {
-      if (type === 'status') {
-        if (json.payload) {
-          console.log(`Type: ${JSON.stringify(type)}`);
-
-          console.log('[RASPBERRY-IOT-STATUS-ACK] Resposta de status recebida');
-          this.queue.remove(json);
-        } else {
-          console.log('Status Changed Connection Received from Aws');
-          console.log(json);
-          console.log('........');
-        }
-      } else if (type === 'action') {
-        if (json.payload) {
-          const { author, power, water, direction, percentimeter, timestamp } =
-            json.payload;
-
-          const newAction = {
-            pivot_id: json.payload.pivot_id,
-            author,
-            power,
-            water,
-            direction,
-            percentimeter
-          };
-          const newTimestamp = new Date(timestamp);
-
-          try {
-            await createActionUseCase.execute(newAction, newTimestamp);
-          } catch (err) {
-            messageErrorTryAction(err, false, IoTDevice.name, 'Create Action');
+          if (result) {
+            this.publish(json, id);
+            console.log(
+              `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
+            );
           }
-          console.log(
-            `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
-          );
-          this.publish(json);
-        } else {
-          console.log('Status Changed Connection Received from Aws');
-          console.log(json);
-          console.log('........');
+        } else if (json.type === 'action') {
+          await HandleCloudMessageTypeCloud.receivedAction(json, this.queue);
         }
       }
+
+      if (this.type === 'Raspberry') {
+        if (type === 'status')
+          await HandleCloudMessageTypeRaspberry.receivedStatus(
+            this.queue,
+            json
+          );
+        else if (type === 'action')
+          await HandleCloudMessageTypeRaspberry.receivedAction(json);
+      }
+    } catch (err) {
+      messageErrorTryAction(err, false, IoTDevice.name, 'Process Message');
     }
   };
 
@@ -436,7 +195,10 @@ class IoTDevice {
 
   setupQueue = async () => {
     if (this.type === 'Raspberry') {
-      emitter.on('status', async (status) => {
+      emitter.on('status', (status) => {
+        console.log(
+          `Emitter Status Raspberry: ${JSON.stringify(status, null, 2)}`
+        );
         const idStrip: string[] = status.payload.pivot_id.split('_');
         const pivot_num = Number(idStrip.pop());
 
@@ -453,19 +215,19 @@ class IoTDevice {
         console.log(
           `[RASPBERRY-IOT-STATUS] Adicionando mensagem à ser enviada`
         );
-        await this.processQueue();
-        emitter.removeAllListeners('status');
+        this.processQueue();
+        emitter.off('status', () => {});
       });
       emitter.on('connection-pivot', async (action) => {
         this.queue.enqueue({ type: 'status', ...action });
-        await this.processQueue();
-        emitter.removeAllListeners('connection-pivot');
+        this.processQueue();
+        emitter.off('connection-pivot', () => {});
       });
     } else {
       emitter.on('connection-pivot', async (action) => {
         this.queue.enqueue({ type: 'status', ...action });
-        await this.processQueue();
-        emitter.removeAllListeners('connection-pivot');
+        this.processQueue();
+        emitter.off('connection-pivot', () => {});
       });
       emitter.on('action', async (action: ActionReceived) => {
         const id = action.payload.pivot_id;
@@ -481,24 +243,25 @@ class IoTDevice {
               action.payload.power,
               action.payload.water,
               action.payload.direction,
-              action.payload.percentimeter
+              action.payload.percentimeter,
+              action.angle
             ),
-            attempts: 0
+            attempts: 1
           });
           console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
-          await this.processQueue();
-          emitter.removeAllListeners('action');
+          emitter.off('action', () => {});
+          this.processQueue();
         } else {
           const numId = action.node_num === 0 ? action.node_num : node_num;
           this.queue.enqueue({
             type: 'action',
             id: `${action.farm_id}_${numId}`, // TODO status ta vindo node_num?
             pivot_num: Number(node_num),
-            payload: action.payload,
+            payload: { ...action.payload, angle: action.angle },
             attempts: 1
           });
-          await this.processQueue();
-          emitter.removeAllListeners('action');
+          this.processQueue();
+          emitter.off('action', () => {});
         }
       });
     }
@@ -524,16 +287,15 @@ class IoTDevice {
               this.type === 'Raspberry' ? this.pubTopic : queue.id;
             this.queue.remove(queue);
             await this.publish(queue, raspOrCloud);
-            setTimeout(() => {
-              this.emittResponse(queue.id);
-            }, 3000);
+            setTimeout(async () => {
+              await emitterResponse.start(queue.id);
+            }, 5000);
           } catch (err) {
             console.log('ERROR AWS publish');
             console.log(err.message);
             queue.attempts!!++;
             if (queue.attempts!! > 3) {
               console.log('Error to received ACK');
-              emitter.emit('action-ack-not-received', queue);
               this.queue.remove(queue);
             } else {
               const currentQueue = this.queue.dequeue()!;

@@ -30,7 +30,7 @@ class CreateSchedulingAngleController {
         percentimeter,
         start_angle,
         end_angle,
-        timestamp
+        timestamp: new Date()
       });
 
       res.send(allSchedulingAngle);

@@ -15,7 +15,7 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import IoTDevice from './aws-iot';
 import * as raspberry from './raspberry/tests';
 import router from './routes';
-import { manageSchedule } from './schedule/manage-schedule';
+import { InitScheduleData } from './schedule';
 import './shared/container';
 import emitter from './utils/eventBus';
 import { handleResultAction } from './utils/handleFarmIdWithUndescores';
@@ -141,7 +141,7 @@ try {
 }
 
 // raspberry.start();
-// const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
-const iotDevice = new IoTDevice('Cloud', 0);
+// export const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
+export const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
-manageSchedule.start();
+InitScheduleData.start();
