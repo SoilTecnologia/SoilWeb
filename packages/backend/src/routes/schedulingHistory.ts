@@ -5,7 +5,7 @@ import { DeleteSchedulingHistoryController } from '../useCases/SchedulingHistory
 import { GetAllSchedulingHistoryController } from '../useCases/SchedulingHistory/GetAllSchedulingHistory/GetAllSchedulingHistoryController';
 import { GetPivotSchedulingHistoryController } from '../useCases/SchedulingHistory/GetPivotSchedulingHistory/GetPivotSchedulingHistoryController';
 import { GetUserSchedulingHistoryController } from '../useCases/SchedulingHistory/GetUserSchedulingHistory/GetUserSchedulingHistoryController';
-//import { UpdateSchedulingController } from '../useCases/Scheduling/UpdateScheduling/UpdateSchedulingController';
+import { UpdateSchedulingHistoryController } from '../useCases/SchedulingHistory/UpdateSchedulingHistory/UpdateSchedulingHistoryController';
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ const deleteSchedulingHistoryController = new DeleteSchedulingHistoryController(
 const getAllSchedulingHistoryController = new GetAllSchedulingHistoryController();
 const getPivotSchedulingHistoryController = new GetPivotSchedulingHistoryController();
 const getUserSchedulingHistoryController = new GetUserSchedulingHistoryController();
-//const updateSchedulingController = new UpdateSchedulingController();
+const updateSchedulingHistoryController = new UpdateSchedulingHistoryController();
   
 router.post(
   '/addSchedulingHistory',
@@ -26,11 +26,11 @@ router.delete(
   authMiddleware(),
   deleteSchedulingHistoryController.handle
 );
-// router.put(
-//   '/updateScheduling/',
-//   authMiddleware(),
-//   updateSchedulingController.handle
-// );
+router.put(
+  '/updateSchedulingHistory/',
+  authMiddleware(),
+  updateSchedulingHistoryController.handle
+);
 router.get(
   '/getSchedulingPivotHistory/:id',
   authMiddleware(),
