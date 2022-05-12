@@ -41,22 +41,28 @@ export const isStateVariableDifferent = (
   newStateVariable: CustomStateVariable,
   pivot_id: string
 ): boolean => {
+  const oldAngle = oldStateVariable.angle;
+  const newAngle = newStateVariable.angle;
+
+  console.log(
+    `Alteração de angulo em ${pivot_id}, antes: ${oldAngle}, novo: ${newAngle}`
+  );
+  console.log('...');
   if (oldStateVariable.angle !== newStateVariable.angle) {
     emitter.emit(`angle-changed-${pivot_id}`, {
-      oldAngle: oldStateVariable.angle,
-      newAlgle: newStateVariable.angle,
+      oldAngle,
+      newAngle,
       pivot_id
     });
-
-    console.log(
-      `Estado de angulo alterado: antigo: ${oldStateVariable.angle}, novo: ${newStateVariable.angle}`
-    );
   }
 
   if (oldStateVariable.percentimeter !== newStateVariable.percentimeter) {
-    console.log(`Estado de percentimetro alterado:
-    Antigo Percentimetro: ${oldStateVariable.percentimeter}
-    Novo Percentimetro: ${newStateVariable.percentimeter}`);
+    const oldPercent = oldStateVariable.percentimeter;
+    const newPercent = oldStateVariable.angle;
+    console.log(
+      `Estado de percentimetro alterado: antigo, ${oldPercent}, novo: ${newPercent}`
+    );
+    console.log('...');
   }
 
   const percentAltered = isPercentDiferent(
@@ -64,17 +70,9 @@ export const isStateVariableDifferent = (
     newStateVariable.percentimeter!!
   );
 
-  if (
-    oldStateVariable.angle! !== newStateVariable.angle! - 5 ||
-    percentAltered
-  ) {
-    console.log('atualização de variavel');
-    console.log(oldStateVariable);
-    console.log(newStateVariable);
-    return true;
-  }
-
-  return false;
+  return (
+    oldStateVariable.angle! !== newStateVariable.angle! - 5 || percentAltered
+  );
 };
 
 type CustomRadioVariable = Pick<RadioVariableModel, 'father' | 'rssi'>;
@@ -82,12 +80,8 @@ export const isRadioVariableDifferent = (
   oldRadioVariable: CustomRadioVariable,
   newRadioVariable: CustomRadioVariable
 ): boolean => {
-  if (
+  return (
     oldRadioVariable.father !== newRadioVariable.father ||
     oldRadioVariable.rssi !== newRadioVariable.rssi
-  ) {
-    return true;
-  }
-
-  return false;
+  );
 };

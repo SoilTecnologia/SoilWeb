@@ -18,25 +18,24 @@ type jobActionProps = {
 type angleDiferentprops = {
   job: schedule.Job | undefined;
   oldAngle: number;
-  newAlgle: number;
+  newAngle: number;
   pivot_id: string;
 };
 
 class SendSchedulingAngle {
   private job: SchedulingAngleModel;
-  private scheduleJob: schedule.Job;
 
   constructor(newJob: SchedulingAngleModel) {
     this.job = newJob;
   }
 
-  // private getOptionsDate(dateReceived: Date) {
-  //   const newDate = dayjs(dateReceived)
-  //     .subtract(1, 'month')
-  //     .add(3, 'hour')
-  //     .toDate();
-  //   return newDate;
-  // }
+  private getOptionsDate(dateReceived: Date) {
+    const newDate = dayjs(dateReceived)
+      .subtract(1, 'month')
+      .add(3, 'hour')
+      .toDate();
+    return newDate;
+  }
 
   private configJob(date: Date, callback: callbackProps) {
     try {
@@ -59,22 +58,7 @@ class SendSchedulingAngle {
     }
   }
 
-  private static listernerEmitter(
-    job: SchedulingAngleModel,
-    angle: angleDiferentprops
-  ) {
-    console.log(
-      `Pivot id ${job.pivot_id} recebeu alteração de angulo no agendamento`
-    );
-    if (angle.newAlgle >= job!!.end_angle!) {
-      console.log('Finalizando job....');
-      schedule.cancelJob(job.scheduling_angle_id);
-      emitter.removeAllListeners(`angle-changed-${job.pivot_id}`);
-      console.log('Jobs finalizados');
-    }
-  }
-
-  private async sendJob({ job, scheduleObjectJob }: jobActionProps) {
+  private async sendJob({ job }: jobActionProps) {
     // console.log(this.scheduleJob);
     const action: Omit<CreateAction, 'timestamp_sent'> = {
       pivot_id: job.pivot_id,
@@ -108,11 +92,52 @@ class SendSchedulingAngle {
     }
   }
 
-  private removeJob() {}
+  private static listernerEmitter(
+    job: SchedulingAngleModel,
+    angle: angleDiferentprops
+  ) {
+    console.log('Nova alteração de angulo em ' + job.pivot_id);
+    if (angle.newAngle >= job!!.end_angle!) {
+      schedule.cancelJob(job.scheduling_angle_id);
+      emitter.removeAllListeners(`angle-changed-${job.pivot_id}`);
+      SendSchedulingAngle.stopAction(job);
+      console.log('Agendamentos finalizados');
+    }
+    console.log('....');
+  }
+
+  private static async stopAction(job: SchedulingAngleModel) {
+    try {
+      const action: Omit<CreateAction, 'timestamp_sent'> = {
+        pivot_id: job.pivot_id,
+        author: job.author,
+        power: false,
+        water: false,
+        direction: 'CLOCKWISE',
+        percentimeter: 0
+      };
+      const deleteScheduleAngle = container.resolve(
+        DeleteSchedulingAngleUseCase
+      );
+      await deleteScheduleAngle.execute(job.scheduling_angle_id);
+
+      console.log('Fim do Agendamento por angulo...');
+      console.log(`Parando o pivo... ${job.pivot_id}`);
+      const createAction = container.resolve(CreateActionUseCase);
+      await createAction.execute(action, job.timestamp, job.start_angle);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        false,
+        SendSchedulingAngle.name,
+        'Remove SchedulingAngle'
+      );
+    }
+  }
+
   async addListening() {
     const { timestamp } = this.job;
-    const config = this.configJob(timestamp!!, this.sendJob);
-    return config;
+    this.configJob(timestamp!!, this.sendJob);
   }
 }
 

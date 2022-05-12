@@ -64,19 +64,6 @@ class ManageScheduleAngle {
     }
   }
 
-  private async listenerJob(listener: listenerJob) {
-    const { job, schedule } = listener;
-
-    emitter.on(`angle-changed-${job.pivot_id}`, (angle) => {
-      console.log('Pivot id recebeu alteração de angulo no agendamento');
-      if (angle.newAlgle >= job!!.end_angle!) {
-        console.log('Angulo está no estágio final...');
-        console.log(schedule.name);
-      }
-    });
-    console.log('angulo alterado');
-  }
-
   private async enqueueOneJob(job: SchedulingAngleModel) {
     console.log('Adicionando novo agendamento ao listener....');
     console.log('...');
