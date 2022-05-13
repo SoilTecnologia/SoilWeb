@@ -37,7 +37,7 @@ router.get(
   getPivotSchedulingHistoryController.handle
 );
 router.get(
-  '/getSchedulingUserHistory/:id',
+  '/getUserSchedulingHistory/:id',
   authMiddleware(),
   getUserSchedulingHistoryController.handle
 );

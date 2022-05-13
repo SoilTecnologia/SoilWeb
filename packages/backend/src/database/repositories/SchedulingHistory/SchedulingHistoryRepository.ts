@@ -10,10 +10,10 @@ class SchedulingHistoryRepository implements ISchedulingHistoryRepository {
       .orderBy('start_timestamp', 'asc');
   }
 
-  async findByUserId(user_id: string | undefined): Promise<SchedulingHistoryModel[] | undefined> {
+  async findByUserId(author: string | undefined): Promise<SchedulingHistoryModel[] | undefined> {
     return await knex<SchedulingHistoryModel>('scheduling_historys')
       .select('*')
-      .where({ user_id }) 
+      .where({ author }) 
       .orderBy('start_timestamp', 'asc');
   }
 
