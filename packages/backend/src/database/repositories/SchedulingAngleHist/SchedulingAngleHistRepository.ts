@@ -7,7 +7,7 @@ class SchedulingAngleHistRepository implements ISchedulingAngleHistRepository {
     return await knex<SchedulingAngleHistModel>('scheduling_angle_hists')
       .select('*')
       .where({ pivot_id })
-      .orderBy('start_timestamp', 'asc');
+      .orderBy('timestamp', 'asc');
   }
 
   async findById(
@@ -16,7 +16,7 @@ class SchedulingAngleHistRepository implements ISchedulingAngleHistRepository {
     return await knex<SchedulingAngleHistModel>('scheduling_angle_hists')
       .select()
       .where({ scheduling_angle_hist_id })
-      .orderBy('start_timestamp', 'asc')
+      .orderBy('timestamp', 'asc')
       .first();
   }
 
@@ -24,7 +24,7 @@ class SchedulingAngleHistRepository implements ISchedulingAngleHistRepository {
     return await knex<SchedulingAngleHistModel>('scheduling_angle_hists')
       .select('*')
       .where({ author }) 
-      .orderBy('start_timestamp', 'asc');
+      .orderBy('timestamp', 'asc');
   }
 
   async getAllSchedulingsAngle(): Promise<SchedulingAngleHistModel[]> {
