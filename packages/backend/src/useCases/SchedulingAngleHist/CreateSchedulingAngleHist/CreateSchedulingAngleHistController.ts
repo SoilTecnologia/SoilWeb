@@ -16,7 +16,7 @@ class CreateSchedulingAngleHistController {
       end_angle,
       timestamp
     } = req.body;
-
+    
     const createSchedulingAngleHistUseCase = container.resolve(
       CreateSchedulingAngleHistUseCase
     );
@@ -34,11 +34,11 @@ class CreateSchedulingAngleHistController {
         end_angle,
         timestamp
       });
-
+      
       res.send(allSchedulingAngleHist);
     } catch (err) {
       console.log(
-        `[ERROR] Server 500 on /schedulingAngle/CreateSchedulingAngleHist`
+        `[ERROR] Server 500 on /schedulingAngle/CreateSchedulingAngleHist`,
       );
       console.log(err);
       next(err);

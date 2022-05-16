@@ -25,7 +25,7 @@ class CreateSchedulingAngleHistUseCase {
       end_angle,
       timestamp
     } = schedulinganglehist;
-
+    
     const schedulingAngleHistModel = new SchedulingAngleHistModel();
 
     const newTimeStamp = dayjs(timestamp).subtract(3, 'hour');
@@ -46,7 +46,7 @@ class CreateSchedulingAngleHistUseCase {
     const newSchedulingAngleHistData = await this.schedulingAngleHistRepository.create(
       schedulingAngleHistModel
     );
-
+    
     return newSchedulingAngleHistData;
   }
 }

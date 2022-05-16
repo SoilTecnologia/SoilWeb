@@ -21,6 +21,6 @@ router.delete('/deleteSchedulingAngleHist/:id', authMiddleware(), deleteScheduli
 router.put('/updateSchedulingAngleHist/', authMiddleware(), updateSchedulingAngleHistController.handle)
 router.get('/getSchedulingAngleHist/:id', authMiddleware(), getSchedulingAngleHistController.handle)
 router.get('/getAllSchedulingAngleHist', authMiddleware(), getAllSchedulingAngleHistController.handle)
-router.get('/getUserSchedulingAngleHist', authMiddleware(), getUserSchedlingAngleHistController.handle)
+router.get('/getUserSchedulingAngleHist/:id', authMiddleware(), getUserSchedlingAngleHistController.handle)
 
 export default router;

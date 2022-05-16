@@ -17,7 +17,7 @@ class CreateSchedulingHistoryController {
       end_timestamp,
       timestamp
     } = req.body;
-    
+
     const createSchedulingHistoryUseCase = container.resolve(CreateSchedulingHistoryUseCase);
 
     try {

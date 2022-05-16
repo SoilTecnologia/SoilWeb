@@ -11,6 +11,7 @@ import userRoute from './users';
 import schedulingRoute from './scheduling';
 import schedulingangleRoute from './schedulingangle';
 import schedulinghistoryRoute from './schedulingHistory'
+import schedulinganglehistRoute from './schedulingangleHist'
 import pumpRoute from './pump';
 
 const router = express.Router();
@@ -47,6 +48,7 @@ router.use('/states', stateRoute);
 router.use('/schedulings', schedulingRoute);
 router.use('/schedulingangles', schedulingangleRoute);
 router.use('/schedulinghistorys', schedulinghistoryRoute)
+router.use('/schedulinganglehists', schedulinganglehistRoute)
 router.use('/pumps', pumpRoute);
 router.use('/api-status', (req, res, next) => {
   res.sendStatus(200);

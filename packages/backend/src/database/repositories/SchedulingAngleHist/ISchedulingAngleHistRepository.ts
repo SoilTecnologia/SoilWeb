@@ -16,7 +16,7 @@ interface ISchedulingAngleHistRepository {
   getAllSchedulingsAngle(): Promise<SchedulingAngleHistModel[]>;
 
   create(
-    schedulingangle: Omit<SchedulingAngleHistModel, 'scheduling_angle_hist_id'>
+    scheduling_angle_hist: Omit<SchedulingAngleHistModel, 'scheduling_angle_hist_id'>
   ): Promise<SchedulingAngleHistModel | undefined>;
 
   delete(
@@ -24,7 +24,7 @@ interface ISchedulingAngleHistRepository {
   ): Promise<SchedulingAngleHistModel | undefined>;
 
   update(
-    schedulingangle: SchedulingAngleHistModel
+    scheduling_angle_hist: SchedulingAngleHistModel
   ): Promise<SchedulingAngleHistModel | undefined>;
 }
 
