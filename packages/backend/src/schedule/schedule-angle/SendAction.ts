@@ -7,26 +7,20 @@ import { SchedulingAngleModel } from '../../database/model/SchedulingAngle';
 import { DeleteSchedulingAngleUseCase } from '../../useCases/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleUseCase';
 import { messageErrorTryAction } from '../../utils/types';
 import emitter from '../../utils/eventBus';
-
-type callbackProps = (job: any) => void;
-
-type jobActionProps = {
-  job: SchedulingAngleModel;
-  scheduleObjectJob: schedule.Job;
-};
-
-type angleDiferentprops = {
-  job: schedule.Job | undefined;
-  oldAngle: number;
-  newAngle: number;
-  pivot_id: string;
-};
+import { ScheduleAngleEmitter } from '../protocols/scheduleEmitterType';
+import {
+  AngleDiferentprops,
+  CallbackProps,
+  JobSchedulingAngleModel
+} from '../protocols';
 
 class SendSchedulingAngle {
   private job: SchedulingAngleModel;
+  private isPut: boolean;
 
-  constructor(newJob: SchedulingAngleModel) {
-    this.job = newJob;
+  constructor({ scheduling, isPut }: ScheduleAngleEmitter) {
+    this.job = scheduling;
+    this.isPut = isPut;
   }
 
   private getOptionsDate(dateReceived: Date) {
@@ -37,12 +31,27 @@ class SendSchedulingAngle {
     return newDate;
   }
 
-  private configJob(date: Date, callback: callbackProps) {
+  public async removeJob(schedule_id: string) {
     try {
-      const dateNow = new Date(Date.now() + 10000);
+      const isCancel = schedule.cancelJob(schedule_id);
+      console.log(`Foi cancelado? ${isCancel ? 'SIM' : 'NÂo'}`);
+      const deleteScheduleAngle = container.resolve(
+        DeleteSchedulingAngleUseCase
+      );
+      await deleteScheduleAngle.execute(schedule_id);
+      console.log('Agendamento Removido...');
+      console.log('...');
+    } catch (err) {
+      messageErrorTryAction(err, false, SendSchedulingAngle.name, 'Remove Job');
+    }
+  }
+
+  private configJob(date: Date, callback: CallbackProps) {
+    try {
+      const dateBow = new Date(Date.now() + 5000);
       const job = schedule.scheduleJob(
         this.job.scheduling_angle_id,
-        dateNow,
+        date,
         callback.bind(null, {
           job: this.job
         })
@@ -58,7 +67,7 @@ class SendSchedulingAngle {
     }
   }
 
-  private async sendJob({ job }: jobActionProps) {
+  private async sendJob({ job }: JobSchedulingAngleModel) {
     // console.log(this.scheduleJob);
     const action: Omit<CreateAction, 'timestamp_sent'> = {
       pivot_id: job.pivot_id,
@@ -75,8 +84,8 @@ class SendSchedulingAngle {
 
       emitter.on(
         `angle-changed-${job.pivot_id}`,
-        (angle: angleDiferentprops) => {
-          SendSchedulingAngle.listernerEmitter(job, angle);
+        (angle: AngleDiferentprops) => {
+          this.listernerEmitter(job, angle);
         }
       );
 
@@ -92,22 +101,24 @@ class SendSchedulingAngle {
     }
   }
 
-  private static listernerEmitter(
+  private async listernerEmitter(
     job: SchedulingAngleModel,
-    angle: angleDiferentprops
+    angle: AngleDiferentprops
   ) {
     console.log('Nova alteração de angulo em ' + job.pivot_id);
     if (angle.newAngle >= job!!.end_angle!) {
       schedule.cancelJob(job.scheduling_angle_id);
       emitter.removeAllListeners(`angle-changed-${job.pivot_id}`);
-      SendSchedulingAngle.stopAction(job);
+      this.stopAction(job);
       console.log('Agendamentos finalizados');
     }
     console.log('....');
   }
 
-  private static async stopAction(job: SchedulingAngleModel) {
+  private async stopAction(job: SchedulingAngleModel) {
     try {
+      this.removeJob(job.scheduling_angle_id);
+
       const action: Omit<CreateAction, 'timestamp_sent'> = {
         pivot_id: job.pivot_id,
         author: job.author,
@@ -116,10 +127,6 @@ class SendSchedulingAngle {
         direction: 'CLOCKWISE',
         percentimeter: 0
       };
-      const deleteScheduleAngle = container.resolve(
-        DeleteSchedulingAngleUseCase
-      );
-      await deleteScheduleAngle.execute(job.scheduling_angle_id);
 
       console.log('Fim do Agendamento por angulo...');
       console.log(`Parando o pivo... ${job.pivot_id}`);
@@ -137,6 +144,7 @@ class SendSchedulingAngle {
 
   async addListening() {
     const { timestamp } = this.job;
+    if (this.isPut) this.removeJob(this.job.scheduling_angle_id);
     this.configJob(timestamp!!, this.sendJob);
   }
 }

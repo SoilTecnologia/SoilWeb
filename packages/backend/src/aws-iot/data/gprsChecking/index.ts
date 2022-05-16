@@ -34,6 +34,10 @@ class CheckGprsInterval {
     return { hours, date };
   }
 
+  public addResponseStatus(pivot_id: string) {
+    this.responseActives.push({ id: pivot_id });
+  }
+
   private async getStatePivot(pivot_id: string, connection: boolean) {
     const getStateUseCase = container.resolve(GetPivotStateUseCase);
     const getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
@@ -92,7 +96,7 @@ class CheckGprsInterval {
     }
   }
 
-  private async checkResponseActive(pivot_id: string) {
+  public async checkResponseActive(pivot_id: string) {
     const resActive = this.responseActives;
     const resNotActive = this.responseNotActives;
 
@@ -108,7 +112,7 @@ class CheckGprsInterval {
       const existsNotActive = resNotActive.find((res) => res.id === pivot_id);
       if (!existsNotActive) {
         console.log('Tentativas 1...');
-        resNotActive.push({ id: pivot_id, attempts: 1 });
+        resNotActive.push({ id: pivot_id, attempts: 2 });
         const payload = {
           payload: '000-000',
           type: 'status',
@@ -120,17 +124,16 @@ class CheckGprsInterval {
           await this.checkResponseActive(pivot_id);
         }, 2000);
       } else {
-        console.log(`Tentativa de conexão n° ${existsNotActive.attempts}`);
-        if (existsNotActive.attempts >= 3) {
+        if (existsNotActive.attempts > 3) {
           await this.getStatePivot(pivot_id, false);
+
           this.responseNotActives = resNotActive.filter(
             (res) => res.id !== pivot_id
           );
-          console.log(
-            `Tentativas excedidas no pivo ${pivot_id}, verificando estado...`
-          );
+          console.log(`Tentativas excedidas no pivo ${pivot_id}`);
           console.log('....');
         } else {
+          console.log(`Tentativa de conexão n° ${existsNotActive.attempts}`);
           const responseWithoutThis = resNotActive.filter(
             (res) => res.id !== pivot_id
           );

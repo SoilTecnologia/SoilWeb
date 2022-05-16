@@ -4,10 +4,11 @@ import { SchedulingModel } from '../../database/model/Scheduling';
 import { GetAllSchedulingUseCase } from '../../useCases/Scheduling/GetAllScheduling/GetAllSchedulingUseCase';
 import emitter from '../../utils/eventBus';
 import { messageErrorTryAction } from '../../utils/types';
+import { ScheduleEmitter } from '../protocols/scheduleEmitterType';
 import { SendSchedulingListening } from './SendAction';
 
 class ManageSchedule {
-  private jobs: SchedulingModel[];
+  private jobs: ScheduleEmitter[];
 
   constructor() {
     this.jobs = [];
@@ -17,12 +18,17 @@ class ManageSchedule {
     return dayjs(date).add(3, 'hour').toDate();
   }
 
-  addJob(schedulling: SchedulingModel) {
+  addJob(schedulling: ScheduleEmitter) {
     this.jobs.push(schedulling);
   }
 
-  removeJob(schedullin_id: string) {
-    this.jobs = this.jobs.filter((job) => job.scheduling_id === schedullin_id);
+  removeJob(schedulling: ScheduleEmitter) {
+    const { scheduling } = schedulling;
+    this.jobs = this.jobs.filter(
+      (job) =>
+        job.scheduling.scheduling_id === scheduling.scheduling_id &&
+        job.scheduling.timestamp === scheduling.timestamp
+    );
   }
 
   private async getScheduling() {
@@ -30,7 +36,8 @@ class ManageSchedule {
     try {
       const schedulling = await getAllSchedullingUseCase.execute();
       if (schedulling && schedulling.length > 0) {
-        for (const job of schedulling) this.addJob(job);
+        for (const job of schedulling)
+          this.addJob({ scheduling: job, isPut: false });
       }
     } catch (err) {
       messageErrorTryAction(err, false, ManageSchedule.name, 'GetSchedule');
@@ -43,15 +50,12 @@ class ManageSchedule {
         console.log('Adicionando novo agendamento ao listener....');
         console.log('...');
         const listenerSchedule = new SendSchedulingListening(job);
-
         await listenerSchedule.addListening();
       }
     }
   }
 
-  private async enqueueOneJob(job: SchedulingModel) {
-    console.log('Adicionando novo agendamento ao listener....');
-    console.log('...');
+  private async enqueueOneJob(job: ScheduleEmitter) {
     const listenerSchedule = new SendSchedulingListening(job);
 
     await listenerSchedule.addListening();
@@ -61,7 +65,7 @@ class ManageSchedule {
     await this.getScheduling();
     await this.enqueueJob();
 
-    emitter.on('scheduling', async (scheduling: SchedulingModel) => {
+    emitter.on('scheduling', async ({ scheduling, isPut }: ScheduleEmitter) => {
       const newStartTimeStamp = this.handleDate(scheduling.start_timestamp!!);
       const newEndTimeStamp = this.handleDate(scheduling.end_timestamp!!);
       const newTimeStamp = this.handleDate(scheduling.timestamp!!);
@@ -73,9 +77,12 @@ class ManageSchedule {
         timestamp: newTimeStamp
       };
 
+      if (isPut) this.removeJob({ scheduling, isPut });
+
       console.log(`Novo Agendamento Recebido... `);
-      this.addJob(newScheduling);
-      await this.enqueueOneJob(newScheduling);
+      this.addJob({ scheduling: newScheduling, isPut });
+      await this.enqueueOneJob({ scheduling: newScheduling, isPut });
+      // await this.enqueueOneJob({ scheduling: newScheduling, isPut }, false);
     });
   }
 }

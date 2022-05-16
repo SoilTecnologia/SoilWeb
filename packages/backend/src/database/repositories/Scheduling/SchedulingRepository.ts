@@ -40,7 +40,7 @@ class SchedulingRepository implements ISchedulingRepository {
   }
 
   async update(
-    scheduling: SchedulingModel
+    scheduling: Omit<SchedulingModel, 'timestamp'>
   ): Promise<SchedulingModel | undefined> {
     const results = await knex<SchedulingModel>('schedulings')
       .where({ scheduling_id: scheduling.scheduling_id })

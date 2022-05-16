@@ -44,11 +44,11 @@ export const isStateVariableDifferent = (
   const oldAngle = oldStateVariable.angle;
   const newAngle = newStateVariable.angle;
 
-  console.log(
-    `Alteração de angulo em ${pivot_id}, antes: ${oldAngle}, novo: ${newAngle}`
-  );
   console.log('...');
   if (oldStateVariable.angle !== newStateVariable.angle) {
+    console.log(
+      `Alteração de angulo em ${pivot_id}, antes: ${oldAngle}, novo: ${newAngle}`
+    );
     emitter.emit(`angle-changed-${pivot_id}`, {
       oldAngle,
       newAngle,

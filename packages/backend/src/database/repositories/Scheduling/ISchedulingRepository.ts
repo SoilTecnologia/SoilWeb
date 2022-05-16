@@ -18,7 +18,9 @@ interface ISchedulingRepository {
     scheduling_id: SchedulingModel['scheduling_id']
   ): Promise<SchedulingModel | undefined>;
 
-  update(scheduling: SchedulingModel): Promise<SchedulingModel | undefined>;
+  update(
+    scheduling: Omit<SchedulingModel, 'timestamp'>
+  ): Promise<SchedulingModel | undefined>;
 }
 
 export { ISchedulingRepository };

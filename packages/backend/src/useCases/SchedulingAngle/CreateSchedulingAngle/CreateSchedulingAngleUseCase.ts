@@ -44,7 +44,10 @@ class CreateSchedulingAngleUseCase {
     );
     if (newSchedulingAngleData) {
       console.log('Agendamento por angulo criado no banco de dados....');
-      emitter.emit('scheduling-angle', newSchedulingAngleData);
+      emitter.emit('scheduling-angle', {
+        scheduling: newSchedulingAngleData,
+        isPut: false
+      });
     }
     return newSchedulingAngleData;
   }
