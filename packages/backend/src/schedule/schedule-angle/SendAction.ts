@@ -18,8 +18,6 @@ import { GetStateVariableUseCase } from '../../useCases/StateVariable/GetStateVa
 class SendSchedulingAngle {
   private job: SchedulingAngleModel;
   private isPut: boolean;
-  private static createAction = container.resolve(CreateActionUseCase);
-  private static stateRepository = container.resolve(GetStateVariableUseCase);
 
   constructor({ scheduling, isPut }: ScheduleAngleEmitter) {
     this.job = scheduling;
@@ -70,13 +68,13 @@ class SendSchedulingAngle {
   private async sendJob({ job }: JobSchedulingAngleModel) {
     // console.log(this.scheduleJob);
     try {
-      const actualState = await SendSchedulingAngle.stateRepository.execute(
-        job.pivot_id
-      );
+      const stateRepository = container.resolve(GetStateVariableUseCase);
+      const actualState = await stateRepository.execute(job.pivot_id);
 
       // Checa se o angulo atual é diferente do angulo start_angulo,
       // se for primeiro temos que retornar o pivo para start angulo,
       // para só então iniciar o agendamento...
+
       if (!actualState || actualState.angle === job.start_angle) {
         await SendSchedulingAngle.initActionForEndAngle(job);
       } else {
@@ -96,12 +94,9 @@ class SendSchedulingAngle {
       direction: job.direction || 'CLOCKWISE',
       percentimeter: 100
     };
+    const createAction = container.resolve(CreateActionUseCase);
 
-    await SendSchedulingAngle.createAction.execute(
-      action,
-      new Date(),
-      job.start_angle
-    );
+    await createAction.execute(action, new Date(), job.start_angle);
     emitter.on(
       `angle-changed-${job.pivot_id}`,
       async (angle: AngleDiferentprops) => {
@@ -123,11 +118,9 @@ class SendSchedulingAngle {
     emitter.on(`angle-changed-${job.pivot_id}`, (angle: AngleDiferentprops) => {
       SendSchedulingAngle.listernerEmitter(job, angle, 'end');
     });
-    await SendSchedulingAngle.createAction.execute(
-      action,
-      job.timestamp,
-      job.end_angle
-    );
+    const createAction = container.resolve(CreateActionUseCase);
+
+    await createAction.execute(action, job.timestamp, job.end_angle);
   }
 
   private static async listernerEmitter(
@@ -178,6 +171,8 @@ class SendSchedulingAngle {
 
   private static async stopAction(job: SchedulingAngleModel) {
     try {
+      const createAction = container.resolve(CreateActionUseCase);
+
       SendSchedulingAngle.removeJob(job.scheduling_angle_id);
 
       const action: Omit<CreateAction, 'timestamp_sent'> = {
@@ -190,7 +185,7 @@ class SendSchedulingAngle {
       };
 
       console.log(`Fim do Agendamento por angulo... No pivo ${job.pivot_id}`);
-      await SendSchedulingAngle.createAction.execute(
+      await createAction.execute(
         action,
         job.timestamp,
         job.start_angle,
