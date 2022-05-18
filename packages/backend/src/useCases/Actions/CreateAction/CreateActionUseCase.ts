@@ -87,7 +87,8 @@ class CreateActionUseCase {
   async execute(
     action: Omit<CreateAction, 'timestamp_sent'>,
     timestamp: CreateAction['timestamp_sent'] | null,
-    angle?: StateVariableModel['angle']
+    angle?: StateVariableModel['angle'],
+    end_angle?: StateVariableModel['angle']
   ) {
     const newTimestamp = timestamp || new Date();
     const userAlreadyExists = await this.applyQueryGetUserById(action.author);
@@ -141,7 +142,10 @@ class CreateActionUseCase {
 
     !angle
       ? emitter.emit('action', emitDataAction)
-      : emitter.emit('action', { ...emitDataAction, angle });
+      : emitter.emit('action', {
+          ...emitDataAction,
+          angle: { start_angle: angle, end_angle }
+        });
   }
 }
 

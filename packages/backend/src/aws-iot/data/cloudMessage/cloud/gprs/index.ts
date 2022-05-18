@@ -9,8 +9,7 @@ const handleGprs = async (payload: any, pivot_id: string) => {
   if (payload) {
     console.log(`Received status from GPRS in Pivot ${pivot_id}`);
     const statusObject = statusPayloadStringToObject(payload);
-
-    // const pivotNum = `${farm_id}_${pivot_num}`;
+    console.log(JSON.stringify(statusObject));
 
     if (statusObject) {
       try {

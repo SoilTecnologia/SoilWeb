@@ -26,7 +26,12 @@ class UpdateSchedulingAngleUseCase {
 
       dayjs.extend(isSameOrAfter);
       const dateIsAfter = dayjs(nowDate).isSameOrAfter(startDate);
+
       if (dateIsAfter) {
+        console.log(
+          'Não foi possivel atualizar o agendamento, pois ele já está em execução'
+        );
+        console.log('...');
         return 'scheduling is running';
       } else {
         const newSchedulingAngle = await this.schedulingAngleRepository.update(

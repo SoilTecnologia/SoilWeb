@@ -1,7 +1,9 @@
 import dayjs from 'dayjs';
 import { container } from 'tsyringe';
 import { SchedulingAngleModel } from '../../database/model/SchedulingAngle';
+import { CreateActionUseCase } from '../../useCases/Actions/CreateAction/CreateActionUseCase';
 import { GetAllSchedulingAngleUseCase } from '../../useCases/SchedulingAngle/GetAllSchedulingAngle/GetAllSchedulingAngleUseCase';
+import { GetStateVariableUseCase } from '../../useCases/StateVariable/GetStateVariable/GetStateVariableUseCase';
 import emitter from '../../utils/eventBus';
 import { messageErrorTryAction } from '../../utils/types';
 import { ScheduleAngleEmitter } from '../protocols/scheduleEmitterType';
@@ -23,14 +25,11 @@ class ManageScheduleAngle {
   }
 
   removeJob(schedulling_angle: SchedulingAngleModel) {
-    this.jobs = this.jobs.filter((job) => {
-      const { scheduling } = job;
-      return (
-        scheduling.scheduling_angle_id ===
-          schedulling_angle.scheduling_angle_id &&
-        scheduling.timestamp === schedulling_angle.timestamp
-      );
-    });
+    this.jobs = this.jobs.filter(
+      (job) =>
+        job.scheduling.scheduling_angle_id ===
+        schedulling_angle.scheduling_angle_id
+    );
   }
 
   private async getScheduling() {
@@ -81,12 +80,13 @@ class ManageScheduleAngle {
       'scheduling-angle',
       async ({ scheduling, isPut }: ScheduleAngleEmitter) => {
         const newTimeStamp = this.handleDate(scheduling.timestamp!!);
+        const newStartTimeStamp = this.handleDate(scheduling.timestamp!!);
 
         const newScheduling: SchedulingAngleModel = {
           ...scheduling,
+          start_timestamp: newStartTimeStamp,
           timestamp: newTimeStamp
         };
-
         if (isPut) this.removeJob(scheduling);
 
         console.log(`Novo Agendamento Recebido... `);

@@ -7,14 +7,19 @@ class CreateSchedulingAngleController {
     const {
       author,
       pivot_id,
+      is_return,
       power,
       water,
       direction,
       percentimeter,
       start_angle,
       end_angle,
+      start_timestamp,
       timestamp
     } = req.body;
+    const data = req.body;
+    console.log(`Cheguei na requisição ${pivot_id}`);
+    console.log(data);
 
     const createSchedulingAngleUseCase = container.resolve(
       CreateSchedulingAngleUseCase
@@ -23,6 +28,7 @@ class CreateSchedulingAngleController {
     try {
       const allSchedulingAngle = await createSchedulingAngleUseCase.execute({
         pivot_id,
+        is_return,
         author,
         power,
         water,
@@ -30,7 +36,8 @@ class CreateSchedulingAngleController {
         percentimeter,
         start_angle,
         end_angle,
-        timestamp: new Date()
+        start_timestamp: new Date(Date.now() + 10000),
+        timestamp
       });
 
       res.send(allSchedulingAngle);

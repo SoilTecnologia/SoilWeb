@@ -7,14 +7,14 @@ class SchedulingRepository implements ISchedulingRepository {
     return await knex<SchedulingModel>('schedulings')
       .select('*')
       .where({ pivot_id })
-      .orderBy('timestamp', 'desc');
+      .orderBy('start_timestamp', 'asc');
   }
 
   async findById(scheduling_id: string): Promise<SchedulingModel | undefined> {
     return await knex<SchedulingModel>('schedulings')
       .select()
       .where({ scheduling_id })
-      .orderBy('timestamp', 'desc')
+      .orderBy('start_timestamp', 'asc')
       .first();
   }
 

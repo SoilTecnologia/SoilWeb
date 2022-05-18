@@ -7,6 +7,7 @@ class UpdateSchedulingAngleController {
     const {
       update_timestamp,
       scheduling_angle_id,
+      is_return,
       pivot_id,
       author,
       power,
@@ -15,6 +16,7 @@ class UpdateSchedulingAngleController {
       percentimeter,
       start_angle,
       end_angle,
+      start_timestamp,
       timestamp
     } = req.body;
     const updateSchedulingAngleUseCase = container.resolve(
@@ -24,6 +26,7 @@ class UpdateSchedulingAngleController {
       const putSchedulingAngle = await updateSchedulingAngleUseCase.execute(
         {
           scheduling_angle_id,
+          is_return,
           pivot_id,
           author,
           power,
@@ -32,6 +35,7 @@ class UpdateSchedulingAngleController {
           percentimeter,
           start_angle,
           end_angle,
+          start_timestamp,
           timestamp
         },
         update_timestamp

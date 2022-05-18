@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
 import { SchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/SchedulingAngleRepository';
@@ -15,6 +16,7 @@ class CreateSchedulingAngleUseCase {
   ) {
     const {
       pivot_id,
+      is_return,
       author,
       power,
       water,
@@ -22,21 +24,27 @@ class CreateSchedulingAngleUseCase {
       percentimeter,
       start_angle,
       end_angle,
+      start_timestamp,
       timestamp
     } = schedulingangle;
 
     const schedulingAngleModel = new SchedulingAngleModel();
 
+    const newTimeStamp = dayjs(timestamp).subtract(3, 'hour');
+    const newStartTimeStamp = dayjs(start_timestamp).subtract(3, 'hour');
+
     Object.assign(schedulingAngleModel, {
       pivot_id,
+      is_return,
       author,
-      power,
-      water,
+      power: is_return ? true : power,
+      water: is_return ? false : water,
       direction,
-      percentimeter,
-      start_angle,
-      end_angle,
-      timestamp
+      percentimeter: is_return ? 100 : percentimeter,
+      start_angle: is_return ? 0 : start_angle,
+      end_angle: is_return ? 0 : end_angle,
+      start_timestamp: newStartTimeStamp,
+      timestamp: newTimeStamp
     });
 
     const newSchedulingAngleData = await this.schedulingAngleRepository.create(

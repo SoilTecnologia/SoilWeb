@@ -190,6 +190,29 @@ export async function up(knex: Knex): Promise<void> {
       table.dateTime('end_timestamp');
       table.dateTime('timestamp').notNullable();
     })
+    .createTable('scheduling_historys', (table) => {
+      table
+        .uuid('scheduling_history_id')
+        .primary()
+        .defaultTo(knex.raw('(uuid_generate_v4())'));
+      table
+        .string('pivot_id')
+        .references('pivot_id')
+        .inTable('pivots')
+        .index()
+        .notNullable()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+      table.string('author').notNullable();
+      table.boolean('is_stop');
+      table.boolean('power');
+      table.boolean('water');
+      table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);
+      table.integer('percentimeter');
+      table.dateTime('start_timestamp');
+      table.dateTime('end_timestamp');
+      table.dateTime('timestamp').notNullable();
+    })
     .createTable('scheduling_angles', (table) => {
       table
         .uuid('scheduling_angle_id')
@@ -204,6 +227,31 @@ export async function up(knex: Knex): Promise<void> {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
       table.string('author');
+      table.boolean('is_return');
+      table.boolean('power');
+      table.boolean('water');
+      table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);
+      table.float('percentimeter');
+      table.float('start_angle');
+      table.float('end_angle');
+      table.dateTime('start_timestamp');
+      table.dateTime('timestamp').notNullable();
+    })
+    .createTable('scheduling_angle_hists', (table) => {
+      table
+        .uuid('scheduling_angle_hist_id')
+        .primary()
+        .defaultTo(knex.raw('(uuid_generate_v4())'));
+      table
+        .string('pivot_id')
+        .references('pivot_id')
+        .inTable('pivots')
+        .index()
+        .notNullable()
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+      table.string('author');
+      table.boolean('is_return');
       table.boolean('power');
       table.boolean('water');
       table.enum('direction', ['CLOCKWISE', 'ANTI_CLOCKWISE']);
@@ -269,7 +317,15 @@ export async function down(knex: Knex): Promise<void> {
       table.dropPrimary();
       table.dropForeign('pivot_id');
     })
+    .alterTable('scheduling_historys', (table) => {
+      table.dropPrimary();
+      table.dropForeign('pivot_id');
+    })
     .alterTable('scheduling_angles', (table) => {
+      table.dropPrimary();
+      table.dropForeign('pivot_id');
+    })
+    .alterTable('scheduling_angle_hists', (table) => {
       table.dropPrimary();
       table.dropForeign('pivot_id');
     })
@@ -290,6 +346,8 @@ export async function down(knex: Knex): Promise<void> {
     .dropTable('farms')
     .dropTable('users')
     .dropTable('schedulings')
+    .dropTable('scheduling_historys')
     .dropTable('scheduling_angles')
+    .dropTable('scheduling_angle_hists')
     .dropTable('pumps');
 }

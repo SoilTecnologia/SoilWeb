@@ -17,7 +17,7 @@ const getAllSchedulingController = new GetAllSchedulingController();
 router.post(
   '/addScheduling',
   authMiddleware(),
-  createSchedulingController.handle
+  createSchedulingController.handle,
 );
 router.delete(
   '/deleteScheduling/:id',

@@ -1,5 +1,5 @@
-class SchedulingAngleModel {
-  scheduling_angle_id: string;
+class SchedulingAngleHistModel {
+  scheduling_angle_hist_id: string;
 
   pivot_id: string;
 
@@ -24,4 +24,4 @@ class SchedulingAngleModel {
   timestamp: Date | null;
 }
 
-export { SchedulingAngleModel };
+export { SchedulingAngleHistModel };
