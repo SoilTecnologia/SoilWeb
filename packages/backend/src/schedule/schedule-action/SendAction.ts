@@ -21,14 +21,6 @@ class SendSchedulingListening {
     this.isPut = isPut;
   }
 
-  private getOptionsDate(dateReceived: Date) {
-    const newDate = dayjs(dateReceived)
-      .subtract(1, 'month')
-      .add(3, 'hour')
-      .toDate();
-    return newDate;
-  }
-
   private async removeJob(scheduling_id: string, delSchedule: boolean) {
     try {
       const isCancel = schedule.cancelJob(scheduling_id);
@@ -117,14 +109,14 @@ class SendSchedulingListening {
   }
 
   async addListening() {
-    const { start_timestamp, end_timestamp, is_stop } = this.job;
+    const { start_timestamp, end_timestamp, is_stop, scheduling_id } = this.job;
 
     if (this.isPut) {
       console.log('Recebido uma atualização de agendamento...');
-      this.removeJob(this.job.scheduling_id, false);
+      this.removeJob(scheduling_id, false);
     }
     // Enviar para iniciar o agendamento
-    if (this.job.is_stop) {
+    if (is_stop) {
       this.configJob(end_timestamp!!, this.stopJob, 'stop');
     } else {
       this.configJob(start_timestamp!!, this.sendJob, 'start');

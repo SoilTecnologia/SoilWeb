@@ -34,7 +34,7 @@ class UpdateSchedulingController {
           start_timestamp,
           end_timestamp
         },
-        update_timestamp
+        dayjs(Date.now()).toDate()
       );
 
       res.status(200).send(putScheduling);

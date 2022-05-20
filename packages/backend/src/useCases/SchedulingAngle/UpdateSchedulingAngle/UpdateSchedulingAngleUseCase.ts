@@ -3,6 +3,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
 import { ISchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/ISchedulingAngleRepository';
+import { dateLocal } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 
 @injectable()
@@ -22,7 +23,7 @@ class UpdateSchedulingAngleUseCase {
 
     if (getSchedulingAngle) {
       const startDate = dayjs(getSchedulingAngle.timestamp);
-      const nowDate = dayjs(update_timestamp).subtract(3, 'hour');
+      const nowDate = dateLocal(update_timestamp); //Nuvem
 
       dayjs.extend(isSameOrAfter);
       const dateIsAfter = dayjs(nowDate).isSameOrAfter(startDate);
@@ -34,9 +35,11 @@ class UpdateSchedulingAngleUseCase {
         console.log('...');
         return 'scheduling is running';
       } else {
-        const newSchedulingAngle = await this.schedulingAngleRepository.update(
-          scheduling_angle
-        );
+        const newSchedulingAngle = await this.schedulingAngleRepository.update({
+          ...scheduling_angle,
+          start_timestamp: dateLocal(scheduling_angle.start_timestamp!),
+          timestamp: dateLocal(scheduling_angle.timestamp!)
+        });
 
         if (newSchedulingAngle) {
           emitter.emit('scheduling-angle', {

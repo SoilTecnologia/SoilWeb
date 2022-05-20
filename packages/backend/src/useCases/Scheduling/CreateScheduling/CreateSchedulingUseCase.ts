@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingModel } from '../../../database/model/Scheduling';
 import { SchedulingRepository } from '../../../database/repositories/Scheduling/SchedulingRepository';
+import { dateLocal } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 @injectable()
@@ -41,10 +42,6 @@ class CreateSchedulingUseCase {
     } = scheduling;
     const schedulingModel = new SchedulingModel();
 
-    const newStartTimeStamp = dayjs(start_timestamp).subtract(3, 'hour');
-    const newEndTimeStamp = dayjs(end_timestamp).subtract(3, 'hour');
-    const newTimeStamp = dayjs(timestamp).subtract(3, 'hour');
-
     Object.assign(schedulingModel, {
       pivot_id,
       author,
@@ -53,9 +50,9 @@ class CreateSchedulingUseCase {
       water: is_stop ? false : water,
       direction: is_stop ? 'CLOCKWISE' : direction,
       percentimeter: is_stop ? 0 : percentimeter,
-      start_timestamp: newStartTimeStamp,
-      end_timestamp: newEndTimeStamp,
-      timestamp: newTimeStamp
+      start_timestamp: dateLocal(start_timestamp!),
+      end_timestamp: dateLocal(end_timestamp!),
+      timestamp: dateLocal(timestamp!)
     });
 
     const newScheduling = await this.applyQueryCreate(schedulingModel);

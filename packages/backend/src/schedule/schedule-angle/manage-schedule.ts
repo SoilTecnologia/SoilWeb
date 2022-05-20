@@ -1,9 +1,10 @@
 import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { container } from 'tsyringe';
 import { SchedulingAngleModel } from '../../database/model/SchedulingAngle';
-import { CreateActionUseCase } from '../../useCases/Actions/CreateAction/CreateActionUseCase';
+import { DeleteSchedulingAngleUseCase } from '../../useCases/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleUseCase';
 import { GetAllSchedulingAngleUseCase } from '../../useCases/SchedulingAngle/GetAllSchedulingAngle/GetAllSchedulingAngleUseCase';
-import { GetStateVariableUseCase } from '../../useCases/StateVariable/GetStateVariable/GetStateVariableUseCase';
+import { dateLocal } from '../../utils/convertTimeZoneDate';
 import emitter from '../../utils/eventBus';
 import { messageErrorTryAction } from '../../utils/types';
 import { ScheduleAngleEmitter } from '../protocols/scheduleEmitterType';
@@ -14,10 +15,6 @@ class ManageScheduleAngle {
 
   constructor() {
     this.jobs = [];
-  }
-
-  handleDate(date: Date) {
-    return dayjs(date).add(3, 'hour').toDate();
   }
 
   addJob({ scheduling, isPut }: ScheduleAngleEmitter) {
@@ -32,6 +29,27 @@ class ManageScheduleAngle {
     );
   }
 
+  async removeScheduleDb(scheduling_id: string) {
+    console.log(
+      'Data de inicio do agendamento expirado, excluindo agendamento....'
+    );
+    try {
+      const deleteScheduleAngle = container.resolve(
+        DeleteSchedulingAngleUseCase
+      );
+      await deleteScheduleAngle.execute(scheduling_id);
+      console.log('Agendamento Removido...');
+      console.log('...');
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        false,
+        ManageScheduleAngle.name,
+        'Delete Schedule Db'
+      );
+    }
+  }
+
   private async getScheduling() {
     const getAllSchedulingAngle = container.resolve(
       GetAllSchedulingAngleUseCase
@@ -39,8 +57,15 @@ class ManageScheduleAngle {
     try {
       const schedulling = await getAllSchedulingAngle.execute();
       if (schedulling && schedulling.length > 0) {
-        for (const job of schedulling)
-          this.addJob({ scheduling: job, isPut: false });
+        for (const job of schedulling) {
+          const dayNow = dayjs(Date.now());
+          dayjs.extend(isSameOrBefore);
+          const dateIsBefore = dayjs(job.start_timestamp).isSameOrBefore(
+            dayNow
+          );
+          if (dateIsBefore) this.removeScheduleDb(job.scheduling_angle_id);
+          else this.addJob({ scheduling: job, isPut: false });
+        }
       }
     } catch (err) {
       messageErrorTryAction(
@@ -79,13 +104,10 @@ class ManageScheduleAngle {
     emitter.on(
       'scheduling-angle',
       async ({ scheduling, isPut }: ScheduleAngleEmitter) => {
-        const newTimeStamp = this.handleDate(scheduling.timestamp!!);
-        const newStartTimeStamp = this.handleDate(scheduling.timestamp!!);
-
         const newScheduling: SchedulingAngleModel = {
           ...scheduling,
-          start_timestamp: newStartTimeStamp,
-          timestamp: newTimeStamp
+          start_timestamp: dateLocal(scheduling.timestamp!!),
+          timestamp: dateLocal(scheduling.start_timestamp!!)
         };
         if (isPut) this.removeJob(scheduling);
 

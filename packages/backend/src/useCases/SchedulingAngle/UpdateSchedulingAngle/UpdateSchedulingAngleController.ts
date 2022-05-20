@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { UpdateSchedulingAngleUseCase } from './UpdateSchedulingAngleUseCase';
@@ -38,7 +39,7 @@ class UpdateSchedulingAngleController {
           start_timestamp,
           timestamp
         },
-        update_timestamp
+        dayjs(Date.now()).toDate()
       );
 
       res.status(200).send(putSchedulingAngle);

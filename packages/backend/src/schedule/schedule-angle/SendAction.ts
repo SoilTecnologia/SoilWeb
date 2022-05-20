@@ -1,5 +1,4 @@
 import schedule from 'node-schedule';
-import dayjs from 'dayjs';
 import { container } from 'tsyringe';
 import { CreateActionUseCase } from '../../useCases/Actions/CreateAction/CreateActionUseCase';
 import { CreateAction } from '../../database/model/types/action';
@@ -24,14 +23,6 @@ class SendSchedulingAngle {
     this.isPut = isPut;
   }
 
-  private getOptionsDate(dateReceived: Date) {
-    const newDate = dayjs(dateReceived)
-      .subtract(1, 'month')
-      .add(3, 'hour')
-      .toDate();
-    return newDate;
-  }
-
   public static async removeJob(schedule_id: string) {
     try {
       schedule.cancelJob(schedule_id);
@@ -48,11 +39,9 @@ class SendSchedulingAngle {
 
   private configJob(date: Date, callback: CallbackProps) {
     try {
-      const dateBow = new Date(Date.now() + 5000);
-
       schedule.scheduleJob(
         this.job.scheduling_angle_id,
-        dateBow,
+        date,
         callback.bind(null, {
           job: this.job
         })
@@ -202,9 +191,9 @@ class SendSchedulingAngle {
   }
 
   async addListening() {
-    const { timestamp } = this.job;
-    if (this.isPut) SendSchedulingAngle.removeJob(this.job.scheduling_angle_id);
-    this.configJob(timestamp!!, this.sendJob);
+    const { start_timestamp, scheduling_angle_id } = this.job;
+    if (this.isPut) SendSchedulingAngle.removeJob(scheduling_angle_id);
+    this.configJob(start_timestamp!!, this.sendJob);
   }
 }
 

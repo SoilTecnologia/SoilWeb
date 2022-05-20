@@ -36,7 +36,7 @@ class CreateSchedulingAngleController {
         percentimeter,
         start_angle,
         end_angle,
-        start_timestamp: new Date(Date.now() + 10000),
+        start_timestamp,
         timestamp
       });
 

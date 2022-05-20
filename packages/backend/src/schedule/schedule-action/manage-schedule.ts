@@ -14,9 +14,8 @@ class ManageSchedule {
     this.jobs = [];
   }
 
-  handleDate(date: Date) {
-    return dayjs(date).add(3, 'hour').toDate();
-  }
+  handleDate = (date: Date) => dayjs(date).toDate();
+  // return dayjs(date).add(3, 'hour').toDate(); Pc Local
 
   addJob(schedulling: ScheduleEmitter) {
     this.jobs.push(schedulling);

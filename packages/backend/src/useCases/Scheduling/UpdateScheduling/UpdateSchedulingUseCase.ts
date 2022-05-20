@@ -3,6 +3,7 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingModel } from '../../../database/model/Scheduling';
 import { ISchedulingRepository } from '../../../database/repositories/Scheduling/ISchedulingRepository';
+import { dateLocal } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 
@@ -62,12 +63,8 @@ class UpdateSchedulingUseCase {
     } else {
       const newScheduling = await this.applyQueryUpdate({
         ...scheduling,
-        start_timestamp: dayjs(scheduling.start_timestamp)
-          .subtract(3, 'hour')
-          .toDate(),
-        end_timestamp: dayjs(scheduling.end_timestamp)
-          .subtract(3, 'hour')
-          .toDate()
+        start_timestamp: dateLocal(scheduling.start_timestamp!),
+        end_timestamp: dateLocal(scheduling.end_timestamp!)
       });
 
       if (newScheduling) {

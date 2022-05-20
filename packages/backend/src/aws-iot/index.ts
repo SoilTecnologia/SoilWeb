@@ -39,13 +39,20 @@ class IoTDevice {
     this.qos = qos;
     this.queue = new MessageQueue();
 
+    const userLocal = 'Henrique';
+    const clientIdCloud = {
+      newDev: 'cloudNewDev2022',
+      newProd: 'cloudNewProd2022',
+      pcLocal: `cloudLocal${userLocal}2022`
+    };
+
     if (type === 'Raspberry' && topic) {
       this.subTopic = topic;
       this.pubTopic = `cloudHenrique`;
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = 'cloudDockerHub2022';
+      this.clientId = clientIdCloud.newDev;
     }
   }
   /*
