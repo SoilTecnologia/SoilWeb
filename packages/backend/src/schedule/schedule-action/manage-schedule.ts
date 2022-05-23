@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { container } from 'tsyringe';
 import { SchedulingModel } from '../../database/model/Scheduling';
+import { DeleteSchedulingUseCase } from '../../useCases/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
 import { GetAllSchedulingUseCase } from '../../useCases/Scheduling/GetAllScheduling/GetAllSchedulingUseCase';
 import emitter from '../../utils/eventBus';
 import { messageErrorTryAction } from '../../utils/types';
@@ -30,13 +32,39 @@ class ManageSchedule {
     );
   }
 
+  async removeScheduleDb(scheduling_id: string) {
+    console.log(
+      'Data de inicio do agendamento expirado, excluindo agendamento....'
+    );
+    try {
+      const deleteScheduleAngle = container.resolve(DeleteSchedulingUseCase);
+      await deleteScheduleAngle.execute(scheduling_id);
+      console.log('Agendamento Removido...');
+      console.log('...');
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        false,
+        ManageSchedule.name,
+        'Delete Schedule Db'
+      );
+    }
+  }
+
   private async getScheduling() {
     const getAllSchedullingUseCase = container.resolve(GetAllSchedulingUseCase);
     try {
       const schedulling = await getAllSchedullingUseCase.execute();
       if (schedulling && schedulling.length > 0) {
-        for (const job of schedulling)
-          this.addJob({ scheduling: job, isPut: false });
+        for (const job of schedulling) {
+          const dayNow = dayjs(Date.now());
+          dayjs.extend(isSameOrBefore);
+          const dateIsBefore = dayjs(job.start_timestamp).isSameOrBefore(
+            dayNow
+          );
+          if (dateIsBefore) this.removeScheduleDb(job.scheduling_id);
+          else this.addJob({ scheduling: job, isPut: false });
+        }
       }
     } catch (err) {
       messageErrorTryAction(err, false, ManageSchedule.name, 'GetSchedule');

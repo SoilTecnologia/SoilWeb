@@ -148,9 +148,11 @@ class GetCyclesUseCase {
     }
 
     // If there's one that started but hasn't ended, make sure to send it too
-    if (this.foundStart)
-      // if(this.currentCycle.states.length > 0 || this.currentCycle.percentimeters.length > 0) {
+    // if(this.currentCycle.states.length > 0 || this.currentCycle.percentimeters.length > 0) {
+
+    if (this.foundStart) {
       this.response.push(this.currentCycle);
+    }
     // }
 
     // Return the reverse so that most recent cycles are shown

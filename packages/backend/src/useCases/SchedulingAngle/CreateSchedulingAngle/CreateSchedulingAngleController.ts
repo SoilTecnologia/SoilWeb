@@ -17,9 +17,8 @@ class CreateSchedulingAngleController {
       start_timestamp,
       timestamp
     } = req.body;
-    const data = req.body;
-    console.log(`Cheguei na requisição ${pivot_id}`);
-    console.log(data);
+
+
 
     const createSchedulingAngleUseCase = container.resolve(
       CreateSchedulingAngleUseCase

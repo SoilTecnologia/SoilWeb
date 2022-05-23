@@ -106,8 +106,8 @@ class ManageScheduleAngle {
       async ({ scheduling, isPut }: ScheduleAngleEmitter) => {
         const newScheduling: SchedulingAngleModel = {
           ...scheduling,
-          start_timestamp: dateLocal(scheduling.timestamp!!),
-          timestamp: dateLocal(scheduling.start_timestamp!!)
+          start_timestamp: dateLocal(scheduling.start_timestamp!!),
+          timestamp: dateLocal(scheduling.timestamp!!)
         };
         if (isPut) this.removeJob(scheduling);
 

@@ -21,23 +21,6 @@ class SendSchedulingListening {
     this.isPut = isPut;
   }
 
-  private async removeJob(scheduling_id: string, delSchedule: boolean) {
-    try {
-      const isCancel = schedule.cancelJob(scheduling_id);
-      console.log(`Foi cancelado? ${isCancel ? 'SIM' : 'NÂo'}`);
-      //Excluindo do banco de dados
-      if (delSchedule) {
-      }
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        false,
-        SendSchedulingListening.name,
-        'Remove Job'
-      );
-    }
-  }
-
   private configJob(date: Date, callback: CallbackProps, id: string) {
     try {
       const scheduleName = `${this.job.scheduling_id}-${id}`;
@@ -78,8 +61,9 @@ class SendSchedulingListening {
     const deleteSchedule = container.resolve(DeleteSchedulingUseCase);
 
     try {
-      const isCancel = schedule.cancelJob(`${job.scheduling_id}-start`);
-      console.log(`Start Foi cancelado? ${isCancel ? 'SIM' : 'NÂo'}`);
+      schedule.cancelJob(`${job.scheduling_id}-start`);
+      schedule.cancelJob(`${job.scheduling_id}-stop`);
+      await deleteSchedule.execute(job.scheduling_id);
 
       const createActionUseCase = container.resolve(CreateActionUseCase);
       // Desliga o estado
@@ -94,12 +78,6 @@ class SendSchedulingListening {
         },
         job.timestamp
       );
-
-      const isCancelStop = await schedule.cancelJob(
-        `${job.scheduling_id}-start`
-      );
-      console.log(`Stop Foi cancelado? ${isCancelStop ? 'SIM' : 'NÂo'}`);
-      await deleteSchedule.execute(job.scheduling_id);
     } catch (err) {
       const error = err as Error;
       console.log(`Error in ${SendSchedulingListening.name} of stopJob`);
@@ -113,7 +91,7 @@ class SendSchedulingListening {
 
     if (this.isPut) {
       console.log('Recebido uma atualização de agendamento...');
-      this.removeJob(scheduling_id, false);
+      schedule.cancelJob(scheduling_id);
     }
     // Enviar para iniciar o agendamento
     if (is_stop) {

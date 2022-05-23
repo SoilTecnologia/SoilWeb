@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { StateModel } from '../../../database/model/State';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class GetLastCycleUseCase {
@@ -10,6 +11,19 @@ class GetLastCycleUseCase {
     @inject('StatesVariablesRepository')
     private stateVariableRepository: IStatesVariableRepository
   ) {}
+
+  async getAnglePercents(state_id: string) {
+    try {
+      return await this.stateVariableRepository.getAnglePercentimeter(state_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        GetLastCycleUseCase.name,
+        'Get Angle Percents'
+      );
+    }
+  }
 
   async execute(pivot_id: StateModel['pivot_id']) {
     const lastState = await this.stateRepository.getLastState(pivot_id);
@@ -26,9 +40,7 @@ class GetLastCycleUseCase {
         }
       }
       if (lastState.power === false) {
-        return await this.stateVariableRepository.getAnglePercentimeter(
-          lastState.state_id
-        );
+        await this.getAnglePercents(lastState.state_id);
       }
     }
 

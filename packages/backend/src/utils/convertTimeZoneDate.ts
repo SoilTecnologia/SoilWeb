@@ -24,5 +24,6 @@ export const createDate = (date?: Date) => {
   }
 };
 
-export const dateLocal = (date: Date) => dayjs(date).toDate();
-//export const dateLocal = (date: Date) => dayjs(date).subtract(3, 'hour');
+// export const dateLocal = (date: Date) => dayjs(date).toDate();
+export const dateLocal = (date: Date) =>
+  dayjs(date).subtract(3, 'hour').toDate();
