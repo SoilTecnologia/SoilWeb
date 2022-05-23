@@ -203,6 +203,7 @@ export async function up(knex: Knex): Promise<void> {
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
+      table.string('updated');
       table.string('author').notNullable();
       table.boolean('is_stop');
       table.boolean('power');
@@ -250,6 +251,7 @@ export async function up(knex: Knex): Promise<void> {
         .notNullable()
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
+      table.string('updated');
       table.string('author');
       table.boolean('is_return');
       table.boolean('power');

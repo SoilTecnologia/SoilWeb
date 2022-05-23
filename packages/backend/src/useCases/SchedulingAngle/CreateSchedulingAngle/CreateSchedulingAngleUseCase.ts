@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
 import { SchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/SchedulingAngleRepository';
-import { dateLocal } from '../../../utils/convertTimeZoneDate';
+import { dateLocal, dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 
 @injectable()
@@ -41,8 +41,8 @@ class CreateSchedulingAngleUseCase {
       percentimeter: is_return ? 100 : percentimeter,
       start_angle: is_return ? 0 : start_angle,
       end_angle: is_return ? 0 : end_angle,
-      start_timestamp: dateLocal(start_timestamp!),
-      timestamp: dateLocal(timestamp!)
+      start_timestamp: dateSaoPaulo(start_timestamp!),
+      timestamp: dateSaoPaulo(timestamp!)
     });
 
     const newSchedulingAngleData = await this.schedulingAngleRepository.create(

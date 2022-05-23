@@ -5,6 +5,8 @@ class SchedulingAngleHistModel {
 
   author: string;
 
+  updated?: string;
+
   is_return: boolean;
 
   power: boolean | null;

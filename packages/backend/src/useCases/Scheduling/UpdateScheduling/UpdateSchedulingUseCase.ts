@@ -2,8 +2,14 @@ import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingModel } from '../../../database/model/Scheduling';
+import { SchedulingHistoryModel } from '../../../database/model/SchedulingHistory';
 import { ISchedulingRepository } from '../../../database/repositories/Scheduling/ISchedulingRepository';
-import { dateLocal } from '../../../utils/convertTimeZoneDate';
+import { ISchedulingHistoryRepository } from '../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
+import {
+  dateIsAter,
+  dateLocal,
+  dateSaoPaulo
+} from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 
@@ -11,7 +17,9 @@ import { messageErrorTryAction } from '../../../utils/types';
 class UpdateSchedulingUseCase {
   constructor(
     @inject('SchedulingRepository')
-    private schedulingRepository: ISchedulingRepository
+    private schedulingRepository: ISchedulingRepository,
+    @inject('SchedulingHistoryRepository')
+    private schedulingHistory: ISchedulingHistoryRepository
   ) {}
 
   private async applyQueryFindById(scheduling_id: string) {
@@ -31,13 +39,34 @@ class UpdateSchedulingUseCase {
     scheduling: Omit<SchedulingModel, 'timestamp'>
   ) {
     try {
-      return await this.schedulingRepository.update(scheduling);
+      console.log(`Vou atualizar: ${scheduling}`);
+      const schel = await this.schedulingRepository.update(scheduling);
+      console.log(`Atualizei: ${schel}`);
+      return schel;
     } catch (err) {
       messageErrorTryAction(
         err,
         true,
         UpdateSchedulingUseCase.name,
         'Update Scheduling '
+      );
+    }
+  }
+
+  private async applyQueryCreateHistory(
+    scheduling: Omit<SchedulingHistoryModel, 'scheduling_history_id'>
+  ) {
+    try {
+      return await this.schedulingHistory.create({
+        ...scheduling,
+        updated: scheduling.scheduling_id
+      });
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdateSchedulingUseCase.name,
+        'Create in History'
       );
     }
   }
@@ -52,22 +81,32 @@ class UpdateSchedulingUseCase {
 
     if (!getScheduling) throw new Error('Schedulings Does Not Exists');
 
-    const startDate = dayjs(getScheduling.start_timestamp);
-    const nowDate = dayjs(update_timestamp).subtract(3, 'hour');
+    const dateIsRuning = dateIsAter(
+      getScheduling.start_timestamp!,
+      update_timestamp
+    );
 
-    dayjs.extend(isSameOrAfter);
-    const dateIsAfter = dayjs(nowDate).isSameOrAfter(startDate);
-
-    if (dateIsAfter) {
+    if (dateIsRuning) {
+      console.log('Não é possivel atualizar, agendamento em execução...');
       return 'scheduling is running';
     } else {
       const newScheduling = await this.applyQueryUpdate({
         ...scheduling,
-        start_timestamp: dateLocal(scheduling.start_timestamp!),
-        end_timestamp: dateLocal(scheduling.end_timestamp!)
+        start_timestamp: dateSaoPaulo(scheduling.start_timestamp!),
+        end_timestamp: dateSaoPaulo(scheduling.end_timestamp!)
       });
 
       if (newScheduling) {
+        const schedule: Omit<SchedulingHistoryModel, 'scheduling_history_id'> =
+          {
+            ...newScheduling
+          };
+        delete schedule.scheduling_id;
+
+        await this.applyQueryCreateHistory({
+          ...schedule,
+          updated: newScheduling.scheduling_id
+        });
         emitter.emit('scheduling', { scheduling: newScheduling, isPut: true });
       }
 

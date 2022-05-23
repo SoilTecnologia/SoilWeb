@@ -1,16 +1,17 @@
 import schedule from 'node-schedule';
 import { SchedulingModel } from '../../database/model/Scheduling';
-import dayjs from 'dayjs';
 import { container } from 'tsyringe';
 import { DeleteSchedulingUseCase } from '../../useCases/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
 import { CreateActionUseCase } from '../../useCases/Actions/CreateAction/CreateActionUseCase';
 import { CreateAction } from '../../database/model/types/action';
-import { messageErrorTryAction } from '../../utils/types';
 import {
   CallbackProps,
   JobSchedulingModel,
   ScheduleEmitter
 } from '../protocols/';
+import { dateRuleSchedule } from '../utils/dateUtils';
+import { messageErrorTryAction } from '../../utils/types';
+import { scheduleFactory } from '../protocols/scheduleFactory';
 
 class SendSchedulingListening {
   private job: SchedulingModel;
@@ -23,11 +24,13 @@ class SendSchedulingListening {
 
   private configJob(date: Date, callback: CallbackProps, id: string) {
     try {
+      const rule = dateRuleSchedule(date);
       const scheduleName = `${this.job.scheduling_id}-${id}`;
-      console.log(`Iniciando a schedule de nome ${scheduleName}`);
-      schedule.scheduleJob(
+
+      console.log(`Configurando o agendamento de nome ${scheduleName}`);
+      scheduleFactory.scheduleJob(
         scheduleName,
-        date,
+        rule,
         callback.bind(null, {
           job: this.job
         })
@@ -50,19 +53,34 @@ class SendSchedulingListening {
       percentimeter: job.percentimeter || 0
     };
     try {
-      console.log(`Iniciando ação agendada as: ${job.start_timestamp}`);
       console.log('.....');
       const createActionUseCase = container.resolve(CreateActionUseCase);
       await createActionUseCase.execute(action, job.timestamp);
-    } catch (err) {}
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        false,
+        SendSchedulingListening.name,
+        'Send Job'
+      );
+    }
   }
 
   private async stopJob({ job }: JobSchedulingModel) {
     const deleteSchedule = container.resolve(DeleteSchedulingUseCase);
+    try {
+      scheduleFactory.cancelJob(`${job.scheduling_id}-start`);
+      scheduleFactory.cancelJob(`${job.scheduling_id}-stop`);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        false,
+        SendSchedulingListening.name,
+        'Cancel Job'
+      );
+    }
 
     try {
-      schedule.cancelJob(`${job.scheduling_id}-start`);
-      schedule.cancelJob(`${job.scheduling_id}-stop`);
       await deleteSchedule.execute(job.scheduling_id);
 
       const createActionUseCase = container.resolve(CreateActionUseCase);
@@ -87,12 +105,8 @@ class SendSchedulingListening {
   }
 
   async addListening() {
-    const { start_timestamp, end_timestamp, is_stop, scheduling_id } = this.job;
+    const { start_timestamp, end_timestamp, is_stop } = this.job;
 
-    if (this.isPut) {
-      console.log('Recebido uma atualização de agendamento...');
-      schedule.cancelJob(scheduling_id);
-    }
     // Enviar para iniciar o agendamento
     if (is_stop) {
       this.configJob(end_timestamp!!, this.stopJob, 'stop');

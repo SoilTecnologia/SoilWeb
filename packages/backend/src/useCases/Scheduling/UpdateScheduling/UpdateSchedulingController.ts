@@ -6,6 +6,8 @@ import { UpdateSchedulingUseCase } from './UpdateSchedulingUseCase';
 
 class UpdateSchedulingController {
   async handle(req: Request, res: Response, next: NextFunction) {
+    console.log('EM update scheduling');
+
     const {
       scheduling_id,
       pivot_id,

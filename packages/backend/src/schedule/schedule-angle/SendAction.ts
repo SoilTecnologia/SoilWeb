@@ -13,6 +13,7 @@ import {
   JobSchedulingAngleModel
 } from '../protocols';
 import { GetStateVariableUseCase } from '../../useCases/StateVariable/GetStateVariable/GetStateVariableUseCase';
+import { dateSaoPaulo } from '../../utils/convertTimeZoneDate';
 
 class SendSchedulingAngle {
   private job: SchedulingAngleModel;
@@ -59,7 +60,9 @@ class SendSchedulingAngle {
     try {
       const stateRepository = container.resolve(GetStateVariableUseCase);
       const actualState = await stateRepository.execute(job.pivot_id);
-
+      console.log(
+        `Iniciando ação agendada as: ${dateSaoPaulo(job.start_timestamp!)}`
+      );
       // Checa se o angulo atual é diferente do angulo start_angulo,
       // se for primeiro temos que retornar o pivo para start angulo,
       // para só então iniciar o agendamento...

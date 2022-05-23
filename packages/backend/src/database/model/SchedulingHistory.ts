@@ -3,9 +3,13 @@ import { StateModel } from './State';
 class SchedulingHistoryModel {
   scheduling_history_id: string;
 
+  scheduling_id?: string;
+
   pivot_id: string;
 
   author: string;
+
+  updated?: string;
 
   is_stop: boolean;
 

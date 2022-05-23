@@ -3,16 +3,35 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
 import { ISchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/ISchedulingAngleRepository';
-import { dateLocal } from '../../../utils/convertTimeZoneDate';
+import { ISchedulingAngleHistRepository } from '../../../database/repositories/SchedulingAngleHist/ISchedulingAngleHistRepository';
+import { dateLocal, dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class UpdateSchedulingAngleUseCase {
   constructor(
     @inject('SchedulingAngleRepository')
-    private schedulingAngleRepository: ISchedulingAngleRepository
+    private schedulingAngleRepository: ISchedulingAngleRepository,
+    @inject('SchedulingAngleRepository')
+    private schedulingAngleHistory: ISchedulingAngleHistRepository
   ) {}
 
+  private async applyQueryCreateHistory(scheduling: SchedulingAngleModel) {
+    try {
+      return await this.schedulingAngleHistory.create({
+        ...scheduling,
+        updated: scheduling.scheduling_angle_id
+      });
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdateSchedulingAngleUseCase.name,
+        'CreateHistory'
+      );
+    }
+  }
   async execute(
     scheduling_angle: SchedulingAngleModel,
     update_timestamp: Date
@@ -23,7 +42,7 @@ class UpdateSchedulingAngleUseCase {
 
     if (getSchedulingAngle) {
       const startDate = dayjs(getSchedulingAngle.timestamp);
-      const nowDate = dateLocal(update_timestamp); //Nuvem
+      const nowDate = dateSaoPaulo(update_timestamp); //Nuvem
 
       dayjs.extend(isSameOrAfter);
       const dateIsAfter = dayjs(nowDate).isSameOrAfter(startDate);
@@ -37,11 +56,12 @@ class UpdateSchedulingAngleUseCase {
       } else {
         const newSchedulingAngle = await this.schedulingAngleRepository.update({
           ...scheduling_angle,
-          start_timestamp: dateLocal(scheduling_angle.start_timestamp!),
-          timestamp: dateLocal(scheduling_angle.timestamp!)
+          start_timestamp: dateSaoPaulo(scheduling_angle.start_timestamp!),
+          timestamp: dateSaoPaulo(scheduling_angle.timestamp!)
         });
 
         if (newSchedulingAngle) {
+          await this.applyQueryCreateHistory(newSchedulingAngle);
           emitter.emit('scheduling-angle', {
             scheduling: newSchedulingAngle,
             isPut: true
