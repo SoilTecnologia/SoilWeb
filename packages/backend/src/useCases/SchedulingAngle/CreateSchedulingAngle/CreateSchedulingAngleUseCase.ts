@@ -1,17 +1,35 @@
 import dayjs from 'dayjs';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
+import { SchedulingAngleHistModel } from '../../../database/model/SchedulingAngleHist';
 import { SchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/SchedulingAngleRepository';
+import { ISchedulingAngleHistRepository } from '../../../database/repositories/SchedulingAngleHist/ISchedulingAngleHistRepository';
 import { dateLocal, dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class CreateSchedulingAngleUseCase {
   constructor(
     @inject('SchedulingAngleRepository')
-    private schedulingAngleRepository: SchedulingAngleRepository
+    private schedulingAngleRepository: SchedulingAngleRepository,
+    @inject('SchedulingAngleHistRepository')
+    private scheduleAngleHistory: ISchedulingAngleHistRepository
   ) {}
-
+  private async applyQueryCreateHistory(
+    scheduling: Omit<SchedulingAngleHistModel, 'scheduling_angle_hist_id'>
+  ) {
+    try {
+      return await this.scheduleAngleHistory.create(scheduling);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        CreateSchedulingAngleUseCase.name,
+        'Create angle history'
+      );
+    }
+  }
   async execute(
     schedulingangle: Omit<SchedulingAngleModel, 'scheduling_angle_id'>
   ) {
@@ -49,6 +67,14 @@ class CreateSchedulingAngleUseCase {
       schedulingAngleModel
     );
     if (newSchedulingAngleData) {
+      const schedule: Omit<
+        SchedulingAngleHistModel,
+        'scheduling_angle_hist_id'
+      > = {
+        ...newSchedulingAngleData
+      };
+      delete schedule.scheduling_angle_id;
+      await this.applyQueryCreateHistory(schedule);
       console.log('Agendamento por angulo criado no banco de dados....');
       emitter.emit('scheduling-angle', {
         scheduling: newSchedulingAngleData,

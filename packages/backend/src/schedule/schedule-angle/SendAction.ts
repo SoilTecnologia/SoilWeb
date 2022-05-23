@@ -14,6 +14,7 @@ import {
 } from '../protocols';
 import { GetStateVariableUseCase } from '../../useCases/StateVariable/GetStateVariable/GetStateVariableUseCase';
 import { dateSaoPaulo } from '../../utils/convertTimeZoneDate';
+import { dateRuleSchedule } from '../utils/dateUtils';
 
 class SendSchedulingAngle {
   private job: SchedulingAngleModel;
@@ -40,9 +41,10 @@ class SendSchedulingAngle {
 
   private configJob(date: Date, callback: CallbackProps) {
     try {
+      const rule = dateRuleSchedule(date);
       schedule.scheduleJob(
         this.job.scheduling_angle_id,
-        date,
+        rule,
         callback.bind(null, {
           job: this.job
         })
@@ -194,8 +196,7 @@ class SendSchedulingAngle {
   }
 
   async addListening() {
-    const { start_timestamp, scheduling_angle_id } = this.job;
-    if (this.isPut) SendSchedulingAngle.removeJob(scheduling_angle_id);
+    const { start_timestamp } = this.job;
     this.configJob(start_timestamp!!, this.sendJob);
   }
 }

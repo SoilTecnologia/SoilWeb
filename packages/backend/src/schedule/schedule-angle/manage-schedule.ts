@@ -8,6 +8,8 @@ import { dateLocal } from '../../utils/convertTimeZoneDate';
 import emitter from '../../utils/eventBus';
 import { messageErrorTryAction } from '../../utils/types';
 import { ScheduleAngleEmitter } from '../protocols/scheduleEmitterType';
+import { scheduleFactory } from '../protocols/scheduleFactory';
+import { checkDateGranted } from '../utils/dateUtils';
 import { SendSchedulingAngle } from './SendAction';
 
 class ManageScheduleAngle {
@@ -27,6 +29,7 @@ class ManageScheduleAngle {
         job.scheduling.scheduling_angle_id ===
         schedulling_angle.scheduling_angle_id
     );
+    scheduleFactory.cancelJob(schedulling_angle.scheduling_angle_id);
   }
 
   async removeScheduleDb(scheduling_id: string) {
@@ -58,13 +61,11 @@ class ManageScheduleAngle {
       const schedulling = await getAllSchedulingAngle.execute();
       if (schedulling && schedulling.length > 0) {
         for (const job of schedulling) {
-          const dayNow = dayjs(Date.now());
-          dayjs.extend(isSameOrBefore);
-          const dateIsBefore = dayjs(job.start_timestamp).isSameOrBefore(
-            dayNow
-          );
-          if (dateIsBefore) this.removeScheduleDb(job.scheduling_angle_id);
-          else this.addJob({ scheduling: job, isPut: false });
+          const dateIsBefore = checkDateGranted(job.start_timestamp!);
+          if (dateIsBefore) {
+            console.log('Data de inicio do agendamento expirada...');
+            this.removeScheduleDb(job.scheduling_angle_id);
+          } else this.addJob({ scheduling: job, isPut: false });
         }
       }
     } catch (err) {
@@ -104,16 +105,11 @@ class ManageScheduleAngle {
     emitter.on(
       'scheduling-angle',
       async ({ scheduling, isPut }: ScheduleAngleEmitter) => {
-        const newScheduling: SchedulingAngleModel = {
-          ...scheduling,
-          start_timestamp: dateLocal(scheduling.start_timestamp!!),
-          timestamp: dateLocal(scheduling.timestamp!!)
-        };
         if (isPut) this.removeJob(scheduling);
 
         console.log(`Novo Agendamento Recebido... `);
-        this.addJob({ scheduling: newScheduling, isPut });
-        await this.enqueueOneJob({ scheduling: newScheduling, isPut });
+        this.addJob({ scheduling, isPut });
+        await this.enqueueOneJob({ scheduling, isPut });
       }
     );
   }

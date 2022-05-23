@@ -1,6 +1,8 @@
 class SchedulingAngleHistModel {
   scheduling_angle_hist_id: string;
 
+  scheduling_angle_id?: string;
+
   pivot_id: string;
 
   author: string;

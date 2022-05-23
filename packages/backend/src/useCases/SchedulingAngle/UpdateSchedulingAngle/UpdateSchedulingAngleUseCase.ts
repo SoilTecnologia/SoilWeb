@@ -2,9 +2,14 @@ import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
+import { SchedulingAngleHistModel } from '../../../database/model/SchedulingAngleHist';
 import { ISchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/ISchedulingAngleRepository';
 import { ISchedulingAngleHistRepository } from '../../../database/repositories/SchedulingAngleHist/ISchedulingAngleHistRepository';
-import { dateLocal, dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
+import {
+  dateIsAter,
+  dateLocal,
+  dateSaoPaulo
+} from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 
@@ -13,16 +18,39 @@ class UpdateSchedulingAngleUseCase {
   constructor(
     @inject('SchedulingAngleRepository')
     private schedulingAngleRepository: ISchedulingAngleRepository,
-    @inject('SchedulingAngleRepository')
-    private schedulingAngleHistory: ISchedulingAngleHistRepository
+    @inject('SchedulingAngleHistRepository')
+    private scheduleAngleHistory: ISchedulingAngleHistRepository
   ) {}
 
-  private async applyQueryCreateHistory(scheduling: SchedulingAngleModel) {
+  private async applyQueryCreateHistory(
+    scheduling: Omit<SchedulingAngleHistModel, 'scheduling_angle_hist_id'>
+  ) {
     try {
-      return await this.schedulingAngleHistory.create({
-        ...scheduling,
-        updated: scheduling.scheduling_angle_id
-      });
+      return await this.scheduleAngleHistory.create(scheduling);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdateSchedulingAngleUseCase.name,
+        'CreateHistory'
+      );
+    }
+  }
+  private async applyQueryFindAngleById(scheduling_id: string) {
+    try {
+      return await this.schedulingAngleRepository.findById(scheduling_id);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        UpdateSchedulingAngleUseCase.name,
+        'Find Schedule Angle By Id'
+      );
+    }
+  }
+  private async applyQueryUpdateSchedule(scheduling: SchedulingAngleModel) {
+    try {
+      return await this.schedulingAngleRepository.update(scheduling);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -36,32 +64,41 @@ class UpdateSchedulingAngleUseCase {
     scheduling_angle: SchedulingAngleModel,
     update_timestamp: Date
   ) {
-    const getSchedulingAngle = await this.schedulingAngleRepository.findById(
+    const getSchedulingAngle = await this.applyQueryFindAngleById(
       scheduling_angle.scheduling_angle_id
     );
 
     if (getSchedulingAngle) {
-      const startDate = dayjs(getSchedulingAngle.timestamp);
-      const nowDate = dateSaoPaulo(update_timestamp); //Nuvem
+      const dateIsRunning = dateIsAter(
+        getSchedulingAngle.start_timestamp!,
+        update_timestamp
+      );
 
-      dayjs.extend(isSameOrAfter);
-      const dateIsAfter = dayjs(nowDate).isSameOrAfter(startDate);
-
-      if (dateIsAfter) {
+      if (dateIsRunning) {
         console.log(
           'Não foi possivel atualizar o agendamento, pois ele já está em execução'
         );
         console.log('...');
         return 'scheduling is running';
       } else {
-        const newSchedulingAngle = await this.schedulingAngleRepository.update({
+        const newSchedulingAngle = await this.applyQueryUpdateSchedule({
           ...scheduling_angle,
           start_timestamp: dateSaoPaulo(scheduling_angle.start_timestamp!),
           timestamp: dateSaoPaulo(scheduling_angle.timestamp!)
         });
 
         if (newSchedulingAngle) {
-          await this.applyQueryCreateHistory(newSchedulingAngle);
+          const schedule: Omit<
+            SchedulingAngleHistModel,
+            'scheduling_angle_hist_id'
+          > = {
+            ...newSchedulingAngle
+          };
+          delete schedule.scheduling_angle_id;
+          await this.applyQueryCreateHistory({
+            ...schedule,
+            updated: newSchedulingAngle.scheduling_angle_id
+          });
           emitter.emit('scheduling-angle', {
             scheduling: newSchedulingAngle,
             isPut: true

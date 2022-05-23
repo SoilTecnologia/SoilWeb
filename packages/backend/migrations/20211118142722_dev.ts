@@ -260,6 +260,7 @@ export async function up(knex: Knex): Promise<void> {
       table.float('percentimeter');
       table.float('start_angle');
       table.float('end_angle');
+      table.dateTime('start_timestamp').notNullable();
       table.dateTime('timestamp').notNullable();
     })
     .createTable('pumps', (table) => {
