@@ -1,15 +1,9 @@
-import dayjs from 'dayjs';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
 import { SchedulingAngleHistModel } from '../../../database/model/SchedulingAngleHist';
 import { ISchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/ISchedulingAngleRepository';
 import { ISchedulingAngleHistRepository } from '../../../database/repositories/SchedulingAngleHist/ISchedulingAngleHistRepository';
-import {
-  dateIsAter,
-  dateLocal,
-  dateSaoPaulo
-} from '../../../utils/convertTimeZoneDate';
+import { dateIsAter, dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 
@@ -95,10 +89,12 @@ class UpdateSchedulingAngleUseCase {
             ...newSchedulingAngle
           };
           delete schedule.scheduling_angle_id;
+
           await this.applyQueryCreateHistory({
             ...schedule,
             updated: newSchedulingAngle.scheduling_angle_id
           });
+
           emitter.emit('scheduling-angle', {
             scheduling: newSchedulingAngle,
             isPut: true

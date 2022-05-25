@@ -1,9 +1,9 @@
-// Set the date to "2018-09-01T16:01:36.386Z"
 import { utcToZonedTime } from 'date-fns-tz';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+
 dayjs.extend(isSameOrAfter);
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -11,9 +11,6 @@ dayjs.extend(timezone);
 export const convertData = (date: Date) => {
   const timeZone = 'America/Sao_Paulo'; // Vamos ver que horas são Lá Embaixo
   const timeInBrisbane = utcToZonedTime(date, timeZone);
-
-  console.log(timeInBrisbane);
-
   return timeInBrisbane;
 };
 
@@ -45,7 +42,7 @@ const dateIsAter = (dateOne: Date, dateTwo: Date) => {
   console.log(`Data final: ${dateReceived}`);
   return dateIsBefore;
 };
-// export const dateLocal = (date: Date) => dayjs(date).toDate();
+
 const dateLocal = (date: Date) => dayjs(date).subtract(3, 'hour').toDate();
 
 export { dateIsAter, dateLocal, dateSaoPaulo, createDate };

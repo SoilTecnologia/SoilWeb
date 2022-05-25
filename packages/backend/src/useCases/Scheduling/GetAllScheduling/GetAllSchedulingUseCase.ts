@@ -8,6 +8,7 @@ class GetAllSchedulingUseCase {
     @inject('SchedulingRepository')
     private schedulingRepository: ISchedulingRepository
   ) {}
+
   private async applyQueryGetAllScheduling() {
     try {
       return await this.schedulingRepository.getAllSchedulings();
@@ -21,7 +22,8 @@ class GetAllSchedulingUseCase {
     }
   }
   async execute() {
-    return await this.applyQueryGetAllScheduling();
+    const allSchedulings = await this.applyQueryGetAllScheduling();
+    return allSchedulings;
   }
 }
 

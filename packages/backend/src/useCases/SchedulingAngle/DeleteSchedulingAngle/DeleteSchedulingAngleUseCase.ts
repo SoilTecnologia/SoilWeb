@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleModel } from '../../../database/model/SchedulingAngle';
 import { ISchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/ISchedulingAngleRepository';
+import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
 class DeleteSchedulingAngleUseCase {
@@ -9,15 +10,38 @@ class DeleteSchedulingAngleUseCase {
     private schedulingangleRepository: ISchedulingAngleRepository
   ) {}
 
+  async applyQueryFindAngle(id: string) {
+    try {
+      return await this.schedulingangleRepository.findById(id);
+    } catch (error) {
+      messageErrorTryAction(
+        error,
+        true,
+        DeleteSchedulingAngleUseCase.name,
+        'FindById'
+      );
+    }
+  }
+
+  async applyQueryDeleteAngle(id: string) {
+    try {
+      return await this.schedulingangleRepository.delete(id);
+    } catch (error) {
+      messageErrorTryAction(
+        error,
+        true,
+        DeleteSchedulingAngleUseCase.name,
+        'FindById'
+      );
+    }
+  }
   async execute(
     schedulingangle_id: SchedulingAngleModel['scheduling_angle_id']
   ) {
-    const schedulingangle = await this.schedulingangleRepository.findById(
-      schedulingangle_id
-    );
+    const schedulingangle = await this.applyQueryFindAngle(schedulingangle_id);
 
     if (schedulingangle) {
-      const schedulingangle = await this.schedulingangleRepository.delete(
+      const schedulingangle = await this.applyQueryDeleteAngle(
         schedulingangle_id
       );
 

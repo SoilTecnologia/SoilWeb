@@ -26,42 +26,15 @@ class CreateSchedulingHistoryUseCase {
     }
   }
 
-  async execute(schedulingHistory: Omit<SchedulingHistoryModel, 'scheduling_history_id'>) {
-    const {
-      is_stop,
-      pivot_id,
-      author,
-      power,
-      water,
-      direction,
-      percentimeter,
-      start_timestamp,
-      end_timestamp,
-      timestamp
-    } = schedulingHistory;
+  async execute(
+    schedulingHistory: Omit<SchedulingHistoryModel, 'scheduling_history_id'>
+  ) {
     const schedulingHistoryModel = new SchedulingHistoryModel();
+    Object.assign(schedulingHistoryModel, schedulingHistory);
 
-    const newStartTimeStamp = dayjs(start_timestamp).subtract(3, 'hour');
-    const newEndTimeStamp = dayjs(end_timestamp).subtract(3, 'hour');
-    const newTimeStamp = dayjs(timestamp).subtract(3, 'hour');
-
-    Object.assign(schedulingHistoryModel, {
-      pivot_id,
-      author,
-      is_stop,
-      power: is_stop ? false : power,
-      water: is_stop ? false : water,
-      direction: is_stop ? 'CLOCKWISE' : direction,
-      percentimeter: is_stop ? 0 : percentimeter,
-      start_timestamp: newStartTimeStamp,
-      end_timestamp: newEndTimeStamp,
-      timestamp: newTimeStamp
-    });
-
-    const newSchedulingHistory = await this.applyQueryCreate(schedulingHistoryModel);
-    if (newSchedulingHistory) {
-      emitter.emit('schedulingHistory', newSchedulingHistory);
-    }
+    const newSchedulingHistory = await this.applyQueryCreate(
+      schedulingHistoryModel
+    );
 
     return newSchedulingHistory;
   }

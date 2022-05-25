@@ -74,6 +74,7 @@ class CreateSchedulingUseCase {
     });
 
     const newScheduling = await this.applyQueryCreate(schedulingModel);
+
     if (newScheduling) {
       await this.applyQueryCreateHistory(schedulingModel);
       emitter.emit('scheduling', { scheduling: newScheduling, isPut: false });

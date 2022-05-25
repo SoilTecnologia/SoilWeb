@@ -16,6 +16,7 @@ class CreateSchedulingAngleUseCase {
     @inject('SchedulingAngleHistRepository')
     private scheduleAngleHistory: ISchedulingAngleHistRepository
   ) {}
+
   private async applyQueryCreateHistory(
     scheduling: Omit<SchedulingAngleHistModel, 'scheduling_angle_hist_id'>
   ) {
@@ -30,6 +31,20 @@ class CreateSchedulingAngleUseCase {
       );
     }
   }
+
+  private async applyQueryCreateAngle(schedulingAngle: SchedulingAngleModel) {
+    try {
+      return await this.schedulingAngleRepository.create(schedulingAngle);
+    } catch (error) {
+      messageErrorTryAction(
+        error,
+        false,
+        CreateSchedulingAngleUseCase.name,
+        'Create Scheduling'
+      );
+    }
+  }
+
   async execute(
     schedulingangle: Omit<SchedulingAngleModel, 'scheduling_angle_id'>
   ) {
@@ -57,15 +72,16 @@ class CreateSchedulingAngleUseCase {
       water: is_return ? false : water,
       direction,
       percentimeter: is_return ? 100 : percentimeter,
-      start_angle: is_return ? 0 : start_angle,
-      end_angle: is_return ? 0 : end_angle,
+      start_angle,
+      end_angle,
       start_timestamp: dateSaoPaulo(start_timestamp!),
       timestamp: dateSaoPaulo(timestamp!)
     });
 
-    const newSchedulingAngleData = await this.schedulingAngleRepository.create(
+    const newSchedulingAngleData = await this.applyQueryCreateAngle(
       schedulingAngleModel
     );
+
     if (newSchedulingAngleData) {
       const schedule: Omit<
         SchedulingAngleHistModel,
@@ -73,14 +89,17 @@ class CreateSchedulingAngleUseCase {
       > = {
         ...newSchedulingAngleData
       };
+
       delete schedule.scheduling_angle_id;
       await this.applyQueryCreateHistory(schedule);
+
       console.log('Agendamento por angulo criado no banco de dados....');
       emitter.emit('scheduling-angle', {
         scheduling: newSchedulingAngleData,
         isPut: false
       });
     }
+
     return newSchedulingAngleData;
   }
 }
