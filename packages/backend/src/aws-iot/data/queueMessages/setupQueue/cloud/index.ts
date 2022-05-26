@@ -19,6 +19,7 @@ class SetupQueueCloud {
       emitter.off('connection-pivot', () => {});
     });
     emitter.on('action', async (action: ActionReceived) => {
+      console.log(action);
       const id = action.payload.pivot_id;
       const { node_num } = await handleResultString(id);
 
@@ -38,7 +39,7 @@ class SetupQueueCloud {
           attempts: 1
         });
         console.log(`[EC2-IOT-ACTION] Adicionando mensagem à ser enviada`);
-        emitter.removeAllListeners('action');
+        emitter.off('action', () => {});
         this.processQueue.start();
       } else {
         const numId = action.node_num === 0 ? action.node_num : node_num;
@@ -50,7 +51,7 @@ class SetupQueueCloud {
           attempts: 1
         });
         this.processQueue.start();
-        emitter.removeAllListeners('action');
+        emitter.off('action', () => {});
       }
     });
   }

@@ -85,7 +85,7 @@ try {
         percentimeter
       });
       emitter.off('connection', () => {});
-      emitter.removeAllListeners('connection');
+
       // console.log(`socket de state: `, status);
     });
 
@@ -98,7 +98,6 @@ try {
         percentimeter
       });
       emitter.off('variable-change', () => {});
-      emitter.removeAllListeners('variable-change');
 
       // console.log(`socket de variavel: `, status);
     });
@@ -117,7 +116,6 @@ try {
       });
 
       emitter.off('action-received-ack', () => {});
-      emitter.removeAllListeners('action-received-ack');
     });
 
     emitter.on('action-ack-not-received', async (action) => {
@@ -133,7 +131,6 @@ try {
         farm_name
       });
       emitter.off('action-ack-not-received', () => {});
-      emitter.removeAllListeners('action-ack-not-received');
     });
   });
 } catch (err) {
@@ -142,7 +139,7 @@ try {
 }
 
 // raspberry.start();
-// export const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
+// export const iotDevice = new IoTDevice('Raspberry', 0, 'agrishow_0');
 export const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
 InitScheduleData.start();
