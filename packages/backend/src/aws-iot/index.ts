@@ -49,7 +49,7 @@ class IoTDevice {
     if (type === 'Raspberry' && topic) {
       this.subTopic = topic;
       this.pubTopic = `cloudHenrique`;
-      this.clientId = topic;
+      this.clientId = `${topic}-${userLocal}`;
     } else {
       this.subTopic = 'cloudHenrique';
       this.clientId = clientIdCloud.newDev;
@@ -157,9 +157,11 @@ class IoTDevice {
 
       console.log(`Recebido ack ${JSON.stringify(json, null, 2)}`);
 
-      type === 'status'
-        ? checkGprsInterval.addResponseStatus(json.id)
-        : emitterResponse.addActionStatus(json.id);
+      if (type === 'status' && this.type === 'Cloud') {
+        checkGprsInterval.addResponseStatus(json.id);
+      } else if (type === 'action') {
+        emitterResponse.addActionStatus(json.id);
+      }
 
       if (this.type === 'Cloud') {
         if (json.type === 'status') {

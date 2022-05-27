@@ -34,7 +34,7 @@ app.use(express.json());
 app.use(router);
 
 httpServer.listen(PORT, () => {
-  console.info(`Server Listening on PORT ${PORT}`);
+  console.info(`Server Listening on PORT ${PORT} `);
 });
 
 class SocketIoConnect {
@@ -138,8 +138,8 @@ try {
   console.log(err.message);
 }
 
-// raspberry.start();
-// export const iotDevice = new IoTDevice('Raspberry', 0, 'agrishow_0');
-export const iotDevice = new IoTDevice('Cloud', 0);
+raspberry.start();
+export const iotDevice = new IoTDevice('Raspberry', 0, 'agrishow_0');
+// export const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
 InitScheduleData.start();

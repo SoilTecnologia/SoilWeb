@@ -8,7 +8,7 @@ class EmitterResponse {
   public responseAction: responseActive[];
 
   constructor() {
-    this.responseAction = [{} as responseActive];
+    this.responseAction = [];
   }
 
   public addActionStatus(pivot_id: string) {

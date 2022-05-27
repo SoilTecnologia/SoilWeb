@@ -26,7 +26,7 @@
   },
   "scripts": {
     "play": "ts-node src/index.ts",
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon src/index.ts --poll",
     "test": "jest"
   },
   "prisma": {

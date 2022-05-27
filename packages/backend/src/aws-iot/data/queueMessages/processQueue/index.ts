@@ -5,6 +5,7 @@ import { checkGprsInterval } from '../../gprsChecking';
 import { emitterResponse } from '../../gprsChecking/emitterResponse';
 
 type typeProject = 'Raspberry' | 'Cloud';
+
 class ProcessQueueMessages {
   private type: typeProject;
   private pubTopic: string | undefined;
@@ -35,11 +36,12 @@ class ProcessQueueMessages {
                 ? this.pubTopic
                 : queue.id;
             queueMessage.remove(queue);
+
             iotDevice.publish(queue, raspOrCloud);
             setTimeout(async () => {
-              if (queue.type === 'status') {
+              if (queue.type === 'status' && this.type === 'Cloud') {
                 await checkGprsInterval.checkResponseActive(queue.id);
-              } else {
+              } else if (queue.type === 'action') {
                 await emitterResponse.start(queue.id);
               }
             }, 5000);

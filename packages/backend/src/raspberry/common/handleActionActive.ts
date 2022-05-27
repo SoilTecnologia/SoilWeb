@@ -94,6 +94,7 @@ class HandleActionActive {
     // Verificar se está deletando essa ação do array
     // Se não estiver procurar uma solução para isso
     this.activeQueue.remove(active);
+    this.activeQueue.dequeue();
     await checkPool();
   };
 

@@ -1,6 +1,6 @@
 FROM node:16.15.0
 
-WORKDIR /usr/soil/frontend
+WORKDIR /etc/soil/frontend
 
 
 COPY package.json .
