@@ -27,7 +27,7 @@ export const handleResultAction = async (id: string) => {
   return { user_id, farm_name, pivot_num };
 };
 
-export const handleResultString = async (id: string) => {
+export const handleResultString = (id: string) => {
   const arrayId = id.split('_');
 
   const newFarmId = arrayId.length > 2 ? handleArray(arrayId) : arrayId;

@@ -7,6 +7,7 @@ import { IActionRepository } from '../../../database/repositories/Action/IAction
 import { INodesRepository } from '../../../database/repositories/Nodes/INodesRepository';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
+import { dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 
@@ -90,7 +91,9 @@ class CreateActionUseCase {
     angle?: StateVariableModel['angle'],
     end_angle?: StateVariableModel['angle']
   ) {
-    const newTimestamp = timestamp || new Date();
+    const newTimestamp = timestamp
+      ? dateSaoPaulo(timestamp)
+      : dateSaoPaulo(new Date());
     const userAlreadyExists = await this.applyQueryGetUserById(action.author);
 
     if (!userAlreadyExists) {

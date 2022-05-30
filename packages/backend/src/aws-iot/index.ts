@@ -1,15 +1,16 @@
 import { iot, mqtt } from 'aws-iot-device-sdk-v2';
 import { TextDecoder } from 'util';
+import { handleResultString } from '../utils/handleFarmIdWithUndescores';
 import MessageQueue from '../utils/message_queue';
 import { messageErrorTryAction } from '../utils/types';
 import {
-  checkGprsInterval,
-  emitterResponse,
   HandleCloudMessageTypeRaspberry,
   HandleCloudMessageTypeCloud
 } from './data';
-import { SetupQueueCloud } from './data/queueMessages/setupQueue/cloud';
-import { SetupQueueRaspberry } from './data/queueMessages/setupQueue/raspberry';
+import { SetupQueueCloud } from './data/Cloud/setupQueue';
+import { SetupQueueRaspberry } from './data/Raspberry/setupQueue';
+import { checkGprsInterval } from './data/utils/gprsChecking';
+import { emitterResponse } from './data/utils/gprsChecking/emitterResponse';
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
 Com ela, conseguimos fazer o envio de mensagens para o broker aws-iot-core, e, dependendo de como 
@@ -39,7 +40,7 @@ class IoTDevice {
     this.qos = qos;
     this.queue = new MessageQueue();
 
-    const userLocal = 'Henrique';
+    const userLocal = 'Henriques123';
     const clientIdCloud = {
       newDev: 'cloudNewDev2022',
       newProd: 'cloudNewProd2022',
@@ -52,35 +53,35 @@ class IoTDevice {
       this.clientId = `${topic}-${userLocal}`;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = clientIdCloud.newDev;
+      this.clientId = clientIdCloud.pcLocal;
     }
   }
   /*
   Nessa função fazemos a inicialização da conexão usando a biblioteca aws-iot-device-sdk-v2.
   */
   async start() {
-    const certPath = './src/aws-iot/device.pem.crt';
-    const keyPath = './src/aws-iot/private.pem.key';
+    const certPath = './src/aws-iot/keys/device.pem.crt';
+    const keyPath = './src/aws-iot/keys/private.pem.key';
     const endpoint = 'a19mijesri84u2-ats.iot.us-east-1.amazonaws.com';
 
     try {
       let configBuilder: iot.AwsIotMqttConnectionConfigBuilder;
       configBuilder =
-        await iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(
+         iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(
           certPath,
           keyPath
         );
 
-      await configBuilder.with_clean_session(false);
-      await configBuilder.with_client_id(this.clientId);
-      await configBuilder.with_endpoint(endpoint);
+       configBuilder.with_clean_session(false);
+       configBuilder.with_client_id(this.clientId);
+       configBuilder.with_endpoint(endpoint);
       // configBuilder.with_keep_alive_seconds(10);
       // configBuilder.with_ping_timeout_ms(1000);
 
-      const config = await configBuilder.build();
+      const config = configBuilder.build();
       const client = new mqtt.MqttClient();
 
-      this.connection = await client.new_connection(config);
+      this.connection =  client.new_connection(config);
 
       /*
       Aqui fazemos a conexão com o broker e o subscribe de um tópico dependendo do tipo de dispositivo.
@@ -163,15 +164,18 @@ class IoTDevice {
         emitterResponse.addActionStatus(json.id);
       }
 
+      const { farm_id, node_num } = handleResultString(id);
+      const pivotId =
+        node_num === '0' && pivot_num ? `${farm_id}_${pivot_num}` : id;
       if (this.type === 'Cloud') {
         if (json.type === 'status') {
           const result = await HandleCloudMessageTypeCloud.receivedStatus({
-            pivot_id: id,
+            pivot_id: pivotId,
             payload
           });
 
           if (result) {
-            this.publish(json, id);
+            this.publish(json, pivotId);
             console.log(
               `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
             );

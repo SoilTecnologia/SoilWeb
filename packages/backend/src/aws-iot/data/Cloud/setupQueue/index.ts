@@ -1,9 +1,9 @@
-import { queueMessage } from '../..';
-import { objectToActionString } from '../../../../../raspberry/common/objectToActionString';
-import emitter from '../../../../../utils/eventBus';
-import { handleResultString } from '../../../../../utils/handleFarmIdWithUndescores';
-import { ActionReceived } from '../../../../protocols';
-import { ProcessQueueMessages } from '../../processQueue';
+import { objectToActionString } from '../../../../raspberry/common/objectToActionString';
+import emitter from '../../../../utils/eventBus';
+import { handleResultString } from '../../../../utils/handleFarmIdWithUndescores';
+import { ActionReceived } from '../../../protocols';
+import { ProcessQueueMessages } from '../../utils/processQueue';
+import { queueMessage } from '../../utils/QueueFactory';
 
 class SetupQueueCloud {
   private processQueue: ProcessQueueMessages;

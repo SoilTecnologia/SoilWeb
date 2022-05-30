@@ -1,8 +1,8 @@
-import { queueMessage } from '..';
+import { queueMessage } from '../QueueFactory';
 import { iotDevice } from '../../../..';
 import emitter from '../../../../utils/eventBus';
-import { checkGprsInterval } from '../../gprsChecking';
-import { emitterResponse } from '../../gprsChecking/emitterResponse';
+import { checkGprsInterval } from '../gprsChecking';
+import { emitterResponse } from '../gprsChecking/emitterResponse';
 
 type typeProject = 'Raspberry' | 'Cloud';
 

@@ -3,7 +3,7 @@ import { GetPivotByIdUseCase } from '../../../../useCases/Pivots/GetById/GetById
 import { handleResultString } from '../../../../utils/handleFarmIdWithUndescores';
 import MessageQueue from '../../../../utils/message_queue';
 import { messageErrorTryAction } from '../../../../utils/types';
-import { socketIo } from '../../../socketIo';
+import { socketIo } from '../../../../utils/socketIo';
 import { handleGateway } from './gateway';
 import { handleGprs } from './gprs';
 

@@ -1,7 +1,7 @@
 import { container } from 'tsyringe';
-import { PivotModel } from '../../../../database/model/Pivot';
-import { GetOneNodeUseCase } from '../../../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
-import { FindAllUseCase } from '../../../../useCases/Pivots/FindAll/FindAllUseCase';
+import { PivotModel } from '../../../../../database/model/Pivot';
+import { GetOneNodeUseCase } from '../../../../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
+import { FindAllUseCase } from '../../../../../useCases/Pivots/FindAll/FindAllUseCase';
 
 const filterPivotsGateway = async (
   pivots: PivotModel[]

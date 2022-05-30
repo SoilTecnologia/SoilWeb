@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:16.15.0
 
 RUN mkdir -p /usr/soil/backend
 

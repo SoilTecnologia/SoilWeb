@@ -1,6 +1,6 @@
-import { queueMessage } from '../..';
-import emitter from '../../../../../utils/eventBus';
-import { ProcessQueueMessages } from '../../processQueue';
+import emitter from '../../../../utils/eventBus';
+import { ProcessQueueMessages } from '../../utils/processQueue';
+import { queueMessage } from '../../utils/QueueFactory';
 
 class SetupQueueRaspberry {
   private processQueue: ProcessQueueMessages;

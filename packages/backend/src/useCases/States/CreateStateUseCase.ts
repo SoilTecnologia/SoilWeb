@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { StateModel } from '../../database/model/State';
 import { IStateRepository } from '../../database/repositories/States/IState';
+import { dateSaoPaulo } from '../../utils/convertTimeZoneDate';
 import emitter from '../../utils/eventBus';
 import { messageErrorTryAction } from '../../utils/types';
 
@@ -27,7 +28,7 @@ class CreateStateUseCase {
     const stateModel = new StateModel();
     Object.assign(stateModel, {
       ...newState,
-      timestamp: new Date()
+      timestamp: dateSaoPaulo(new Date())
     });
 
     const action = await this.applyQueryCreateState(stateModel);

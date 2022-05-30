@@ -25,8 +25,8 @@ interface IStateRepository {
 
   getHistoryCycle(
     pivot_id: StateModel['pivot_id'],
-    start: string,
-    end: string
+    start: string  | Date ,
+    end: string  | Date
   ): Promise<any[]>;
 }
 

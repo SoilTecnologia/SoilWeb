@@ -3,8 +3,11 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
 
 dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -43,6 +46,17 @@ const dateIsAter = (dateOne: Date, dateTwo: Date) => {
   return dateIsBefore;
 };
 
+const dateIsBefore = (dateOne: Date, dateTwo: Date) => {
+  const dateNow = dayjs(dateOne).tz('America/Sao_Paulo');
+  const dateReceived = dayjs(dateTwo)
+    .tz('America/Sao_Paulo')
+    .subtract(3, 'hour');
+  const dateIsBefore = dayjs(dateReceived).isSameOrBefore(dateNow);
+  console.log(`Data inicio: ${dateNow}`);
+  console.log(`Data final: ${dateReceived}`);
+  return dateIsBefore;
+};
+
 const dateLocal = (date: Date) => dayjs(date).subtract(3, 'hour').toDate();
 
-export { dateIsAter, dateLocal, dateSaoPaulo, createDate };
+export { dateIsAter,dateIsBefore, dateLocal, dateSaoPaulo, createDate };

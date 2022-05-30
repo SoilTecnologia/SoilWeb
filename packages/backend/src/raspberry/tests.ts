@@ -12,6 +12,7 @@ import { GetOneNodeUseCase } from '../useCases/Nodes/GetOneNode/GetOneNodeUseCas
 import { FindAllUseCase } from '../useCases/Pivots/FindAll/FindAllUseCase';
 import emitter from '../utils/eventBus';
 import GenericQueue from '../utils/generic_queue';
+import { messageErrorTryAction } from '../utils/types';
 import { CheckStatusRadio } from './common/checkStatusRadio';
 import { HandleActionActive } from './common/handleActionActive';
 import { payloadToString } from './common/payloadToString';
@@ -58,8 +59,17 @@ const filterActionGateway = async (actions: ActionsResult[]) => {
   const getNode = container.resolve(GetOneNodeUseCase);
   const allActions: ActionsResult[] = [];
   for (const action of actions) {
-    const node = await getNode.execute(action.node_id!!);
-    if (node?.node_num === 0) allActions.push(action);
+    try {
+      const node = await getNode.execute(action.node_id!!);
+      if (node?.node_num === 0) allActions.push(action);
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        false,
+        'filterActionGateway',
+        'Filter actions'
+      );
+    }
   }
 
   return allActions;

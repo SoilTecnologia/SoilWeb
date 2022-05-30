@@ -138,8 +138,8 @@ try {
   console.log(err.message);
 }
 
-raspberry.start();
-export const iotDevice = new IoTDevice('Raspberry', 0, 'agrishow_0');
-// export const iotDevice = new IoTDevice('Cloud', 0);
+// raspberry.start();
+// export const iotDevice = new IoTDevice('Raspberry', 0, 'agrishow_0');
+export const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
 InitScheduleData.start();

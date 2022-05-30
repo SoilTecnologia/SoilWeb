@@ -1,9 +1,18 @@
+import dayjs from 'dayjs';
 import { inject, injectable } from 'tsyringe';
 import { StateModel } from '../../../database/model/State';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
-import { createDate } from '../../../utils/convertTimeZoneDate';
+import { createDate, dateIsAter, dateIsBefore, dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+
+
+dayjs.extend(isSameOrAfter);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type PartialCycleResponse = {
   start_date: string;
@@ -60,8 +69,8 @@ class GetCyclesUseCase {
 
   private async applyQueryGetStoryCycle(
     pivot_id: string,
-    start: string,
-    end: string
+    start : string | Date,
+    end: string | Date
   ) {
     try {
       return await this.stateRepository.getHistoryCycle(pivot_id, start, end);
@@ -75,9 +84,24 @@ class GetCyclesUseCase {
     }
   }
 
+  handleDate(date: string, hour:number){
+    const [day,month,year] = date.split('-')
+    const ha = dayjs(`${year}-${month}-${day}`)
+    .tz('America/Sao_Paulo').add(1,"day")
+    .second(0).hour(hour).minute(0).subtract(3, "hour")
+    return ha.toDate()
+  }
+
   async execute(pivot_id: StateModel['pivot_id'], start: string, end: string) {
     // Get all status from a pivot and order it by last to more recent
-    const states = await this.applyQueryGetStoryCycle(pivot_id, start, end);
+    const startDate = this.handleDate(start,0)
+    const endDate = this.handleDate(end,24)
+
+    const states = await this.applyQueryGetStoryCycle(pivot_id, startDate, endDate);
+    console.log("...")
+    console.log(states)
+    console.log("...")
+
     /* 
     This will loop over all the states,
     once it finds a state with power = true,
@@ -85,78 +109,86 @@ class GetCyclesUseCase {
     and will add the state to the cycle,
     until it finds a state with power = false
   */
-
-    for (let state of states!!) {
+    if(!states || states.length <= 0) {
+      console.log("===============")
+      console.log("Não exitem alterações de estado nesse periodo.")
+      console.log("===============")
+      return []
+    }
+    else{
+      for (let state of states!!) {
+        if (this.foundStart) {
+          if (state.power === false) {
+            this.currentCycle!.is_running = false;
+            this.currentCycle!.end_date = createDate(state.timestamp);
+            this.currentCycle!.states.push({
+              power: state.power,
+              water: state.water,
+              direction: state.direction,
+              timestamp: createDate(state.timestamp),
+              connection: state.connection
+            });
+  
+            this.response.push(this.currentCycle!);
+            this.foundStart = false;
+            this.currentCycle = {
+              states: [],
+              percentimeters: []
+            } as unknown as PartialCycleResponse;
+          } else {
+            this.currentCycle!.states.push({
+              power: state.power,
+              water: state.water,
+              direction: state.direction,
+              timestamp: createDate(state.timestamp),
+              connection: state.connection
+            });
+          }
+        } 
+        else {
+          if (state.power) {
+            this.foundStart = true;
+            this.currentCycle!.start_date = createDate(state.timestamp);
+            this.currentCycle!.is_running = true;
+            this.currentCycle!.start_state = {
+              power: state.power,
+              water: state.water,
+              direction: state.direction
+            };
+            this.currentCycle!.states.push({
+              power: state.power,
+              water: state.water,
+              direction: state.direction,
+              timestamp: createDate(state.timestamp),
+              connection: state.connection
+            });
+          }
+        }
+  
+        const variables = await this.applyQueryGetVariableGroupBt(state.state_id);
+  
+        if (!variables) throw new Error('Does Not Find Variables');
+  
+        for (let variable of variables) {
+          if (variable)
+            this.currentCycle!.percentimeters.push({
+              value: variable.percentimeter!,
+              timestamp: createDate(variable.timestamp!)
+            });
+        }
+      }
+  
+      // If there's one that started but hasn't ended, make sure to send it too
+      // if(this.currentCycle.states.length > 0 || this.currentCycle.percentimeters.length > 0) {
+  
       if (this.foundStart) {
-        if (state.power === false) {
-          this.currentCycle!.is_running = false;
-          this.currentCycle!.end_date = createDate(state.timestamp);
-          this.currentCycle!.states.push({
-            power: state.power,
-            water: state.water,
-            direction: state.direction,
-            timestamp: createDate(state.timestamp),
-            connection: state.connection
-          });
-
-          this.response.push(this.currentCycle!);
-          this.foundStart = false;
-          this.currentCycle = {
-            states: [],
-            percentimeters: []
-          } as unknown as PartialCycleResponse;
-        } else {
-          this.currentCycle!.states.push({
-            power: state.power,
-            water: state.water,
-            direction: state.direction,
-            timestamp: createDate(state.timestamp),
-            connection: state.connection
-          });
-        }
-      } else {
-        if (state.power) {
-          this.foundStart = true;
-          this.currentCycle!.start_date = createDate(state.timestamp);
-          this.currentCycle!.is_running = true;
-          this.currentCycle!.start_state = {
-            power: state.power,
-            water: state.water,
-            direction: state.direction
-          };
-          this.currentCycle!.states.push({
-            power: state.power,
-            water: state.water,
-            direction: state.direction,
-            timestamp: createDate(state.timestamp),
-            connection: state.connection
-          });
-        }
+        this.response.push(this.currentCycle);
       }
-
-      const variables = await this.applyQueryGetVariableGroupBt(state.state_id);
-
-      if (!variables) throw new Error('Does Not Find Variables');
-
-      for (let variable of variables) {
-        if (variable)
-          this.currentCycle!.percentimeters.push({
-            value: variable.percentimeter!,
-            timestamp: createDate(variable.timestamp!)
-          });
-      }
+      // }
+  
+      // Return the reverse so that most recent cycles are shown
+      return this.response.reverse();
     }
-
-    // If there's one that started but hasn't ended, make sure to send it too
-    // if(this.currentCycle.states.length > 0 || this.currentCycle.percentimeters.length > 0) {
-
-    if (this.foundStart) {
-      this.response.push(this.currentCycle);
-    }
-    // }
-
-    // Return the reverse so that most recent cycles are shown
-    return this.response.reverse();
   }
 }
 

@@ -67,8 +67,8 @@ class StatesRepository implements IStateRepository {
 
   async getHistoryCycle(
     pivot_id: string,
-    start: string,
-    end: string
+    start: string  | Date,
+    end: string  | Date
   ): Promise<any[]> {
     return await knex<StateModel>('states')
       .select(
@@ -80,8 +80,8 @@ class StatesRepository implements IStateRepository {
         'connection'
       )
       .where('pivot_id', pivot_id)
-      .where('timestamp', '>=', `${start}T00:00:00`)
-      .where('timestamp', '<=', `${end}T23:59:59Z`)
+      .where('timestamp', '>=',  start)
+      .where('timestamp', '<=', end)
       .orderBy('timestamp', 'asc');
   }
 }

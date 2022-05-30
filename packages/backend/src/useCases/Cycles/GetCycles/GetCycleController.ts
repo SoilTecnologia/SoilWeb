@@ -7,6 +7,7 @@ class GetCycleController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const { pivot_id, start, end } = req.params;
 
+
     const getCyclesUseCase = container.resolve(GetCyclesUseCase);
 
     try {

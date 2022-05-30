@@ -404,9 +404,7 @@ export const requestPivotHistoric = async (
 ) => {
   console.log(pivot_id, start_date, end_date);
   return await api
-    .get(`cycles/${pivot_id}/${start_date}/${end_date}`, {
-      headers: { Authorization: tokenId ? tokenId : token },
-    })
+    .get(`cycles/${pivot_id}/${start_date}/${end_date}`, tokenHeader(tokenId))
     .then((response) => response.data)
     .catch((err) => {
       console.log("[ERROR] Falha ao salvar pivos");

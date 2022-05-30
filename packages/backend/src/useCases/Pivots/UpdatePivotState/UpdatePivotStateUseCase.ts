@@ -1,3 +1,4 @@
+import { timeStamp } from 'console';
 import { container, inject, injectable } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
 import { RadioVariableModel } from '../../../database/model/RadioVariable';
@@ -10,6 +11,7 @@ import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivots
 import { IRadioVariableRepository } from '../../../database/repositories/RadioVariables/IRadioVariableRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
+import { dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import {
   isRadioVariableDifferent,
@@ -172,7 +174,7 @@ class UpdatePivotStateUseCase {
         power: newState.power || false,
         water: newState.water,
         direction: newState.direction,
-        timestamp: new Date()
+        timestamp
       });
 
       console.log('STATE IS CREATED IN DATABASE');
@@ -204,7 +206,7 @@ class UpdatePivotStateUseCase {
             state_id: this.state.state_id,
             angle,
             percentimeter,
-            timestamp: new Date()
+            timestamp
           });
 
           if (stateVariable) {
@@ -233,7 +235,7 @@ class UpdatePivotStateUseCase {
           state_id: this.state!.state_id,
           father,
           rssi,
-          timestamp: new Date(timestamp)
+          timestamp
         });
 
         if (radioVariable) {
@@ -251,10 +253,14 @@ class UpdatePivotStateUseCase {
     direction: StateModel['direction'],
     angle: StateVariableModel['angle'],
     percentimeter: StateVariableModel['percentimeter'],
-    timestamp: Date,
+    newTimestamp: Date,
     father: RadioVariableModel['father'],
     rssi: RadioVariableModel['rssi']
   ) {
+    const timestamp = newTimestamp
+      ? dateSaoPaulo(newTimestamp)
+      : dateSaoPaulo(new Date());
+
     const oldState = await this.applyQueryGetStateByPivot(pivot_id);
     this.state = oldState;
 

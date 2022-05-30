@@ -1,4 +1,4 @@
-import emitter from '../../../../utils/eventBus';
+import emitter from '../../../../../utils/eventBus';
 
 interface responseActive {
   id: string;
