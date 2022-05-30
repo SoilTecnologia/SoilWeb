@@ -5,6 +5,6 @@ const localConnect = 'localhost';
 module.exports = {
   development: {
     client: 'postgresql',
-    connection: `postgresql://soil:soil2021@${dockerConnect}:5432/soildb`
+    connection: `postgresql://soil:soil2021@${localConnect}:5432/soildb`
   }
 };
