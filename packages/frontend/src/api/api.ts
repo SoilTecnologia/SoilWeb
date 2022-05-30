@@ -5,7 +5,7 @@ const prod = "https://api.soiltech.com.br/";
 const devWeb = "https://be.soiltech.com.br/";
 
 export const api = axios.create({
-  baseURL: devLocal,
+  baseURL: devWeb,
 });
 
 // api.interceptors.request.use((config) => {

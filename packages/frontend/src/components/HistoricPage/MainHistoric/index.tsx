@@ -113,7 +113,7 @@ const MainHistoric = () => {
 
           <MuiPickersUtilsProvider utils={DateFnsUtils} locale={pt}>
             <ThemeProvider theme={useStyles}>
-              <DatePicker
+               <DatePicker
                 value={endDate}
                 minDate={startDate}
                 maxDate={new Date()}
