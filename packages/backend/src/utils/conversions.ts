@@ -52,17 +52,22 @@ export const statusPayloadStringToObject = (payload: string) => {
     response.percentimeter = Number(percentimeter);
     response.angle = Number(angle);
     response.timestamp = new Date(Number(timestamp) * 1000);
-
     return response;
   }
   return null;
 };
 
+const handleAngle = (angle: number) => {
+  if (angle < 0) return 0;
+  else if (angle > 360) return 360;
+  else return angle;
+};
 export const objectToActionPayloadString = (
   power: ActionModel['power'],
   water: ActionModel['water'],
   direction: ActionModel['direction'],
-  percentimeter: ActionModel['percentimeter']
+  percentimeter: ActionModel['percentimeter'],
+  angle?: number
 ) => {
   let actionString = '';
   if (power) {
@@ -72,6 +77,11 @@ export const objectToActionPayloadString = (
     else actionString += '5';
     actionString += '1';
     actionString += percentimeter.toString().padStart(3, '0');
+    if (angle) {
+      const angleValid = handleAngle(angle);
+      actionString += '-';
+      actionString += angleValid;
+    }
   } else {
     return '002-000';
   }

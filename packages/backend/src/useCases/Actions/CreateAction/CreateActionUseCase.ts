@@ -1,6 +1,6 @@
 /* eslint-disable no-unneeded-ternary */
 import { inject, injectable } from 'tsyringe';
-// import { v4 as uuid } from 'uuid';
+import { StateVariableModel } from '../../../database/model/StateVariables';
 import { CreateAction } from '../../../database/model/types/action';
 import { UserModel } from '../../../database/model/User';
 import { IActionRepository } from '../../../database/repositories/Action/IActionRepository';
@@ -86,7 +86,9 @@ class CreateActionUseCase {
 
   async execute(
     action: Omit<CreateAction, 'timestamp_sent'>,
-    timestamp: CreateAction['timestamp_sent'] | null
+    timestamp: CreateAction['timestamp_sent'] | null,
+    angle?: StateVariableModel['angle'],
+    end_angle?: StateVariableModel['angle']
   ) {
     const newTimestamp = timestamp || new Date();
     const userAlreadyExists = await this.applyQueryGetUserById(action.author);
@@ -121,7 +123,7 @@ class CreateActionUseCase {
       .............`
     );
 
-    emitter.emit('action', {
+    const emitDataAction = {
       farm_id,
       is_gprs,
       node_num,
@@ -136,7 +138,14 @@ class CreateActionUseCase {
         percentimeter: action.percentimeter,
         timestamp: newTimestamp
       }
-    });
+    };
+
+    !angle
+      ? emitter.emit('action', emitDataAction)
+      : emitter.emit('action', {
+          ...emitDataAction,
+          angle: { start_angle: angle, end_angle }
+        });
   }
 }
 

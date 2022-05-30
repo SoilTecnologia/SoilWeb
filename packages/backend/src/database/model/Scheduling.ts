@@ -1,26 +1,27 @@
+import { StateModel } from './State';
+
 class SchedulingModel {
-   scheduling_id: string; 
+  scheduling_id: string;
 
-   pivot_id: string;
+  pivot_id: string;
 
-   power: boolean | null;
+  author: string;
 
-   water: boolean | null;
+  is_stop: boolean;
 
-   direction: 'CLOCKWISE' | 'ANTI_CLOCKWISE' | null;
+  power: boolean | null;
 
-   start_angle: number | null;
+  water: boolean;
 
-   end_angle: number | null;
+  direction: StateModel['direction'];
 
-   percentimeter: number | null;
+  percentimeter: number | null;
 
-   start_timestamp: Date | null;
+  start_timestamp: Date | null;
 
-   end_timestamp: Date | null;
+  end_timestamp: Date | null;
 
-   timestamp: Date | null;
-
+  timestamp: Date | null;
 }
 
-export {SchedulingModel}
+export { SchedulingModel };

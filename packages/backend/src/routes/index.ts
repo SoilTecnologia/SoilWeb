@@ -6,9 +6,13 @@ import cycleRoute from './cycles';
 import farmRoute from './farms';
 import nodeRoute from './nodes';
 import pivotRoute from './pivots';
-import schedulingRoute from './scheduling';
 import stateRoute from './state';
 import userRoute from './users';
+import schedulingRoute from './scheduling';
+import schedulingangleRoute from './schedulingangle';
+import schedulinghistoryRoute from './schedulingHistory';
+import schedulinganglehistRoute from './schedulingangleHist';
+import pumpRoute from './pump';
 
 const router = express.Router();
 
@@ -41,7 +45,11 @@ router.use('/nodes', nodeRoute);
 router.use('/actions', actionRoute);
 router.use('/cycles', cycleRoute);
 router.use('/states', stateRoute);
-router.use('/scheduling', schedulingRoute);
+router.use('/schedulings', schedulingRoute);
+router.use('/scheduling-angles', schedulingangleRoute);
+router.use('/scheduling_historys', schedulinghistoryRoute);
+router.use('/scheduling_angle_hists', schedulinganglehistRoute);
+router.use('/pumps', pumpRoute);
 router.use('/api-status', (req, res, next) => {
   res.sendStatus(200);
 });

@@ -1,11 +1,14 @@
 import { RadioVariableModel } from '../database/model/RadioVariable';
 import { StateModel } from '../database/model/State';
 import { StateVariableModel } from '../database/model/StateVariables';
+import emitter from './eventBus';
 
 export type CustomState = Pick<
   StateModel,
   'connection' | 'power' | 'water' | 'direction'
 >;
+type CustomStateVariable = Pick<StateVariableModel, 'angle' | 'percentimeter'>;
+
 export const isStateDifferent = (
   oldState: CustomState,
   newState: CustomState
@@ -23,24 +26,53 @@ export const isStateDifferent = (
   return false;
 };
 
-type CustomStateVariable = Pick<StateVariableModel, 'angle' | 'percentimeter'>;
+const isPercentDiferent = (oldPercent: number, newPercent: number) => {
+  const arrayPercent = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
+  const subtractPercent = oldPercent - newPercent;
+  const percentAltered =
+    oldPercent !== newPercent &&
+    arrayPercent.some((num) => num === subtractPercent);
+
+  return percentAltered;
+};
+
 export const isStateVariableDifferent = (
   oldStateVariable: CustomStateVariable,
-  newStateVariable: CustomStateVariable
+  newStateVariable: CustomStateVariable,
+  pivot_id: string
 ): boolean => {
-  if (
-    oldStateVariable.angle! <= newStateVariable.angle! - 5 ||
-    oldStateVariable.angle! >= newStateVariable.angle! + 5 ||
-    oldStateVariable.percentimeter! <= newStateVariable.percentimeter! - 5 ||
-    oldStateVariable.percentimeter! >= newStateVariable.percentimeter! + 5
-  ) {
-    console.log('atualização de variavel');
-    console.log(oldStateVariable);
-    console.log(newStateVariable);
-    return true;
+  const oldAngle = oldStateVariable.angle;
+  const newAngle = newStateVariable.angle;
+
+  console.log('...');
+  if (oldStateVariable.angle !== newStateVariable.angle) {
+    console.log(
+      `Alteração de angulo em ${pivot_id}, antes: ${oldAngle}, novo: ${newAngle}`
+    );
+    emitter.emit(`angle-changed-${pivot_id}`, {
+      oldAngle,
+      newAngle,
+      pivot_id
+    });
   }
 
-  return false;
+  if (oldStateVariable.percentimeter !== newStateVariable.percentimeter) {
+    const oldPercent = oldStateVariable.percentimeter;
+    const newPercent = oldStateVariable.angle;
+    console.log(
+      `Estado de percentimetro alterado: antigo, ${oldPercent}, novo: ${newPercent}`
+    );
+    console.log('...');
+  }
+
+  const percentAltered = isPercentDiferent(
+    oldStateVariable.percentimeter!!,
+    newStateVariable.percentimeter!!
+  );
+
+  return (
+    oldStateVariable.angle! !== newStateVariable.angle! - 5 || percentAltered
+  );
 };
 
 type CustomRadioVariable = Pick<RadioVariableModel, 'father' | 'rssi'>;
@@ -48,12 +80,8 @@ export const isRadioVariableDifferent = (
   oldRadioVariable: CustomRadioVariable,
   newRadioVariable: CustomRadioVariable
 ): boolean => {
-  if (
+  return (
     oldRadioVariable.father !== newRadioVariable.father ||
     oldRadioVariable.rssi !== newRadioVariable.rssi
-  ) {
-    return true;
-  }
-
-  return false;
+  );
 };

@@ -1,4 +1,3 @@
-import { Socket } from 'socket.io';
 import { socketsIoConnect } from '../..';
 
 type ackReceived = { pivot_num: number; farm_name: string; user_id: string };

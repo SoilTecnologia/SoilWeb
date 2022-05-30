@@ -7,27 +7,27 @@ class CreateSchedulingController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const {
       pivot_id,
+      author,
+      is_stop,
       power,
       water,
       direction,
-      start_angle,
-      end_angle,
       percentimeter,
       start_timestamp,
       end_timestamp,
       timestamp
     } = req.body;
-
+    console.log(`Recebido: ${pivot_id}`);
     const createSchedulingUseCase = container.resolve(CreateSchedulingUseCase);
 
     try {
       const allScheduling = await createSchedulingUseCase.execute({
         pivot_id,
+        author,
+        is_stop,
         power,
         water,
         direction,
-        start_angle,
-        end_angle,
         percentimeter,
         start_timestamp,
         end_timestamp,
@@ -35,7 +35,6 @@ class CreateSchedulingController {
       });
 
       res.send(allScheduling);
-      console.log('seeend', allScheduling);
     } catch (err) {
       messageErrorTryAction(
         err,

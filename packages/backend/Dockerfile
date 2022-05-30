@@ -1,12 +1,12 @@
-FROM node:16.15.0
+FROM node:latest
+
+RUN mkdir -p /usr/soil/backend
 
 WORKDIR /usr/soil/backend
 
 COPY package.json .
 
-COPY .env ./
-
-COPY tsconfig.json ./
+COPY tsconfig.json .
 
 RUN yarn 
 

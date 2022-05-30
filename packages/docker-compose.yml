@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.8"
 
 services:
   soil_postgres:
@@ -12,7 +12,7 @@ services:
       - POSTGRES_PASSWORD=soil2021
       - POSTGRES_DB=soildb
     volumes:
-      - ./backend/scripts:/docker-entrypoint-initdb.d
+      - .\\backend\\scripts:/docker-entrypoint-initdb.d
 
   soil_backend:
     build: ./backend
@@ -26,24 +26,21 @@ services:
       - 9229:9229
     volumes:
       - ./backend:/usr/soil/backend
+
     links:
       - soil_postgres
     depends_on:
       - soil_postgres
 
-  soil_frontend:
-    build: ./frontend
-    container_name: soil_frontend
-    restart: always
-    ports:
-      - 3000:3000
-    volumes:
-      - ./frontend:/usr/soil/frontend
-    links:
-      - soil_backend
-    depends_on:
-      - soil_backend
-
-volumes:
-  pgdata:
-    driver: local
+  # soil_frontend:
+  #   build: ./frontend
+  #   container_name: soil_frontend
+  #   restart: always
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - .\frontend:\\etc\\soil\\frontend
+  #   links:
+  #     - soil_backend
+  #   depends_on:
+  #     - soil_backend

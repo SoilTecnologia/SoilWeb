@@ -7,6 +7,7 @@ this file is responsible for:
   - Setting up the event emitter to be used on other systems
 */
 import cors from 'cors';
+import dayjs from 'dayjs';
 import express from 'express';
 import { createServer } from 'http';
 import 'reflect-metadata';
@@ -15,6 +16,7 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import IoTDevice from './aws-iot';
 import * as raspberry from './raspberry/tests';
 import router from './routes';
+import { InitScheduleData } from './schedule';
 import './shared/container';
 import emitter from './utils/eventBus';
 import { handleResultAction } from './utils/handleFarmIdWithUndescores';
@@ -32,7 +34,7 @@ app.use(express.json());
 app.use(router);
 
 httpServer.listen(PORT, () => {
-  console.log(`Server Listening on PORT ${PORT} backend `);
+  console.info(`Server Listening on PORT ${PORT} `);
 });
 
 class SocketIoConnect {
@@ -47,6 +49,18 @@ export const socketsIoConnect = new SocketIoConnect();
 
 try {
   io.on('connection', (socket: Socket) => {
+    emitter.on('action-update', (action) => {
+      socket.emit(`action-response-${action.id}`, {
+        type: 'sucess'
+      });
+    });
+
+    emitter.on('action-not-update', (action) => {
+      socket.emit(`action-response-${action.id}`, {
+        type: 'fail'
+      });
+    });
+
     emitter.on('state-change', (status: any) => {
       const {
         user_id,
@@ -70,6 +84,7 @@ try {
         connection,
         percentimeter
       });
+      emitter.off('connection', () => {});
 
       // console.log(`socket de state: `, status);
     });
@@ -82,6 +97,7 @@ try {
         angle,
         percentimeter
       });
+      emitter.off('variable-change', () => {});
 
       // console.log(`socket de variavel: `, status);
     });
@@ -91,11 +107,15 @@ try {
         action.id
       );
 
-      socket.emit(`${user_id}-ackreceived`, {
-        type: 'ack',
+      socket.emit(`ack-response-${action.id}`, {
+        type: 'sucess',
+        user_id: user_id,
+        pivot_id: action.id,
         pivot_num,
         farm_name
       });
+
+      emitter.off('action-received-ack', () => {});
     });
 
     emitter.on('action-ack-not-received', async (action) => {
@@ -103,11 +123,14 @@ try {
         action.id
       );
 
-      socket.emit(`${user_id}-acknotreceived`, {
-        type: 'ack',
+      socket.emit(`ack-response-${action.id}`, {
+        user_id,
+        type: 'fail',
+        pivot_id: action.id,
         pivot_num,
         farm_name
       });
+      emitter.off('action-ack-not-received', () => {});
     });
   });
 } catch (err) {
@@ -115,7 +138,8 @@ try {
   console.log(err.message);
 }
 
-// raspberry.start();
-// const iotDevice = new IoTDevice('Raspberry', 0, 'araxa_0');
-const iotDevice = new IoTDevice('Cloud', 0);
+raspberry.start();
+export const iotDevice = new IoTDevice('Raspberry', 0, 'agrishow_0');
+// export const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
+InitScheduleData.start();
