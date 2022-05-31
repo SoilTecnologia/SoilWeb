@@ -68,11 +68,11 @@ class HandleActionActive {
     const action = await this.getUpdatePivotController.execute(
       active.action.pivot_id,
       true,
-      active.action.power,
-      active.action.water,
-      active.action.direction,
+      payload.power,
+      payload.water,
+      payload.direction,
       payload.angle,
-      active.action.percentimeter,
+      payload.percentimeter,
       payload.timestamp,
       '',
       null
