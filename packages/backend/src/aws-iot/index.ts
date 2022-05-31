@@ -53,7 +53,7 @@ class IoTDevice {
       this.clientId = `${topic}-${userLocal}`;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = clientIdCloud.pcLocal;
+      this.clientId = clientIdCloud.newDev;
     }
   }
   /*
@@ -157,25 +157,27 @@ class IoTDevice {
       } = json;
 
       console.log(`Recebido ack ${JSON.stringify(json, null, 2)}`);
+      
+      const pivotId = payload.pivot_id || id
 
       if (type === 'status' && this.type === 'Cloud') {
-        checkGprsInterval.addResponseStatus(json.id);
+        checkGprsInterval.addResponseStatus(pivotId);
       } else if (type === 'action') {
-        emitterResponse.addActionStatus(json.id);
+        emitterResponse.addActionStatus(pivotId);
       }
-
-      const { farm_id, node_num } = handleResultString(id);
-      const pivotId =
-        node_num === '0' && pivot_num ? `${farm_id}_${pivot_num}` : id;
+      
+      const {node_num} = handleResultString(id)
       if (this.type === 'Cloud') {
         if (json.type === 'status') {
+          
           const result = await HandleCloudMessageTypeCloud.receivedStatus({
             pivot_id: pivotId,
-            payload
+            payload,
+            node_num
           });
 
           if (result) {
-            this.publish(json, pivotId);
+            this.publish(json, id);
             console.log(
               `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
             );

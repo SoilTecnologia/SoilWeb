@@ -4,6 +4,12 @@ import { useContextAuth } from "hooks/useLoginAuth";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
+const urlIo = {
+  newDev: "https://be.soiltech.com.br",
+  local: "https://localhost:3308",
+  newProd: "http://api.soiltech.com.br"
+}
+
 const Socket = () => {
   const { user } = useContextAuth();
   const { farm, pivot, socketPayload, setSocketPayload } = useContextUserData();
@@ -18,7 +24,7 @@ const Socket = () => {
     VariableSocket: false,
   });
 
-  const socket = io("http://localhost:3308", { transports: ["websocket"] });
+  const socket = io(urlIo.newDev, { transports: ["websocket"] });
 
   useEffect(() => {
     if (user?.user_id && farm?.farm_id) {

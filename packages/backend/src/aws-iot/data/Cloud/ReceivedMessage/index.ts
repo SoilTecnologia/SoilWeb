@@ -10,13 +10,12 @@ import { handleGprs } from './gprs';
 type handleCloudProps = {
   pivot_id: string;
   payload: any;
+  node_num: string;
 };
 
 class HandleCloudMessageTypeCloud {
-  public static async receivedStatus({ pivot_id, payload }: handleCloudProps) {
+  public static async receivedStatus({ pivot_id, payload, node_num }: handleCloudProps) {
     const getPivotUseCase = container.resolve(GetPivotByIdUseCase);
-
-    const { node_num } = await handleResultString(pivot_id);
     // Se possui um pivot_num, é um concentrador
     // Caso contrário podemos assumir que é um GPRS
     try {
