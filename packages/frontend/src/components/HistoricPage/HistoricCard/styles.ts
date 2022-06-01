@@ -1,21 +1,26 @@
 import styled, {css} from "styled-components";
-export const Card = styled.button`
+export const Card = styled.div`
  ${({theme})=> css`
     display:flex;
-    flex-direction:row;
+    flex-direction:column;
     width:80%;
-    background:${theme.colors.primary} ;
     background: linear-gradient( ${theme.colors.primary} 80%, ${theme.colors.primary_gradient} 100% );
     margin:10px;
     align-items:center;
-    justify-content:space-between;
     border-radius:22.5px;
-    padding: 20px;;
-    &:hover{
-    cursor: pointer;
-    opacity: 0.85;
-  }
+    padding: 20px;
 
+
+ `}
+`;
+export const ExapandButton = styled.button`
+ ${({theme})=> css`
+    display:flex;
+    margin:10px;
+    align-items:center;
+    border-radius:22.5px;
+    background: ${theme.colors.primary};
+    cursor: pointer;
  `}
 `;
 export const Wrapper = styled.div`
@@ -23,6 +28,14 @@ export const Wrapper = styled.div`
    display:flex;
     flex-direction:column;
     align-items:center;
+  `}
+`;
+export const StatusWrapper = styled.div`
+  ${({theme})=> css`
+   display:flex;
+    flex-direction:row;
+    width:100%;
+    justify-content:space-between;
   `}
 `;
 export const Text = styled.div`
@@ -46,3 +59,11 @@ ${({theme})=> css`
   margin: 0 ${theme.spacings.xxsmall};
 `}
 `;
+
+
+export const PercentChart=styled.div`
+  display:flex;
+
+  width:50% ;
+  align-self:flex-start;
+`
