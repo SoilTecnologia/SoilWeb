@@ -6,6 +6,6 @@ const rdsConnect = 'soildb-new-dev.cdfsr0wfegop.us-east-1.rds.amazonaws.com';
 module.exports = {
   development: {
     client: 'postgresql',
-    connection: `postgresql://soil:soil2021@${rdsConnect}:5432/soildb`
+    connection: `postgresql://soil:soil2021@${dockerConnect}:5432/soildb`
   }
 };

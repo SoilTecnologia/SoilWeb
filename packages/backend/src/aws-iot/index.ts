@@ -53,7 +53,7 @@ class IoTDevice {
       this.clientId = `${topic}-${userLocal}`;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = clientIdCloud.newDev;
+      this.clientId = clientIdCloud.pcLocal;
     }
   }
   /*

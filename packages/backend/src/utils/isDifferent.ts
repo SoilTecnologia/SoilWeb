@@ -26,14 +26,13 @@ export const isStateDifferent = (
   return false;
 };
 
-const isPercentDiferent = (oldPercent: number, newPercent: number) => {
-  const arrayPercent = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
-  const subtractPercent = oldPercent - newPercent;
-  const percentAltered =
-    oldPercent !== newPercent &&
-    arrayPercent.some((num) => num === subtractPercent);
+export const isPercentDiferent = (oldPercent: number, newPercent: number) => {
+  const subtractPercent = oldPercent < newPercent ? newPercent - oldPercent : oldPercent - newPercent ;
+  const checkSubtract = subtractPercent > 0 && subtractPercent <= 5
+  console.log(`Checando subtração de ${oldPercent} - ${newPercent} = ${subtractPercent}`)
+  console.log("...")
 
-  return percentAltered;
+  return checkSubtract || oldPercent === newPercent ;
 };
 
 export const isStateVariableDifferent = (

@@ -24,7 +24,7 @@ const Socket = () => {
     VariableSocket: false,
   });
 
-  const socket = io(urlIo.newDev, { transports: ["websocket"] });
+  const socket = io(urlIo.local, { transports: ["websocket"] });
 
   useEffect(() => {
     if (user?.user_id && farm?.farm_id) {

@@ -8,6 +8,7 @@ import { messageErrorTryAction } from '../../../utils/types';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import { isPercentDiferent } from '../../../utils/isDifferent';
 
 
 dayjs.extend(isSameOrAfter);
@@ -92,16 +93,16 @@ class GetCyclesUseCase {
     return ha.toDate()
   }
 
+  checkPercent(percents: number[]){
+
+  }
+
   async execute(pivot_id: StateModel['pivot_id'], start: string, end: string) {
     // Get all status from a pivot and order it by last to more recent
     const startDate = this.handleDate(start,0)
     const endDate = this.handleDate(end,24)
 
     const states = await this.applyQueryGetStoryCycle(pivot_id, startDate, endDate);
-    console.log("...")
-    console.log(states)
-    console.log("...")
-
     /* 
     This will loop over all the states,
     once it finds a state with power = true,
@@ -168,15 +169,46 @@ class GetCyclesUseCase {
         const variables = await this.applyQueryGetVariableGroupBt(state.state_id);
   
         if (!variables) throw new Error('Does Not Find Variables');
-  
+        
+        let oldPercent : null | number = null
+        console.log("Checagem do states: " + state.state_id);
+        
         for (let variable of variables) {
-          if (variable)
-            this.currentCycle!.percentimeters.push({
-              value: variable.percentimeter!,
-              timestamp: createDate(variable.timestamp!)
-            });
+          if(variable.percentimeter !== null){
+            if( oldPercent === null || !isPercentDiferent(oldPercent, variable.percentimeter!) ){
+              console.log(`Percent maior antigo antigo: ${oldPercent} Novo: ${variable.percentimeter!}`)
+              const {percentimeters} = this.currentCycle
+
+              if( percentimeters &&  percentimeters.length > 0 ){ 
+                  const lastItem = percentimeters[percentimeters.length -1]
+                  const percentEquals = isPercentDiferent(lastItem.value, variable.percentimeter)
+                  !percentEquals && percentimeters.push({
+                    value: variable.percentimeter!,
+                    timestamp: createDate(variable.timestamp!)
+                  }); 
+              }else{
+                this.currentCycle.percentimeters.push({
+                  value: variable.percentimeter!,
+                  timestamp: createDate(variable.timestamp!)
+                }); 
+              }
+                     
+            }else {
+              console.log(`Intervalo de  percent curto ${oldPercent} Novo: ${variable.percentimeter!}`)
+            }
+  
+              oldPercent = variable.percentimeter!
+           }else{
+             console.log(variable.percentimeter, " Percents")
+           }
+          
         }
+
+        oldPercent = null
+        console.log("....");
+
       }
+
   
       // If there's one that started but hasn't ended, make sure to send it too
       // if(this.currentCycle.states.length > 0 || this.currentCycle.percentimeters.length > 0) {
@@ -190,6 +222,7 @@ class GetCyclesUseCase {
       return this.response.reverse();
     }
   }
+
 }
 
 export { GetCyclesUseCase };
