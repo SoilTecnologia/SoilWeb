@@ -40,7 +40,7 @@ class IoTDevice {
     this.qos = qos;
     this.queue = new MessageQueue();
 
-    const userLocal = 'Henriques123';
+    const userLocal = 'Henrique';
     const clientIdCloud = {
       newDev: 'cloudNewDev2022',
       newProd: 'cloudNewProd2022',
