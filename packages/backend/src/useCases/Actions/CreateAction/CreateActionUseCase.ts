@@ -88,6 +88,7 @@ class CreateActionUseCase {
   async execute(
     action: Omit<CreateAction, 'timestamp_sent'>,
     timestamp: CreateAction['timestamp_sent'] | null,
+    isSchedule: boolean,
     angle?: StateVariableModel['angle'],
     end_angle?: StateVariableModel['angle']
   ) {
@@ -108,7 +109,7 @@ class CreateActionUseCase {
     const actionResult = await this.applyQueryCreatedAction({
       ...action,
       power: action.power || false,
-      timestamp_sent: newTimestamp
+      timestamp_sent: isSchedule ? timestamp! : newTimestamp
     });
 
     if (!actionResult) throw new Error('Does Not Create Action');
@@ -139,7 +140,7 @@ class CreateActionUseCase {
         water: action.water,
         direction: action.direction,
         percentimeter: action.percentimeter,
-        timestamp: newTimestamp
+        timestamp:  isSchedule ? timestamp! : newTimestamp
       }
     };
 

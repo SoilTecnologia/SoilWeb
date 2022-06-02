@@ -2,7 +2,7 @@ import { container, inject, injectable } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
-import { createDate } from '../../../utils/convertTimeZoneDate';
+import { dateSaoPaulo, dateString } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 import { GetLastCycleUseCase } from '../../Cycles/GetLastCycles/GetLastCycleUseCase';
 
@@ -68,7 +68,7 @@ class ReadPivotStateUseCase {
       end_angle: stateAndVariable
         ? variables[variables.length - 1]!.angle
         : null,
-      timestamp: state ? createDate(state.timestamp) : null
+      timestamp: state ? dateString(state.timestamp) : null
     };
 
     return result;

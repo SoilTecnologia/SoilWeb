@@ -2,6 +2,7 @@ import { container, inject, injectable } from 'tsyringe';
 import { StateModel } from '../../../database/model/State';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
+import { dateString } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 import { GetLastCycleUseCase } from '../../Cycles/GetLastCycles/GetLastCycleUseCase';
 
@@ -70,7 +71,7 @@ class GetPivotStateUseCase {
       end_angle: stateAnVariabes
         ? variables[variables.length - 1]!.angle
         : null,
-      timestamp: state?.timestamp
+      timestamp: dateString(state?.timestamp) 
     };
   }
 }

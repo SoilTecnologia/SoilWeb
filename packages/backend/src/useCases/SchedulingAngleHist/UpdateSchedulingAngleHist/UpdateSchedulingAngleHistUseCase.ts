@@ -1,6 +1,8 @@
+import { timeStamp } from 'console';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingAngleHistModel } from '../../../database/model/SchedulingAngleHist';
 import { ISchedulingAngleHistRepository } from '../../../database/repositories/SchedulingAngleHist/ISchedulingAngleHistRepository';
+import { dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -41,6 +43,11 @@ class UpdateSchedulingAngleHistUseCase {
     );
 
     if (getSchedulingAngle) {
+      Object.assign(schedule,{
+        ...schedule,
+        timestamp: dateSaoPaulo(schedule.timestamp!),
+        start_timestamp: dateSaoPaulo(schedule.start_timestamp!)
+      })
       const newSchedulingAngle = await this.applyQuerUpdateScheduling(schedule);
 
       return newSchedulingAngle;

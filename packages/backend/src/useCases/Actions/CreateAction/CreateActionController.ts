@@ -28,7 +28,8 @@ class CreateActionController {
     try {
       const newAction = await createActionUseCase.execute(
         newActionCreated,
-        null
+        null,
+        false
       );
 
       res.json(newAction);

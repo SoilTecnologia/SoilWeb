@@ -44,7 +44,7 @@ class ProcessQueueMessages {
               } else if (queue.type === 'action') {
                 await emitterResponse.start(queue.id);
               }
-            }, 5000);
+            }, 10000);
           } catch (err) {
             console.log('ERROR AWS publish');
             console.log(err.message);

@@ -156,7 +156,7 @@ class CheckGprsInterval {
       // await this.getStatePivot(pivot_id, false)
     }
   }
-
+  
   public async checkPivots() {
     this.getDate();
     // 10 minutos = 10000 * 6 * 10

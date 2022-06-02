@@ -3,7 +3,7 @@ import { SchedulingModel } from '../../../database/model/Scheduling';
 import { SchedulingHistoryModel } from '../../../database/model/SchedulingHistory';
 import { ISchedulingRepository } from '../../../database/repositories/Scheduling/ISchedulingRepository';
 import { ISchedulingHistoryRepository } from '../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
-import { dateLocal, dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
+import {  dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 @injectable()

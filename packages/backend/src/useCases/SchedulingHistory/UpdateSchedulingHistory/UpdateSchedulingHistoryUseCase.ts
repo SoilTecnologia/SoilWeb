@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { SchedulingHistoryModel } from '../../../database/model/SchedulingHistory';
 import { ISchedulingHistoryRepository } from '../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
+import { dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -23,7 +24,7 @@ class UpdateSchedulingHistoryUseCase {
     }
   }
 
-  private async applyQueryDelete(schedulingHistory: SchedulingHistoryModel) {
+  private async applyQueryUpdateSchedule(schedulingHistory: SchedulingHistoryModel) {
     try {
       return await this.schedulingHistoryRepository.update(schedulingHistory);
     } catch (err) {
@@ -42,10 +43,20 @@ class UpdateSchedulingHistoryUseCase {
     );
 
     if (!getSchedulingHistory) throw new Error('Scheduling Historys Does Not Exists');
+    else{
+      Object.assign(schedulingHistory, {
+        ...schedulingHistory,
+        timestamp: dateSaoPaulo(schedulingHistory.timestamp!),
+        start_timestamp: dateSaoPaulo(schedulingHistory.start_timestamp!),
+        end_timestamp: dateSaoPaulo(schedulingHistory.end_timestamp!),
+  
+      });
 
-    const newSchedulingHistory = await this.applyQueryDelete(schedulingHistory);
+      const newSchedulingHistory = await this.applyQueryUpdateSchedule(schedulingHistory);
 
-    return newSchedulingHistory;
+      return newSchedulingHistory;
+    }
+    
   }
 }
 

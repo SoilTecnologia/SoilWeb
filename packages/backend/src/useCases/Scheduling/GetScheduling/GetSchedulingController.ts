@@ -11,7 +11,6 @@ class GetSchedulingController {
 
     try {
       const allSchedulingfromPivot = await getSchedulingUseCase.execute(id);
-
       res.status(200).send(allSchedulingfromPivot);
     } catch (err) {
       messageErrorTryAction(

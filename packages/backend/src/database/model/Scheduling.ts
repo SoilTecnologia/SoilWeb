@@ -24,4 +24,6 @@ class SchedulingModel {
   timestamp: Date | null;
 }
 
+
+
 export { SchedulingModel };

@@ -40,7 +40,7 @@ class IoTDevice {
     this.qos = qos;
     this.queue = new MessageQueue();
 
-    const userLocal = 'Henrique';
+    const userLocal = 'Henriques123';
     const clientIdCloud = {
       newDev: 'cloudNewDev2022',
       newProd: 'cloudNewProd2022',
@@ -50,7 +50,7 @@ class IoTDevice {
     if (type === 'Raspberry' && topic) {
       this.subTopic = topic;
       this.pubTopic = `cloudHenrique`;
-      this.clientId = `${topic}-${userLocal}`;
+      this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
       this.clientId = clientIdCloud.pcLocal;
@@ -156,6 +156,7 @@ class IoTDevice {
         payload: any;
       } = json;
 
+      console.log(json)
       console.log(`Recebido ack ${JSON.stringify(json, null, 2)}`);
       
       const pivotId = payload.pivot_id || id

@@ -13,6 +13,7 @@ import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
 import { dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
+import { dateJs } from '../../../utils/handleDates/dateFactory';
 import {
   isRadioVariableDifferent,
   isStateDifferent,
@@ -259,7 +260,12 @@ class UpdatePivotStateUseCase {
   ) {
     const timestamp = newTimestamp
       ? dateSaoPaulo(newTimestamp)
-      : dateSaoPaulo(new Date());
+      : dateJs().tz().toDate();
+
+      console.log(`
+      Data recebida na att: ${newTimestamp},
+      Nova Data: ${timestamp}
+      `)
 
     const oldState = await this.applyQueryGetStateByPivot(pivot_id);
     this.state = oldState;

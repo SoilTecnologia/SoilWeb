@@ -7,7 +7,6 @@ import { ISchedulingRepository } from '../../../database/repositories/Scheduling
 import { ISchedulingHistoryRepository } from '../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
 import {
   dateIsAter,
-  dateLocal,
   dateSaoPaulo
 } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
@@ -39,9 +38,7 @@ class UpdateSchedulingUseCase {
     scheduling: Omit<SchedulingModel, 'timestamp'>
   ) {
     try {
-      console.log(`Vou atualizar: ${scheduling}`);
       const schel = await this.schedulingRepository.update(scheduling);
-      console.log(`Atualizei: ${schel}`);
       return schel;
     } catch (err) {
       messageErrorTryAction(
@@ -97,10 +94,9 @@ class UpdateSchedulingUseCase {
       });
 
       if (newScheduling) {
-        const schedule: Omit<SchedulingHistoryModel, 'scheduling_history_id'> =
-          {
-            ...newScheduling
-          };
+        type omitId =  Omit<SchedulingHistoryModel, 'scheduling_history_id'>
+        const schedule: omitId = newScheduling
+         
         delete schedule.scheduling_id;
 
         await this.applyQueryCreateHistory({

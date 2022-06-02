@@ -55,7 +55,7 @@ class SendSchedulingListening {
     try {
       console.log('.....');
       const createActionUseCase = container.resolve(CreateActionUseCase);
-      await createActionUseCase.execute(action, job.timestamp);
+      await createActionUseCase.execute(action, job.timestamp, true);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -94,7 +94,8 @@ class SendSchedulingListening {
           direction: 'CLOCKWISE',
           percentimeter: 0
         },
-        job.timestamp
+        job.timestamp,
+        true
       );
     } catch (err) {
       const error = err as Error;

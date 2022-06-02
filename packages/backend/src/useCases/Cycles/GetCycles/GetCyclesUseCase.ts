@@ -3,7 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { StateModel } from '../../../database/model/State';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
-import { createDate, dateIsAter, dateIsBefore, dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
+import { dateString, dateIsAter, dateIsBefore } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -121,12 +121,12 @@ class GetCyclesUseCase {
         if (this.foundStart) {
           if (state.power === false) {
             this.currentCycle!.is_running = false;
-            this.currentCycle!.end_date = createDate(state.timestamp);
+            this.currentCycle!.end_date = dateString(state.timestamp);
             this.currentCycle!.states.push({
               power: state.power,
               water: state.water,
               direction: state.direction,
-              timestamp: createDate(state.timestamp),
+              timestamp: dateString(state.timestamp),
               connection: state.connection
             });
   
@@ -141,7 +141,7 @@ class GetCyclesUseCase {
               power: state.power,
               water: state.water,
               direction: state.direction,
-              timestamp: createDate(state.timestamp),
+              timestamp: dateString(state.timestamp),
               connection: state.connection
             });
           }
@@ -149,7 +149,7 @@ class GetCyclesUseCase {
         else {
           if (state.power) {
             this.foundStart = true;
-            this.currentCycle!.start_date = createDate(state.timestamp);
+            this.currentCycle!.start_date = dateString(state.timestamp);
             this.currentCycle!.is_running = true;
             this.currentCycle!.start_state = {
               power: state.power,
@@ -160,7 +160,7 @@ class GetCyclesUseCase {
               power: state.power,
               water: state.water,
               direction: state.direction,
-              timestamp: createDate(state.timestamp),
+              timestamp: dateString(state.timestamp),
               connection: state.connection
             });
           }
@@ -184,12 +184,12 @@ class GetCyclesUseCase {
                   const percentEquals = isPercentDiferent(lastItem.value, variable.percentimeter)
                   !percentEquals && percentimeters.push({
                     value: variable.percentimeter!,
-                    timestamp: createDate(variable.timestamp!)
+                    timestamp: dateString(variable.timestamp!)
                   }); 
               }else{
                 this.currentCycle.percentimeters.push({
                   value: variable.percentimeter!,
-                  timestamp: createDate(variable.timestamp!)
+                  timestamp: dateString(variable.timestamp!)
                 }); 
               }
                      

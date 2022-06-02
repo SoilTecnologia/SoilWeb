@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { StateModel } from '../../../database/model/State';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
+import { dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()

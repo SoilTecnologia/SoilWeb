@@ -3,6 +3,7 @@ import { StateModel } from '../../database/model/State';
 import { IStateRepository } from '../../database/repositories/States/IState';
 import { dateSaoPaulo } from '../../utils/convertTimeZoneDate';
 import emitter from '../../utils/eventBus';
+import { dateJs } from '../../utils/handleDates/dateFactory';
 import { messageErrorTryAction } from '../../utils/types';
 
 @injectable()
@@ -28,7 +29,7 @@ class CreateStateUseCase {
     const stateModel = new StateModel();
     Object.assign(stateModel, {
       ...newState,
-      timestamp: dateSaoPaulo(new Date())
+      timestamp: dateJs().tz().toDate()
     });
 
     const action = await this.applyQueryCreateState(stateModel);

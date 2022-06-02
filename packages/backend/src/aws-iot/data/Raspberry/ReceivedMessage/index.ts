@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 import { iotDevice } from '../../../..';
 import { CreateActionUseCase } from '../../../../useCases/Actions/CreateAction/CreateActionUseCase';
+import { dateSaoPaulo } from '../../../../utils/convertTimeZoneDate';
 import MessageQueue from '../../../../utils/message_queue';
 import { messageErrorTryAction } from '../../../../utils/types';
 
@@ -30,10 +31,10 @@ class HandleCloudMessageTypeRaspberry {
         direction,
         percentimeter
       };
-      const newTimestamp = new Date(timestamp);
+      const newTimestamp = dateSaoPaulo(timestamp);
 
       try {
-        await createActionUseCase.execute(newAction, newTimestamp);
+        await createActionUseCase.execute(newAction, newTimestamp, false);
         console.log(
           `[EC2-IOT-STATUS-RESPONSE] Enviando ACK de mensagem recebida...`
         );

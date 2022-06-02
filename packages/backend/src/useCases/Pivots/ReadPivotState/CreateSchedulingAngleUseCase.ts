@@ -49,21 +49,31 @@ class CreateSchedulingAngleUseCase {
     schedulingangle: Omit<SchedulingAngleModel, 'scheduling_angle_id'>
   ) {
     const {
+      pivot_id,
       is_return,
+      author,
       power,
       water,
+      direction,
       percentimeter,
+      start_angle,
+      end_angle,
       start_timestamp,
       timestamp
     } = schedulingangle;
 
     const schedulingAngleModel = new SchedulingAngleModel();
-    
+
     Object.assign(schedulingAngleModel, {
-      ...schedulingangle,
+      pivot_id,
+      is_return,
+      author,
       power: is_return ? true : power,
       water: is_return ? false : water,
+      direction,
       percentimeter: is_return ? 100 : percentimeter,
+      start_angle,
+      end_angle,
       start_timestamp: dateSaoPaulo(start_timestamp!),
       timestamp: dateSaoPaulo(timestamp!)
     });
@@ -73,11 +83,14 @@ class CreateSchedulingAngleUseCase {
     );
 
     if (newSchedulingAngleData) {
+      const schedule: Omit<
+        SchedulingAngleHistModel,
+        'scheduling_angle_hist_id'
+      > = {
+        ...newSchedulingAngleData
+      };
 
-      type omitId = Omit<SchedulingAngleHistModel,'scheduling_angle_hist_id'>
-      const schedule: omitId  = newSchedulingAngleData;
       delete schedule.scheduling_angle_id;
-
       await this.applyQueryCreateHistory(schedule);
 
       console.log('Agendamento por angulo criado no banco de dados....');

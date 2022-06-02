@@ -90,7 +90,7 @@ class SendSchedulingAngle {
     };
     const createAction = container.resolve(CreateActionUseCase);
 
-    await createAction.execute(action, new Date(), job.start_angle);
+    await createAction.execute(action, new Date(), true, job.start_angle);
     emitter.on(
       `angle-changed-${job.pivot_id}`,
       async (angle: AngleDiferentprops) => {
@@ -114,7 +114,7 @@ class SendSchedulingAngle {
     });
     const createAction = container.resolve(CreateActionUseCase);
 
-    await createAction.execute(action, job.timestamp, job.end_angle);
+    await createAction.execute(action, job.timestamp, true, job.end_angle);
   }
 
   private static async listernerEmitter(
@@ -182,6 +182,7 @@ class SendSchedulingAngle {
       await createAction.execute(
         action,
         job.timestamp,
+        true,
         job.start_angle,
         job.end_angle
       );

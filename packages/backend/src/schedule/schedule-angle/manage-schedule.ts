@@ -1,10 +1,8 @@
-import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
 import { container } from 'tsyringe';
 import { SchedulingAngleModel } from '../../database/model/SchedulingAngle';
 import { DeleteSchedulingAngleUseCase } from '../../useCases/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleUseCase';
 import { GetAllSchedulingAngleUseCase } from '../../useCases/SchedulingAngle/GetAllSchedulingAngle/GetAllSchedulingAngleUseCase';
-import { dateLocal } from '../../utils/convertTimeZoneDate';
 import emitter from '../../utils/eventBus';
 import { messageErrorTryAction } from '../../utils/types';
 import { ScheduleAngleEmitter } from '../protocols/scheduleEmitterType';

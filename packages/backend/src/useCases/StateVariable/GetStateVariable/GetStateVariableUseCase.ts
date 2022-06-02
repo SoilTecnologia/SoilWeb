@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
+import { dateString } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -59,6 +60,12 @@ class GetStateVariableUseCase {
       const stateVariable = await this.applyQueryGetStateVariable(
         state.state_id
       );
+
+      Object.assign(stateVariable,{
+        ...stateVariable,
+        timestamp: dateString(stateVariable?.timestamp)
+      })
+      
       return stateVariable;
     }
   }

@@ -32,7 +32,7 @@ export const isPercentDiferent = (oldPercent: number, newPercent: number) => {
   console.log(`Checando subtração de ${oldPercent} - ${newPercent} = ${subtractPercent}`)
   console.log("...")
 
-  return checkSubtract || oldPercent === newPercent ;
+  return checkSubtract || oldPercent === newPercent;
 };
 
 export const isStateVariableDifferent = (

@@ -16,7 +16,6 @@ class EmitterResponse {
   }
 
   public async start(pivot_id: string) {
-    console.log(this.responseAction);
     const pivotExist = this.responseAction.some((item) => item.id === pivot_id);
 
     if (pivotExist) {
