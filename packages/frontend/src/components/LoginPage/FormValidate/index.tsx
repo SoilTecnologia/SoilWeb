@@ -25,7 +25,6 @@ type FormDataProps = {
 
 const FormValidate = ({ setErrorAuth }: FormDataProps) => {
   //Contexts
-
   const { signIn } = useContextAuth();
   const {
     handleSubmit,

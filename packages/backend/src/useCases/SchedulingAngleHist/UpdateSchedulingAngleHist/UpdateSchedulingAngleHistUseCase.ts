@@ -43,11 +43,6 @@ class UpdateSchedulingAngleHistUseCase {
     );
 
     if (getSchedulingAngle) {
-      Object.assign(schedule,{
-        ...schedule,
-        timestamp: dateSaoPaulo(schedule.timestamp!),
-        start_timestamp: dateSaoPaulo(schedule.start_timestamp!)
-      })
       const newSchedulingAngle = await this.applyQuerUpdateScheduling(schedule);
 
       return newSchedulingAngle;

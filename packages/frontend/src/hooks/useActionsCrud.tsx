@@ -44,7 +44,7 @@ interface UserProviderProps {
 
 interface actionCrudProps {
   getAllUser: (token?: string) => Promise<requestUser[] | null>;
-  createUser: (user: UserCreate) => void;
+  createUser: (user: UserCreate, notLogged?: boolean) => void;
   updateUser: (user: User) => void;
   deleteUser: (id: string) => void;
   getAllFarmsUser: (id: string) => void;
@@ -107,23 +107,22 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     return response;
   };
 
-  const createUser = async (newUser: UserCreate) => {
+  const createUser = async (newUser: UserCreate, notLogged?: boolean) => {
     const result = await requestPostUser(newUser);
-    console.log("Retorno");
-    console.log(result);
-
-    if (result) {
+    if (result && !notLogged) {
       await getAllUser(user?.token);
       setData(stateDefault);
     }
     return result;
   };
+
   const updateUser = async (updatedUser: User) => {
     const newUser = await requestUpdateUser(updatedUser, user?.token);
     if (newUser) {
       await getAllUser(user?.token);
     }
   };
+
   const deleteUser = async (id: string) => {
     await requestDeleteUser(id, user?.token);
     await getAllUser(user?.token);

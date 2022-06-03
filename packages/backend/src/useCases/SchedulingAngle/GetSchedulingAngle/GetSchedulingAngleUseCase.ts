@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
 import { ISchedulingAngleRepository } from '../../../database/repositories/SchedulingAngle/ISchedulingAngleRepository';
+import { dateString } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -25,8 +26,22 @@ class GetSchedulingAngleUseCase {
 
   async execute(pivot_id: PivotModel['pivot_id']) {
     const getSchedulingAngle = await this.applyQueryGetSchedule(pivot_id);
+    if(getSchedulingAngle && getSchedulingAngle.length > 0){
+      const schedulings = []
+      for(let schedule of getSchedulingAngle){
+        Object.assign(schedule, {
+          ...schedule,
+          start_timestamp: dateString(schedule.start_timestamp!),
+          timestamp: dateString(schedule.timestamp!)
+        })
 
-    return getSchedulingAngle;
+        schedulings.push(schedule)
+      }
+
+      return schedulings;
+    }
+    else return []
+
   }
 }
 

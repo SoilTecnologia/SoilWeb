@@ -27,6 +27,7 @@ class CreateStateUseCase {
       power: state.power || false
     };
     const stateModel = new StateModel();
+    
     Object.assign(stateModel, {
       ...newState,
       timestamp: dateJs().tz().toDate()

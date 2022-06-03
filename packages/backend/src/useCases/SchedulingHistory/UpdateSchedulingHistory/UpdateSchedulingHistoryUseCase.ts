@@ -44,14 +44,6 @@ class UpdateSchedulingHistoryUseCase {
 
     if (!getSchedulingHistory) throw new Error('Scheduling Historys Does Not Exists');
     else{
-      Object.assign(schedulingHistory, {
-        ...schedulingHistory,
-        timestamp: dateSaoPaulo(schedulingHistory.timestamp!),
-        start_timestamp: dateSaoPaulo(schedulingHistory.start_timestamp!),
-        end_timestamp: dateSaoPaulo(schedulingHistory.end_timestamp!),
-  
-      });
-
       const newSchedulingHistory = await this.applyQueryUpdateSchedule(schedulingHistory);
 
       return newSchedulingHistory;

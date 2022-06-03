@@ -27,14 +27,7 @@ class CreateSchedulingAngleHistUseCase {
     }
   }
 
-  async execute(schedulinganglehist: SchedulingAngleHistModel) {
-
-    Object.assign(schedulinganglehist,{
-      ...schedulinganglehist,
-      start_timestamp: dateSaoPaulo(schedulinganglehist.start_timestamp!),
-      timestamp: dateSaoPaulo(schedulinganglehist.timestamp!)
-    })
-    
+  async execute(schedulinganglehist: SchedulingAngleHistModel) {   
     const newSchedulingAngleHistData = await this.applyQueryCreateScheduleAngle(
       schedulinganglehist
     );

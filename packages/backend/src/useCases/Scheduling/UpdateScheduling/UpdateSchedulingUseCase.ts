@@ -90,13 +90,12 @@ class UpdateSchedulingUseCase {
       const newScheduling = await this.applyQueryUpdate({
         ...scheduling,
         start_timestamp: dateSaoPaulo(scheduling.start_timestamp!),
-        end_timestamp: dateSaoPaulo(scheduling.end_timestamp!)
+        end_timestamp: dateSaoPaulo(scheduling.end_timestamp!),     
       });
 
       if (newScheduling) {
         type omitId =  Omit<SchedulingHistoryModel, 'scheduling_history_id'>
-        const schedule: omitId = newScheduling
-         
+        const schedule: omitId = newScheduling 
         delete schedule.scheduling_id;
 
         await this.applyQueryCreateHistory({

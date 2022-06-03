@@ -12,7 +12,7 @@ class CreateSchedulingHistoryUseCase {
     private schedulingHistoryRepository: SchedulingHistoryRepository
   ) {}
 
-  private async applyQueryCreate(schedulingHistory: SchedulingHistoryModel) {
+  private async applyQueryCreate(schedulingHistory: Omit<SchedulingHistoryModel, "scheduling_history_id">) {
     try {
       return await this.schedulingHistoryRepository.create(schedulingHistory);
     } catch (err) {
@@ -29,19 +29,9 @@ class CreateSchedulingHistoryUseCase {
 
   async execute(
     schedulingHistory: Omit<SchedulingHistoryModel, 'scheduling_history_id'>
-  ) {
-    const schedulingHistoryModel = new SchedulingHistoryModel();
-    
-    Object.assign(schedulingHistoryModel, {
-      ...schedulingHistory,
-      timestamp: dateSaoPaulo(schedulingHistory.timestamp!),
-      start_timestamp: dateSaoPaulo(schedulingHistory.start_timestamp!),
-      end_timestamp: dateSaoPaulo(schedulingHistory.end_timestamp!),
-
-    });
-
+  ) {    
     const newSchedulingHistory = await this.applyQueryCreate(
-      schedulingHistoryModel
+      schedulingHistory
     );
 
     return newSchedulingHistory;

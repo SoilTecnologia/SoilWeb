@@ -2,6 +2,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import ContentInputs from "components/globalComponents/ContentInputs";
 import SelectOptionsComponent from "components/globalComponents/SelectOptionsComponent";
 import { useContextActionCrud } from "hooks/useActionsCrud";
+import  Router  from 'next/router';
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { UserCreate } from "utils/models/user";
@@ -25,7 +26,10 @@ const optionsSelect = [
   },
 ];
 
-const CreateNewUser = () => {
+type createPros = {
+  notLogged?: boolean
+}
+const CreateNewUser = ({notLogged}: createPros) => {
   //Contexts
   const { createUser } = useContextActionCrud();
 
@@ -43,7 +47,9 @@ const CreateNewUser = () => {
       user_type: data.user_type,
       login: data.login?.toLowerCase(),
       password: data.password,
-    });
+    }, notLogged);
+
+    if(notLogged) Router.push("/")
   });
 
   return (
