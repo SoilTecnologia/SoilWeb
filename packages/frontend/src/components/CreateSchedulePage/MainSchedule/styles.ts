@@ -129,8 +129,12 @@ export const ClockIcon = styled(FaHistory)`
   font-family: ${({ theme }) => theme.font.family.Montserrat_bold};
 `;
 
-// export const Button = styled.button`
-//   height:300px;
-//   width:400px;
-//   background:black;
-// `
+export const HeaderText = styled.h1`
+  ${({ theme }) => css`
+    font-size: ${theme.font.sizes.xxlarge};
+    color: ${theme.colors.primary};
+    font-family: ${theme.font.family.Montserrat_bold};
+    padding: 0 ${theme.spacings.xxsmall};
+    align-self:center;
+  `}
+`;

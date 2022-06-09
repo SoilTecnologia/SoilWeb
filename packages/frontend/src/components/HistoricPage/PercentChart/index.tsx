@@ -61,6 +61,7 @@ const PercentChart = ({ historic }: PropsProvider) => {
 
     scales: {
       x: {
+        display:false,
         time: {
           unit: "hour",
           displayFormats: {
@@ -70,7 +71,7 @@ const PercentChart = ({ historic }: PropsProvider) => {
           },
         },
         title: {
-          display: true,
+          display: false,
           text: "Horário",
           color: theme.colors.secondary
         },

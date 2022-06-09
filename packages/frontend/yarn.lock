@@ -7897,10 +7897,10 @@ react-chartjs-2@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-chartjs-2/-/react-chartjs-2-4.1.0.tgz#2a123df16d3a987c54eb4e810ed766d3c03adf8d"
   integrity sha512-AsUihxEp8Jm1oBhbEovE+w50m9PVNhz1sfwEIT4hZduRC0m14gHWHd0cUaxkFDb8HNkdMIGzsNlmVqKiOpU74g==
 
-react-chrono@^1.15.3:
-  version "1.15.3"
-  resolved "https://registry.yarnpkg.com/react-chrono/-/react-chrono-1.15.3.tgz#8f52862c97b88fe2c671a8c366dc4a28e11e0cec"
-  integrity sha512-z7qTw1iV6BczXn9Sd1jPu7DunPELvIsmitFBAVIUOzKNM/Ul/xnReJnGPTZQcVmm2nR0Z6oSMUQqMv2G7sLAQw==
+react-chrono@^1.16.0:
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/react-chrono/-/react-chrono-1.16.0.tgz#9ae1bb7f6ac510b77954ab48ceb3d7b166def30d"
+  integrity sha512-3ZhGtFv9W94vARcKLmURl5XIhnCBgN9VmRkEjTCp2lwsQwh+7AFylPK/msIs5apUNLB1Bxs+f/lOff6Ws3W5nw==
   dependencies:
     "@emotion/core" "^11.0.0-next.10"
     "@emotion/react" "^11.9.0"
