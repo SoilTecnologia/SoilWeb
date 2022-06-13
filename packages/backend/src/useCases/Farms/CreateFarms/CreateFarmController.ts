@@ -28,7 +28,7 @@ class CreateFarmController {
 
     try {
       const farm = await createFarmUseCase.execute(newFarm);
-      res.status(200).send(farm);
+      res.status(201).send(farm);
     } catch (err) {
       messageErrorTryAction(
         err,
