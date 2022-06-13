@@ -32,7 +32,13 @@
   "scripts": {
     "play": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts --poll",
-    "test": "jest"
+    "clear": "jest --clearCache",
+    "test": "jest --passWithNoTests --silent --noStackTrace --runInBand",
+    "test:full": "jest --passWithNoTests --noStackTrace --runInBand",
+    "test:unit": "npm test -- --watch -c jest-unit-config.js ",
+    "test:integration": "npm test -- --watch -c jest-integration-config.js ",
+    "test:staged": "npm test --findRelatedTests",
+    "test:ci": "npm test -- --coverage"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
