@@ -1,5 +1,6 @@
 import { PivotModel } from '../../model/Pivot';
 import { StateModel } from '../../model/State';
+import { StateVariableModel } from '../../model/StateVariables';
 
 interface IStateRepository {
   findByPivotId(

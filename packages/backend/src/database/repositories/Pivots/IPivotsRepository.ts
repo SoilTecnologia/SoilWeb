@@ -19,6 +19,8 @@ interface IPivotsRepository {
 
   delete(pivot_id: PivotModel['pivot_id']): Promise<number | undefined>;
 
+  getLatLong(pivot_id: string): Promise<Pick<PivotModel, "pivot_lat" | "pivot_lng"> | undefined>;
+
   update(
     pivot: PivotModel,
     pivot_id: PivotModel['pivot_id']

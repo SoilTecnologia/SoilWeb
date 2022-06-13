@@ -7,32 +7,19 @@ import { GetPivotStateUseCase } from '../../useCases/States/GetPivotState/GetPiv
 import { StatusObject } from '../../utils/conversions';
 import emitter from '../../utils/eventBus';
 import GenericQueue from '../../utils/generic_queue';
+import { IdleDataResponseCmd } from '../protocols';
 import { checkPool, sendData } from '../tests';
-
-type IdleData = {
-  pivot_id: string;
-  radio_id: number;
-  attempts: number;
-  cmdResponse?: string;
-};
-
-type RadioResponse = {
-  cmd: number;
-  id: number;
-  payload: Array<number>;
-  status: string;
-};
 
 export type interval = (onOff: boolean) => void;
 
 class CheckStatusRadio {
-  private current: IdleData;
+  private current: IdleDataResponseCmd;
 
   private pivot_id: string;
 
   private radio_id: number;
 
-  private idleQueue: GenericQueue<IdleData>;
+  private idleQueue: GenericQueue<IdleDataResponseCmd>;
 
   private getUpdatePivotController: UpdatePivotStateUseCase;
 
@@ -42,7 +29,7 @@ class CheckStatusRadio {
 
   private getStateUseCase: GetPivotStateUseCase;
 
-  constructor(idleQueue: GenericQueue<IdleData>) {
+  constructor(idleQueue: GenericQueue<IdleDataResponseCmd>) {
     this.idleQueue = idleQueue;
     // this.intervalState = intervalState;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);

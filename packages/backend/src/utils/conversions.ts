@@ -62,6 +62,7 @@ const handleAngle = (angle: number) => {
   else if (angle > 360) return 360;
   else return angle;
 };
+
 export const objectToActionPayloadString = (
   power: ActionModel['power'],
   water: ActionModel['water'],

@@ -1,6 +1,4 @@
-import { AxiosResponse } from 'axios';
 import { container } from 'tsyringe';
-import IoTDevice from '../../aws-iot';
 import { ActionsResult } from '../../types/actionsType';
 import { DeleteActionUseCase } from '../../useCases/Actions/DeleteAction/DeleteACtionUseCase';
 import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase';
@@ -11,28 +9,18 @@ import { GetPivotStateUseCase } from '../../useCases/States/GetPivotState/GetPiv
 import { StatusObject } from '../../utils/conversions';
 import emitter from '../../utils/eventBus';
 import GenericQueue from '../../utils/generic_queue';
-import { checkPool, RadioResponse, sendData } from '../tests';
+import { ActionDataWithCmd, ResponseSendData } from '../protocols';
+import { checkPool, sendData } from '../tests';
 import { objectToActionString } from './objectToActionString';
-
-type ActionData = {
-  action: ActionsResult;
-  timestamp: Date;
-  attempts: number;
-  cmdResponse?: string;
-};
-type responseSendData = {
-  result: StatusObject | undefined;
-  data: RadioResponse;
-};
 
 export type interval = (onOff: boolean) => void;
 
 class HandleActionActive {
-  private current: ActionData;
+  private current: ActionDataWithCmd;
 
   private action: ActionsResult;
 
-  private activeQueue: GenericQueue<ActionData>;
+  private activeQueue: GenericQueue<ActionDataWithCmd>;
 
   private getUpdatePivotController: UpdatePivotStateUseCase;
 
@@ -46,7 +34,7 @@ class HandleActionActive {
 
   private getStateUseCase: GetPivotStateUseCase;
 
-  constructor(activeQueue: GenericQueue<ActionData>) {
+  constructor(activeQueue: GenericQueue<ActionDataWithCmd>) {
     this.activeQueue = activeQueue;
     // this.intervalState = intervalState;
     this.getUpdatePivotController = container.resolve(UpdatePivotStateUseCase);
@@ -61,7 +49,7 @@ class HandleActionActive {
 
   updateActionWithCondicionsValid = async (
     payload: StatusObject,
-    active: ActionData
+    active: ActionDataWithCmd
   ) => {
     // this.intervalState(false);
 
@@ -98,7 +86,7 @@ class HandleActionActive {
     await checkPool();
   };
 
-  returnFailled = async (active: ActionData) => {
+  returnFailled = async (active: ActionDataWithCmd) => {
     if (active.attempts > 3) {
       // this.intervalState(false);
       console.log('');
@@ -155,7 +143,7 @@ class HandleActionActive {
     }
   };
 
-  async logErrorTry(active: ActionData) {
+  async logErrorTry(active: ActionDataWithCmd) {
     active.attempts && active.attempts++;
     if (active.attempts && active.attempts > 3)
       await this.returnFailled(active);
@@ -165,7 +153,7 @@ class HandleActionActive {
       }, 5000);
   }
 
-  async sendItem(active: ActionData) {
+  async sendItem(active: ActionDataWithCmd) {
     console.log(`Numero de Tentativas ${active.attempts}`);
     console.log(
       `CHECKING ACTIVE IN ${this.action.radio_id} of the Pivot ${this.action.pivot_id}`
@@ -206,7 +194,7 @@ class HandleActionActive {
     }
   }
 
-  async treatsResponses(response: responseSendData, active: ActionData) {
+  async treatsResponses(response: ResponseSendData, active: ActionDataWithCmd) {
     if (response && response.result) {
       const { data, result } = response;
 

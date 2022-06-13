@@ -4,6 +4,8 @@ import { readAllPivots } from '../../model/types/pivot';
 import { IPivotsRepository } from './IPivotsRepository';
 
 class PivotsRepository implements IPivotsRepository {
+
+  
   async findById(pivot_id: string): Promise<PivotModel | undefined> {
     return await knex<PivotModel>('pivots')
       .select()
@@ -66,6 +68,15 @@ class PivotsRepository implements IPivotsRepository {
       .where('nodes.farm_id', farm_id);
 
     return pivots;
+  }
+
+  async getLatLong(pivot_id: string): Promise<Pick<PivotModel, "pivot_lat" | "pivot_lng"> | undefined> {
+    const data =  await knex<PivotModel>('pivots')
+      .select("pivot_lat", "pivot_lng")
+      .where({ pivot_id })
+      .first();
+
+      return data;
   }
 }
 

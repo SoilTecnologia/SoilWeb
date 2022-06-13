@@ -1,5 +1,4 @@
 import { ActionModel } from '../../database/model/Action';
-import { PivotModel } from '../../database/model/Pivot';
 import { StateVariableModel } from '../../database/model/StateVariables';
 
 const handleResultPercentToString = (num: number) => {
@@ -29,7 +28,7 @@ export const objectToActionString = (
   else actionString += '5';
   actionString += '1';
   actionString += '-';
-  actionString += percent;
+  actionString += percent.toString().padStart(3,0)
   if (newAngle) {
     const angle = responseAngle(newAngle);
     actionString += '-';

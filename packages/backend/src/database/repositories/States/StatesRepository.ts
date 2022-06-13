@@ -1,5 +1,6 @@
 import knex from '../..';
 import { StateModel } from '../../model/State';
+import { StateVariableModel } from '../../model/StateVariables';
 import { IStateRepository } from './IState';
 
 class StatesRepository implements IStateRepository {
