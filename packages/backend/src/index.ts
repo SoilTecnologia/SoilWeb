@@ -6,6 +6,7 @@ this file is responsible for:
   - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)
   - Setting up the event emitter to be used on other systems
 */
+import dotenv from "dotenv"
 import cors from 'cors';
 import dayjs from 'dayjs';
 import express from 'express';
@@ -20,8 +21,9 @@ import { InitScheduleData } from './schedule';
 import './shared/container';
 import emitter from './utils/eventBus';
 import { handleResultAction } from './utils/handleFarmIdWithUndescores';
-
-require('dotenv').config();
+dotenv.config({
+  path: process.env.NODE_ENV === "test" ? ".env.test" : ".env"
+})
 
 const PORT = 3308;
 const app = express();

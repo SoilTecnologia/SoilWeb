@@ -81,7 +81,7 @@ export const objectToActionPayloadString = (
     if (angle) {
       const angleValid = handleAngle(angle);
       actionString += '-';
-      actionString += angleValid;
+      actionString += angleValid.toString();
     }
   } else {
     return '002-000';

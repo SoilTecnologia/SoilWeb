@@ -1,23 +1,32 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import process from 'process';
 import { inject, injectable } from 'tsyringe';
-import { UserModel } from '../../../database/model/User';
-import { IUsersRepository } from '../../../database/repositories/Users/IUsersRepository';
-import { messageErrorTryAction } from '../../../utils/types';
+import { UserModel } from '../../../../database/model/User';
+import { IAddNewUser } from '../../../../database/repositories/Users/AddUser/IAddNewUser';
+import { IFindByLogin } from '../../../../database/repositories/Users/FindByLogin/IFindByLoginRepository';
+import { IUsersRepository } from '../../../../database/repositories/Users/IUsersRepository';
+import { messageErrorTryAction } from '../../../../utils/types';
+import { AddUserModel, ICreateUserUseCase, UserResponse } from '../protocols/ICreateUser';
+
+
 
 @injectable()
-class CreateUserUseCase {
+class CreateUserUseCase implements ICreateUserUseCase {
   constructor(
-    @inject('UsersRepository') private userRepository: IUsersRepository
+    @inject('UsersRepository') private addUserRepository: IAddNewUser,
+    @inject('UsersRepository') private userRepository: IFindByLogin,
+
   ) {}
 
   private createJwt(user: UserModel) {
+    const secret = process.env.NODE_ENV === "test" ? "testsoil" : process.env.TOKEN_SECRET
     const token = jwt.sign(
       {
         user_id: user.user_id,
         user_type: user.user_type
       },
-      process.env.TOKEN_SECRET as jwt.Secret,
+      secret as jwt.Secret ,
       {
         expiresIn: '2h'
       }
@@ -45,9 +54,9 @@ class CreateUserUseCase {
     }
   }
 
-  private async apllyQueryCreateUser(user: UserModel) {
+  private async apllyQueryCreateUser(user: AddUserModel) {
     try {
-      return await this.userRepository.create(user);
+      return await this.addUserRepository.create(user);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -58,7 +67,7 @@ class CreateUserUseCase {
     }
   }
 
-  async execute({ login, password, user_type }: UserModel) {
+  async execute({ login, password, user_type }: AddUserModel): Promise<UserResponse> {
     const encryptedPassword = await bcrypt.hash(password, 10);
 
     const userALreadyExists = await this.apllyQueryFindUser(
@@ -78,9 +87,12 @@ class CreateUserUseCase {
 
     const newUser = await this.apllyQueryCreateUser(userModel);
 
-    if (newUser) return this.createJwt(newUser[0]);
-
-    throw new Error('Failed to create user');
+    if(!newUser)throw new Error('Failed to create user')
+    else{
+      const userResponse = this.createJwt(newUser) 
+      return userResponse
+    }
+    
   }
 }
 

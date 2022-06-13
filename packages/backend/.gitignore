@@ -4,3 +4,5 @@ node_modules
 __tests__
 certs
 policies
+coverage
+dist

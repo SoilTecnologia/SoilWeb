@@ -25,7 +25,15 @@ import { ISchedulingHistoryRepository} from '../../database/repositories/Schedul
 import { SchedulingHistoryRepository}from '../../database/repositories/SchedulingHistory/SchedulingHistoryRepository';
 import { SchedulingAngleHistRepository } from '../../database/repositories/SchedulingAngleHist/SchedulingAngleHistRepository'
 import { ISchedulingAngleHistRepository } from '../../database/repositories/SchedulingAngleHist/ISchedulingAngleHistRepository'
+import { AddNewUserRepository } from '../../database/repositories/Users/AddUser/AddNewUserRepository';
+import { FindAllUseCase } from '../../useCases/Pivots/FindAll/FindAllUseCase';
+import { IAddNewUser } from '../../database/repositories/Users/AddUser/IAddNewUser';
+import { IFindByLogin } from '../../database/repositories/Users/FindByLogin/IFindByLoginRepository';
+import { FindUserByLoginRepository } from '../../database/repositories/Users/FindByLogin/FindByLoginRTepository';
 
+//Users
+container.register<IAddNewUser>("AddUser", AddNewUserRepository)
+container.register<IFindByLogin>("FindUserByLogin", FindUserByLoginRepository)
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',

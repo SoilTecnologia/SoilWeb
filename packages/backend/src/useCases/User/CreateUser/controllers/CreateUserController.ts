@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { messageErrorTryAction } from '../../../utils/types';
-import { CreateUserUseCase } from './CreateUserUseCase';
+import { messageErrorTryAction } from '../../../../utils/types';
+import { CreateUserUseCase } from '../services/CreateUserUseCase';
 
 class CreateUserController {
   async handle(

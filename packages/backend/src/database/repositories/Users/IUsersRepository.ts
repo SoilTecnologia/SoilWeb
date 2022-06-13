@@ -6,8 +6,11 @@ type ResponseDTO = {
   token: string;
 };
 
+
+
 interface IUsersRepository {
   findByLogin(login: UserModel['login']): Promise<UserModel | undefined>;
+
   findById(login: UserModel['login']): Promise<UserModel | undefined>;
 
   signInController(

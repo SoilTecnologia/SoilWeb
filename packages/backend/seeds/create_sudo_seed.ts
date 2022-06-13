@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 import { container } from 'tsyringe';
-import { CreateUserUseCase } from '../src/useCases/User/CreateUser/CreateUserUseCase';
+import { CreateUserUseCase } from '../src/useCases/User/CreateUser/services/CreateUserUseCase';
 
 // Insere um usuário SUDO para os administradores Soil
 

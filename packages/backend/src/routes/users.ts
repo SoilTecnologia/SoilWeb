@@ -2,7 +2,7 @@ import express from 'express';
 import authMiddleware from '../middlewares/auth';
 import { authHandler, IUserAuthInfoRequest } from '../types/express';
 import { AuthSignInController } from '../useCases/User/AuthSignInUser/AuthLoginController';
-import { CreateUserController } from '../useCases/User/CreateUser/CreateUserController';
+import { CreateUserController } from '../useCases/User/CreateUser/controllers/CreateUserController';
 import { DeleteUserController } from '../useCases/User/DeleteUser/deleteUserController';
 import { GetAllUserController } from '../useCases/User/GetAllUsers/GetAllUserController';
 import { UpdateUserController } from '../useCases/User/Updateuser/UpdateUserController';
