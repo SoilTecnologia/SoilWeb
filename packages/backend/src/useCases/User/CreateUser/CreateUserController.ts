@@ -1,9 +1,10 @@
+import { ICreateUserController } from '@root/database/protocols/users';
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { messageErrorTryAction } from '../../../utils/types';
 import { CreateUserUseCase } from './CreateUserUseCase';
 
-class CreateUserController {
+class CreateUserController implements ICreateUserController {
   async handle(
     request: Request,
     response: Response,

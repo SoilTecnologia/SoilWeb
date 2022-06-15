@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 
 export interface IUserAuthInfoRequest extends express.Request {
   user: {
@@ -11,7 +11,7 @@ export const authHandler = (
   handler: (
     req: IUserAuthInfoRequest,
     res: express.Response,
-    next: express.NextFunction,
+    next: express.NextFunction
   ) => any
 ) => {
   return (
@@ -22,4 +22,10 @@ export const authHandler = (
     const requestWrapper: IUserAuthInfoRequest = <IUserAuthInfoRequest>req;
     handler(requestWrapper, res, next);
   };
+};
+
+export type ParamsHandlerController = {
+  request: Request;
+  response: Response;
+  next: NextFunction;
 };

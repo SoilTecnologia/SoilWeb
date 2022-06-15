@@ -23,7 +23,8 @@ class AuthSignInUseCase {
       return false;
     } catch (err) {
       console.log('ERROR WHEN COMPARE PASSWORD');
-      console.log(err.message);
+      const error = err as Error;
+      console.log(error.message);
     }
   }
 

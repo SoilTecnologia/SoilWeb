@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
       "@root/*": ["./src/*"],
       "@useCases/*": ["./src/useCases/*"],
@@ -16,7 +16,7 @@
     "declarationDir": "./dist/@types",
     "declaration": true,
     "removeComments": true,
-    "rootDir": ".",
+    "rootDir": "./",
     "target": "es2021",
     "sourceMap": true,
     "skipLibCheck": true,
@@ -24,11 +24,14 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "strict": true,
+    "strict": false,
+    "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
-    "noImplicitOverride": true,
+    "noImplicitAny": true,
+    "alwaysStrict": false,
+    "strictNullChecks": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
-  },
-  "include": ["src", "__tests__"]
+    "experimentalDecorators": true,
+    "typeRoots": ["./node_modules/@types/", "./src/types"]
+  }
 }

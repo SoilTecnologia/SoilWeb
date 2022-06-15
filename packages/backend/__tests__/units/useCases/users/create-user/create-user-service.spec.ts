@@ -1,7 +1,8 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import {
   ICreateUserRepository,
-  ICreateUserUseCase
+  ICreateUserUseCase,
+  IFindUserByLogin
 } from '@database/protocols/users';
 import {
   AlreadyExistsError,
@@ -14,7 +15,9 @@ import { UserModel } from '@database/model/User';
 import { CreateUserUseCase } from '@useCases/User/CreateUser/CreateUserUseCase';
 
 describe('Create User Use Case', () => {
-  let userRepository: MockProxy<ICreateUserUseCase.Dependencies>;
+  let addUserRepo: MockProxy<ICreateUserRepository>;
+  let findUserRepo: MockProxy<IFindUserByLogin>;
+
   let encrypter: MockProxy<IEncrypter>;
   let token: MockProxy<ITokenJwt>;
   let createUserService: ICreateUserUseCase;
@@ -24,11 +27,17 @@ describe('Create User Use Case', () => {
   let userCreated: UserModel;
 
   beforeEach(() => {
-    userRepository = mock();
+    addUserRepo = mock();
+    findUserRepo = mock();
     encrypter = mock();
     token = mock();
 
-    createUserService = new CreateUserUseCase(token, encrypter, userRepository);
+    createUserService = new CreateUserUseCase(
+      token,
+      encrypter,
+      addUserRepo,
+      findUserRepo
+    );
 
     addUser = { login: 'soil', password: '123456', user_type: 'SUDO' };
     addUserEncrypted = { ...addUser, password: 'password_encrypted' };
@@ -46,8 +55,8 @@ describe('Create User Use Case', () => {
       user_type: 'SUDO'
     };
 
-    userRepository.findUserByLogin.mockResolvedValue(undefined);
-    userRepository.create.mockResolvedValue(userCreated);
+    findUserRepo.findUserByLogin.mockResolvedValue(undefined);
+    addUserRepo.create.mockResolvedValue(userCreated);
     encrypter.encrypt.mockResolvedValue('password_encrypted');
     token.create.mockResolvedValue('token_valid');
   });
@@ -72,7 +81,7 @@ describe('Create User Use Case', () => {
   });
 
   it('should encrypted password return password encrypted ', async () => {
-    const callUserCreated = jest.spyOn(userRepository, 'create');
+    const callUserCreated = jest.spyOn(addUserRepo, 'create');
     await createUserService.execute(addUser);
 
     expect(callUserCreated).toHaveBeenCalledWith({
@@ -83,7 +92,7 @@ describe('Create User Use Case', () => {
 
   // Tests created user in database response
   it('should create user repository to have been called with data valids to have called once time', async () => {
-    const fnEncrypted = jest.spyOn(userRepository, 'create');
+    const fnEncrypted = jest.spyOn(addUserRepo, 'create');
 
     await createUserService.execute(addUser);
 
@@ -92,7 +101,7 @@ describe('Create User Use Case', () => {
   });
 
   it('should find user repository to have been called with data valids to have called once time', async () => {
-    const fnEncrypted = jest.spyOn(userRepository, 'findUserByLogin');
+    const fnEncrypted = jest.spyOn(findUserRepo, 'findUserByLogin');
 
     await createUserService.execute(addUser);
 
@@ -101,7 +110,7 @@ describe('Create User Use Case', () => {
   });
 
   it('should to throw error if user is not created in database', async () => {
-    userRepository.create.mockResolvedValueOnce(undefined);
+    addUserRepo.create.mockResolvedValueOnce(undefined);
 
     const err = createUserService.execute(addUser);
 
@@ -109,7 +118,7 @@ describe('Create User Use Case', () => {
   });
 
   it('should to throw error if user received already exists in database', async () => {
-    userRepository.findUserByLogin.mockResolvedValueOnce({
+    findUserRepo.findUserByLogin.mockResolvedValueOnce({
       user_id: 'soil_id',
       login: 'soil',
       password: '123456',
@@ -163,7 +172,7 @@ describe('Create User Use Case', () => {
   });
 
   it('should throw database error, when repository create return error', () => {
-    jest.spyOn(userRepository, 'create').mockRejectedValueOnce(new Error());
+    jest.spyOn(addUserRepo, 'create').mockRejectedValueOnce(new Error());
 
     const promise = createUserService.execute(addUser);
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
@@ -171,7 +180,7 @@ describe('Create User Use Case', () => {
 
   it('should throw database error, when repository findUserByLogin return error', () => {
     jest
-      .spyOn(userRepository, 'findUserByLogin')
+      .spyOn(findUserRepo, 'findUserByLogin')
       .mockRejectedValueOnce(new Error());
     const promise = createUserService.execute(addUser);
 

@@ -46,8 +46,9 @@ class ProcessQueueMessages {
               }
             }, 10000);
           } catch (err) {
+            const error = err as Error;
             console.log('ERROR AWS publish');
-            console.log(err.message);
+            console.log(error.message);
             queue.attempts!!++;
             if (queue.attempts!! > 3) {
               console.log('Error to received ACK');

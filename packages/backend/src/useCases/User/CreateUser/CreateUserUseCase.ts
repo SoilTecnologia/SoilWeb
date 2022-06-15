@@ -2,7 +2,8 @@ import { inject, injectable } from 'tsyringe';
 import { UserModel } from '@database/model/User';
 import {
   ICreateUserRepository,
-  ICreateUserUseCase
+  ICreateUserUseCase,
+  IFindUserByLogin
 } from '@database/protocols/users';
 import {
   AlreadyExistsError,
@@ -20,15 +21,15 @@ class CreateUserUseCase implements ICreateUserUseCase {
   constructor(
     @inject('TokenJwt') private tokenJwt: ITokenJwt,
     @inject('Encrypter') private encrypter: IEncrypter,
-    @inject('UsersRepository')
-    private userRepository: ICreateUserUseCase.Dependencies
+    @inject('AddUser') private addUserRepo: ICreateUserRepository,
+    @inject('FindUserByLogin') private findUserRepo: IFindUserByLogin
   ) {}
 
   private async apllyQueryFindUser(
     login: UserModel['login']
   ): Promise<UserModel | undefined | DatabaseError> {
     try {
-      return await this.userRepository.findUserByLogin(login);
+      return await this.findUserRepo.findUserByLogin(login);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -44,7 +45,7 @@ class CreateUserUseCase implements ICreateUserUseCase {
     user: ICreateUserUseCase.Params
   ): Promise<ICreateUserRepository.Response | DatabaseError> {
     try {
-      return await this.userRepository.create(user);
+      return await this.addUserRepo.create(user);
     } catch (err) {
       messageErrorTryAction(
         err,
