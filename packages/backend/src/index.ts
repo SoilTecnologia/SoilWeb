@@ -1,14 +1,15 @@
 /* eslint-disable camelcase */
-/* 
+/*
 This is the entry point of the application,
 this file is responsible for:
   - Setting up the Express Server
   - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)
   - Setting up the event emitter to be used on other systems
 */
-import dotenv from "dotenv"
+import './utils/config/module-alias';
+import dotenv from 'dotenv';
 import cors from 'cors';
-import dayjs from 'dayjs';
+
 import express from 'express';
 import { createServer } from 'http';
 import 'reflect-metadata';
@@ -22,8 +23,8 @@ import './shared/container';
 import emitter from './utils/eventBus';
 import { handleResultAction } from './utils/handleFarmIdWithUndescores';
 dotenv.config({
-  path: process.env.NODE_ENV === "test" ? ".env.test" : ".env"
-})
+  path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env'
+});
 
 const PORT = 3308;
 const app = express();
@@ -132,13 +133,14 @@ try {
         pivot_num,
         farm_name
       });
-      
+
       emitter.off('action-ack-not-received', () => {});
     });
   });
 } catch (err) {
+  const error = err as Error;
   console.log('Error to connect Io');
-  console.log(err.message);
+  console.log(error.message);
 }
 
 // raspberry.start();

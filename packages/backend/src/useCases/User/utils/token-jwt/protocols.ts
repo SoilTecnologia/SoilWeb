@@ -1,15 +1,12 @@
-import { UserModel } from '../../../../database/model/User'
-import { ICreateUserUseCase } from '../../../../database/protocols/users/create-user/create-user'
+import { UserModel } from '@database/model/User';
 
-interface ITokenJwt{
-  create(user: ITokenJwt.Params): Promise<ITokenJwt.Response>
+interface ITokenJwt {
+  create(user: ITokenJwt.Params): Promise<ITokenJwt.Response>;
 }
 
-namespace ITokenJwt{
-  export type Params = UserModel
-  export type Response =  string | null
+namespace ITokenJwt {
+  export type Params = UserModel;
+  export type Response = string | null;
 }
 
-export {
-  ITokenJwt
-}
+export { ITokenJwt };
