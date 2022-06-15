@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
+import authMiddleware from "../protocols/middlewares/auth"
 import { CreateSchedulingAngleHistController } from '../useCases/SchedulingAngleHist/CreateSchedulingAngleHist/CreateSchedulingAngleHistController'
 import { DeleteSchedulingAngleHistController } from '../useCases/SchedulingAngleHist/DeleteSchedulingAngleHist/DeleteSchedulingAngleHistController';
 import { GetAllSchedulingAngleHistController } from '../useCases/SchedulingAngleHist/GetAllSchedulingAngleHist/GetAllSchedulingAngleHistController';

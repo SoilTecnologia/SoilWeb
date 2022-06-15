@@ -1,9 +1,9 @@
 import knex from '../../..';
 import { UserModel } from '../../../model/User';
-import { IFindByLogin } from './IFindByLoginRepository';
+import { IFindUserByLogin } from '../../../protocols/users';
 
-class FindUserByLoginRepository implements IFindByLogin {
-  async findByLogin(login: string): Promise<UserModel | undefined> {
+class FindUserByLoginRepository implements IFindUserByLogin {
+  async findUserByLogin(login: IFindUserByLogin.Params): Promise<IFindUserByLogin.Response> {
     try {
       return await knex<UserModel>('users')
         .select('*')

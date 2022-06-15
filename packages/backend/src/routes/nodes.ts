@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
+import authMiddleware from "../protocols/middlewares/auth"
 import { CreateNodeController } from '../useCases/Nodes/CreateNode/CreateNodeController';
 import { DeleteNodeController } from '../useCases/Nodes/DeleteNode/DeleteNodeController';
 import { GetAllByFarmIdController } from '../useCases/Nodes/GetAllByFarmId/GetAllByFarmIdController';

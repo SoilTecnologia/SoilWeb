@@ -1,10 +1,9 @@
 import knex from '../../..';
-import { AddUserModel } from '../../../../useCases/User/CreateUser/protocols/ICreateUser';
 import { UserModel } from '../../../model/User';
-import { IAddNewUser } from './IAddNewUser';
+import { ICreateUserRepository } from '../../../protocols/users';
 
-class AddNewUserRepository implements IAddNewUser {
-  async create(user: AddUserModel): Promise<UserModel> {
+class AddNewUserRepository implements ICreateUserRepository {
+  async create(user: ICreateUserRepository.Params): Promise<ICreateUserRepository.Response> {
     const newUsers = await knex<UserModel>('users').insert(user).returning('*');
     return newUsers[0]
   }

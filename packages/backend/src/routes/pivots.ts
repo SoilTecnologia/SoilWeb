@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
+import authMiddleware from "../protocols/middlewares/auth"
 import { CreatePivotController } from '../useCases/Pivots/CreatePivots/CreatePivotController';
 import { DeletePivotController } from '../useCases/Pivots/DeletePivot/DeletePivotController';
 import { FindAllController } from '../useCases/Pivots/FindAll/FindAllController';

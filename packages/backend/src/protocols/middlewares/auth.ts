@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { IUserAuthInfoRequest } from '../types/express';
+import { IUserAuthInfoRequest } from '../express';
 
 interface TokenInfo {
   user_id: string;
@@ -13,11 +13,15 @@ interface TokenInfo {
   - Returns 200 and user details if it's valid
   - Returns 40x if the token is invalid or not provided
 */
-const authMiddleware = (): ((
+
+type MiddleResponse = (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
-) => any) => {
+) => any
+
+
+const authMiddleware = (): MiddleResponse => {
   return (
     req: express.Request,
     res: express.Response,

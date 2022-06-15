@@ -1,6 +1,6 @@
 /* eslint-disable spaced-comment */
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
+import authMiddleware from "../protocols/middlewares/auth"
 import { CreateFarmController } from '../useCases/Farms/CreateFarms/CreateFarmController';
 import { DeleteFarmController } from '../useCases/Farms/DeleteFarm/DeleteFarmController';
 import { GetAllFarmsController } from '../useCases/Farms/GetAllfarms/GetAllFarmsController';

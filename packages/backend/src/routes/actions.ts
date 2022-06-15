@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
+import authMiddleware from "../protocols/middlewares/auth"
 import { CreateActionController } from '../useCases/Actions/CreateAction/CreateActionController';
 import { DeleteActionController } from '../useCases/Actions/DeleteAction/DeleteActionController';
 import { DeleteAllActionController } from '../useCases/Actions/DeleteAllActions/DeleteALlActionController';

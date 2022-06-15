@@ -1,6 +1,6 @@
 import { container } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
-import { ActionsResult } from '../../../types/actionsType';
+import { ActionsResult } from '../../../protocols/actionsType';
 import { GetOneNodeUseCase } from '../../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
 import { messageErrorTryAction } from '../../../utils/types';
 

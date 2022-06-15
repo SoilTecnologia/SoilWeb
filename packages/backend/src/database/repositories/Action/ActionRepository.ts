@@ -1,5 +1,5 @@
 import knex from '../..';
-import { ActionsResult } from '../../../types/actionsType';
+import { ActionsResult } from '../../../protocols/actionsType';
 import { ActionModel } from '../../model/Action';
 import { CreateAction } from '../../model/types/action';
 import { IActionRepository } from './IActionRepository';

@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
+import authMiddleware from "../protocols/middlewares/auth"
 import { CreateSchedulingAngleController } from '../useCases/SchedulingAngle/CreateSchedulingAngle/CreateSchedulingAngleController';
 import { DeleteSchedulingAngleController } from '../useCases/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleController';
 import { GetAllSchedulingAngleController } from '../useCases/SchedulingAngle/GetAllSchedulingAngle/GetAllSchedulingAngleController';

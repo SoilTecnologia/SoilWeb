@@ -1,4 +1,4 @@
-import MessageQueueType from '../types/message_queue';
+import MessageQueueType from '../protocols/message_queue';
 
 let _ = require('lodash');
 

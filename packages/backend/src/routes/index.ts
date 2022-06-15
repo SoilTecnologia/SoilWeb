@@ -1,6 +1,6 @@
 import express from 'express';
 // import raspberryRoute from './raspberry';
-import { ServerError } from '../types/errors';
+import { ServerError } from '../protocols/errors';
 import actionRoute from './actions';
 import cycleRoute from './cycles';
 import farmRoute from './farms';

@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
+import authMiddleware from "../protocols/middlewares/auth"
 import { GetCycleController } from '../useCases/Cycles/GetCycles/GetCycleController';
 import { GetLastCycleController } from '../useCases/Cycles/GetLastCycles/GetLastCyclesController';
 

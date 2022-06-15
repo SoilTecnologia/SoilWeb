@@ -1,4 +1,4 @@
-import { ActionsResult } from '../../../types/actionsType';
+import { ActionsResult } from '../../../protocols/actionsType';
 import { ActionModel } from '../../model/Action';
 import { CreateAction } from '../../model/types/action';
 import { UserModel } from '../../model/User';

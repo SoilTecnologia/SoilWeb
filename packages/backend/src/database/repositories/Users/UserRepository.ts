@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import knex from '../..';
-import { InvalidCredentials } from '../../../types/errors';
+import { InvalidCredentials } from '../../../protocols/errors';
 import { UserModel } from '../../model/User';
 import { IUsersRepository, ResponseDTO } from './IUsersRepository';
 

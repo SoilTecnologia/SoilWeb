@@ -1,5 +1,5 @@
 import { container } from 'tsyringe';
-import { ActionsResult } from '../../types/actionsType';
+import { ActionsResult } from '../../protocols/actionsType';
 import { DeleteActionUseCase } from '../../useCases/Actions/DeleteAction/DeleteACtionUseCase';
 import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase';
 import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';

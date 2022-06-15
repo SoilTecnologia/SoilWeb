@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
+import authMiddleware from "../protocols/middlewares/auth"
 import { GetPivotStateController } from '../useCases/States/GetPivotState/GetPivotStateController';
 
 const router = express.Router();

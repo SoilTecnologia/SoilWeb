@@ -1,5 +1,5 @@
 import express from 'express';
-import authMiddleware from '../middlewares/auth';
+import authMiddleware from "../protocols/middlewares/auth"
 import { CreatePumpController } from '../useCases/Pumps/CreatePump/CreatePumpController';
 import { DeletePumpController } from '../useCases/Pumps/DeletePump/DeletePumpController';
 import { GetPumpController } from '../useCases/Pumps/GetPump/GetPumpController';

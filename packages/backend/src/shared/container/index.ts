@@ -27,13 +27,22 @@ import { SchedulingAngleHistRepository } from '../../database/repositories/Sched
 import { ISchedulingAngleHistRepository } from '../../database/repositories/SchedulingAngleHist/ISchedulingAngleHistRepository'
 import { AddNewUserRepository } from '../../database/repositories/Users/AddUser/AddNewUserRepository';
 import { FindAllUseCase } from '../../useCases/Pivots/FindAll/FindAllUseCase';
-import { IAddNewUser } from '../../database/repositories/Users/AddUser/IAddNewUser';
-import { IFindByLogin } from '../../database/repositories/Users/FindByLogin/IFindByLoginRepository';
 import { FindUserByLoginRepository } from '../../database/repositories/Users/FindByLogin/FindByLoginRTepository';
+import { ICreateUserRepository } from '../../database/protocols/users/create-user/create-user';
+import { IFindUserByLogin } from '../../database/protocols/users/find-user-by-login/IFindByLoginRepository';
+import { IEncrypter } from '../../useCases/User/utils/encrypted-password/protocols';
+import { BcryptAdapter } from '../../useCases/User/utils/encrypted-password';
+import { ITokenJwt } from '../../useCases/User/utils/token-jwt/protocols';
+import { CreateJwt } from '../../useCases/User/utils/token-jwt';
 
 //Users
-container.register<IAddNewUser>("AddUser", AddNewUserRepository)
-container.register<IFindByLogin>("FindUserByLogin", FindUserByLoginRepository)
+container.register<ICreateUserRepository>("AddUser", AddNewUserRepository)
+container.register<IFindUserByLogin>("FindUserByLogin", FindUserByLoginRepository)
+
+//Encrypter
+container.register<IEncrypter>("Encrypter", BcryptAdapter)
+//Token Jwt
+container.register<ITokenJwt>("TokenJwt", CreateJwt)
 
 container.registerSingleton<IUsersRepository>(
   'UsersRepository',

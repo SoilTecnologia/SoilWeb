@@ -1,4 +1,4 @@
-import { ActionsResult } from '../../types/actionsType';
+import { ActionsResult } from '../../protocols/actionsType';
 
 interface ActionData  {
   action: ActionsResult;
