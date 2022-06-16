@@ -1,12 +1,16 @@
-import knex from '../../..';
-import { UserModel } from '../../../model/User';
-import { ICreateUserRepository } from '../../../protocols/users';
+import knex from '@database/index';
+import { UserModel } from '@database/model/User';
+import { ICreateUserRepository } from '@database/protocols/users';
 
-class AddNewUserRepository implements ICreateUserRepository {
-  async create(user: ICreateUserRepository.Params): Promise<ICreateUserRepository.Response> {
-    const newUsers = await knex<UserModel>('users').insert(user).returning('*');
-    return newUsers[0]
+class AddNewUserRepo implements ICreateUserRepository {
+  async create(
+    user: ICreateUserRepository.Params
+  ): Promise<ICreateUserRepository.Response> {
+    const [newUsers] = await knex<UserModel>('users')
+      .insert(user)
+      .returning('*');
+    return newUsers;
   }
 }
 
-export {AddNewUserRepository}
+export { AddNewUserRepo };

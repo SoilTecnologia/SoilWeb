@@ -39,31 +39,37 @@ export class InvalidRequestBody extends Error {
   }
 }
 
-export class AlreadyExistsError extends Error{
- constructor(data: string){
-  super(`${data} Already Exists`)
+export class AlreadyExistsError extends Error {
+  constructor(data: string) {
+    super(`${data} Already Exists`);
 
-  Object.setPrototypeOf(this, AlreadyExistsError.prototype);
- }
+    Object.setPrototypeOf(this, AlreadyExistsError.prototype);
+  }
 }
 
-export class FailedCreateDataError extends Error{
-  constructor(data: string){
-    super(`Failed in at created ${data}`)
+export class FailedCreateDataError extends Error {
+  constructor(data: string) {
+    super(`Failed in at created ${data}`);
 
     Object.setPrototypeOf(this, FailedCreateDataError.prototype);
-
   }
 }
 
-export class DatabaseErrorReturn extends Error{
-  constructor(){
-    super("Database Error")
+export class DatabaseErrorReturn extends Error {
+  constructor() {
+    super('Database Error');
 
     Object.setPrototypeOf(this, DatabaseErrorReturn.prototype);
-
   }
 }
 
-export type DatabaseError = "Database Error"
-export const DATABASE_ERROR: DatabaseError = "Database Error"
+export class TypeParamError extends Error {
+  constructor(value: string) {
+    super(`Type Data Inválid ${value}`);
+
+    Object.setPrototypeOf(this, TypeParamError.prototype);
+  }
+}
+
+export type DatabaseError = 'Database Error';
+export const DATABASE_ERROR: DatabaseError = 'Database Error';

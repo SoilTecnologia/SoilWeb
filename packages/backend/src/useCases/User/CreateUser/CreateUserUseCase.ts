@@ -2,14 +2,16 @@ import { inject, injectable } from 'tsyringe';
 import { UserModel } from '@database/model/User';
 import {
   ICreateUserRepository,
-  ICreateUserUseCase
+  ICreateUserUseCase,
+  IFindUserByLogin
 } from '@database/protocols/users';
 import {
   AlreadyExistsError,
   DatabaseError,
   DatabaseErrorReturn,
   DATABASE_ERROR,
-  FailedCreateDataError
+  FailedCreateDataError,
+  TypeParamError
 } from '@protocols/errors';
 import { messageErrorTryAction } from '@utils/types';
 import { IEncrypter } from '../utils/encrypted-password/protocols';
@@ -20,15 +22,15 @@ class CreateUserUseCase implements ICreateUserUseCase {
   constructor(
     @inject('TokenJwt') private tokenJwt: ITokenJwt,
     @inject('Encrypter') private encrypter: IEncrypter,
-    @inject('UsersRepository')
-    private userRepository: ICreateUserUseCase.Dependencies
+    @inject('AddUser') private addUserRepo: ICreateUserRepository,
+    @inject('FindUserByLogin') private findUserRepo: IFindUserByLogin
   ) {}
 
   private async apllyQueryFindUser(
     login: UserModel['login']
   ): Promise<UserModel | undefined | DatabaseError> {
     try {
-      return await this.userRepository.findUserByLogin(login);
+      return await this.findUserRepo.findUserByLogin(login);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -44,7 +46,7 @@ class CreateUserUseCase implements ICreateUserUseCase {
     user: ICreateUserUseCase.Params
   ): Promise<ICreateUserRepository.Response | DatabaseError> {
     try {
-      return await this.userRepository.create(user);
+      return await this.addUserRepo.create(user);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -60,6 +62,12 @@ class CreateUserUseCase implements ICreateUserUseCase {
     user: ICreateUserUseCase.Params
   ): Promise<ICreateUserUseCase.Response> {
     const { password, login, user_type } = user;
+
+    if (!password || !login || !user_type) throw new Error('Params inválids');
+    if (typeof password !== 'string') throw new TypeParamError('password');
+    if (typeof login !== 'string') throw new TypeParamError('login');
+    if (typeof user_type !== 'string') throw new TypeParamError('user_type');
+
     const encryptedPassword = await this.encrypter.encrypt(password);
 
     const userALreadyExists = await this.apllyQueryFindUser(
@@ -78,19 +86,18 @@ class CreateUserUseCase implements ICreateUserUseCase {
       });
 
       const newUser = await this.apllyQueryCreateUser(userModel);
-
       if (newUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
       else if (!newUser) throw new FailedCreateDataError('User');
       else {
         const token = await this.tokenJwt.create(newUser);
-
         if (!token) throw new Error('Does not create token jwt');
-        else
+        else {
           return {
             user_id: newUser.user_id,
             user_type: newUser.user_type,
-            token
+            token: token
           };
+        }
       }
     }
   }

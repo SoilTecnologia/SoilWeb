@@ -56,9 +56,9 @@ class HandleActionActive {
     const action = await this.getUpdatePivotController.execute(
       active.action.pivot_id,
       true,
-      payload.power || false ,
+      payload.power || false,
       payload.water || false,
-      payload.direction || "CLOCKWISE" ,
+      payload.direction || 'CLOCKWISE',
       payload.angle || 0,
       payload.percentimeter || 0,
       payload.timestamp || new Date(),
@@ -131,8 +131,9 @@ class HandleActionActive {
             });
         }
       } catch (err) {
+        const error = err as Error;
         console.log('ERROR IN Returns Failled');
-        console.log(err.message);
+        console.log(error.message);
       } finally {
         this.activeQueue.remove(this.current);
         emitter.emit('action-not-update', { id: active.action.pivot_id });
@@ -189,7 +190,8 @@ class HandleActionActive {
         await this.treatsResponses(response, active);
       }
     } catch (err) {
-      console.log(err.message);
+      const error = err as Error;
+      console.log(error.message);
       await this.logErrorTry(active);
     }
   }
@@ -215,7 +217,8 @@ class HandleActionActive {
       try {
         await this.sendItem(active);
       } catch (err) {
-        console.log(`[ERROR - RASPBERRY.TEST]: ${err.message}`);
+        const error = err as Error;
+        console.log(`[ERROR - RASPBERRY.TEST]: ${error.message}`);
         console.log('');
         await this.logErrorTry(active);
       }

@@ -1,5 +1,4 @@
 import express from 'express';
-// import raspberryRoute from './raspberry';
 import { ServerError } from '../protocols/errors';
 import actionRoute from './actions';
 import cycleRoute from './cycles';
@@ -32,8 +31,10 @@ function error(
   next: express.NextFunction
 ) {
   console.log(err);
-  if (err instanceof ServerError) res.status(400).send(err.message);
-  else if (err instanceof Error) res.status(500).send(err.message);
+  const error = err as Error;
+
+  if (err instanceof ServerError) res.status(400).send(error.message);
+  else if (err instanceof Error) res.status(500).send(error.message);
   else res.status(500).send('Internal Server Error');
   next();
 }

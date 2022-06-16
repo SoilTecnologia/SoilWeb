@@ -8,10 +8,10 @@ COPY package.json .
 
 COPY tsconfig.json .
 
-RUN yarn 
+RUN yarn
 
 COPY . .
 
 EXPOSE 3308
 
-CMD ["yarn", "dev"]
+CMD ["yarn", "cloud"]

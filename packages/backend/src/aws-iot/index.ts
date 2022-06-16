@@ -101,8 +101,10 @@ class IoTDevice {
       this.type === 'Cloud' && (await checkGprsInterval.checkPivots());
       await this.setupQueue();
     } catch (err) {
+      const error = err as Error;
+
       console.log('Aws does not connected'.toUpperCase());
-      console.log(err);
+      console.log(error.message);
     }
   }
   /*
@@ -120,10 +122,11 @@ class IoTDevice {
       console.log('.......................');
       await this.connection.publish(finalTopic!, string, 0, false);
     } catch (err) {
+      const error = err as Error;
       console.log(
         `Error publishing to topic: ${finalTopic} from ${this.clientId}`
       );
-      console.log(err.message);
+      console.log(error.message);
     }
   }
 

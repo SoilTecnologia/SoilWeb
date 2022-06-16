@@ -14,7 +14,8 @@ class GetFarmByUserUseCase {
       return await this.farmRepository.getFarmsByUser(user_id);
     } catch (err) {
       console.log(`${ERROR_QUERIES_DATABASE} --> ${GetFarmByUserUseCase.name}`);
-      console.log(err.message);
+      const error = err as Error;
+      console.log(error.message);
     }
   }
 }

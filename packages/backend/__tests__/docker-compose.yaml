@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  soil_postgres_test:
+    image: postgres:alpine
+    container_name: soil_db_test
+    restart: always
+    ports:
+      - 5436:5432
+    environment:
+      - POSTGRES_USER=soil_test
+      - POSTGRES_PASSWORD=soil2021_test
+      - POSTGRES_DB=soildb_test
+    volumes:
+      - ./database/scripts:/docker-entrypoint-initdb.d
