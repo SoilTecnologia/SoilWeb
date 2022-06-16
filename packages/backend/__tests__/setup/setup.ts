@@ -1,6 +1,6 @@
+import 'reflect-metadata';
 import knex from 'knex';
 import { MockClient } from 'knex-mock-client';
-import 'reflect-metadata';
 
 jest.mock('../../src/database/index', () => {
   return knex({ client: MockClient, dialect: 'pg' });

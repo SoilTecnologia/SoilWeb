@@ -11,7 +11,7 @@ export default {
 
   test: {
     client: 'sqlite3',
-    connection: ':memory:',
+    connection: '../__tests__/database/data.db',
     useNullAsDefault: true,
     migrations: {
       directory: './migrations'

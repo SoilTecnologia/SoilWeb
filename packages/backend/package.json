@@ -37,12 +37,12 @@
     "play": "node dist/src/index.js",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts --poll",
     "clear": "NODE_ENV=test jest --clearCache",
-    "test": "NODE_ENV=test jest --passWithNoTests  --silent --noStackTrace --runInBand --detectOpenHandles --forceExit",
+    "test": "NODE_ENV=test jest --passWithNoTests --silent --noStackTrace --runInBand --detectOpenHandles",
     "test:full": "NODE_ENV=test jest   --passWithNoTests --noStackTrace --runInBand",
-    "test:unit": "NODE_ENV=test jest  -- --watch -c jest-unit-config.js ",
+    "test:unit": "NODE_ENV=test npm test -- --watch -c jest-unit-config.js ",
     "test:integration": "NODE_ENV=test npm test -- --watch -c jest-integration-config.js ",
     "test:staged": "NODE_ENV=test npm test --findRelatedTests",
-    "test:ci": "NODE_ENV=test jest --passWithNoTests --silent --noStackTrace --runInBand --collect-coverage"
+    "test:ci": "NODE_ENV=test npm test -c -- --coverage"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -70,6 +70,7 @@
     "module-alias": "^2.2.2",
     "node-cron": "^3.0.0",
     "node-schedule": "^2.1.0",
+    "objection": "^3.0.1",
     "ora": "^6.1.0",
     "pg": "^8.7.1",
     "postgres": "^1.0.2",
