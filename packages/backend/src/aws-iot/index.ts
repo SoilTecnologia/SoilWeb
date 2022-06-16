@@ -13,7 +13,7 @@ import { checkGprsInterval } from './data/utils/gprsChecking';
 import { emitterResponse } from './data/utils/gprsChecking/emitterResponse';
 /*
 Essa classe é responsável por fornecer uma abstração sobre a biblioteca aws-iot-device-sdk-v2.
-Com ela, conseguimos fazer o envio de mensagens para o broker aws-iot-core, e, dependendo de como 
+Com ela, conseguimos fazer o envio de mensagens para o broker aws-iot-core, e, dependendo de como
 inicializamos sua instância, decidimos como ela deve ser utilizada.
 */
 
@@ -67,21 +67,21 @@ class IoTDevice {
     try {
       let configBuilder: iot.AwsIotMqttConnectionConfigBuilder;
       configBuilder =
-         iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(
+        iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(
           certPath,
           keyPath
         );
 
-       configBuilder.with_clean_session(false);
-       configBuilder.with_client_id(this.clientId);
-       configBuilder.with_endpoint(endpoint);
+      configBuilder.with_clean_session(false);
+      configBuilder.with_client_id(this.clientId);
+      configBuilder.with_endpoint(endpoint);
       // configBuilder.with_keep_alive_seconds(10);
       // configBuilder.with_ping_timeout_ms(1000);
 
       const config = configBuilder.build();
       const client = new mqtt.MqttClient();
 
-      this.connection =  client.new_connection(config);
+      this.connection = client.new_connection(config);
 
       /*
       Aqui fazemos a conexão com o broker e o subscribe de um tópico dependendo do tipo de dispositivo.
@@ -156,21 +156,20 @@ class IoTDevice {
         payload: any;
       } = json;
 
-      console.log(json)
+      console.log(json);
       console.log(`Recebido ack ${JSON.stringify(json, null, 2)}`);
-      
-      const pivotId = payload.pivot_id || id
+
+      const pivotId = payload.pivot_id || id;
 
       if (type === 'status' && this.type === 'Cloud') {
         checkGprsInterval.addResponseStatus(pivotId);
       } else if (type === 'action') {
         emitterResponse.addActionStatus(pivotId);
       }
-      
-      const {node_num} = handleResultString(id)
+
+      const { node_num } = handleResultString(id);
       if (this.type === 'Cloud') {
         if (json.type === 'status') {
-          
           const result = await HandleCloudMessageTypeCloud.receivedStatus({
             pivot_id: pivotId,
             payload,
@@ -203,7 +202,7 @@ class IoTDevice {
   };
 
   /*
-  A função que cria a Queue adiciona listeners que irão receber eventos do banco de dados e adiciona-los a fila de mensagens. 
+  A função que cria a Queue adiciona listeners que irão receber eventos do banco de dados e adiciona-los a fila de mensagens.
   OBS: a conversao do timestamp pra string é pra facilitar a comparação no método queue.remove
   */
 

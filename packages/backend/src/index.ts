@@ -6,7 +6,6 @@ this file is responsible for:
   - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)
   - Setting up the event emitter to be used on other systems
 */
-import './utils/config/module-alias';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
