@@ -6,12 +6,16 @@ import { AuthSignInUseCase } from './AuthLoginUseCase';
 class AuthSignInController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const { login, password } = req.body;
+
+    if (Object.keys(req.body).length > 2)
+      res.status(400).send({ error: 'Received Params not expected' });
+
     const authSignInUseCase = container.resolve(AuthSignInUseCase);
 
     try {
-      const cookieInfo = await authSignInUseCase.execute(login, password);
+      const cookieInfo = await authSignInUseCase.execute({ login, password });
 
-      res.status(200).send(cookieInfo);
+      res.status(201).send(cookieInfo);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -19,7 +23,7 @@ class AuthSignInController {
         AuthSignInController.name,
         ` TRY LOGIN`
       );
-      next();
+      return res.status(400).send({ error: err.message });
     }
   }
 }

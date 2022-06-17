@@ -3,7 +3,7 @@ import { IEncrypter } from './protocols';
 
 class BcryptAdapter implements IEncrypter {
   private salt = 10;
-  async encrypt(value: string): Promise<string | Error> {
+  async encrypt({ value }: IEncrypter.Params): IEncrypter.Response {
     try {
       const hash = await bcrypt.hash(value, this.salt);
       return hash;

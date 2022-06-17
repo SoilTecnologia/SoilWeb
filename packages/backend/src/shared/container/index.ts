@@ -30,10 +30,14 @@ import { FindAllUseCase } from '../../useCases/Pivots/FindAll/FindAllUseCase';
 import { FindUserByLoginRepo } from '@database/repositories/Users/FindByLogin/FindByLoginRTepository';
 import { ICreateUserRepository } from '@database/protocols/users/create-user/create-user';
 import { IFindUserByLogin } from '@database/protocols/users/find-user-by-login/IFindByLoginRepository';
-import { IEncrypter } from '../../useCases/User/utils/encrypted-password/protocols';
-import { BcryptAdapter } from '../../useCases/User/utils/encrypted-password';
+import {
+  ICompareEncrypt,
+  IEncrypter
+} from '../../useCases/User/utils/encrypted-password/protocols';
+import { BcryptAdapter } from '../../useCases/User/utils/encrypted-password/bcrypter-adapter';
 import { ITokenJwt } from '../../useCases/User/utils/token-jwt/protocols';
 import { CreateJwt } from '../../useCases/User/utils/token-jwt';
+import { BCryptCompare } from '@root/useCases/User/utils/encrypted-password/compare-encrypted';
 
 //Users
 container.register<ICreateUserRepository>('AddUser', AddNewUserRepo);
@@ -41,6 +45,7 @@ container.register<IFindUserByLogin>('FindUserByLogin', FindUserByLoginRepo);
 
 //Encrypter
 container.register<IEncrypter>('Encrypter', BcryptAdapter);
+container.register<ICompareEncrypt>('CompareEncrypt', BCryptCompare);
 //Token Jwt
 container.register<ITokenJwt>('TokenJwt', CreateJwt);
 

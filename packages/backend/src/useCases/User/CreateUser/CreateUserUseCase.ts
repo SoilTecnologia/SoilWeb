@@ -68,7 +68,7 @@ class CreateUserUseCase implements ICreateUserUseCase {
     if (typeof login !== 'string') throw new TypeParamError('login');
     if (typeof user_type !== 'string') throw new TypeParamError('user_type');
 
-    const encryptedPassword = await this.encrypter.encrypt(password);
+    const encryptedPassword = await this.encrypter.encrypt({ value: password });
 
     const userALreadyExists = await this.apllyQueryFindUser(
       login.toLowerCase()

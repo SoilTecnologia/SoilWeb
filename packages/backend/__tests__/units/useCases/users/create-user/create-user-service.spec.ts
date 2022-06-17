@@ -64,7 +64,7 @@ describe('Create User Use Case', () => {
 
     await createUserService.execute(addUser);
 
-    expect(fnEncrypted).toHaveBeenCalledWith('123456');
+    expect(fnEncrypted).toHaveBeenCalledWith({ value: '123456' });
     expect(fnEncrypted).toBeCalledTimes(1);
   });
 
