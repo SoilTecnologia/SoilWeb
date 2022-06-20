@@ -17,7 +17,7 @@ class AuthSignInUseCase implements ILoginAuth {
   constructor(
     @inject('TokenJwt') private tokenJwt: ITokenJwt,
     @inject('CompareEncrypt') private bcryptCompare: ICompareEncrypt,
-    @inject('UsersRepository') private findUserByLogin: IFindUserByLogin
+    @inject('FindUserByLogin') private findUserByLogin: IFindUserByLogin
   ) {}
 
   private async applyQuerie(

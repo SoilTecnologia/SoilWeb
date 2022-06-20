@@ -78,6 +78,20 @@ describe('Create User Use Case', () => {
     });
   });
 
+  it('should to have created token with data valids', async () => {
+    jest.spyOn(token, 'create').mockResolvedValueOnce('soiltech');
+
+    const value = await createUserService.execute(addUser);
+
+    expect(value).toHaveProperty('token', 'soiltech');
+  });
+
+  it('should to have error if encrypter to throw ', async () => {
+    jest.spyOn(token, 'create').mockResolvedValueOnce(null);
+
+    const promise = createUserService.execute(addUser);
+    expect(promise).rejects.toThrow(new Error('Does not create token jwt'));
+  });
   // Tests created user in database response
   it('should create user repository to have been called with data valids to have called once time', async () => {
     const fnEncrypted = jest.spyOn(addUserRepo, 'create');

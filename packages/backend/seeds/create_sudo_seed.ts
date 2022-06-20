@@ -10,7 +10,5 @@ export async function seed(knex: Knex): Promise<void> {
     login: 'sudo',
     password: '1234',
     user_type: 'SUDO'
-  }
-   
-  );
+  });
 }

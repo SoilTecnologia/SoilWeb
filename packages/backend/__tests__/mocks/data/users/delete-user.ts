@@ -7,5 +7,5 @@ export const deleteUserMocked = async (login: string) => {
     .where({ login })
     .first();
 
-  if (user) await knex('users').select('*').where({ login }).delete();
+  if (user) await knex('users').select('*').where({ login }).del();
 };

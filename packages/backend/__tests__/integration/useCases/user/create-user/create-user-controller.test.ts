@@ -3,15 +3,18 @@ import '@root/shared/container/index';
 import knex from '@root/database';
 import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
+import { UserModel } from '@root/database/model/User';
+import { deleteUserMocked } from '@tests/mocks/data/users/delete-user';
 
 describe('books', () => {
-  beforeEach(async () => {
-    await knex.migrate.rollback();
+  beforeAll(async () => {
+    await knex.migrate.down();
     await knex.migrate.latest();
-    await knex.seed.run();
   });
 
-  afterAll(async () => await knex.destroy());
+  afterAll(async () => {
+    await knex.destroy();
+  });
 
   it('should be return 400 and error params inválid if to have param null', async () => {
     const promise = await supertest(app).post('/users/signup').send({});
@@ -60,7 +63,11 @@ describe('books', () => {
   });
 
   it('should error if already exists a user in database', async () => {
-    await supertest(app).post('/users/signup').send(addUser);
+    const user = await knex('users')
+      .select('*')
+      .where({ login: addUser })
+      .first();
+    if (!user) await supertest(app).post('/users/signup').send(addUser);
 
     const promise = await supertest(app).post('/users/signup').send(addUser);
 
@@ -69,6 +76,8 @@ describe('books', () => {
   });
 
   it('should be return a status 201 and a user-response data valids with request call with params válids', async () => {
+    await deleteUserMocked(addUser.login);
+
     const promise = await supertest(app).post('/users/signup').send(addUser);
 
     expect(promise.status).toBe(201);

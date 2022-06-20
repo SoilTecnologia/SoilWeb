@@ -1,10 +1,12 @@
-import supertest from 'supertest';
 import '@root/shared/container/index';
+import supertest from 'supertest';
 import knex from '@root/database';
 import { app } from '@root/app';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { ICompareEncrypt } from '@root/useCases/User/utils/encrypted-password/protocols';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
+import { UserModel } from '@root/database/model/User';
+import { deleteUserMocked } from '@tests/mocks/data/users/delete-user';
 
 describe('Auth Login Controller', () => {
   let compareEncrypt: MockProxy<ICompareEncrypt>;
@@ -12,15 +14,13 @@ describe('Auth Login Controller', () => {
 
   beforeAll(async () => {
     compareEncrypt = mock();
-  });
-
-  beforeEach(async () => {
-    await knex.migrate.rollback();
+    await knex.migrate.down();
     await knex.migrate.latest();
-    await knex.seed.run();
   });
 
-  afterAll(async () => await knex.destroy());
+  afterAll(async () => {
+    await knex.destroy();
+  });
 
   it('should be return 400 and error params inválid if to have param null', async () => {
     const promise = await supertest(app).post('/users/signin').send({});
@@ -59,17 +59,41 @@ describe('Auth Login Controller', () => {
     expect(promise.body).toHaveProperty('error', `Type Data Inválid login`);
   });
 
-  it('should return data valid code 201 and user response with token ', async () => {
-    const user = await supertest(app).post('/users/signup').send(addUser);
+  it('should return Credential invalids if user not exists', async () => {
+    await deleteUserMocked(addLogin.login);
+    const promise = await supertest(app).post('/users/signin').send(addLogin);
+
+    expect(promise.status).toBe(400);
+    expect(promise.body).toHaveProperty('error', 'Invalid Credentials');
+  });
+
+  it('should return Credential invalids if password not correctly', async () => {
+    const user = await knex('users')
+      .select('*')
+      .where('login', addLogin.login)
+      .first();
+    if (!user) await supertest(app).post('/users/signup').send(addUser);
 
     const promise = await supertest(app)
       .post('/users/signin')
-      .send({ login: 'soil', password: '123456' });
+      .send({ ...addLogin, password: '654321' });
 
-    console.log(promise);
+    expect(promise.status).toBe(400);
+    expect(promise.body).toHaveProperty('error', 'Invalid Credentials');
+  });
+
+  it('should return data valid code 201 and user response with token ', async () => {
+    const user = await knex<UserModel>('users')
+      .select('*')
+      .where('login', addLogin.login)
+      .first();
+    if (!user) await supertest(app).post('/users/signup').send(addUser);
+
+    const promise = await supertest(app).post('/users/signin').send(addLogin);
+
     expect(promise.status).toBe(201);
     expect(promise.body).toHaveProperty('token');
-    expect(promise.body).toHaveProperty('user_id', user.body.user_id);
+    expect(promise.body).toHaveProperty('user_id');
     expect(promise.body).toHaveProperty('user_type', 'SUDO');
   });
 });
