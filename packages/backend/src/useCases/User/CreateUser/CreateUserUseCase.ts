@@ -28,7 +28,7 @@ class CreateUserUseCase implements ICreateUserUseCase {
 
   private async apllyQueryFindUser(
     login: UserModel['login']
-  ): Promise<UserModel | undefined | DatabaseError> {
+  ): Promise<IFindUserByLogin.Response | DatabaseError> {
     try {
       return await this.findUserRepo.findUserByLogin(login);
     } catch (err) {

@@ -12,6 +12,7 @@ class BCryptCompare implements ICompareEncrypt {
       console.log('ERROR WHEN COMPARE PASSWORD');
       const error = err as Error;
       console.log(error.message);
+      return 'BCRYPT COMPARE ERROR';
     }
   }
 }

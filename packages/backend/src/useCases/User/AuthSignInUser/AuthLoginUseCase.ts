@@ -1,6 +1,11 @@
 import { IFindUserByLogin } from '@root/database/protocols/users';
 import { ILoginAuth } from '@root/database/protocols/users/auth-login/login-auth';
-import { TypeParamError } from '@root/protocols/errors';
+import {
+  DatabaseError,
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  TypeParamError
+} from '@root/protocols/errors';
 import { inject, injectable } from 'tsyringe';
 import { UserModel } from '../../../database/model/User';
 import { messageErrorTryAction } from '../../../utils/types';
@@ -15,11 +20,14 @@ class AuthSignInUseCase implements ILoginAuth {
     @inject('UsersRepository') private findUserByLogin: IFindUserByLogin
   ) {}
 
-  private async applyQuerie(login: UserModel['login']) {
+  private async applyQuerie(
+    login: UserModel['login']
+  ): Promise<IFindUserByLogin.Response | DatabaseError> {
     try {
       return await this.findUserByLogin.findUserByLogin(login);
     } catch (err) {
       messageErrorTryAction(err, true, AuthSignInUseCase.name, 'LOGIN USER');
+      return DATABASE_ERROR;
     }
   }
 
@@ -29,21 +37,28 @@ class AuthSignInUseCase implements ILoginAuth {
     if (typeof login !== 'string') throw new TypeParamError('login');
 
     const user = await this.applyQuerie(login.toLowerCase());
-    const comparePassword = await this.bcryptCompare.compare({
-      password,
-      password_encrypted: user?.password!!
-    });
 
-    if (!user || !comparePassword) throw new Error('Invalid Credentials');
+    if (user === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!user) throw new Error('Invalid Credentials');
     else {
-      const tokenResponse = await this.tokenJwt.create(user);
-      if (!tokenResponse) throw new Error('Does not create token jwt');
+      const comparePassword = await this.bcryptCompare.compare({
+        password,
+        password_encrypted: user.password!!
+      });
 
-      return {
-        user_type: user.user_type,
-        user_id: user.user_id!,
-        token: tokenResponse
-      };
+      if (comparePassword === 'BCRYPT COMPARE ERROR') {
+        throw new Error('BCRYPT COMPARE ERROR');
+      } else if (!comparePassword) throw new Error('Invalid Credentials');
+      else {
+        const tokenResponse = await this.tokenJwt.create(user);
+        if (!tokenResponse) throw new Error('Does not create token jwt');
+
+        return {
+          user_type: user.user_type,
+          user_id: user.user_id!,
+          token: tokenResponse
+        };
+      }
     }
   }
 }

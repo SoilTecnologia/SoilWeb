@@ -11,7 +11,7 @@ interface ICompareEncrypt {
 
 namespace ICompareEncrypt {
   export type Params = { password: string; password_encrypted: string };
-  export type Response = Promise<boolean | undefined | Error>;
+  export type Response = Promise<boolean | undefined | 'BCRYPT COMPARE ERROR'>;
 }
 
 namespace IEncrypter {

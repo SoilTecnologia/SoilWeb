@@ -169,4 +169,12 @@ describe('Create User Use Case', () => {
 
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
+
+  it('should to have a userResponse valid with token válid, if receied params válid for login user', async () => {
+    const promise = await createUserService.execute(addUser);
+
+    expect(promise).toHaveProperty('user_id', userCreated?.user_id);
+    expect(promise).toHaveProperty('token', 'token_valid');
+    expect(promise).toHaveProperty('user_type', userCreated?.user_type);
+  });
 });
