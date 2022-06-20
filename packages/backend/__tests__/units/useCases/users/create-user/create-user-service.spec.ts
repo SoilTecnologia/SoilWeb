@@ -1,18 +1,17 @@
 import { mock, MockProxy } from 'jest-mock-extended';
+import { IEncrypter } from '@root/useCases/data/User/utils/encrypted-password/protocols';
+import { ITokenJwt } from '@root/useCases/data/User/utils/token-jwt/protocols';
+import { CreateUserUseCase } from '@root/useCases/data/User/CreateUser/CreateUserUseCase';
+import { ICreateUserUseCase } from '@root/useCases/contracts/users/create-user/create-user-protocol';
 import {
   ICreateUserRepository,
-  ICreateUserUseCase,
-  IFindUserByLogin
+  IFindUserByLoginRepo
 } from '@database/protocols/users';
 import {
   AlreadyExistsError,
   DatabaseErrorReturn,
   FailedCreateDataError
 } from '@protocols/errors';
-import { IEncrypter } from '@useCases/User/utils/encrypted-password/protocols';
-import { ITokenJwt } from '@useCases/User/utils/token-jwt/protocols';
-import { UserModel } from '@database/model/User';
-import { CreateUserUseCase } from '@useCases/User/CreateUser/CreateUserUseCase';
 import {
   addUser,
   userCreated,
@@ -21,7 +20,7 @@ import {
 
 describe('Create User Use Case', () => {
   let addUserRepo: MockProxy<ICreateUserRepository>;
-  let findUserRepo: MockProxy<IFindUserByLogin>;
+  let findUserRepo: MockProxy<IFindUserByLoginRepo>;
 
   let encrypter: MockProxy<IEncrypter>;
   let token: MockProxy<ITokenJwt>;
@@ -168,6 +167,13 @@ describe('Create User Use Case', () => {
     expect(promise).rejects.toThrow();
   });
 
+  it('Should received an error if encrypted return a error', () => {
+    jest.spyOn(encrypter, 'encrypt').mockResolvedValueOnce(new Error());
+
+    const promise = createUserService.execute(addUser);
+    expect(promise).rejects.toThrow();
+  });
+
   it('should throw database error, when repository create return error', () => {
     jest.spyOn(addUserRepo, 'create').mockRejectedValueOnce(new Error());
 
@@ -175,7 +181,7 @@ describe('Create User Use Case', () => {
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
 
-  it('should throw database error, when repository findUserByLogin return error', () => {
+  it('should throw database error, when repository findUserByLogin return error', async () => {
     jest
       .spyOn(findUserRepo, 'findUserByLogin')
       .mockRejectedValueOnce(new Error());

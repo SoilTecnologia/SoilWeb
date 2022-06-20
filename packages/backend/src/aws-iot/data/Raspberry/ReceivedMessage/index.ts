@@ -1,6 +1,6 @@
 import { container } from 'tsyringe';
 import { iotDevice } from '../../../..';
-import { CreateActionUseCase } from '../../../../useCases/Actions/CreateAction/CreateActionUseCase';
+import { CreateActionUseCase } from '../../../../useCases/data/Actions/CreateAction/CreateActionUseCase';
 import { dateSaoPaulo } from '../../../../utils/convertTimeZoneDate';
 import MessageQueue from '../../../../utils/message_queue';
 import { messageErrorTryAction } from '../../../../utils/types';

@@ -1,7 +1,5 @@
-import {
-  ICreateUserRepository,
-  ICreateUserUseCase
-} from '@root/database/protocols/users';
+import { ICreateUserRepository } from '@root/database/protocols/users';
+import { ICreateUserUseCase } from '@root/useCases/contracts/users/create-user/create-user-protocol';
 
 export const addUser: ICreateUserUseCase.Params = {
   login: 'soil',

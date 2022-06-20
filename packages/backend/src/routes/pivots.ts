@@ -1,17 +1,17 @@
 import express from 'express';
-import authMiddleware from "../protocols/middlewares/auth"
-import { CreatePivotController } from '../useCases/Pivots/CreatePivots/CreatePivotController';
-import { DeletePivotController } from '../useCases/Pivots/DeletePivot/DeletePivotController';
-import { FindAllController } from '../useCases/Pivots/FindAll/FindAllController';
-import { GetAllPivotsController } from '../useCases/Pivots/GetAllPivots/GetAllPivotsController';
-import { GetByPivotIdController } from '../useCases/Pivots/GetByPivotId/GetByPivotIdController';
-import { GetOnePivotController } from '../useCases/Pivots/GetOnePivots/GetOnePivotController';
-import { ReadAllController } from '../useCases/Pivots/ReadAll/ReadAllController';
-import { ReadListController } from '../useCases/Pivots/ReadList/ReadListController';
-import { ReadMapController } from '../useCases/Pivots/ReadMap/ReadMapController';
-import { ReadPivotStateController } from '../useCases/Pivots/ReadPivotState/ReadPivotController';
-import { UpdatePivotController } from '../useCases/Pivots/UpdatePivot/UpdatePivotController';
-import { UpdateStatePivotController } from '../useCases/Pivots/UpdatePivotState/UpdatePivotStateController';
+import authMiddleware from '@protocols/middlewares/auth';
+import { CreatePivotController } from '@useCases/data/Pivots/CreatePivots/CreatePivotController';
+import { DeletePivotController } from '@useCases/data/Pivots/DeletePivot/DeletePivotController';
+import { FindAllController } from '@useCases/data/Pivots/FindAll/FindAllController';
+import { GetAllPivotsController } from '@useCases/data/Pivots/GetAllPivots/GetAllPivotsController';
+import { GetByPivotIdController } from '@useCases/data/Pivots/GetByPivotId/GetByPivotIdController';
+import { GetOnePivotController } from '@useCases/data/Pivots/GetOnePivots/GetOnePivotController';
+import { ReadAllController } from '@useCases/data/Pivots/ReadAll/ReadAllController';
+import { ReadListController } from '@useCases/data/Pivots/ReadList/ReadListController';
+import { ReadMapController } from '@useCases/data/Pivots/ReadMap/ReadMapController';
+import { ReadPivotStateController } from '@useCases/data/Pivots/ReadPivotState/ReadPivotController';
+import { UpdatePivotController } from '@useCases/data/Pivots/UpdatePivot/UpdatePivotController';
+import { UpdateStatePivotController } from '@useCases/data/Pivots/UpdatePivotState/UpdatePivotStateController';
 
 const router = express.Router();
 

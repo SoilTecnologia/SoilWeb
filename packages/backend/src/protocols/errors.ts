@@ -71,5 +71,13 @@ export class TypeParamError extends Error {
   }
 }
 
+export class ParamsInvalid extends Error {
+  constructor() {
+    super(`Params inválids`);
+
+    Object.setPrototypeOf(this, ParamsInvalid.prototype);
+  }
+}
+
 export type DatabaseError = 'Database Error';
 export const DATABASE_ERROR: DatabaseError = 'Database Error';

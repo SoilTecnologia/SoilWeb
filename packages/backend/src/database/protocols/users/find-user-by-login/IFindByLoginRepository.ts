@@ -1,14 +1,14 @@
 import { UserModel } from '@database/model/User';
 
-interface IFindUserByLogin {
+interface IFindUserByLoginRepo {
   findUserByLogin(
-    login: IFindUserByLogin.Params
-  ): Promise<IFindUserByLogin.Response>;
+    login: IFindUserByLoginRepo.Params
+  ): Promise<IFindUserByLoginRepo.Response>;
 }
 
-namespace IFindUserByLogin {
+namespace IFindUserByLoginRepo {
   export type Params = UserModel['login'];
   export type Response = UserModel | undefined;
 }
 
-export { IFindUserByLogin };
+export { IFindUserByLoginRepo };

@@ -7,8 +7,9 @@ import { io } from "socket.io-client";
 const urlIo = {
   newDev: "https://be.soiltech.com.br",
   local: "https://localhost:3308",
-  newProd: "http://api.soiltech.com.br"
-}
+  localDocker: "https://localhost:3333",
+  newProd: "http://api.soiltech.com.br",
+};
 
 const Socket = () => {
   const { user } = useContextAuth();
@@ -24,7 +25,7 @@ const Socket = () => {
     VariableSocket: false,
   });
 
-  const socket = io(urlIo.local, { transports: ["websocket"] });
+  const socket = io(urlIo.localDocker, { transports: ["websocket"] });
 
   useEffect(() => {
     if (user?.user_id && farm?.farm_id) {

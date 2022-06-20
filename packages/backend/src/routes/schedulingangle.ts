@@ -1,10 +1,10 @@
 import express from 'express';
-import authMiddleware from "../protocols/middlewares/auth"
-import { CreateSchedulingAngleController } from '../useCases/SchedulingAngle/CreateSchedulingAngle/CreateSchedulingAngleController';
-import { DeleteSchedulingAngleController } from '../useCases/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleController';
-import { GetAllSchedulingAngleController } from '../useCases/SchedulingAngle/GetAllSchedulingAngle/GetAllSchedulingAngleController';
-import { GetSchedulingAngleController } from '../useCases/SchedulingAngle/GetSchedulingAngle/GetSchedulingAngleController';
-import { UpdateSchedulingAngleController } from '../useCases/SchedulingAngle/UpdateSchedulingAngle/UpdateSchedulingAngleController';
+import authMiddleware from '../protocols/middlewares/auth';
+import { CreateSchedulingAngleController } from '../useCases/data/SchedulingAngle/CreateSchedulingAngle/CreateSchedulingAngleController';
+import { DeleteSchedulingAngleController } from '../useCases/data/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleController';
+import { GetAllSchedulingAngleController } from '../useCases/data/SchedulingAngle/GetAllSchedulingAngle/GetAllSchedulingAngleController';
+import { GetSchedulingAngleController } from '../useCases/data/SchedulingAngle/GetSchedulingAngle/GetSchedulingAngleController';
+import { UpdateSchedulingAngleController } from '../useCases/data/SchedulingAngle/UpdateSchedulingAngle/UpdateSchedulingAngleController';
 
 const router = express.Router();
 

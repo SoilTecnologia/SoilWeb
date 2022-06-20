@@ -1,10 +1,10 @@
 import express from 'express';
-import authMiddleware from "../protocols/middlewares/auth"
-import { CreateSchedulingController } from '../useCases/Scheduling/CreateScheduling/CreateSchedulingController';
-import { DeleteSchedulingController } from '../useCases/Scheduling/DeleteScheduling/DeleteSchedulingController';
-import { UpdateSchedulingController } from '../useCases/Scheduling/UpdateScheduling/UpdateSchedulingController';
-import { GetSchedulingController } from '../useCases/Scheduling/GetScheduling/GetSchedulingController';
-import { GetAllSchedulingController } from '../useCases/Scheduling/GetAllScheduling/GetAllSchedulingController';
+import authMiddleware from '../protocols/middlewares/auth';
+import { CreateSchedulingController } from '../useCases/data/Scheduling/CreateScheduling/CreateSchedulingController';
+import { DeleteSchedulingController } from '../useCases/data/Scheduling/DeleteScheduling/DeleteSchedulingController';
+import { UpdateSchedulingController } from '../useCases/data/Scheduling/UpdateScheduling/UpdateSchedulingController';
+import { GetSchedulingController } from '../useCases/data/Scheduling/GetScheduling/GetSchedulingController';
+import { GetAllSchedulingController } from '../useCases/data/Scheduling/GetAllScheduling/GetAllSchedulingController';
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ const getAllSchedulingController = new GetAllSchedulingController();
 router.post(
   '/addScheduling',
   authMiddleware(),
-  createSchedulingController.handle,
+  createSchedulingController.handle
 );
 router.delete(
   '/deleteScheduling/:id',

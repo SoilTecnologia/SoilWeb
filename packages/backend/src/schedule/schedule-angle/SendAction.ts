@@ -1,9 +1,9 @@
 import schedule from 'node-schedule';
 import { container } from 'tsyringe';
-import { CreateActionUseCase } from '../../useCases/Actions/CreateAction/CreateActionUseCase';
+import { CreateActionUseCase } from '../../useCases/data/Actions/CreateAction/CreateActionUseCase';
 import { CreateAction } from '../../database/model/types/action';
 import { SchedulingAngleModel } from '../../database/model/SchedulingAngle';
-import { DeleteSchedulingAngleUseCase } from '../../useCases/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleUseCase';
+import { DeleteSchedulingAngleUseCase } from '../../useCases/data/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleUseCase';
 import { messageErrorTryAction } from '../../utils/types';
 import emitter from '../../utils/eventBus';
 import { ScheduleAngleEmitter } from '../protocols/scheduleEmitterType';
@@ -12,7 +12,7 @@ import {
   CallbackProps,
   JobSchedulingAngleModel
 } from '../protocols';
-import { GetStateVariableUseCase } from '../../useCases/StateVariable/GetStateVariable/GetStateVariableUseCase';
+import { GetStateVariableUseCase } from '../../useCases/data/StateVariable/GetStateVariable/GetStateVariableUseCase';
 import { dateSaoPaulo } from '../../utils/convertTimeZoneDate';
 import { dateRuleSchedule } from '../utils/dateUtils';
 

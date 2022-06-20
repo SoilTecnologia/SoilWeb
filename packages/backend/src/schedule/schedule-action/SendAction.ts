@@ -1,8 +1,8 @@
 import schedule from 'node-schedule';
 import { SchedulingModel } from '../../database/model/Scheduling';
 import { container } from 'tsyringe';
-import { DeleteSchedulingUseCase } from '../../useCases/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
-import { CreateActionUseCase } from '../../useCases/Actions/CreateAction/CreateActionUseCase';
+import { DeleteSchedulingUseCase } from '../../useCases/data/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
+import { CreateActionUseCase } from '../../useCases/data/Actions/CreateAction/CreateActionUseCase';
 import { CreateAction } from '../../database/model/types/action';
 import {
   CallbackProps,

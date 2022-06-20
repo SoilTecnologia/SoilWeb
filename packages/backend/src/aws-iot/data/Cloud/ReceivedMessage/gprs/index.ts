@@ -1,7 +1,7 @@
 import { container } from 'tsyringe';
-import { UpdatePivotStateUseCase } from '../../../../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
-import { statusPayloadStringToObject } from '../../../../../utils/conversions';
-import { messageErrorTryAction } from '../../../../../utils/types';
+import { UpdatePivotStateUseCase } from '@useCases/data/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
+import { statusPayloadStringToObject } from '@utils/conversions';
+import { messageErrorTryAction } from '@utils/types';
 
 const handleGprs = async (payload: any, pivot_id: string) => {
   const updateStatePivot = container.resolve(UpdatePivotStateUseCase);

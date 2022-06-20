@@ -6,7 +6,7 @@ this file is responsible for:
   - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)
   - Setting up the event emitter to be used on other systems
 */
-import './utils/config/module-alias';
+// import './utils/config/module-alias';
 import 'reflect-metadata';
 import './shared/container';
 import dotenv from 'dotenv';
@@ -17,13 +17,19 @@ import { Server } from 'socket.io';
 import { IoConnect } from './io-connect';
 import { createServer } from 'http';
 import { app } from './app';
+import knex from './database';
 
 dotenv.config({
   path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env'
 });
+
+const PORT = process.env.NODE_ENV === 'dev_docker' ? 3333 : 3308;
+
 const httpServer = createServer(app);
-httpServer.listen(3308, () => {
-  console.info(`Server Listening on PORT ${3308}, \n Welcome to the soil`);
+
+httpServer.listen(PORT, async () => {
+  console.info(`Server Listening on PORT ${PORT}, \n Welcome to the soil`);
+  await knex.migrate.latest();
 });
 
 export const io = new Server(httpServer);

@@ -1,9 +1,9 @@
 import { response } from 'express';
 import { container } from 'tsyringe';
-import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
-import { GetPivotByIdUseCase } from '../../useCases/Pivots/GetById/GetByIdUseCase';
-import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
-import { GetPivotStateUseCase } from '../../useCases/States/GetPivotState/GetPivotStateUseCase';
+import { GetOneNodeUseCase } from '../../useCases/data/Nodes/GetOneNode/GetOneNodeUseCase';
+import { GetPivotByIdUseCase } from '../../useCases/data/Pivots/GetById/GetByIdUseCase';
+import { UpdatePivotStateUseCase } from '../../useCases/data/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
+import { GetPivotStateUseCase } from '../../useCases/data/States/GetPivotState/GetPivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
 import emitter from '../../utils/eventBus';
 import GenericQueue from '../../utils/generic_queue';

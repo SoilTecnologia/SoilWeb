@@ -1,7 +1,7 @@
 import { container } from 'tsyringe';
 import { PivotModel } from '../../../database/model/Pivot';
 import { ActionsResult } from '../../../protocols/actionsType';
-import { GetOneNodeUseCase } from '../../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
+import { GetOneNodeUseCase } from '../../../useCases/data/Nodes/GetOneNode/GetOneNodeUseCase';
 import { messageErrorTryAction } from '../../../utils/types';
 
 const filterActionGateway = async (actions: ActionsResult[]) => {
@@ -37,7 +37,4 @@ const filterPivotsGateway = async (
   return allPivots;
 };
 
-export {
-  filterActionGateway,
-  filterPivotsGateway
-}
+export { filterActionGateway, filterPivotsGateway };

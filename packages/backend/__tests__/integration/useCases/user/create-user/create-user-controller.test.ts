@@ -3,7 +3,6 @@ import '@root/shared/container/index';
 import knex from '@root/database';
 import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
-import { UserModel } from '@root/database/model/User';
 import { deleteUserMocked } from '@tests/mocks/data/users/delete-user';
 
 describe('books', () => {

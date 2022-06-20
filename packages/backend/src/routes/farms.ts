@@ -1,13 +1,13 @@
 /* eslint-disable spaced-comment */
 import express from 'express';
-import authMiddleware from "../protocols/middlewares/auth"
-import { CreateFarmController } from '../useCases/Farms/CreateFarms/CreateFarmController';
-import { DeleteFarmController } from '../useCases/Farms/DeleteFarm/DeleteFarmController';
-import { GetAllFarmsController } from '../useCases/Farms/GetAllfarms/GetAllFarmsController';
-import { GetFarmsByUserController } from '../useCases/Farms/GetFarmByUserController/GetFarmsByUserController';
-import { GetMapFarmsController } from '../useCases/Farms/GetMapFarms/GetMapController';
-import { GetOneFarmController } from '../useCases/Farms/GetOneFarm/GetOneFarmController';
-import { UpdateFarmController } from '../useCases/Farms/UpdateFarm/UpdateFarmsController';
+import authMiddleware from '../protocols/middlewares/auth';
+import { CreateFarmController } from '../useCases/data/Farms/CreateFarms/CreateFarmController';
+import { DeleteFarmController } from '../useCases/data/Farms/DeleteFarm/DeleteFarmController';
+import { GetAllFarmsController } from '../useCases/data/Farms/GetAllfarms/GetAllFarmsController';
+import { GetFarmsByUserController } from '../useCases/data/Farms/GetFarmByUserController/GetFarmsByUserController';
+import { GetMapFarmsController } from '../useCases/data/Farms/GetMapFarms/GetMapController';
+import { GetOneFarmController } from '../useCases/data/Farms/GetOneFarm/GetOneFarmController';
+import { UpdateFarmController } from '../useCases/data/Farms/UpdateFarm/UpdateFarmsController';
 
 const router = express.Router();
 

@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import { container } from 'tsyringe';
 import { SchedulingModel } from '../../database/model/Scheduling';
-import { DeleteSchedulingUseCase } from '../../useCases/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
-import { GetAllSchedulingUseCase } from '../../useCases/Scheduling/GetAllScheduling/GetAllSchedulingUseCase';
+import { DeleteSchedulingUseCase } from '../../useCases/data/Scheduling/DeleteScheduling/DeleteSchedulingUseCase';
+import { GetAllSchedulingUseCase } from '../../useCases/data/Scheduling/GetAllScheduling/GetAllSchedulingUseCase';
 import emitter from '../../utils/eventBus';
 import { messageErrorTryAction } from '../../utils/types';
 import { ScheduleEmitter } from '../protocols/scheduleEmitterType';

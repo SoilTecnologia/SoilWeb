@@ -1,11 +1,11 @@
 import { container } from 'tsyringe';
 import { ActionsResult } from '../../protocols/actionsType';
-import { DeleteActionUseCase } from '../../useCases/Actions/DeleteAction/DeleteACtionUseCase';
-import { UpdateActionsUseCase } from '../../useCases/Actions/UpdateActionUseCase';
-import { GetOneNodeUseCase } from '../../useCases/Nodes/GetOneNode/GetOneNodeUseCase';
-import { GetPivotByIdUseCase } from '../../useCases/Pivots/GetById/GetByIdUseCase';
-import { UpdatePivotStateUseCase } from '../../useCases/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
-import { GetPivotStateUseCase } from '../../useCases/States/GetPivotState/GetPivotStateUseCase';
+import { DeleteActionUseCase } from '../../useCases/data/Actions/DeleteAction/DeleteACtionUseCase';
+import { UpdateActionsUseCase } from '../../useCases/data/Actions/UpdateActionUseCase';
+import { GetOneNodeUseCase } from '../../useCases/data/Nodes/GetOneNode/GetOneNodeUseCase';
+import { GetPivotByIdUseCase } from '../../useCases/data/Pivots/GetById/GetByIdUseCase';
+import { UpdatePivotStateUseCase } from '../../useCases/data/Pivots/UpdatePivotState/UpdatePivotStateUseCase';
+import { GetPivotStateUseCase } from '../../useCases/data/States/GetPivotState/GetPivotStateUseCase';
 import { StatusObject } from '../../utils/conversions';
 import emitter from '../../utils/eventBus';
 import GenericQueue from '../../utils/generic_queue';

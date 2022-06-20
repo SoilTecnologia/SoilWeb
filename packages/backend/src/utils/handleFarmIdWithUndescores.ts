@@ -1,5 +1,5 @@
 import { container } from 'tsyringe';
-import { GetOneFarmUseCase } from '../useCases/Farms/GetOneFarm/GetOneFarmsuseCase';
+import { GetOneFarmUseCase } from '@useCases/data/Farms/GetOneFarm/GetOneFarmsuseCase';
 
 const handleArray = (array: string[]) => {
   // const pivot_num = array[array.length - 1];

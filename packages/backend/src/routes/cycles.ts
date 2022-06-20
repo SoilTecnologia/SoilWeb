@@ -1,7 +1,7 @@
 import express from 'express';
-import authMiddleware from "../protocols/middlewares/auth"
-import { GetCycleController } from '../useCases/Cycles/GetCycles/GetCycleController';
-import { GetLastCycleController } from '../useCases/Cycles/GetLastCycles/GetLastCyclesController';
+import authMiddleware from '@protocols/middlewares/auth';
+import { GetCycleController } from '@useCases/data/Cycles/GetCycles/GetCycleController';
+import { GetLastCycleController } from '@useCases/data/Cycles/GetLastCycles/GetLastCyclesController';
 
 const router = express.Router();
 

@@ -1,12 +1,12 @@
-import { IFindUserByLogin } from '@root/database/protocols/users';
-import { ILoginAuth } from '@root/database/protocols/users/auth-login/login-auth';
+import { IFindUserByLoginRepo } from '@root/database/protocols/users';
+import { ILoginAuth } from '@root/useCases/contracts/users/auth-login/login-auth';
 import { DatabaseErrorReturn } from '@root/protocols/errors';
-import { AuthSignInUseCase } from '@root/useCases/User/AuthSignInUser/AuthLoginUseCase';
+import { AuthSignInUseCase } from '@root/useCases/data/User/AuthSignInUser/AuthLoginUseCase';
 import {
   ICompareEncrypt,
   IEncrypter
-} from '@root/useCases/User/utils/encrypted-password/protocols';
-import { ITokenJwt } from '@root/useCases/User/utils/token-jwt/protocols';
+} from '@root/useCases/data/User/utils/encrypted-password/protocols';
+import { ITokenJwt } from '@root/useCases/data/User/utils/token-jwt/protocols';
 import {
   addUser,
   userCreated
@@ -14,7 +14,7 @@ import {
 import { mock, MockProxy } from 'jest-mock-extended';
 
 describe('Auth Login', () => {
-  let findUserRepo: MockProxy<IFindUserByLogin>;
+  let findUserRepo: MockProxy<IFindUserByLoginRepo>;
   let encrypter: MockProxy<ICompareEncrypt>;
   let token: MockProxy<ITokenJwt>;
 

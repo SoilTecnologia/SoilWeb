@@ -1,21 +1,27 @@
 import express from 'express';
-import authMiddleware from "../protocols/middlewares/auth"
-import { CreateSchedulingHistoryController } from '../useCases/SchedulingHistory/CreateSchedulingHistory/CreateSchedulingHistoryController';
-import { DeleteSchedulingHistoryController } from '../useCases/SchedulingHistory/DeleteSchedulingHistory/DeleteSchedulingHistoryController';
-import { GetAllSchedulingHistoryController } from '../useCases/SchedulingHistory/GetAllSchedulingHistory/GetAllSchedulingHistoryController';
-import { GetPivotSchedulingHistoryController } from '../useCases/SchedulingHistory/GetPivotSchedulingHistory/GetPivotSchedulingHistoryController';
-import { GetUserSchedulingHistoryController } from '../useCases/SchedulingHistory/GetUserSchedulingHistory/GetUserSchedulingHistoryController';
-import { UpdateSchedulingHistoryController } from '../useCases/SchedulingHistory/UpdateSchedulingHistory/UpdateSchedulingHistoryController';
+import authMiddleware from '../protocols/middlewares/auth';
+import { CreateSchedulingHistoryController } from '../useCases/data/SchedulingHistory/CreateSchedulingHistory/CreateSchedulingHistoryController';
+import { DeleteSchedulingHistoryController } from '../useCases/data/SchedulingHistory/DeleteSchedulingHistory/DeleteSchedulingHistoryController';
+import { GetAllSchedulingHistoryController } from '../useCases/data/SchedulingHistory/GetAllSchedulingHistory/GetAllSchedulingHistoryController';
+import { GetPivotSchedulingHistoryController } from '../useCases/data/SchedulingHistory/GetPivotSchedulingHistory/GetPivotSchedulingHistoryController';
+import { GetUserSchedulingHistoryController } from '../useCases/data/SchedulingHistory/GetUserSchedulingHistory/GetUserSchedulingHistoryController';
+import { UpdateSchedulingHistoryController } from '../useCases/data/SchedulingHistory/UpdateSchedulingHistory/UpdateSchedulingHistoryController';
 
 const router = express.Router();
 
-const createSchedulingHistoryController = new CreateSchedulingHistoryController();
-const deleteSchedulingHistoryController = new DeleteSchedulingHistoryController();
-const getAllSchedulingHistoryController = new GetAllSchedulingHistoryController();
-const getPivotSchedulingHistoryController = new GetPivotSchedulingHistoryController();
-const getUserSchedulingHistoryController = new GetUserSchedulingHistoryController();
-const updateSchedulingHistoryController = new UpdateSchedulingHistoryController();
-  
+const createSchedulingHistoryController =
+  new CreateSchedulingHistoryController();
+const deleteSchedulingHistoryController =
+  new DeleteSchedulingHistoryController();
+const getAllSchedulingHistoryController =
+  new GetAllSchedulingHistoryController();
+const getPivotSchedulingHistoryController =
+  new GetPivotSchedulingHistoryController();
+const getUserSchedulingHistoryController =
+  new GetUserSchedulingHistoryController();
+const updateSchedulingHistoryController =
+  new UpdateSchedulingHistoryController();
+
 router.post(
   '/addSchedulingHistory',
   authMiddleware(),
@@ -46,6 +52,5 @@ router.get(
   authMiddleware(),
   getAllSchedulingHistoryController.handle
 );
-
 
 export default router;

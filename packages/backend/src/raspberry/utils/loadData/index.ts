@@ -1,10 +1,9 @@
 import { container } from 'tsyringe';
 import { filterActionGateway, filterPivotsGateway } from '..';
-import { GetAllActionsUseCase } from '../../../useCases/Actions/GetAllActions/GetAllActionUseCase';
-import { FindAllUseCase } from '../../../useCases/Pivots/FindAll/FindAllUseCase';
+import { GetAllActionsUseCase } from '../../../useCases/data/Actions/GetAllActions/GetAllActionUseCase';
+import { FindAllUseCase } from '../../../useCases/data/Pivots/FindAll/FindAllUseCase';
 import { ActionData, IdleData } from '../../protocols';
 import GenericQueue from '../../../utils/generic_queue';
-
 
 const loadActions = async (activeQueue: GenericQueue<ActionData>) => {
   const readPivots = container.resolve(GetAllActionsUseCase);
@@ -31,7 +30,4 @@ const loadPivots = async (idleQueue: GenericQueue<IdleData>) => {
   }
 };
 
-export {
-  loadActions,
-  loadPivots
-}
+export { loadActions, loadPivots };

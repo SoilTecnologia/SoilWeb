@@ -1,11 +1,11 @@
 import express from 'express';
 import authMiddleware from '../protocols/middlewares/auth';
 import { authHandler, IUserAuthInfoRequest } from '../protocols/express';
-import { AuthSignInController } from '../useCases/User/AuthSignInUser/AuthLoginController';
-import { CreateUserController } from '../useCases/User/CreateUser/CreateUserController';
-import { DeleteUserController } from '../useCases/User/DeleteUser/deleteUserController';
-import { GetAllUserController } from '../useCases/User/GetAllUsers/GetAllUserController';
-import { UpdateUserController } from '../useCases/User/Updateuser/UpdateUserController';
+import { AuthSignInController } from '../useCases/data/User/AuthSignInUser/AuthLoginController';
+import { CreateUserController } from '../useCases/data/User/CreateUser/CreateUserController';
+import { DeleteUserController } from '../useCases/data/User/DeleteUser/deleteUserController';
+import { GetAllUserController } from '../useCases/data/User/GetAllUsers/GetAllUserController';
+import { UpdateUserController } from '../useCases/data/User/Updateuser/UpdateUserController';
 
 const router = express.Router();
 

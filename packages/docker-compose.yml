@@ -22,7 +22,7 @@ services:
       - DATABASE_URL="mysql://soil:password@localhost:3306/newsoildb"
       - TOKEN_SECRET=suadighui3gui4gb32ui4g23u4g23
     ports:
-      - 3308:3308
+      - 3333:3333
       - 9229:9229
     volumes:
       - ./backend:/usr/soil/backend

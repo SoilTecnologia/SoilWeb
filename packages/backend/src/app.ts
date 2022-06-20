@@ -1,7 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import router from './routes';
-import { CreateUserController } from './useCases/User/CreateUser/CreateUserController';
+import { CreateUserController } from './useCases/data/User/CreateUser/CreateUserController';
 
 const app = express();
 const createUserController = new CreateUserController();

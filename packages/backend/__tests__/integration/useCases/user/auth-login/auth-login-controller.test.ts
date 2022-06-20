@@ -3,7 +3,7 @@ import supertest from 'supertest';
 import knex from '@root/database';
 import { app } from '@root/app';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { ICompareEncrypt } from '@root/useCases/User/utils/encrypted-password/protocols';
+import { ICompareEncrypt } from '@root/useCases/data/User/utils/encrypted-password/protocols';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserModel } from '@root/database/model/User';
 import { deleteUserMocked } from '@tests/mocks/data/users/delete-user';

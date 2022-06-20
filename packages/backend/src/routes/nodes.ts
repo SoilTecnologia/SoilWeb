@@ -1,11 +1,11 @@
 import express from 'express';
-import authMiddleware from "../protocols/middlewares/auth"
-import { CreateNodeController } from '../useCases/Nodes/CreateNode/CreateNodeController';
-import { DeleteNodeController } from '../useCases/Nodes/DeleteNode/DeleteNodeController';
-import { GetAllByFarmIdController } from '../useCases/Nodes/GetAllByFarmId/GetAllByFarmIdController';
-import { GetByNumByFarmController } from '../useCases/Nodes/GetByNumByFarm/GetByNumByFarmController';
-import { GetOneNodeController } from '../useCases/Nodes/GetOneNode/GetOneNodeController';
-import { UpdateNodeController } from '../useCases/Nodes/UpdateNode/UpdateNodeController';
+import authMiddleware from '../protocols/middlewares/auth';
+import { CreateNodeController } from '../useCases/data/Nodes/CreateNode/CreateNodeController';
+import { DeleteNodeController } from '../useCases/data/Nodes/DeleteNode/DeleteNodeController';
+import { GetAllByFarmIdController } from '../useCases/data/Nodes/GetAllByFarmId/GetAllByFarmIdController';
+import { GetByNumByFarmController } from '../useCases/data/Nodes/GetByNumByFarm/GetByNumByFarmController';
+import { GetOneNodeController } from '../useCases/data/Nodes/GetOneNode/GetOneNodeController';
+import { UpdateNodeController } from '../useCases/data/Nodes/UpdateNode/UpdateNodeController';
 
 const router = express.Router();
 

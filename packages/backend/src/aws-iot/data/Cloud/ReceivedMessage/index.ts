@@ -1,9 +1,9 @@
 import { container } from 'tsyringe';
-import { GetPivotByIdUseCase } from '../../../../useCases/Pivots/GetById/GetByIdUseCase';
-import { handleResultString } from '../../../../utils/handleFarmIdWithUndescores';
-import MessageQueue from '../../../../utils/message_queue';
-import { messageErrorTryAction } from '../../../../utils/types';
-import { socketIo } from '../../../../utils/socketIo';
+import { GetPivotByIdUseCase } from '@useCases/data/Pivots/GetById/GetByIdUseCase';
+import { handleResultString } from '@utils/handleFarmIdWithUndescores';
+import MessageQueue from '@utils/message_queue';
+import { messageErrorTryAction } from '@utils/types';
+import { socketIo } from '@utils/socketIo';
 import { handleGateway } from './gateway';
 import { handleGprs } from './gprs';
 
@@ -14,7 +14,11 @@ type handleCloudProps = {
 };
 
 class HandleCloudMessageTypeCloud {
-  public static async receivedStatus({ pivot_id, payload, node_num }: handleCloudProps) {
+  public static async receivedStatus({
+    pivot_id,
+    payload,
+    node_num
+  }: handleCloudProps) {
     const getPivotUseCase = container.resolve(GetPivotByIdUseCase);
     // Se possui um pivot_num, é um concentrador
     // Caso contrário podemos assumir que é um GPRS

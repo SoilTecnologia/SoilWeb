@@ -1,9 +1,9 @@
 import express from 'express';
-import authMiddleware from "../protocols/middlewares/auth"
-import { CreateActionController } from '../useCases/Actions/CreateAction/CreateActionController';
-import { DeleteActionController } from '../useCases/Actions/DeleteAction/DeleteActionController';
-import { DeleteAllActionController } from '../useCases/Actions/DeleteAllActions/DeleteALlActionController';
-import { GetAllActionsController } from '../useCases/Actions/GetAllActions/GetAllActionsController';
+import authMiddleware from '../protocols/middlewares/auth';
+import { CreateActionController } from '../useCases/data/Actions/CreateAction/CreateActionController';
+import { DeleteActionController } from '../useCases/data/Actions/DeleteAction/DeleteActionController';
+import { DeleteAllActionController } from '../useCases/data/Actions/DeleteAllActions/DeleteALlActionController';
+import { GetAllActionsController } from '../useCases/data/Actions/GetAllActions/GetAllActionsController';
 
 const router = express.Router();
 

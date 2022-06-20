@@ -14,4 +14,4 @@ COPY . .
 
 EXPOSE 3308
 
-CMD ["yarn", "cloud"]
+CMD ["yarn", "dev:docker"]
