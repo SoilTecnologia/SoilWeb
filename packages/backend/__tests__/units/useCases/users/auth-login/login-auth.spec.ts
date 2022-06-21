@@ -43,20 +43,9 @@ describe('Auth Login', () => {
     expect(callUser).toBeCalledTimes(1);
   });
 
-  it('should encrypted password to have been called with data valids to have called once time', async () => {
-    findUserRepo.findUserByLogin.mockResolvedValueOnce(userCreated);
-    const fnEncrypted = jest.spyOn(encrypter, 'compare');
+  // Validation user data
 
-    await authLogin.execute(dataLogin);
-
-    expect(fnEncrypted).toHaveBeenCalledWith({
-      password: 'soiltech',
-      password_encrypted: userCreated?.password
-    });
-    expect(fnEncrypted).toBeCalledTimes(1);
-  });
-
-  it('should to throw error, with password diferrent of the database password', () => {
+  it('should to throw error Invalid Credentials, if password not correctly', () => {
     encrypter.compare.mockResolvedValueOnce(false);
 
     const promise = authLogin.execute({ ...dataLogin, password: '4321' });
@@ -64,14 +53,22 @@ describe('Auth Login', () => {
     expect(promise).rejects.toThrow(new Error('Invalid Credentials'));
   });
 
-  // Tests Database
-
-  it('should to throw errr Invalid Credentials if user not exists in database', () => {
+  it('should to throw err Invalid Credentials if user not exists in database', () => {
     findUserRepo.findUserByLogin.mockResolvedValueOnce(undefined);
 
     const promise = authLogin.execute(dataLogin);
 
     expect(promise).rejects.toThrow(new Error('Invalid Credentials'));
+  });
+  // Tests Database
+
+  it('should findUserRepo to have been called with data valids to have called once time', async () => {
+    const fnFindUser = jest.spyOn(findUserRepo, 'findUserByLogin');
+
+    await authLogin.execute(dataLogin);
+
+    expect(fnFindUser).toHaveBeenCalledWith('soil');
+    expect(fnFindUser).toBeCalledTimes(1);
   });
 
   it('should throw database error, when repository findUserByLogin return error', () => {
@@ -84,6 +81,18 @@ describe('Auth Login', () => {
   });
 
   //Tests Encrypter
+  it('should encrypted password to have been called with data valids to have called once time', async () => {
+    findUserRepo.findUserByLogin.mockResolvedValueOnce(userCreated);
+    const fnEncrypted = jest.spyOn(encrypter, 'compare');
+
+    await authLogin.execute(dataLogin);
+
+    expect(fnEncrypted).toHaveBeenCalledWith({
+      password: 'soiltech',
+      password_encrypted: userCreated?.password
+    });
+    expect(fnEncrypted).toBeCalledTimes(1);
+  });
 
   it('Should to have error if compare encrypter return error', async () => {
     jest
@@ -136,6 +145,8 @@ describe('Auth Login', () => {
     const promise = authLogin.execute(dataLogin);
     expect(promise).rejects.toThrow();
   });
+
+  // Result ok
 
   it('should to have a userResponse valid with token válid, if receied params válid for login user', async () => {
     const promise = await authLogin.execute(dataLogin);

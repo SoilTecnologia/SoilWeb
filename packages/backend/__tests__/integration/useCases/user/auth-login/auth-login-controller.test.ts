@@ -19,6 +19,7 @@ describe('Auth Login Controller', () => {
   });
 
   afterAll(async () => {
+    await knex.migrate.down();
     await knex.destroy();
   });
 

@@ -12,6 +12,7 @@ describe('books', () => {
   });
 
   afterAll(async () => {
+    await knex.migrate.down();
     await knex.destroy();
   });
 

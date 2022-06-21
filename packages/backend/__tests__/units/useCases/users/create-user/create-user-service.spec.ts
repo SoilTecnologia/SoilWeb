@@ -77,20 +77,20 @@ describe('Create User Use Case', () => {
     });
   });
 
-  it('should to have created token with data valids', async () => {
-    jest.spyOn(token, 'create').mockResolvedValueOnce('soiltech');
-
-    const value = await createUserService.execute(addUser);
-
-    expect(value).toHaveProperty('token', 'soiltech');
-  });
-
-  it('should to have error if encrypter to throw ', async () => {
-    jest.spyOn(token, 'create').mockResolvedValueOnce(null);
+  it('Should received an error if encrypted throw a error', () => {
+    jest.spyOn(encrypter, 'encrypt').mockResolvedValueOnce('ENCRYPT ERROR');
 
     const promise = createUserService.execute(addUser);
-    expect(promise).rejects.toThrow(new Error('Does not create token jwt'));
+    expect(promise).rejects.toThrow(new Error('ENCRYPT ERROR'));
   });
+
+  it('Should received an error if encrypted throw a error', () => {
+    jest.spyOn(encrypter, 'encrypt').mockRejectedValueOnce(new Error());
+
+    const promise = createUserService.execute(addUser);
+    expect(promise).rejects.toThrow();
+  });
+
   // Tests created user in database response
   it('should create user repository to have been called with data valids to have called once time', async () => {
     const fnEncrypted = jest.spyOn(addUserRepo, 'create');
@@ -116,6 +116,22 @@ describe('Create User Use Case', () => {
     const err = createUserService.execute(addUser);
 
     expect(err).rejects.toThrow(new FailedCreateDataError('User'));
+  });
+
+  it('should throw create user database error, when repository create return error', () => {
+    jest.spyOn(addUserRepo, 'create').mockRejectedValueOnce(new Error());
+
+    const promise = createUserService.execute(addUser);
+    expect(promise).rejects.toThrow(new DatabaseErrorReturn());
+  });
+
+  it('should throw database error, when repository findUserByLogin return error', async () => {
+    jest
+      .spyOn(findUserRepo, 'findUserByLogin')
+      .mockRejectedValueOnce(new Error());
+    const promise = createUserService.execute(addUser);
+
+    expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
 
   it('should to throw error if user received already exists in database', async () => {
@@ -152,43 +168,14 @@ describe('Create User Use Case', () => {
     expect(promise).rejects.toThrow(new Error('Does not create token jwt'));
   });
 
-  //Test response useCases
-  it('should return error if ocurred error created token', () => {
+  it('should to have error if encrypter to throw ', async () => {
     jest.spyOn(token, 'create').mockRejectedValueOnce(new Error());
 
     const promise = createUserService.execute(addUser);
     expect(promise).rejects.toThrow();
   });
 
-  it('Should received an error if encrypted throw a error', () => {
-    jest.spyOn(encrypter, 'encrypt').mockRejectedValueOnce(new Error());
-
-    const promise = createUserService.execute(addUser);
-    expect(promise).rejects.toThrow();
-  });
-
-  it('Should received an error if encrypted return a error', () => {
-    jest.spyOn(encrypter, 'encrypt').mockResolvedValueOnce(new Error());
-
-    const promise = createUserService.execute(addUser);
-    expect(promise).rejects.toThrow();
-  });
-
-  it('should throw database error, when repository create return error', () => {
-    jest.spyOn(addUserRepo, 'create').mockRejectedValueOnce(new Error());
-
-    const promise = createUserService.execute(addUser);
-    expect(promise).rejects.toThrow(new DatabaseErrorReturn());
-  });
-
-  it('should throw database error, when repository findUserByLogin return error', async () => {
-    jest
-      .spyOn(findUserRepo, 'findUserByLogin')
-      .mockRejectedValueOnce(new Error());
-    const promise = createUserService.execute(addUser);
-
-    expect(promise).rejects.toThrow(new DatabaseErrorReturn());
-  });
+  //Test response useCases
 
   it('should to have a userResponse valid with token válid, if receied params válid for login user', async () => {
     const promise = await createUserService.execute(addUser);

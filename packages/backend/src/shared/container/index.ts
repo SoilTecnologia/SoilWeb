@@ -41,11 +41,14 @@ import { IDeleteUserRepo } from '@database/protocols/users/delete-user/IDeleteUs
 import { DeleteUserRepo } from '@database/repositories/Users/DeleteUser/DeleteUserRepository';
 import { IFindUserByIdRepo } from '@database/protocols/users/find-by-id/IFindByIdRepository';
 import { FindUserByIdRepo } from '@database/repositories/Users/FindById/FindByIdRepository';
+import { IGetAllUserRepo } from '@database/protocols/users/get-all/IGetAllUserRepo';
+import { GetAllUserRepo } from '@database/repositories/Users/getAll/GetAllRepo';
 
 //Users
 container.register<ICreateUserRepository>('AddUser', AddNewUserRepo);
 container.register<IFindUserByIdRepo>('FindUserById', FindUserByIdRepo);
 container.register<IDeleteUserRepo>('DeleteUser', DeleteUserRepo);
+container.register<IGetAllUserRepo>('GetAllUsers', GetAllUserRepo);
 container.register<IFindUserByLoginRepo>(
   'FindUserByLogin',
   FindUserByLoginRepo

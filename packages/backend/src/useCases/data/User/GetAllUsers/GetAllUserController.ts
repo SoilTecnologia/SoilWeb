@@ -5,18 +5,22 @@ import { GetAllUserUseCase } from './GetAllUserUseCase';
 
 class GetAllUserController {
   async handle(req: Request, res: Response, next: NextFunction) {
-    const getAllUserUseCase = container.resolve(GetAllUserUseCase);
-    try {
-      const usersList = await getAllUserUseCase.execute();
-      res.status(200).send(usersList);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        false,
-        GetAllUserController.name,
-        'Get All Users'
-      );
-      next();
+    if (Object.keys(req.body).length > 0) {
+      res.status(400).send({ error: 'Received Params not expected' });
+    } else {
+      const getAllUserUseCase = container.resolve(GetAllUserUseCase);
+      try {
+        const usersList = await getAllUserUseCase.execute();
+        return res.status(201).send(usersList);
+      } catch (err) {
+        messageErrorTryAction(
+          err,
+          false,
+          GetAllUserController.name,
+          'Get All Users'
+        );
+        res.status(400).send({ error: err.message });
+      }
     }
   }
 }

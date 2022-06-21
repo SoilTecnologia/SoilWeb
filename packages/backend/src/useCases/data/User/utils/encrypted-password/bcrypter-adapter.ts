@@ -9,7 +9,8 @@ class BcryptAdapter implements IEncrypter {
       return hash;
     } catch (err) {
       const error = err as Error;
-      return error;
+      console.log(error.message);
+      return 'ENCRYPT ERROR';
     }
   }
 }

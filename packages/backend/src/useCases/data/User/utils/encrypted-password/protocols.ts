@@ -16,7 +16,7 @@ namespace ICompareEncrypt {
 
 namespace IEncrypter {
   export type Params = { value: string };
-  export type Response = Promise<string | Error>;
+  export type Response = Promise<string | 'ENCRYPT ERROR'>;
 }
 
 export { IEncrypter, ICompareEncrypt };

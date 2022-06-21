@@ -71,8 +71,7 @@ class CreateUserUseCase implements ICreateUserUseCase {
 
     const encryptedPassword = await this.encrypter.encrypt({ value: password });
 
-    if (encryptedPassword instanceof Error)
-      throw new Error(encryptedPassword.message);
+    if (encryptedPassword === 'ENCRYPT ERROR') throw new Error('ENCRYPT ERROR');
 
     const userALreadyExists = await this.apllyQueryFindUser(
       login.toLowerCase()
