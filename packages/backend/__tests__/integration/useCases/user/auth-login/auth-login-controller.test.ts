@@ -8,7 +8,7 @@ import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserModel } from '@root/database/model/User';
 import { deleteUserMocked } from '@tests/mocks/data/users/delete-user';
 
-describe('Auth Login Controller', () => {
+describe('Auth Login Integration', () => {
   let compareEncrypt: MockProxy<ICompareEncrypt>;
   const addLogin = { login: 'soil', password: '123456' };
 

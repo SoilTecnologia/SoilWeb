@@ -1,17 +1,29 @@
+import { IUpdateUserService } from '@root/useCases/contracts/users/update-user/update-user-protocol';
 import { inject, injectable } from 'tsyringe';
-import { UserModel } from '../../../../database/model/User';
-import { IUsersRepository } from '../../../../database/repositories/Users/IUsersRepository';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { UserModel } from '@database/model/User';
+import { IUsersRepository } from '@database/repositories/Users/IUsersRepository';
+import { messageErrorTryAction } from '@utils/types';
+import { IFindUserByIdRepo } from '@root/database/protocols/users';
+import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUserRepo';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  ParamsInvalid,
+  TypeParamError
+} from '@root/protocols/errors';
+import { IEncrypter } from '../utils/encrypted-password/protocols';
 
 @injectable()
-class UpdateUserUseCase {
+class UpdateUserUseCase implements IUpdateUserService {
   constructor(
-    @inject('UsersRepository') private userRepository: IUsersRepository
+    @inject('FindUserById') private findUser: IFindUserByIdRepo,
+    @inject('UpdateUser') private updateUser: IUpdateUserRepo,
+    @inject('Encrypter') private encrypter: IEncrypter
   ) {}
 
   private async apllyQueryGetUserById(user_id: string) {
     try {
-      return await this.userRepository.findById(user_id);
+      return await this.findUser.findById({ id: user_id });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -19,35 +31,61 @@ class UpdateUserUseCase {
         UpdateUserUseCase.name,
         'Find User By Id'
       );
+
+      return DATABASE_ERROR;
     }
   }
 
   private async apllyQueryUpdateUser(userModel: UserModel) {
     try {
-      return await this.userRepository.putUser(userModel);
+      return await this.updateUser.update(userModel);
     } catch (err) {
       messageErrorTryAction(err, true, UpdateUserUseCase.name, 'Update User');
+      return DATABASE_ERROR;
     }
   }
 
-  async execute({ login, password, user_type, user_id }: UserModel) {
-    const userModel = new UserModel();
-    const selectUser = await this.apllyQueryGetUserById(user_id!!);
+  async execute({
+    login,
+    password,
+    user_type,
+    user_id
+  }: IUpdateUserService.Params): IUpdateUserService.Response {
+    if (!password || !login || !user_type || !user_id)
+      throw new ParamsInvalid();
 
-    if (selectUser) {
-      Object.assign(userModel, {
-        user_id: user_id || selectUser.user_id,
-        login: login || selectUser.login,
-        password: password || selectUser.password,
-        user_type: user_type || selectUser.user_type
+    if (typeof password !== 'string') throw new TypeParamError('password');
+    if (typeof login !== 'string') throw new TypeParamError('login');
+    if (typeof user_type !== 'string') throw new TypeParamError('user_type');
+    if (typeof user_id !== 'string') throw new TypeParamError('user_id');
+
+    const userModel = new UserModel();
+
+    const selectUser = await this.apllyQueryGetUserById(user_id);
+
+    if (selectUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!selectUser) throw new Error('User does not find');
+    else {
+      const encryptedPassword = await this.encrypter.encrypt({
+        value: password
       });
 
-      const newUser = await this.apllyQueryUpdateUser(userModel);
+      if (encryptedPassword === 'ENCRYPT ERROR')
+        throw new Error('ENCRYPT ERROR');
+      else {
+        Object.assign(userModel, {
+          user_id,
+          login,
+          password: encryptedPassword,
+          user_type
+        });
+        const newUser = await this.apllyQueryUpdateUser(userModel);
 
-      return newUser;
+        if (newUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
+        else if (!newUser) throw new Error('User not update');
+        else return newUser;
+      }
     }
-
-    throw new Error('User does not find');
   }
 }
 

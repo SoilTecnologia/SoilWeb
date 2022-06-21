@@ -5,7 +5,7 @@ import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { deleteUserMocked } from '@tests/mocks/data/users/delete-user';
 
-describe('books', () => {
+describe('Create User Integration', () => {
   beforeAll(async () => {
     await knex.migrate.down();
     await knex.migrate.latest();

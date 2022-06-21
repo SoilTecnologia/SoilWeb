@@ -1,11 +1,4 @@
 /* eslint-disable camelcase */
-/*
-This is the entry point of the application,
-this file is responsible for:
-  - Setting up the Express Server
-  - Setting up AWS IoT Core (depending on the deployment RASP/CLOUD)
-  - Setting up the event emitter to be used on other systems
-*/
 // import './utils/config/module-alias';
 import 'reflect-metadata';
 import './shared/container';

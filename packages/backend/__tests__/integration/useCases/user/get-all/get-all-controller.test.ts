@@ -6,7 +6,7 @@ import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
 import { UserModel } from '@root/database/model/User';
 
-describe('books', () => {
+describe('Get All Users Integration', () => {
   let userAuth: UserResponseData;
 
   beforeAll(async () => {
@@ -41,7 +41,7 @@ describe('books', () => {
     expect(body).toHaveProperty('error', 'Received Params not expected');
   });
 
-  it('should be return 400 if received token invalid', async () => {
+  it('should be return 401 if received token invalid', async () => {
     const { status, text } = await supertest(app)
       .get(`/users/allUsers/`)
       .send({ name: 'soils' })

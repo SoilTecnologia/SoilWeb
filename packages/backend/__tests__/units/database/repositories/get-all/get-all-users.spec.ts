@@ -9,7 +9,7 @@ jest.mock('@database/index', () => {
   return knex({ client: MockClient, dialect: 'pg' });
 });
 
-describe('Delete User Repository', () => {
+describe('Get All User Repository', () => {
   let tracker: Tracker;
   let getUsers: IGetAllUserRepo;
 

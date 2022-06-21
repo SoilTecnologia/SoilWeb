@@ -5,7 +5,7 @@ import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
 
-describe('books', () => {
+describe('Delete User Integration', () => {
   let user: UserResponseData;
 
   beforeAll(async () => {
@@ -30,6 +30,15 @@ describe('books', () => {
       .set('Authorization', user.token);
 
     expect(status).toBe(404);
+  });
+
+  it('should be return 400 if received token invalid', async () => {
+    const { status, text } = await supertest(app)
+      .delete(`/users/delUser/${user.user_id}`)
+      .set('Authorization', 'abcde');
+
+    expect(status).toBe(401);
+    expect(text).toBe('Invalid Token!');
   });
 
   it('should be return 400 if to have received param undefined', async () => {

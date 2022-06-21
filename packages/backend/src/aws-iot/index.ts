@@ -44,7 +44,7 @@ class IoTDevice {
     const clientIdCloud = {
       newDev: 'cloudNewDev2022',
       newProd: 'cloudNewProd2022',
-      pcLocal: `cloudLocal${userLocal}2022`
+      pcLocal: `cloudLocal${userLocal}2021`
     };
 
     if (type === 'Raspberry' && topic) {
@@ -53,7 +53,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = clientIdCloud.pcLocal;
+      this.clientId = 'clientIdCloud.pcLocal';
     }
   }
   /*
@@ -104,7 +104,7 @@ class IoTDevice {
       const error = err as Error;
 
       console.log('Aws does not connected'.toUpperCase());
-      console.log(error.message);
+      console.log(err);
     }
   }
   /*

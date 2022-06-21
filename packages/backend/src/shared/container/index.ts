@@ -43,12 +43,15 @@ import { IFindUserByIdRepo } from '@database/protocols/users/find-by-id/IFindByI
 import { FindUserByIdRepo } from '@database/repositories/Users/FindById/FindByIdRepository';
 import { IGetAllUserRepo } from '@database/protocols/users/get-all/IGetAllUserRepo';
 import { GetAllUserRepo } from '@database/repositories/Users/getAll/GetAllRepo';
+import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUserRepo';
+import { UpdateUserRepo } from '@root/database/repositories/Users/UpdateUser/UpdateUserRepo';
 
 //Users
 container.register<ICreateUserRepository>('AddUser', AddNewUserRepo);
 container.register<IFindUserByIdRepo>('FindUserById', FindUserByIdRepo);
 container.register<IDeleteUserRepo>('DeleteUser', DeleteUserRepo);
 container.register<IGetAllUserRepo>('GetAllUsers', GetAllUserRepo);
+container.register<IUpdateUserRepo>('UpdateUser', UpdateUserRepo);
 container.register<IFindUserByLoginRepo>(
   'FindUserByLogin',
   FindUserByLoginRepo
