@@ -1,7 +1,11 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import { IEncrypter } from '@root/useCases/data/User/utils/encrypted-password/protocols';
 import { IFindUserByIdRepo } from '@database/protocols/users';
-import { DatabaseErrorReturn } from '@protocols/errors';
+import {
+  DatabaseErrorReturn,
+  DataNotFound,
+  NotUpdateError
+} from '@protocols/errors';
 import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
 import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUserRepo';
 import { IUpdateUserService } from '@root/useCases/contracts/users/update-user/update-user-protocol';
@@ -60,7 +64,7 @@ describe('Update User Use Case', () => {
     jest.spyOn(findUserRepo, 'findById').mockResolvedValueOnce(undefined);
 
     const promise = putUserService.execute(userCreated!);
-    expect(promise).rejects.toThrow(new Error('User does not find'));
+    expect(promise).rejects.toThrow(new DataNotFound('User'));
   });
 
   // Encrypter
@@ -116,7 +120,7 @@ describe('Update User Use Case', () => {
     jest.spyOn(putUserRepo, 'update').mockResolvedValueOnce(undefined);
 
     const promise = putUserService.execute(userCreated!);
-    expect(promise).rejects.toThrow(new Error('User not update'));
+    expect(promise).rejects.toThrow(new NotUpdateError('User'));
   });
 
   //Test response useCases

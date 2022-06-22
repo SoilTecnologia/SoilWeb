@@ -3,8 +3,11 @@ import { FarmModel } from '@database/model/Farm';
 import { messageErrorTryAction } from '@utils/types';
 import { ICreateFarmUseCase } from '@root/useCases/contracts/farms/create/create-farm-protocol';
 import {
+  AlreadyExistsError,
   DatabaseErrorReturn,
   DATABASE_ERROR,
+  DataNotFound,
+  FailedCreateDataError,
   ParamsInvalid,
   TypeParamError
 } from '@root/protocols/errors';
@@ -88,12 +91,12 @@ class CreateFarmUseCase implements ICreateFarmUseCase {
     const farmAlreadExisty = await this.findFarmById(farm_id);
 
     if (farmAlreadExisty === DATABASE_ERROR) throw new DatabaseErrorReturn();
-    else if (farmAlreadExisty) throw new Error('Farm Already Exists');
+    else if (farmAlreadExisty) throw new AlreadyExistsError('Farm');
     else {
       const userExists = await this.findUserById(user_id);
 
       if (userExists === DATABASE_ERROR) throw new DatabaseErrorReturn();
-      else if (!userExists) throw new Error('User does not exists');
+      else if (!userExists) throw new DataNotFound('User');
       else {
         const newFarm = await this.applyQueryCreateFarm({
           farm_id,
@@ -105,7 +108,7 @@ class CreateFarmUseCase implements ICreateFarmUseCase {
         });
 
         if (newFarm === DATABASE_ERROR) throw new DatabaseErrorReturn();
-        else if (!newFarm) throw new Error('Does not created Farm');
+        else if (!newFarm) throw new FailedCreateDataError('Farm');
         else return newFarm;
       }
     }

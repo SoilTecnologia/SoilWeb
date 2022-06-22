@@ -1,6 +1,10 @@
 import { IFindUserByLoginRepo } from '@root/database/protocols/users';
 import { ILoginAuth } from '@root/useCases/contracts/users/auth-login/login-auth';
-import { DatabaseErrorReturn } from '@root/protocols/errors';
+import {
+  DatabaseErrorReturn,
+  FailedCreateDataError,
+  InvalidCredentials
+} from '@root/protocols/errors';
 import { AuthSignInUseCase } from '@root/useCases/data/User/AuthSignInUser/AuthLoginUseCase';
 import {
   ICompareEncrypt,
@@ -50,7 +54,7 @@ describe('Auth Login', () => {
 
     const promise = authLogin.execute({ ...dataLogin, password: '4321' });
 
-    expect(promise).rejects.toThrow(new Error('Invalid Credentials'));
+    expect(promise).rejects.toThrow(new InvalidCredentials());
   });
 
   it('should to throw err Invalid Credentials if user not exists in database', () => {
@@ -58,7 +62,7 @@ describe('Auth Login', () => {
 
     const promise = authLogin.execute(dataLogin);
 
-    expect(promise).rejects.toThrow(new Error('Invalid Credentials'));
+    expect(promise).rejects.toThrow(new InvalidCredentials());
   });
   // Tests Database
 
@@ -107,11 +111,11 @@ describe('Auth Login', () => {
   it('Should to have error if compare encrypter return null', async () => {
     jest
       .spyOn(encrypter, 'compare')
-      .mockRejectedValueOnce(new Error('Invalid Credentials'));
+      .mockRejectedValueOnce(new InvalidCredentials());
 
     const promise = authLogin.execute(addUser);
 
-    expect(promise).rejects.toThrow(new Error('Invalid Credentials'));
+    expect(promise).rejects.toThrow(new InvalidCredentials());
   });
 
   //Token
@@ -136,7 +140,7 @@ describe('Auth Login', () => {
     jest.spyOn(token, 'create').mockResolvedValueOnce(null);
 
     const promise = authLogin.execute(dataLogin);
-    expect(promise).rejects.toThrow(new Error('Does not create token jwt'));
+    expect(promise).rejects.toThrow(new FailedCreateDataError('token jwt'));
   });
 
   it('should return error if ocurred error created token', () => {

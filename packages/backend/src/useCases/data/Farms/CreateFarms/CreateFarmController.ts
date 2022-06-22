@@ -1,8 +1,8 @@
 import { ParamsNotExpected } from '@root/protocols/errors';
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { FarmModel } from '../../../../database/model/Farm';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { FarmModel } from '@database/model/Farm';
+import { messageErrorTryAction } from '@utils/types';
 import { CreateFarmUseCase } from './CreateFarmUseCase';
 
 class CreateFarmController {

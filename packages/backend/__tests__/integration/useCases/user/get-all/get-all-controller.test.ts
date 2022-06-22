@@ -5,6 +5,7 @@ import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
 import { UserModel } from '@root/database/model/User';
+import { DataNotFound, ParamsNotExpected } from '@root/protocols/errors';
 
 describe('Get All Users Integration', () => {
   let userAuth: UserResponseData;
@@ -38,7 +39,7 @@ describe('Get All Users Integration', () => {
       .set('Authorization', userAuth!!.token!!);
 
     expect(status).toBe(400);
-    expect(body).toHaveProperty('error', 'Received Params not expected');
+    expect(body).toHaveProperty('error', new ParamsNotExpected().message);
   });
 
   it('should be return 401 if received token invalid', async () => {
@@ -89,6 +90,6 @@ describe('Get All Users Integration', () => {
       .set('Authorization', userAuth.token);
 
     expect(status).toBe(400);
-    expect(body).toHaveProperty('error', 'No user found');
+    expect(body).toHaveProperty('error', new DataNotFound('User').message);
   });
 });

@@ -1,3 +1,4 @@
+import { ParamsNotExpected } from '@root/protocols/errors';
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { messageErrorTryAction } from '../../../../utils/types';
@@ -12,7 +13,7 @@ class CreateUserController {
     const { login, password, user_type } = request.body;
 
     if (Object.keys(request.body).length > 3) {
-      response.status(400).send({ error: 'Received Params not expected' });
+      response.status(400).send({ error: new ParamsNotExpected().message });
     } else {
       const createUserUseCase = container.resolve(CreateUserUseCase);
 

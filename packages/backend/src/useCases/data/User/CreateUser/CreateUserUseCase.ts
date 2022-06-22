@@ -93,7 +93,7 @@ class CreateUserUseCase implements ICreateUserUseCase {
       else if (!newUser) throw new FailedCreateDataError('User');
       else {
         const token = await this.tokenJwt.create(newUser);
-        if (!token) throw new Error('Does not create token jwt');
+        if (!token) throw new FailedCreateDataError('token jwt');
         else {
           return {
             user_id: newUser.user_id,

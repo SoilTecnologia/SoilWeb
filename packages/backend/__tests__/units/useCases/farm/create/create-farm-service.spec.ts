@@ -7,7 +7,12 @@ import { ICreateFarmUseCase } from '@root/useCases/contracts/farms/create/create
 import { CreateFarmUseCase } from '@root/useCases/data/Farms/CreateFarms/CreateFarmUseCase';
 import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
-import { DatabaseErrorReturn } from '@root/protocols/errors';
+import {
+  AlreadyExistsError,
+  DatabaseErrorReturn,
+  DataNotFound,
+  FailedCreateDataError
+} from '@root/protocols/errors';
 
 describe('Create User Use Case', () => {
   let addfarmRepo: MockProxy<ICreateFarmRepo>;
@@ -66,7 +71,7 @@ describe('Create User Use Case', () => {
 
     const promise = createService.execute(addFarms);
 
-    expect(promise).rejects.toThrow(new Error('Farm Already Exists'));
+    expect(promise).rejects.toThrow(new AlreadyExistsError('Farm'));
   });
 
   //Tests find user by id
@@ -94,7 +99,7 @@ describe('Create User Use Case', () => {
 
     const promise = createService.execute(addFarms);
 
-    expect(promise).rejects.toThrow(new Error('User does not exists'));
+    expect(promise).rejects.toThrow(new DataNotFound('User'));
   });
 
   // Tests create farm
@@ -123,7 +128,7 @@ describe('Create User Use Case', () => {
 
     const promise = createService.execute(addFarms);
 
-    expect(promise).rejects.toThrow(new Error('Does not created Farm'));
+    expect(promise).rejects.toThrow(new FailedCreateDataError('Farm').message);
   });
 
   // Test response useCase

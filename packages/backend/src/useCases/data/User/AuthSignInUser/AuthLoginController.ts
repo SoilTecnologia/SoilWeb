@@ -1,3 +1,4 @@
+import { ParamsNotExpected } from '@root/protocols/errors';
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { messageErrorTryAction } from '../../../../utils/types';
@@ -8,7 +9,7 @@ class AuthSignInController {
     const { login, password } = req.body;
 
     if (Object.keys(req.body).length > 2) {
-      res.status(400).send({ error: 'Received Params not expected' });
+      res.status(400).send({ error: new ParamsNotExpected().message });
     } else {
       const authSignInUseCase = container.resolve(AuthSignInUseCase);
 

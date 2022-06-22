@@ -96,5 +96,13 @@ export class DataNotFound extends Error {
   }
 }
 
+export class NotUpdateError extends Error {
+  constructor(value: string) {
+    super(`${value} Not Update`);
+
+    Object.setPrototypeOf(this, NotUpdateError.prototype);
+  }
+}
+
 export type DatabaseError = 'Database Error';
 export const DATABASE_ERROR: DatabaseError = 'Database Error';

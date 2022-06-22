@@ -52,13 +52,7 @@ describe('Find Farm By Id Use Case', () => {
 
     const promise = await findService.execute(addFarms.farm_id);
 
-    expect(promise).toBe(undefined);
-    expect(promise).not.toHaveProperty('user_id', addFarms?.user_id);
-    expect(promise).not.toHaveProperty('farm_id', addFarms?.farm_id);
-    expect(promise).not.toHaveProperty('farm_name', addFarms?.farm_name);
-    expect(promise).not.toHaveProperty('farm_city', addFarms?.farm_city);
-    expect(promise).not.toHaveProperty('farm_lat', addFarms?.farm_lat);
-    expect(promise).not.toHaveProperty('farm_lng', addFarms?.farm_lng);
+    expect(promise).toBeUndefined();
   });
 
   // Test response useCase

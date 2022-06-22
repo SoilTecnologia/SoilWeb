@@ -4,7 +4,11 @@ import {
   IFindUserByIdRepo
 } from '@root/database/protocols/users';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { DatabaseErrorReturn, ParamsInvalid } from '@root/protocols/errors';
+import {
+  DatabaseErrorReturn,
+  DataNotFound,
+  ParamsInvalid
+} from '@root/protocols/errors';
 import { IDeleteUserService } from '@root/useCases/contracts/users/delete-user/del-user-protocol';
 import { DeleteUserUseCase } from '@root/useCases/data/User/DeleteUser/deleteUserUseCase';
 import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
@@ -48,7 +52,7 @@ describe('Delete User Service', () => {
 
     const promise = deleteUserService.execute({ user_id });
 
-    expect(promise).rejects.toThrow(new Error('User does not exists'));
+    expect(promise).rejects.toThrow(new DataNotFound('User'));
   });
 
   it('should return error if database return a error ', () => {

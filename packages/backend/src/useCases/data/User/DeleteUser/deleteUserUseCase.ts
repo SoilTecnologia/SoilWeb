@@ -3,6 +3,7 @@ import { IFindUserByIdRepo } from '@root/database/protocols/users/find-by-id/IFi
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
+  DataNotFound,
   ParamsInvalid,
   TypeParamError
 } from '@root/protocols/errors';
@@ -43,15 +44,19 @@ class DeleteUserUseCase implements IDeleteUserService {
   async execute({
     user_id
   }: IDeleteUserService.Params): IDeleteUserService.Response {
-    const selectUser = await this.apllyQueryFindUser(user_id);
+    if (user_id === 'undefined' || user_id === 'null') {
+      throw new ParamsInvalid();
+    } else {
+      const selectUser = await this.apllyQueryFindUser(user_id);
 
-    if (selectUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
-    else if (!selectUser) throw new Error('User does not exists');
-    else {
-      const del = await this.applyQueryDeleteUser(user_id);
+      if (selectUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
+      else if (!selectUser) throw new DataNotFound('User');
+      else {
+        const del = await this.applyQueryDeleteUser(user_id);
 
-      if (del === DATABASE_ERROR) throw new DatabaseErrorReturn();
-      else return { status: del ? 'OK' : 'FAIL' };
+        if (del === DATABASE_ERROR) throw new DatabaseErrorReturn();
+        else return { status: del ? 'OK' : 'FAIL' };
+      }
     }
   }
 }

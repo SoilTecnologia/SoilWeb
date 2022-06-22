@@ -1,7 +1,11 @@
 import { IGetAllUserService } from '@root/useCases/contracts/users/get-all-user/get-all-user';
 import { inject, injectable } from 'tsyringe';
 import { messageErrorTryAction } from '@utils/types';
-import { DatabaseErrorReturn, DATABASE_ERROR } from '@root/protocols/errors';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
 import { IGetAllUserRepo } from '@root/database/protocols/users/get-all/IGetAllUserRepo';
 
 @injectable()
@@ -21,7 +25,7 @@ class GetAllUserUseCase implements IGetAllUserService {
     const users = await this.applyQueryGetUsers();
 
     if (users === DATABASE_ERROR) throw new DatabaseErrorReturn();
-    else if (!users || users.length <= 0) throw new Error('No user found');
+    else if (!users || users.length <= 0) throw new DataNotFound('User');
     else return users;
   }
 }

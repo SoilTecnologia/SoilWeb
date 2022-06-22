@@ -6,6 +6,7 @@ import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
 import { uuidGlobal } from '@tests/mocks/data/global';
+import { DataNotFound } from '@root/protocols/errors';
 
 describe('Create Farms Integration', () => {
   let token: string;
@@ -146,7 +147,7 @@ describe('Create Farms Integration', () => {
       .set('Authorization', token);
 
     expect(status).toBe(400);
-    expect(body).toHaveProperty('error', `User does not exists`);
+    expect(body).toHaveProperty('error', new DataNotFound('User').message);
   });
 
   it('should be return a status 201 and a new farm', async () => {

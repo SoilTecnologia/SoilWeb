@@ -7,6 +7,12 @@ import { ICompareEncrypt } from '@root/useCases/data/User/utils/encrypted-passwo
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserModel } from '@root/database/model/User';
 import { deleteUserMocked } from '@tests/mocks/data/users/delete-user';
+import {
+  InvalidCredentials,
+  ParamsInvalid,
+  ParamsNotExpected,
+  TypeParamError
+} from '@root/protocols/errors';
 
 describe('Auth Login Integration', () => {
   let compareEncrypt: MockProxy<ICompareEncrypt>;
@@ -27,7 +33,7 @@ describe('Auth Login Integration', () => {
     const promise = await supertest(app).post('/users/signin').send({});
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', 'Params inválids');
+    expect(promise.body).toHaveProperty('error', new ParamsInvalid().message);
   });
 
   it('should be return 400 and error if to have received params not expected', async () => {
@@ -38,7 +44,7 @@ describe('Auth Login Integration', () => {
     expect(promise.status).toBe(400);
     expect(promise.body).toHaveProperty(
       'error',
-      `Received Params not expected`
+      new ParamsNotExpected().message
     );
   });
 
@@ -48,7 +54,10 @@ describe('Auth Login Integration', () => {
       .send({ ...addLogin, password: 32 });
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', `Type Data Inválid password`);
+    expect(promise.body).toHaveProperty(
+      'error',
+      new TypeParamError('password').message
+    );
   });
 
   it('should be return type params error if received login type not valid', async () => {
@@ -57,7 +66,10 @@ describe('Auth Login Integration', () => {
       .send({ ...addLogin, login: 32 });
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', `Type Data Inválid login`);
+    expect(promise.body).toHaveProperty(
+      'error',
+      new TypeParamError('login').message
+    );
   });
 
   it('should return Credential invalids if user not exists', async () => {
@@ -65,7 +77,10 @@ describe('Auth Login Integration', () => {
     const promise = await supertest(app).post('/users/signin').send(addLogin);
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', 'Invalid Credentials');
+    expect(promise.body).toHaveProperty(
+      'error',
+      new InvalidCredentials().message
+    );
   });
 
   it('should return Credential invalids if password not correctly', async () => {
@@ -80,7 +95,10 @@ describe('Auth Login Integration', () => {
       .send({ ...addLogin, password: '654321' });
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', 'Invalid Credentials');
+    expect(promise.body).toHaveProperty(
+      'error',
+      new InvalidCredentials().message
+    );
   });
 
   it('should return data valid code 201 and user response with token ', async () => {

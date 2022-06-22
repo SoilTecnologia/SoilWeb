@@ -4,6 +4,8 @@ import {
   DatabaseError,
   DatabaseErrorReturn,
   DATABASE_ERROR,
+  FailedCreateDataError,
+  InvalidCredentials,
   ParamsInvalid,
   TypeParamError
 } from '@root/protocols/errors';
@@ -40,7 +42,7 @@ class AuthSignInUseCase implements ILoginAuth {
     const user = await this.applyQuerie(login.toLowerCase());
 
     if (user === DATABASE_ERROR) throw new DatabaseErrorReturn();
-    else if (!user) throw new Error('Invalid Credentials');
+    else if (!user) throw new InvalidCredentials();
     else {
       const comparePassword = await this.bcryptCompare.compare({
         password,
@@ -49,10 +51,10 @@ class AuthSignInUseCase implements ILoginAuth {
 
       if (comparePassword === 'BCRYPT COMPARE ERROR') {
         throw new Error('BCRYPT COMPARE ERROR');
-      } else if (!comparePassword) throw new Error('Invalid Credentials');
+      } else if (!comparePassword) throw new InvalidCredentials();
       else {
         const tokenResponse = await this.tokenJwt.create(user);
-        if (!tokenResponse) throw new Error('Does not create token jwt');
+        if (!tokenResponse) throw new FailedCreateDataError('token jwt');
 
         return {
           user_type: user.user_type,

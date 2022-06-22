@@ -7,6 +7,8 @@ import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUs
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
+  DataNotFound,
+  NotUpdateError,
   ParamsInvalid,
   TypeParamError
 } from '@root/protocols/errors';
@@ -63,7 +65,7 @@ class UpdateUserUseCase implements IUpdateUserService {
     const selectUser = await this.apllyQueryGetUserById(user_id);
 
     if (selectUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
-    else if (!selectUser) throw new Error('User does not find');
+    else if (!selectUser) throw new DataNotFound('User');
     else {
       const encryptedPassword = await this.encrypter.encrypt({
         value: password
@@ -81,7 +83,7 @@ class UpdateUserUseCase implements IUpdateUserService {
         const newUser = await this.apllyQueryUpdateUser(userModel);
 
         if (newUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
-        else if (!newUser) throw new Error('User not update');
+        else if (!newUser) throw new NotUpdateError('User');
         else return newUser;
       }
     }

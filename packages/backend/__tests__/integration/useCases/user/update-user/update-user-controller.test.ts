@@ -8,6 +8,12 @@ import {
 } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
 import { uuidGlobal } from '@tests/mocks/data/global';
+import {
+  DataNotFound,
+  ParamsInvalid,
+  ParamsNotExpected,
+  TypeParamError
+} from '@root/protocols/errors';
 
 describe('Update User Integration', () => {
   let userAuth: UserResponseData;
@@ -41,7 +47,7 @@ describe('Update User Integration', () => {
       .set('Authorization', userAuth.token);
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', 'Params inválids');
+    expect(promise.body).toHaveProperty('error', new ParamsInvalid().message);
   });
 
   it('should be return 401 if received token invalid', async () => {
@@ -63,7 +69,7 @@ describe('Update User Integration', () => {
     expect(promise.status).toBe(400);
     expect(promise.body).toHaveProperty(
       'error',
-      `Received Params not expected`
+      new ParamsNotExpected().message
     );
   });
 
@@ -74,7 +80,10 @@ describe('Update User Integration', () => {
       .set('Authorization', userAuth.token);
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', `Type Data Inválid password`);
+    expect(promise.body).toHaveProperty(
+      'error',
+      new TypeParamError('password').message
+    );
   });
 
   it('should be return type params error if received login type not valid', async () => {
@@ -84,7 +93,10 @@ describe('Update User Integration', () => {
       .set('Authorization', userAuth.token);
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', `Type Data Inválid login`);
+    expect(promise.body).toHaveProperty(
+      'error',
+      new TypeParamError('login').message
+    );
   });
 
   it('should be return type params error if received user_type type not valid', async () => {
@@ -94,7 +106,10 @@ describe('Update User Integration', () => {
       .set('Authorization', userAuth.token);
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', `Type Data Inválid user_type`);
+    expect(promise.body).toHaveProperty(
+      'error',
+      new TypeParamError('user_type').message
+    );
   });
 
   it('should be return type params error if received user_id type not valid', async () => {
@@ -104,7 +119,10 @@ describe('Update User Integration', () => {
       .set('Authorization', userAuth.token);
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', `Type Data Inválid user_id`);
+    expect(promise.body).toHaveProperty(
+      'error',
+      new TypeParamError('user_id').message
+    );
   });
 
   it('should be return user does not found if not exits user in db', async () => {
@@ -114,7 +132,10 @@ describe('Update User Integration', () => {
       .set('Authorization', userAuth.token);
 
     expect(promise.status).toBe(400);
-    expect(promise.body).toHaveProperty('error', `User does not find`);
+    expect(promise.body).toHaveProperty(
+      'error',
+      new DataNotFound('User').message
+    );
   });
   it('should be return a status 201 and a user-response data valids with request call with params válids', async () => {
     const promise = await supertest(app)

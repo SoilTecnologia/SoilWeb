@@ -1,5 +1,5 @@
 import { IGetAllUserRepo } from '@root/database/protocols/users/get-all/IGetAllUserRepo';
-import { DatabaseErrorReturn } from '@root/protocols/errors';
+import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
 import { IGetAllUserService } from '@root/useCases/contracts/users/get-all-user/get-all-user';
 import { GetAllUserUseCase } from '@root/useCases/data/User/GetAllUsers/GetAllUserUseCase';
 import { usersArray } from '@tests/mocks/data/users/user-values-for-mocks';
@@ -51,7 +51,7 @@ describe('Get All Users', () => {
 
     const promise = getAllUserService.execute();
 
-    expect(promise).rejects.toThrow(new Error('No user found'));
+    expect(promise).rejects.toThrow(new DataNotFound('User'));
   });
 
   // tests return

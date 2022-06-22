@@ -5,6 +5,11 @@ import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
 import { uuidGlobal } from '@tests/mocks/data/global';
+import {
+  DataNotFound,
+  ParamsInvalid,
+  ParamsNotExpected
+} from '@root/protocols/errors';
 
 describe('Delete User Integration', () => {
   let user: UserResponseData;
@@ -49,7 +54,7 @@ describe('Delete User Integration', () => {
       .set('Authorization', user.token);
 
     expect(status).toBe(400);
-    expect(body).toHaveProperty('error', 'Params Invalid');
+    expect(body).toHaveProperty('error', new ParamsInvalid().message);
   });
 
   it('should be return 400 if to have received param null', async () => {
@@ -59,7 +64,7 @@ describe('Delete User Integration', () => {
       .set('Authorization', user.token);
 
     expect(status).toBe(400);
-    expect(body).toHaveProperty('error', 'Params Invalid');
+    expect(body).toHaveProperty('error', new ParamsInvalid().message);
   });
 
   it('should be return 404 if received more params in route', async () => {
@@ -77,7 +82,7 @@ describe('Delete User Integration', () => {
       .set('Authorization', user.token);
 
     expect(status).toBe(400);
-    expect(body).toHaveProperty('error', `Received Params not expected`);
+    expect(body).toHaveProperty('error', new ParamsNotExpected().message);
   });
 
   it('should be return 400 and error user not exists if not exists in db', async () => {
@@ -86,7 +91,7 @@ describe('Delete User Integration', () => {
       .set('Authorization', user.token);
 
     expect(status).toBe(400);
-    expect(body).toHaveProperty('error', `User does not exists`);
+    expect(body).toHaveProperty('error', new DataNotFound('User').message);
   });
 
   it('should to have param status if db returnered data', async () => {
