@@ -44,14 +44,4 @@ describe('Find User By Login Repository', () => {
     expect(promise?.password).toBe('123456');
     expect(promise?.user_type).toBe('SUDO');
   });
-
-  it('should throw error if database error', async () => {
-    tracker.on.select('users').simulateErrorOnce('database error');
-
-    await findByLogin.findUserByLogin('soil').catch((err) => {
-      expect(err.message).toBe(
-        'select * from "users" where "login" = $1 - database error'
-      );
-    });
-  });
 });

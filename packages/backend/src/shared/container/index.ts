@@ -13,8 +13,6 @@ import { IStateRepository } from '@database/repositories/States/IState';
 import { StatesRepository } from '@database/repositories/States/StatesRepository';
 import { IStatesVariableRepository } from '@database/repositories/StatesVariables/IStatesVariablesRepository';
 import { StatesVariablesRepository } from '@database/repositories/StatesVariables/StatesVariablesRepository';
-import { IUsersRepository } from '@database/repositories/Users/IUsersRepository';
-import { UsersRepository } from '@database/repositories/Users/UserRepository';
 import { ISchedulingRepository } from '@database/repositories/Scheduling/ISchedulingRepository';
 import { SchedulingRepository } from '@database/repositories/Scheduling/SchedulingRepository';
 import { ISchedulingAngleRepository } from '@database/repositories/SchedulingAngle/ISchedulingAngleRepository';
@@ -32,7 +30,7 @@ import { IFindUserByLoginRepo } from '@database/protocols/users/find-user-by-log
 import {
   ICompareEncrypt,
   IEncrypter
-} from '../../useCases/data/User/utils/encrypted-password/protocols';
+} from '@useCases/data/User/utils/encrypted-password/protocols';
 import { BcryptAdapter } from '@useCases/data/User/utils/encrypted-password/bcrypter-adapter';
 import { ITokenJwt } from '@useCases/data/User/utils/token-jwt/protocols';
 import { CreateJwt } from '@useCases/data/User/utils/token-jwt';
@@ -45,6 +43,10 @@ import { IGetAllUserRepo } from '@database/protocols/users/get-all/IGetAllUserRe
 import { GetAllUserRepo } from '@database/repositories/Users/getAll/GetAllRepo';
 import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUserRepo';
 import { UpdateUserRepo } from '@root/database/repositories/Users/UpdateUser/UpdateUserRepo';
+import { ICreateFarmRepo } from '@root/database/protocols/farms/create-farms/create-farms-protocol';
+import { CreateFarmRepo } from '@root/database/repositories/Farms/Create/CreateFarmRepo';
+import { IFindFarmByIdRepo } from '@root/database/protocols/farms/find-by-farm_id/find';
+import { FindFarmByIdRepo } from '@root/database/repositories/Farms/FindById/FindByIdRepo';
 
 //Users
 container.register<ICreateUserRepository>('AddUser', AddNewUserRepo);
@@ -64,10 +66,11 @@ container.register<ICompareEncrypt>('CompareEncrypt', BCryptCompare);
 //Token Jwt
 container.register<ITokenJwt>('TokenJwt', CreateJwt);
 
-container.registerSingleton<IUsersRepository>(
-  'UsersRepository',
-  delay(() => UsersRepository)
-);
+// Farms
+
+container.register<ICreateFarmRepo>('CreateFarms', CreateFarmRepo);
+container.register<IFindFarmByIdRepo>('FindFarmById', FindFarmByIdRepo);
+
 container.registerSingleton<IFarmsRepository>(
   'FarmsRepository',
   delay(() => FarmsRepository)

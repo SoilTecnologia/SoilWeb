@@ -47,12 +47,10 @@ describe('Delete User Repository', () => {
     expect(promise).toBe(1);
   });
 
-  it('should throw error if database error', async () => {
+  it('should throw error if database error', () => {
     tracker.on.delete('users').simulateErrorOnce('database error');
-    await delUser.deleteUser({ user_id }).catch((err) => {
-      expect(err.message).toBe(
-        'delete from "users" where "user_id" = $1 - database error'
-      );
-    });
+    const response = delUser.deleteUser({ user_id });
+
+    expect(response).rejects.toThrow();
   });
 });

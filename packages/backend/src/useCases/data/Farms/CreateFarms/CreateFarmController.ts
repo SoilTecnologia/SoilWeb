@@ -15,28 +15,30 @@ class CreateFarmController {
       farm_lat
     }: FarmModel = req.body;
 
-    const createFarmUseCase = container.resolve(CreateFarmUseCase);
+    if (Object.keys(req.body).length > 6) {
+      res.status(400).send({ error: 'Received Params not expected' });
+    } else {
+      const createFarmUseCase = container.resolve(CreateFarmUseCase);
 
-    const newFarm = {
-      farm_id,
-      user_id,
-      farm_name,
-      farm_city,
-      farm_lng,
-      farm_lat
-    };
-
-    try {
-      const farm = await createFarmUseCase.execute(newFarm);
-      res.status(200).send(farm);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        false,
-        CreateFarmController.name,
-        'Create Farm'
-      );
-      next();
+      try {
+        const farm = await createFarmUseCase.execute({
+          farm_id,
+          user_id,
+          farm_name,
+          farm_city,
+          farm_lng,
+          farm_lat
+        });
+        res.status(201).send(farm);
+      } catch (err) {
+        messageErrorTryAction(
+          err,
+          false,
+          CreateFarmController.name,
+          'Create Farm'
+        );
+        res.status(400).send({ error: err.message });
+      }
     }
   }
 }

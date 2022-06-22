@@ -1,7 +1,6 @@
 import { IUpdateUserService } from '@root/useCases/contracts/users/update-user/update-user-protocol';
 import { inject, injectable } from 'tsyringe';
 import { UserModel } from '@database/model/User';
-import { IUsersRepository } from '@database/repositories/Users/IUsersRepository';
 import { messageErrorTryAction } from '@utils/types';
 import { IFindUserByIdRepo } from '@root/database/protocols/users';
 import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUserRepo';

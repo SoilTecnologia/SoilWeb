@@ -51,12 +51,10 @@ describe('Update User Repository', () => {
     expect(promise?.user_type).toBe('SUDO');
   });
 
-  it('should throw error if database error', async () => {
+  it('should throw error if database error', () => {
     tracker.on.update('users').simulateErrorOnce('database error');
-    await putUserRepo.update(userCreated!).catch((err) => {
-      expect(err.message).toBe(
-        'update "users" set "login" = $1, "password" = $2, "user_type" = $3, "user_id" = $4 where "user_id" = $5 returning * - database error'
-      );
-    });
+    const response = putUserRepo.update(userCreated!);
+
+    expect(response).rejects.toThrow();
   });
 });

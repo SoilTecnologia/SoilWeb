@@ -41,10 +41,10 @@ describe('Get All User Repository', () => {
     expect(promise).toStrictEqual(usersArray);
   });
 
-  it('should throw error if database error', async () => {
+  it('should throw error if database error', () => {
     tracker.on.select('users').simulateErrorOnce('database error');
-    await getUsers.getAll().catch((err) => {
-      expect(err.message).toBe('select * from "users" - database error');
-    });
+    const response = getUsers.getAll();
+
+    expect(response).rejects.toThrow();
   });
 });

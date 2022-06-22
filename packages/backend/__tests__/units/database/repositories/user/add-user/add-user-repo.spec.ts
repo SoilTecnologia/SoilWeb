@@ -8,7 +8,7 @@ import {
   userCreated
 } from '@tests/mocks/data/users/user-values-for-mocks';
 
-jest.mock('../../../../../src/database/index', () => {
+jest.mock('@database/index', () => {
   return knex({ client: MockClient, dialect: 'pg' });
 });
 
@@ -54,10 +54,8 @@ describe('Add User Repository', () => {
 
   it('should throw error if database error', async () => {
     tracker.on.insert('users').simulateErrorOnce('database error');
-    await addUserRepo.create(addUser).catch((err) => {
-      expect(err.message).toBe(
-        'insert into "users" ("login", "password", "user_type") values ($1, $2, $3) returning * - database error'
-      );
-    });
+    const response = addUserRepo.create(addUser);
+
+    expect(response).rejects.toThrow();
   });
 });

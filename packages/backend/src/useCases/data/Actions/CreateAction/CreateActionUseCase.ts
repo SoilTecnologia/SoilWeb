@@ -1,4 +1,8 @@
 /* eslint-disable no-unneeded-ternary */
+import {
+  ICreateUserRepository,
+  IFindUserByIdRepo
+} from '@root/database/protocols/users';
 import { inject, injectable } from 'tsyringe';
 import { StateVariableModel } from '../../../../database/model/StateVariables';
 import { CreateAction } from '../../../../database/model/types/action';
@@ -6,7 +10,6 @@ import { UserModel } from '../../../../database/model/User';
 import { IActionRepository } from '../../../../database/repositories/Action/IActionRepository';
 import { INodesRepository } from '../../../../database/repositories/Nodes/INodesRepository';
 import { IPivotsRepository } from '../../../../database/repositories/Pivots/IPivotsRepository';
-import { IUsersRepository } from '../../../../database/repositories/Users/IUsersRepository';
 import { dateSaoPaulo } from '../../../../utils/convertTimeZoneDate';
 import emitter from '../../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../../utils/types';
@@ -14,7 +17,8 @@ import { messageErrorTryAction } from '../../../../utils/types';
 @injectable()
 class CreateActionUseCase {
   constructor(
-    @inject('UsersRepository') private usersRepository: IUsersRepository,
+    @inject('AddUser') private createUser: ICreateUserRepository,
+    @inject('FindUserById') private findUser: IFindUserByIdRepo,
     @inject('ActionsRepository') private actionRepository: IActionRepository,
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository,
     @inject('NodesRepository') private nodeRepository: INodesRepository
@@ -48,7 +52,7 @@ class CreateActionUseCase {
 
   private async applyQueryGetUserById(user_id: string) {
     try {
-      return await this.usersRepository.findById(user_id);
+      return await this.findUser.findById({ id: user_id });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -74,7 +78,7 @@ class CreateActionUseCase {
 
   private async applyQueryCreateUser(user: UserModel) {
     try {
-      return await this.usersRepository.create(user);
+      return await this.createUser.create(user);
     } catch (err) {
       messageErrorTryAction(
         err,
