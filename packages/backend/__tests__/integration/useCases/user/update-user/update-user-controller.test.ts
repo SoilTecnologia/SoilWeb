@@ -7,6 +7,7 @@ import {
   userCreated
 } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
+import { uuidGlobal } from '@tests/mocks/data/global';
 
 describe('Update User Integration', () => {
   let userAuth: UserResponseData;
@@ -109,7 +110,7 @@ describe('Update User Integration', () => {
   it('should be return user does not found if not exits user in db', async () => {
     const promise = await supertest(app)
       .put('/users/putUser')
-      .send({ ...userCreated, user_id: 'user_not_exists' })
+      .send({ ...userCreated, user_id: uuidGlobal })
       .set('Authorization', userAuth.token);
 
     expect(promise.status).toBe(400);

@@ -39,6 +39,15 @@ export class InvalidRequestBody extends Error {
   }
 }
 
+export class ParamsNotExpected extends Error {
+  // Normal signature with defaults
+  constructor() {
+    super('Received Params not expected');
+
+    Object.setPrototypeOf(this, ParamsNotExpected.prototype);
+  }
+}
+
 export class AlreadyExistsError extends Error {
   constructor(data: string) {
     super(`${data} Already Exists`);
@@ -76,6 +85,14 @@ export class ParamsInvalid extends Error {
     super(`Params inválids`);
 
     Object.setPrototypeOf(this, ParamsInvalid.prototype);
+  }
+}
+
+export class DataNotFound extends Error {
+  constructor(value: string) {
+    super(`${value} Does not exists`);
+
+    Object.setPrototypeOf(this, DataNotFound.prototype);
   }
 }
 

@@ -5,6 +5,7 @@ import { app } from '@root/app';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
+import { uuidGlobal } from '@tests/mocks/data/global';
 
 describe('Create Farms Integration', () => {
   let token: string;
@@ -31,8 +32,9 @@ describe('Create Farms Integration', () => {
 
   it('should be return 400 and error params inválid if to have param null', async () => {
     const { status, body } = await supertest(app)
-      .post('/users/signup')
-      .send({});
+      .post('/farms/addfarm')
+      .send({})
+      .set('Authorization', token);
 
     expect(status).toBe(400);
     expect(body).toHaveProperty('error', 'Params inválids');
@@ -137,10 +139,10 @@ describe('Create Farms Integration', () => {
     await knex('farms').select('*').del();
   });
 
-  it('should be return user dows not exists if received user_id invalid', async () => {
+  it('should be return user does not exists if received user_id invalid', async () => {
     const { status, body } = await supertest(app)
       .post('/farms/addfarm')
-      .send({ ...addFarms, user_id: 'user_id_invalid' })
+      .send({ ...addFarms, user_id: uuidGlobal })
       .set('Authorization', token);
 
     expect(status).toBe(400);

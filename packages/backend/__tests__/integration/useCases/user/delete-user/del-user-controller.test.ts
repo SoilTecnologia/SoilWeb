@@ -4,6 +4,7 @@ import knex from '@root/database';
 import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
+import { uuidGlobal } from '@tests/mocks/data/global';
 
 describe('Delete User Integration', () => {
   let user: UserResponseData;
@@ -81,7 +82,7 @@ describe('Delete User Integration', () => {
 
   it('should be return 400 and error user not exists if not exists in db', async () => {
     const { status, body } = await supertest(app)
-      .delete(`/users/delUser/${'soil'}`)
+      .delete(`/users/delUser/${uuidGlobal}`)
       .set('Authorization', user.token);
 
     expect(status).toBe(400);

@@ -1,3 +1,4 @@
+import { ParamsNotExpected } from '@root/protocols/errors';
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { FarmModel } from '../../../../database/model/Farm';
@@ -16,7 +17,7 @@ class CreateFarmController {
     }: FarmModel = req.body;
 
     if (Object.keys(req.body).length > 6) {
-      res.status(400).send({ error: 'Received Params not expected' });
+      res.status(400).send({ error: new ParamsNotExpected().message });
     } else {
       const createFarmUseCase = container.resolve(CreateFarmUseCase);
 

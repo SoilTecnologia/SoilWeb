@@ -44,4 +44,11 @@ describe('Find User By Login Repository', () => {
     expect(promise?.password).toBe('123456');
     expect(promise?.user_type).toBe('SUDO');
   });
+
+  it('should throw error if database error', () => {
+    tracker.on.select('users').simulateErrorOnce('database error');
+    const response = findByLogin.findUserByLogin('soil');
+
+    expect(response).rejects.toThrow();
+  });
 });
