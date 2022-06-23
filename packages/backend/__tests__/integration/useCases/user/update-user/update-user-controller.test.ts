@@ -6,7 +6,7 @@ import {
   addUser,
   userCreated
 } from '@tests/mocks/data/users/user-values-for-mocks';
-import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
+import { UserResponseData } from '@root/useCases/contracts';
 import { uuidGlobal } from '@tests/mocks/data/global';
 import {
   DataNotFound,

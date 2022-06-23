@@ -3,7 +3,7 @@ import '@root/shared/container/index';
 import knex from '@root/database';
 import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
-import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
+import { UserResponseData } from '@root/useCases/contracts';
 import { UserModel } from '@root/database/model/User';
 import { DataNotFound, ParamsNotExpected } from '@root/protocols/errors';
 

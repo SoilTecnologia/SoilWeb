@@ -1,20 +1,24 @@
 import { mock, MockProxy } from 'jest-mock-extended';
-import { IEncrypter } from '@root/useCases/data/User/utils/encrypted-password/protocols';
-import { IFindUserByIdRepo } from '@database/protocols/users';
 import {
   DatabaseErrorReturn,
   DataNotFound,
-  NotUpdateError
+  NotUpdateError,
+  ParamsEquals
 } from '@protocols/errors';
 import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
-import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUserRepo';
-import { IUpdateUserService } from '@root/useCases/contracts/users/update-user/update-user-protocol';
-import { UpdateUserUseCase } from '@root/useCases/data/User/Updateuser/UpdateUserUseCase';
+import { IUpdateUserRepo, IFindUserByIdRepo } from '@database/protocols';
+import { IUpdateUserService } from '@root/useCases/contracts';
+import {
+  UpdateUserUseCase,
+  IEncrypter,
+  ICompareEncrypt
+} from '@root/useCases/data';
 
 describe('Update User Use Case', () => {
   let putUserRepo: MockProxy<IUpdateUserRepo>;
   let findUserRepo: MockProxy<IFindUserByIdRepo>;
   let encrypter: MockProxy<IEncrypter>;
+  let CompareEncrypter: MockProxy<ICompareEncrypt>;
 
   let putUserService: IUpdateUserService;
 
@@ -22,13 +26,20 @@ describe('Update User Use Case', () => {
     putUserRepo = mock();
     findUserRepo = mock();
     encrypter = mock();
+    CompareEncrypter = mock();
 
     putUserService = new UpdateUserUseCase(
       findUserRepo,
       putUserRepo,
-      encrypter
+      encrypter,
+      CompareEncrypter
     );
-    findUserRepo.findById.mockResolvedValue(userCreated);
+
+    CompareEncrypter.compare.mockResolvedValue(true);
+    findUserRepo.findById.mockResolvedValue({
+      ...userCreated!,
+      login: 'isDiferrent'
+    });
     putUserRepo.update.mockResolvedValue(userCreated);
     encrypter.encrypt.mockResolvedValue('password_encrypted');
   });
@@ -67,8 +78,25 @@ describe('Update User Use Case', () => {
     expect(promise).rejects.toThrow(new DataNotFound('User'));
   });
 
-  // Encrypter
+  // Compare datas
+
+  it('should throw error, if received data equal a old user', () => {
+    jest.spyOn(findUserRepo, 'findById').mockResolvedValueOnce(userCreated!);
+
+    const promise = putUserService.execute(userCreated!);
+    expect(promise).rejects.toThrow(new ParamsEquals());
+  });
+
+  it('should throw error, if compare password return error', () => {
+    CompareEncrypter.compare.mockResolvedValueOnce('BCRYPT COMPARE ERROR');
+
+    const promise = putUserService.execute(userCreated!);
+    expect(promise).rejects.toThrow(new Error('BCRYPT COMPARE ERROR'));
+  });
+
+  // // Encrypter
   it('should encrypted password to have been called with data valids to have called once time', async () => {
+    CompareEncrypter.compare.mockResolvedValueOnce(false);
     const fnEncrypted = jest.spyOn(encrypter, 'encrypt');
 
     await putUserService.execute(userCreated!);
@@ -78,6 +106,7 @@ describe('Update User Use Case', () => {
   });
 
   it('should encrypted password return password encrypted ', async () => {
+    CompareEncrypter.compare.mockResolvedValueOnce(false);
     const callUserCreated = jest.spyOn(putUserRepo, 'update');
     await putUserService.execute(userCreated!);
 
@@ -88,49 +117,45 @@ describe('Update User Use Case', () => {
   });
 
   it('Should received an error if encrypted throw a error', () => {
+    CompareEncrypter.compare.mockResolvedValueOnce(false);
     jest.spyOn(encrypter, 'encrypt').mockResolvedValueOnce('ENCRYPT ERROR');
 
     const promise = putUserService.execute(userCreated!);
     expect(promise).rejects.toThrow(new Error('ENCRYPT ERROR'));
   });
 
-  // putUser
-  it('should create user repository to have been called with data valids to have called once time', async () => {
+  // // putUser
+  it('should updte user repository to have been called with data valids to have called once time', async () => {
     const fnEncrypted = jest.spyOn(putUserRepo, 'update');
 
     await putUserService.execute(userCreated!);
 
-    expect(fnEncrypted).toHaveBeenCalledWith({
-      user_id: 'soiltech',
-      login: 'soil',
-      password: 'password_encrypted',
-      user_type: 'SUDO'
-    });
+    expect(fnEncrypted).toHaveBeenCalledWith(userCreated);
     expect(fnEncrypted).toBeCalledTimes(1);
   });
 
-  it('should throw find user database error, when repository find user return error', () => {
-    jest.spyOn(putUserRepo, 'update').mockRejectedValueOnce(new Error());
-
-    const promise = putUserService.execute(userCreated!);
-    expect(promise).rejects.toThrow(new DatabaseErrorReturn());
-  });
-
-  it('should throw user not exists, if repository not return user', () => {
+  it('should throw user not updated, if repository not return user', () => {
     jest.spyOn(putUserRepo, 'update').mockResolvedValueOnce(undefined);
 
     const promise = putUserService.execute(userCreated!);
     expect(promise).rejects.toThrow(new NotUpdateError('User'));
   });
 
-  //Test response useCases
+  it('should throw database error, when repository update user return error', () => {
+    jest.spyOn(putUserRepo, 'update').mockRejectedValueOnce(new Error());
 
-  it('should to user to have  updated', async () => {
+    const promise = putUserService.execute(userCreated!);
+    expect(promise).rejects.toThrow(new DatabaseErrorReturn());
+  });
+
+  // //Test response useCases
+
+  it('should a user to have  updated', async () => {
     const promise = await putUserService.execute(userCreated!);
 
-    expect(promise).toHaveProperty('user_id', 'soiltech');
-    expect(promise).toHaveProperty('user_type', 'SUDO');
-    expect(promise).toHaveProperty('login', 'soil');
-    expect(promise).toHaveProperty('password', '123456');
+    expect(promise).toHaveProperty('user_id', userCreated?.user_id);
+    expect(promise).toHaveProperty('user_type', userCreated?.user_type);
+    expect(promise).toHaveProperty('login', userCreated?.login);
+    expect(promise).toHaveProperty('password');
   });
 });
