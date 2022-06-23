@@ -1,21 +1,21 @@
-import { IFindUserByLoginRepo } from '@root/database/protocols/users';
-import { ILoginAuth } from '@root/useCases/contracts/users/auth-login/login-auth';
+import { mock, MockProxy } from 'jest-mock-extended';
+
+import { IFindUserByLoginRepo } from '@root/database/protocols';
+import { ILoginAuth } from '@root/useCases/contracts';
 import {
   DatabaseErrorReturn,
   FailedCreateDataError,
   InvalidCredentials
 } from '@root/protocols/errors';
-import { AuthSignInUseCase } from '@root/useCases/data/User/AuthSignInUser/AuthLoginUseCase';
 import {
   ICompareEncrypt,
-  IEncrypter
-} from '@root/useCases/data/User/utils/encrypted-password/protocols';
-import { ITokenJwt } from '@root/useCases/data/User/utils/token-jwt/protocols';
+  AuthSignInUseCase,
+  ITokenJwt
+} from '@root/useCases/data';
 import {
   addUser,
   userCreated
 } from '@tests/mocks/data/users/user-values-for-mocks';
-import { mock, MockProxy } from 'jest-mock-extended';
 
 describe('Auth Login', () => {
   let findUserRepo: MockProxy<IFindUserByLoginRepo>;

@@ -1,6 +1,6 @@
 import knex from '@root/database';
 import { FarmModel } from '@root/database/model/Farm';
-import { IFindFarmByIdRepo } from '@root/database/protocols/farms/find-by-farm_id/find';
+import { IFindFarmByIdRepo } from '@root/database/protocols';
 
 class FindFarmByIdRepo implements IFindFarmByIdRepo {
   async find({

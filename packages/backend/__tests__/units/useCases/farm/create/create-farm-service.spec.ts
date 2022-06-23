@@ -1,10 +1,6 @@
 import { mock, MockProxy } from 'jest-mock-extended';
-
-import { IFindUserByIdRepo } from '@database/protocols/users';
-import { IFindFarmByIdRepo } from '@root/database/protocols/farms/find-by-farm_id/find';
-import { ICreateFarmRepo } from '@root/database/protocols/farms/create-farms/create-farms-protocol';
-import { ICreateFarmUseCase } from '@root/useCases/contracts/farms/create/create-farm-protocol';
-import { CreateFarmUseCase } from '@root/useCases/data/Farms/CreateFarms/CreateFarmUseCase';
+import { ICreateFarmUseCase } from '@root/useCases/contracts';
+import { CreateFarmUseCase } from '@root/useCases/data';
 import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import {
@@ -13,6 +9,11 @@ import {
   DataNotFound,
   FailedCreateDataError
 } from '@root/protocols/errors';
+import {
+  ICreateFarmRepo,
+  IFindFarmByIdRepo,
+  IFindUserByIdRepo
+} from '@root/database/protocols';
 
 describe('Create User Use Case', () => {
   let addfarmRepo: MockProxy<ICreateFarmRepo>;

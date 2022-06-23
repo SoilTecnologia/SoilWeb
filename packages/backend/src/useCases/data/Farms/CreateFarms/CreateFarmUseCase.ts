@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { FarmModel } from '@database/model/Farm';
 import { messageErrorTryAction } from '@utils/types';
-import { ICreateFarmUseCase } from '@root/useCases/contracts/farms/create/create-farm-protocol';
+import { ICreateFarmUseCase } from '@root/useCases/contracts';
 import {
   AlreadyExistsError,
   DatabaseErrorReturn,
@@ -11,9 +11,8 @@ import {
   ParamsInvalid,
   TypeParamError
 } from '@root/protocols/errors';
-import { IFindUserByIdRepo } from '@root/database/protocols/users';
-import { ICreateFarmRepo } from '@root/database/protocols/farms/create-farms/create-farms-protocol';
-import { IFindFarmByIdRepo } from '@root/database/protocols/farms/find-by-farm_id/find';
+import { IFindUserByIdRepo } from '@root/database/protocols';
+import { ICreateFarmRepo, IFindFarmByIdRepo } from '@root/database/protocols';
 
 @injectable()
 class CreateFarmUseCase implements ICreateFarmUseCase {
@@ -70,6 +69,9 @@ class CreateFarmUseCase implements ICreateFarmUseCase {
     user_id,
     farm_name
   }: ICreateFarmUseCase.Params): Promise<ICreateFarmUseCase.Response> {
+    /*
+    Check types params and values not nullable
+    */
     if (
       !farm_id ||
       !user_id ||
@@ -90,11 +92,16 @@ class CreateFarmUseCase implements ICreateFarmUseCase {
 
     const farmAlreadExisty = await this.findFarmById(farm_id);
 
+    /*
+      Check farm exist and response database
+    */
     if (farmAlreadExisty === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (farmAlreadExisty) throw new AlreadyExistsError('Farm');
     else {
       const userExists = await this.findUserById(user_id);
-
+      /*
+        Check user exist and response databse
+      */
       if (userExists === DATABASE_ERROR) throw new DatabaseErrorReturn();
       else if (!userExists) throw new DataNotFound('User');
       else {
@@ -106,7 +113,9 @@ class CreateFarmUseCase implements ICreateFarmUseCase {
           user_id,
           farm_name
         });
-
+        /*
+          Check is user created with sucessfully
+          */
         if (newFarm === DATABASE_ERROR) throw new DatabaseErrorReturn();
         else if (!newFarm) throw new FailedCreateDataError('Farm');
         else return newFarm;

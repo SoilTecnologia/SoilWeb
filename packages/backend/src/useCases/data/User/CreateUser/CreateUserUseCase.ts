@@ -1,9 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { UserModel } from '@database/model/User';
-import {
-  ICreateUserRepository,
-  IFindUserByLoginRepo
-} from '@database/protocols/users';
+import { messageErrorTryAction } from '@utils/types';
 import {
   AlreadyExistsError,
   DatabaseError,
@@ -13,10 +10,12 @@ import {
   ParamsInvalid,
   TypeParamError
 } from '@protocols/errors';
-import { messageErrorTryAction } from '@utils/types';
-import { IEncrypter } from '../utils/encrypted-password/protocols';
-import { ITokenJwt } from '../utils/token-jwt/protocols';
-import { ICreateUserUseCase } from '@useCases/contracts/users/create-user/create-user-protocol';
+import { IEncrypter, ITokenJwt } from '@useCases/data/User';
+import { ICreateUserUseCase } from '@useCases/contracts/users/';
+import {
+  ICreateUserRepository,
+  IFindUserByLoginRepo
+} from '@root/database/protocols';
 
 @injectable()
 class CreateUserUseCase implements ICreateUserUseCase {

@@ -2,8 +2,8 @@ import 'reflect-metadata';
 import knex from 'knex';
 import { getTracker, MockClient, Tracker } from 'knex-mock-client';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
-import { IFindFarmByIdRepo } from '@root/database/protocols/farms/find-by-farm_id/find';
-import { FindFarmByIdRepo } from '@root/database/repositories/Farms/FindById/FindByIdRepo';
+import { IFindFarmByIdRepo } from '@root/database/protocols';
+import { FindFarmByIdRepo } from '@root/database/repositories';
 
 jest.mock('@database/index', () => {
   return knex({ client: MockClient, dialect: 'pg' });

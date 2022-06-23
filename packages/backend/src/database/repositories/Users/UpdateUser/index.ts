@@ -1,7 +1,7 @@
 import knex from '@root/database';
 import { UserModel } from '@root/database/model/User';
-import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUserRepo';
-import { IUpdateUserService } from '@root/useCases/contracts/users/update-user/update-user-protocol';
+import { IUpdateUserRepo } from '@root/database/protocols';
+import { IUpdateUserService } from '@root/useCases/contracts';
 
 class UpdateUserRepo implements IUpdateUserRepo {
   async update({

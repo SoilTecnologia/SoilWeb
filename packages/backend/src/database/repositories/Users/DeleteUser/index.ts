@@ -1,6 +1,6 @@
 import knex from '@root/database';
 import { UserModel } from '@root/database/model/User';
-import { IDeleteUserRepo } from '@root/database/protocols/users/delete-user/IDeleteUser';
+import { IDeleteUserRepo } from '@root/database/protocols';
 
 class DeleteUserRepo implements IDeleteUserRepo {
   async deleteUser({

@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import knex from 'knex';
 import { getTracker, MockClient, Tracker } from 'knex-mock-client';
-import { ICreateFarmRepo } from '@root/database/protocols/farms/create-farms/create-farms-protocol';
-import { CreateFarmRepo } from '@root/database/repositories/Farms/Create/CreateFarmRepo';
+import { ICreateFarmRepo } from '@root/database/protocols';
+import { CreateFarmRepo } from '@root/database/repositories';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 
 jest.mock('@database/index', () => {

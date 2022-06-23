@@ -1,15 +1,13 @@
-import { IDeleteUserRepo } from '@root/database/protocols/users/delete-user/IDeleteUser';
-import { IFindUserByIdRepo } from '@root/database/protocols/users/find-by-id/IFindByIdRepository';
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
   DataNotFound,
-  ParamsInvalid,
-  TypeParamError
+  ParamsInvalid
 } from '@root/protocols/errors';
 import { inject, injectable } from 'tsyringe';
 import { messageErrorTryAction } from '@utils/types';
-import { IDeleteUserService } from '@root/useCases/contracts/users/delete-user/del-user-protocol';
+import { IDeleteUserRepo, IFindUserByIdRepo } from '@root/database/protocols';
+import { IDeleteUserService } from '@root/useCases/contracts';
 
 @injectable()
 class DeleteUserUseCase implements IDeleteUserService {

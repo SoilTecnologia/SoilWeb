@@ -1,7 +1,7 @@
-import { IGetAllUserRepo } from '@root/database/protocols/users/get-all/IGetAllUserRepo';
+import { IGetAllUserRepo } from '@root/database/protocols';
 import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
-import { IGetAllUserService } from '@root/useCases/contracts/users/get-all-user/get-all-user';
-import { GetAllUserUseCase } from '@root/useCases/data/User/GetAllUsers/GetAllUserUseCase';
+import { IGetAllUserService } from '@root/useCases/contracts';
+import { GetAllUserUseCase } from '@root/useCases/data';
 import { usersArray } from '@tests/mocks/data/users/user-values-for-mocks';
 import { MockProxy } from 'jest-mock-extended';
 import mock from 'jest-mock-extended/lib/Mock';

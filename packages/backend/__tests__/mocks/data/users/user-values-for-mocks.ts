@@ -1,6 +1,6 @@
 import { UserModel } from '@root/database/model/User';
-import { ICreateUserRepository } from '@root/database/protocols/users';
-import { ICreateUserUseCase } from '@root/useCases/contracts/users/create-user/create-user-protocol';
+import { ICreateUserRepository } from '@root/database/protocols';
+import { ICreateUserUseCase } from '@root/useCases/contracts';
 
 export const addUser: ICreateUserUseCase.Params = {
   login: 'soil',

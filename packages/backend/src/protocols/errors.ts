@@ -103,6 +103,13 @@ export class NotUpdateError extends Error {
     Object.setPrototypeOf(this, NotUpdateError.prototype);
   }
 }
+export class ParamsEquals extends Error {
+  constructor() {
+    super(`New Params is equals a old params`);
+
+    Object.setPrototypeOf(this, ParamsEquals.prototype);
+  }
+}
 
 export type DatabaseError = 'Database Error';
 export const DATABASE_ERROR: DatabaseError = 'Database Error';

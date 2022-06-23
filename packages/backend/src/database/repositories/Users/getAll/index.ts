@@ -1,6 +1,6 @@
 import knex from '@root/database';
 import { UserModel } from '@root/database/model/User';
-import { IGetAllUserRepo } from '@root/database/protocols/users/get-all/IGetAllUserRepo';
+import { IGetAllUserRepo } from '@root/database/protocols';
 
 class GetAllUserRepo implements IGetAllUserRepo {
   async getAll(): IGetAllUserRepo.Response {

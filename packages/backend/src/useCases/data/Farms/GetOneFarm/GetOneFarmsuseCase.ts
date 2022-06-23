@@ -1,17 +1,15 @@
 import { inject, injectable } from 'tsyringe';
-import { IFarmsRepository } from '@database/repositories/Farms/IFarmsRepository';
 import { messageErrorTryAction } from '@utils/types';
-import { IFindFarmByIdRepo } from '@root/database/protocols/farms/find-by-farm_id/find';
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
-  DataNotFound,
-  ParamsInvalid,
-  TypeParamError
+  ParamsInvalid
 } from '@root/protocols/errors';
+import { IGetOneFarmService } from '@root/useCases/contracts';
+import { IFindFarmByIdRepo } from '@root/database/protocols';
 
 @injectable()
-class GetOneFarmUseCase {
+class GetOneFarmUseCase implements IGetOneFarmService {
   constructor(@inject('FindFarmById') private findFarm: IFindFarmByIdRepo) {}
 
   private async applyQueryFindById(farm_id: string) {
@@ -23,7 +21,9 @@ class GetOneFarmUseCase {
     }
   }
 
-  async execute(farm_id: string) {
+  async execute({
+    farm_id
+  }: IGetOneFarmService.Params): IGetOneFarmService.Response {
     if (farm_id === 'undefined' || farm_id === 'null') {
       throw new ParamsInvalid();
     } else {

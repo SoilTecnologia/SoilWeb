@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { messageErrorTryAction } from '@utils/types';
 import { DeleteUserUseCase } from './deleteUserUseCase';
-import { ParamsInvalid, ParamsNotExpected } from '@root/protocols/errors';
+import { ParamsNotExpected } from '@root/protocols/errors';
 
 class DeleteUserController {
   async handle(req: Request, res: Response, next: NextFunction) {

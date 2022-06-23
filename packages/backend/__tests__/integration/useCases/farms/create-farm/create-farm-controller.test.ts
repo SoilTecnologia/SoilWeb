@@ -4,7 +4,6 @@ import knex from '@root/database';
 import { app } from '@root/app';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
-import { UserResponseData } from '@root/useCases/contracts/users/create-user/create-user-protocol';
 import { uuidGlobal } from '@tests/mocks/data/global';
 import { DataNotFound } from '@root/protocols/errors';
 

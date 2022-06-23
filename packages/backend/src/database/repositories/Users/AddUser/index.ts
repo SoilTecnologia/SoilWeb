@@ -1,6 +1,6 @@
 import knex from '@database/index';
 import { UserModel } from '@database/model/User';
-import { ICreateUserRepository } from '@database/protocols/users';
+import { ICreateUserRepository } from '@database/protocols';
 
 class AddNewUserRepo implements ICreateUserRepository {
   async create(

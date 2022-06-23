@@ -14,7 +14,9 @@ class GetOneFarmController {
       const getOneFarmUseCase = container.resolve(GetOneFarmUseCase);
 
       try {
-        const allFarmsFromUser = await getOneFarmUseCase.execute(farmId);
+        const allFarmsFromUser = await getOneFarmUseCase.execute({
+          farm_id: farmId
+        });
 
         return res.status(200).send(allFarmsFromUser);
       } catch (err) {

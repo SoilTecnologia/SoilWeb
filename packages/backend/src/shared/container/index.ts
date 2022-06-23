@@ -23,30 +23,44 @@ import { ISchedulingHistoryRepository } from '@database/repositories/SchedulingH
 import { SchedulingHistoryRepository } from '@database/repositories/SchedulingHistory/SchedulingHistoryRepository';
 import { SchedulingAngleHistRepository } from '@database/repositories/SchedulingAngleHist/SchedulingAngleHistRepository';
 import { ISchedulingAngleHistRepository } from '@database/repositories/SchedulingAngleHist/ISchedulingAngleHistRepository';
-import { AddNewUserRepo } from '@database/repositories/Users/AddUser/AddNewUserRepository';
-import { FindUserByLoginRepo } from '@database/repositories/Users/FindByLogin/FindByLoginRTepository';
-import { ICreateUserRepository } from '@database/protocols/users/create-user/create-user';
-import { IFindUserByLoginRepo } from '@database/protocols/users/find-user-by-login/IFindByLoginRepository';
+
+//Encrypters and Tokens
 import {
+  IEncrypter,
+  BcryptAdapter,
+  BCryptCompare,
   ICompareEncrypt,
-  IEncrypter
-} from '@useCases/data/User/utils/encrypted-password/protocols';
-import { BcryptAdapter } from '@useCases/data/User/utils/encrypted-password/bcrypter-adapter';
-import { ITokenJwt } from '@useCases/data/User/utils/token-jwt/protocols';
-import { CreateJwt } from '@useCases/data/User/utils/token-jwt';
-import { BCryptCompare } from '@useCases/data/User/utils/encrypted-password/compare-encrypted';
-import { IDeleteUserRepo } from '@database/protocols/users/delete-user/IDeleteUser';
-import { DeleteUserRepo } from '@database/repositories/Users/DeleteUser/DeleteUserRepository';
-import { IFindUserByIdRepo } from '@database/protocols/users/find-by-id/IFindByIdRepository';
-import { FindUserByIdRepo } from '@database/repositories/Users/FindById/FindByIdRepository';
-import { IGetAllUserRepo } from '@database/protocols/users/get-all/IGetAllUserRepo';
-import { GetAllUserRepo } from '@database/repositories/Users/getAll/GetAllRepo';
-import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUserRepo';
-import { UpdateUserRepo } from '@root/database/repositories/Users/UpdateUser/UpdateUserRepo';
-import { ICreateFarmRepo } from '@root/database/protocols/farms/create-farms/create-farms-protocol';
-import { CreateFarmRepo } from '@root/database/repositories/Farms/Create/CreateFarmRepo';
-import { IFindFarmByIdRepo } from '@root/database/protocols/farms/find-by-farm_id/find';
-import { FindFarmByIdRepo } from '@root/database/repositories/Farms/FindById/FindByIdRepo';
+  CreateJwt,
+  ITokenJwt
+} from '@useCases/data/User';
+
+// Implementations Repositories
+import {
+  AddNewUserRepo,
+  FindUserByIdRepo,
+  FindUserByLoginRepo,
+  DeleteUserRepo,
+  UpdateUserRepo,
+  GetAllUserRepo,
+  FindFarmByIdRepo,
+  CreateFarmRepo,
+  UpdateFarmRepo,
+  DeleteFarmRepo
+} from '@database/repositories/';
+
+// Protocols Repositories
+import {
+  ICreateUserRepository,
+  IFindUserByIdRepo,
+  IFindUserByLoginRepo,
+  IDeleteUserRepo,
+  IGetAllUserRepo,
+  IUpdateUserRepo,
+  IFindFarmByIdRepo,
+  ICreateFarmRepo,
+  IUpdateFarmRepo,
+  IDeleteFarmRepo
+} from '@database/protocols/';
 
 //Users
 container.register<ICreateUserRepository>('AddUser', AddNewUserRepo);
@@ -62,14 +76,14 @@ container.register<IFindUserByLoginRepo>(
 //Encrypter
 container.register<IEncrypter>('Encrypter', BcryptAdapter);
 container.register<ICompareEncrypt>('CompareEncrypt', BCryptCompare);
-
 //Token Jwt
 container.register<ITokenJwt>('TokenJwt', CreateJwt);
 
 // Farms
-
 container.register<ICreateFarmRepo>('CreateFarms', CreateFarmRepo);
 container.register<IFindFarmByIdRepo>('FindFarmById', FindFarmByIdRepo);
+container.register<IUpdateFarmRepo>('UpdateFarm', UpdateFarmRepo);
+container.register<IDeleteFarmRepo>('DeleteFarm', DeleteFarmRepo);
 
 container.registerSingleton<IFarmsRepository>(
   'FarmsRepository',

@@ -1,13 +1,8 @@
 import 'reflect-metadata';
 import knex from 'knex';
 import { getTracker, MockClient, Tracker } from 'knex-mock-client';
-import { IDeleteUserRepo } from '@root/database/protocols/users';
-import { AddNewUserRepo } from '@root/database/repositories/Users/AddUser/AddNewUserRepository';
-import {
-  addUser,
-  userCreated
-} from '@tests/mocks/data/users/user-values-for-mocks';
-import { DeleteUserRepo } from '@root/database/repositories/Users/DeleteUser/DeleteUserRepository';
+import { IDeleteUserRepo } from '@root/database/protocols';
+import { DeleteUserRepo } from '@root/database/repositories';
 
 jest.mock('@database/index', () => {
   return knex({ client: MockClient, dialect: 'pg' });

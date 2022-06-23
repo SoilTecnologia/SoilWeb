@@ -1,6 +1,6 @@
 import knex from '@root/database';
 import { FarmModel } from '@root/database/model/Farm';
-import { ICreateFarmRepo } from '@root/database/protocols/farms/create-farms/create-farms-protocol';
+import { ICreateFarmRepo } from '@root/database/protocols';
 
 class CreateFarmRepo implements ICreateFarmRepo {
   async create(

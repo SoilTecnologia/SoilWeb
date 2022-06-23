@@ -1,16 +1,9 @@
 import '@root/shared/container/index';
-import {
-  IDeleteUserRepo,
-  IFindUserByIdRepo
-} from '@root/database/protocols/users';
+import { IDeleteUserRepo, IFindUserByIdRepo } from '@root/database/protocols';
 import { mock, MockProxy } from 'jest-mock-extended';
-import {
-  DatabaseErrorReturn,
-  DataNotFound,
-  ParamsInvalid
-} from '@root/protocols/errors';
-import { IDeleteUserService } from '@root/useCases/contracts/users/delete-user/del-user-protocol';
-import { DeleteUserUseCase } from '@root/useCases/data/User/DeleteUser/deleteUserUseCase';
+import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
+import { IDeleteUserService } from '@root/useCases/contracts';
+import { DeleteUserUseCase } from '@root/useCases/data';
 import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
 
 describe('Delete User Service', () => {

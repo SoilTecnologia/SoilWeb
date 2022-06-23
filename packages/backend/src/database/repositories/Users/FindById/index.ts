@@ -1,4 +1,4 @@
-import { IFindUserByIdRepo } from '@root/database/protocols/users/find-by-id/IFindByIdRepository';
+import { IFindUserByIdRepo } from '@root/database/protocols';
 import knex from '@database/index';
 import { UserModel } from '@database/model/User';
 

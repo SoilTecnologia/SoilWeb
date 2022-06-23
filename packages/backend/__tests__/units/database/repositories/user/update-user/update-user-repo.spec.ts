@@ -2,8 +2,8 @@ import 'reflect-metadata';
 import knex from 'knex';
 import { getTracker, MockClient, Tracker } from 'knex-mock-client';
 import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
-import { IUpdateUserRepo } from '@root/database/protocols/users/update/IUpdateUserRepo';
-import { UpdateUserRepo } from '@root/database/repositories/Users/UpdateUser/UpdateUserRepo';
+import { IUpdateUserRepo } from '@root/database/protocols';
+import { UpdateUserRepo } from '@root/database/repositories';
 
 jest.mock('@database/index', () => {
   return knex({ client: MockClient, dialect: 'pg' });

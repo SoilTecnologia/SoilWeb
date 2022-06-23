@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import knex from 'knex';
 import { getTracker, MockClient, Tracker } from 'knex-mock-client';
-import { IGetAllUserRepo } from '@root/database/protocols/users/get-all/IGetAllUserRepo';
-import { GetAllUserRepo } from '@root/database/repositories/Users/getAll/GetAllRepo';
+import { IGetAllUserRepo } from '@root/database/protocols';
+import { GetAllUserRepo } from '@root/database/repositories';
 import { usersArray } from '@tests/mocks/data/users/user-values-for-mocks';
 
 jest.mock('@database/index', () => {

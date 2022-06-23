@@ -1,5 +1,4 @@
-import { IFindUserByLoginRepo } from '@root/database/protocols/users';
-import { ILoginAuth } from '@root/useCases/contracts/users/auth-login/login-auth';
+import { IFindUserByLoginRepo } from '@root/database/protocols';
 import {
   DatabaseError,
   DatabaseErrorReturn,
@@ -10,10 +9,10 @@ import {
   TypeParamError
 } from '@root/protocols/errors';
 import { inject, injectable } from 'tsyringe';
-import { UserModel } from '../../../../database/model/User';
-import { messageErrorTryAction } from '../../../../utils/types';
-import { ICompareEncrypt } from '../utils/encrypted-password/protocols';
-import { ITokenJwt } from '../utils/token-jwt/protocols';
+import { UserModel } from '@database/model/User';
+import { messageErrorTryAction } from '@utils/types';
+import { ICompareEncrypt, ITokenJwt } from '@useCases/data/User';
+import { ILoginAuth } from '@root/useCases/contracts/users/';
 
 @injectable()
 class AuthSignInUseCase implements ILoginAuth {

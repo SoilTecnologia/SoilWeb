@@ -1,4 +1,4 @@
-import { IGetAllUserService } from '@root/useCases/contracts/users/get-all-user/get-all-user';
+import { IGetAllUserService } from '@root/useCases/contracts';
 import { inject, injectable } from 'tsyringe';
 import { messageErrorTryAction } from '@utils/types';
 import {
@@ -6,7 +6,7 @@ import {
   DATABASE_ERROR,
   DataNotFound
 } from '@root/protocols/errors';
-import { IGetAllUserRepo } from '@root/database/protocols/users/get-all/IGetAllUserRepo';
+import { IGetAllUserRepo } from '@root/database/protocols';
 
 @injectable()
 class GetAllUserUseCase implements IGetAllUserService {

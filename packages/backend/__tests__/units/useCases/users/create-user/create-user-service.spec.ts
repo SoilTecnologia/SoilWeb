@@ -1,12 +1,10 @@
 import { mock, MockProxy } from 'jest-mock-extended';
-import { IEncrypter } from '@root/useCases/data/User/utils/encrypted-password/protocols';
-import { ITokenJwt } from '@root/useCases/data/User/utils/token-jwt/protocols';
-import { CreateUserUseCase } from '@root/useCases/data/User/CreateUser/CreateUserUseCase';
-import { ICreateUserUseCase } from '@root/useCases/contracts/users/create-user/create-user-protocol';
+import { CreateUserUseCase, ITokenJwt, IEncrypter } from '@root/useCases/data';
+import { ICreateUserUseCase } from '@root/useCases/contracts';
 import {
   ICreateUserRepository,
   IFindUserByLoginRepo
-} from '@database/protocols/users';
+} from '@database/protocols';
 import {
   AlreadyExistsError,
   DatabaseErrorReturn,

@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import knex from 'knex';
 import { getTracker, MockClient, Tracker } from 'knex-mock-client';
-import { ICreateUserRepository } from '@root/database/protocols/users';
-import { AddNewUserRepo } from '@root/database/repositories/Users/AddUser/AddNewUserRepository';
+import { ICreateUserRepository } from '@root/database/protocols';
+import { AddNewUserRepo } from '@root/database/repositories';
 import {
   addUser,
   userCreated

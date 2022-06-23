@@ -1,6 +1,6 @@
-import knex from '../../..';
-import { UserModel } from '../../../model/User';
-import { IFindUserByLoginRepo } from '../../../protocols/users';
+import knex from '@database/index';
+import { UserModel } from '@database/model/User';
+import { IFindUserByLoginRepo } from '@database/protocols/users';
 
 class FindUserByLoginRepo implements IFindUserByLoginRepo {
   async findUserByLogin(

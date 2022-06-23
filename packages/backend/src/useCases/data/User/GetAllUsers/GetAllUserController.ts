@@ -1,7 +1,7 @@
 import { ParamsNotExpected } from '@root/protocols/errors';
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { messageErrorTryAction } from '@utils/types';
 import { GetAllUserUseCase } from './GetAllUserUseCase';
 
 class GetAllUserController {
