@@ -45,7 +45,10 @@ import {
   FindFarmByIdRepo,
   CreateFarmRepo,
   UpdateFarmRepo,
-  DeleteFarmRepo
+  DeleteFarmRepo,
+  GetAllFarmsRepo,
+  GetFarmByUserIdRepo,
+  GetMapFarmRepo
 } from '@database/repositories/';
 
 // Protocols Repositories
@@ -59,7 +62,10 @@ import {
   IFindFarmByIdRepo,
   ICreateFarmRepo,
   IUpdateFarmRepo,
-  IDeleteFarmRepo
+  IDeleteFarmRepo,
+  IGetAllFarmsRepo,
+  IGetFarmByUserIdRepo,
+  IGetMapFarmRepo
 } from '@database/protocols/';
 
 //Users
@@ -76,6 +82,7 @@ container.register<IFindUserByLoginRepo>(
 //Encrypter
 container.register<IEncrypter>('Encrypter', BcryptAdapter);
 container.register<ICompareEncrypt>('CompareEncrypt', BCryptCompare);
+
 //Token Jwt
 container.register<ITokenJwt>('TokenJwt', CreateJwt);
 
@@ -84,6 +91,9 @@ container.register<ICreateFarmRepo>('CreateFarms', CreateFarmRepo);
 container.register<IFindFarmByIdRepo>('FindFarmById', FindFarmByIdRepo);
 container.register<IUpdateFarmRepo>('UpdateFarm', UpdateFarmRepo);
 container.register<IDeleteFarmRepo>('DeleteFarm', DeleteFarmRepo);
+container.register<IGetAllFarmsRepo>('GetAllFarms', GetAllFarmsRepo);
+container.register<IGetFarmByUserIdRepo>('GetFarmByUser', GetFarmByUserIdRepo);
+container.register<IGetMapFarmRepo>('GetMapFarm', GetMapFarmRepo);
 
 container.registerSingleton<IFarmsRepository>(
   'FarmsRepository',
@@ -124,6 +134,7 @@ container.registerSingleton<ISchedulingRepository>(
   'SchedulingRepository',
   delay(() => SchedulingRepository)
 );
+
 container.registerSingleton<ISchedulingAngleRepository>(
   'SchedulingAngleRepository',
   delay(() => SchedulingAngleRepository)

@@ -55,7 +55,7 @@ class UpdateFarmUseCase implements IUpdateFarmService {
     try {
       return await this.updateFarm.update(farm);
     } catch (err) {
-      messageErrorTryAction(err, true, UpdateFarmUseCase.name, 'FUpdate Farm');
+      messageErrorTryAction(err, true, UpdateFarmUseCase.name, 'Update Farm');
       return DATABASE_ERROR;
     }
   }

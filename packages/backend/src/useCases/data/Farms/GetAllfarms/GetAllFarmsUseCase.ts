@@ -1,16 +1,20 @@
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
 import { inject, injectable } from 'tsyringe';
-import { IFarmsRepository } from '../../../../database/repositories/Farms/IFarmsRepository';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { messageErrorTryAction } from '@utils/types';
+import { IGetAllFarmsService } from '@root/useCases/contracts';
+import { IGetAllFarmsRepo } from '@root/database/protocols';
 
 @injectable()
-class GetAllFarmsUseCase {
-  constructor(
-    @inject('FarmsRepository') private farmRepository: IFarmsRepository
-  ) {}
+class GetAllFarmsUseCase implements IGetAllFarmsService {
+  constructor(@inject('GetAllFarms') private findFarms: IGetAllFarmsRepo) {}
 
   private async applyQueryGetAll() {
     try {
-      return await this.farmRepository.getAllFarms();
+      return await this.findFarms.getAll();
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -18,15 +22,16 @@ class GetAllFarmsUseCase {
         GetAllFarmsUseCase.name,
         'Get All Farms'
       );
+      return DATABASE_ERROR;
     }
   }
 
-  async execute() {
+  async execute(): IGetAllFarmsService.Response {
     const farms = await this.applyQueryGetAll();
 
-    if (farms) return farms;
-
-    throw new Error('Does not exists Farms');
+    if (farms === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!farms) throw new DataNotFound('Farm');
+    else return farms;
   }
 }
 

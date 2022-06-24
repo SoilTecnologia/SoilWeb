@@ -20,7 +20,7 @@ export const handleResultAction = async (id: string) => {
 
   /* Tentar melhorar isso daqui, nao depender de fazer uma query pra saber o usuario" */
   const getFarmUseCase = container.resolve(GetOneFarmUseCase);
-  const farm = await getFarmUseCase.execute(farm_id);
+  const farm = await getFarmUseCase.execute({ farm_id });
 
   const { user_id, farm_name } = farm!!;
 

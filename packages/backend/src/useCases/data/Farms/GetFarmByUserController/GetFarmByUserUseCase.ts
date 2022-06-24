@@ -1,21 +1,75 @@
+import {
+  IFindUserByIdRepo,
+  IGetFarmByUserIdRepo
+} from '@root/database/protocols';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound,
+  ParamsInvalid
+} from '@root/protocols/errors';
 import { inject, injectable } from 'tsyringe';
-import { UserModel } from '../../../../database/model/User';
-import { IFarmsRepository } from '../../../../database/repositories/Farms/IFarmsRepository';
-import { ERROR_QUERIES_DATABASE } from '../../../../utils/types';
+import { messageErrorTryAction } from '@utils/types';
+import { IGetFarmByUserService } from '@root/useCases/contracts';
 
 @injectable()
-class GetFarmByUserUseCase {
+class GetFarmByUserUseCase implements IGetFarmByUserService {
   constructor(
-    @inject('FarmsRepository') private farmRepository: IFarmsRepository
+    @inject('GetFarmByUser') private findFarms: IGetFarmByUserIdRepo,
+    @inject('FindUserById') private findUser: IFindUserByIdRepo
   ) {}
 
-  async execute(user_id: UserModel['password']) {
+  private async applyQueryGetByUser(user_id: string) {
     try {
-      return await this.farmRepository.getFarmsByUser(user_id);
+      return await this.findFarms.getAll({ user_id });
     } catch (err) {
-      console.log(`${ERROR_QUERIES_DATABASE} --> ${GetFarmByUserUseCase.name}`);
-      const error = err as Error;
-      console.log(error.message);
+      messageErrorTryAction(
+        err,
+        true,
+        GetFarmByUserUseCase.name,
+        'Get Farm By User Id'
+      );
+      return DATABASE_ERROR;
+    }
+  }
+  private async applyQueryGetUser(user_id: string) {
+    try {
+      return await this.findUser.findById({ id: user_id });
+    } catch (err) {
+      messageErrorTryAction(
+        err,
+        true,
+        GetFarmByUserUseCase.name,
+        'Get Farm By User Id'
+      );
+      return DATABASE_ERROR;
+    }
+  }
+
+  async execute({
+    user_id
+  }: IGetFarmByUserService.Params): IGetFarmByUserService.Response {
+    /*
+      Check types params and values not nullables
+    */
+    if (user_id === 'undefined' || user_id === 'null') {
+      throw new ParamsInvalid();
+    }
+
+    const user = await this.applyQueryGetUser(user_id);
+    /*
+      Check user exist in database
+    */
+    if (user === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!user) throw new DataNotFound('User');
+    else {
+      const farms = await this.applyQueryGetByUser(user_id);
+      /*
+        Check query get farms by user and error database
+      */
+      if (farms === DATABASE_ERROR) throw new DatabaseErrorReturn();
+      else if (!farms) throw new DataNotFound('Farms');
+      else return farms;
     }
   }
 }
