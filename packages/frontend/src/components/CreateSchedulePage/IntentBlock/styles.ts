@@ -13,7 +13,6 @@ ${({theme})=>css`
   width:100%;
   flex-direction:column;
   align-items:center;
-  padding:${theme.spacings.xsmall};
 `}
 `;
 export const HeaderText = styled.h1`
@@ -54,9 +53,8 @@ export const ScheduleTypeButton= styled.button<{isSelected:boolean}>`
       ${theme.colors.primary} 90%,
       ${theme.colors.primary_gradient} 100%
     );
-
     box-shadow: 5px 5px 15px gray;
-    transition: all 0.3s linear;
+    transition: all 0.5s linear;
     border-radius: 1.5rem;
 
     &:hover {

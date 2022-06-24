@@ -1,47 +1,50 @@
-import { useContextIntentsData } from "hooks/useContextIntentData";
-import Intent from "utils/models/intent";
-import IntentSelectionButtons from "../IntentSelectionButtons";
+import ScheduleSelectionButtons from "../ScheduleSelectionButtons";
 import IntentsInlineContainer from "../IntentsInlineContainer";
 import PercentComponent from "../PercentComponent";
 import * as S from "./styles";
+import { useContextScheduleData } from "hooks/useContextScheduleData";
+
+
 
 
 const IntentManager = () => {
-
+  const { scheduleType } = useContextScheduleData()
   return (
-    <S.Container>
-      <S.IntentWrapper>
+    scheduleType !== '' ?
+      < S.Container >
+        <S.IntentWrapper>
 
-        <IntentsInlineContainer
-          intentName="LIGA/DESLIGA"
-        >
-          <IntentSelectionButtons type="power" />
-        </IntentsInlineContainer>
+          <IntentsInlineContainer
+            intentName="LIGA/DESLIGA"
+          >
+            <ScheduleSelectionButtons type="power" />
+          </IntentsInlineContainer>
 
-        <IntentsInlineContainer
-          intentName="SENTIDO"
-        >
-          <IntentSelectionButtons type="direction" />
-        </IntentsInlineContainer>
+          <IntentsInlineContainer
+            intentName="SENTIDO"
+          >
+            <ScheduleSelectionButtons type="direction" />
+          </IntentsInlineContainer>
 
-      </S.IntentWrapper>
+        </S.IntentWrapper>
 
-      <S.IntentWrapper>
+        <S.IntentWrapper>
 
-        <IntentsInlineContainer
-          intentName="ÁGUA"
-        >
-          <IntentSelectionButtons type="water" />
-        </IntentsInlineContainer>
+          <IntentsInlineContainer
+            intentName="ÁGUA"
+          >
+            <ScheduleSelectionButtons type="water" />
+          </IntentsInlineContainer>
 
-        <IntentsInlineContainer
-          intentName="PERCENTÍMETRO"
-        >
-          <PercentComponent />
-        </IntentsInlineContainer>
+          <IntentsInlineContainer
+            intentName="PERCENTÍMETRO"
+          >
+            <PercentComponent />
+          </IntentsInlineContainer>
 
-      </S.IntentWrapper>
-    </S.Container>
+        </S.IntentWrapper>
+      </ S.Container >
+      : <></>
 
   )
 };

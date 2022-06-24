@@ -1,37 +1,46 @@
-import IntentManager from "../IntentManager";
-import SendAndCancelButton from "../SendAndCancelButton";
-import Map, { Layer, Source } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { useEffect, useState } from "react";
 import * as S from "./styles";
+import IntentManager from "../IntentManager";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { useContextAuth } from "hooks/useLoginAuth";
 import { useContextUserData } from "hooks/useContextUserData";
+import SendAndCancelButton from "../SendAndCancelButton";
+import ScheduleFormComponent from "../ScheduleFormComponent";
 import theme from "styles/theme";
-import { useState } from "react";
+import { useContextScheduleData } from "hooks/useContextScheduleData";
 
 const IntentBlock = () => {
-  const { farm, pivot } = useContextUserData();
-  const [scheduleType, setScheduleType] = useState('')
+  const { user } = useContextAuth()
+  const { pivot } = useContextUserData()
+  const { scheduleType, setScheduleType, setNewAngleSchedule, setNewDateSchedule } = useContextScheduleData()
 
 
-  const stateSelector = () => {
-    if (pivot.connection) {
-      if (pivot.power) {
-        if (pivot.water) return `${theme.colors.wet}`;
-        return `${theme.colors.dry}`;
-      }
-      return `${theme.colors.off}`;
-    }
-    return `${theme.colors.offline}`;
-  };
 
-  const toggleState = (type: string) => {
+  const toggleState = (type: string | any) => {
     if (scheduleType === type) {
       setScheduleType('')
     } else {
       setScheduleType(type)
     }
+
+    if (type === 'StopAngle' || type === 'AutoReturn') {
+      if (type === 'StopAngle') {
+        setNewAngleSchedule(prevState => ({ ...prevState, ['is_return']: false }))
+      }
+      else {
+        setNewAngleSchedule(prevState => ({ ...prevState, ['is_return']: true }))
+      }
+    }
+
+    else if (type === 'Complete' || type === 'EasyStop') {
+      if (type === 'Complete') {
+        setNewDateSchedule(prevState => ({ ...prevState, ['is_stop']: false }))
+      } else {
+        setNewDateSchedule(prevState => ({ ...prevState, ['is_stop']: true }))
+      }
+
+    }
   }
-
-
   return (
     <S.Container>
       <S.ScheduleTypeContainer >
@@ -59,6 +68,9 @@ const IntentBlock = () => {
 
         </S.RowAlign>
 
+
+
+        <ScheduleFormComponent />
       </S.ScheduleTypeContainer>
 
 
@@ -93,6 +105,9 @@ const IntentBlock = () => {
 
         <IntentManager />
         <SendAndCancelButton />
+
+
+
       </S.IntentContainer>
 
 

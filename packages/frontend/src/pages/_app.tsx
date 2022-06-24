@@ -9,6 +9,7 @@ import { UseCrudContextProvider } from "hooks/useActionsCrud";
 import { UseLoginProvider } from "hooks/useLoginAuth";
 import { UserDataProvider } from "hooks/useContextUserData";
 import { IntentsDataProvider } from "hooks/useContextIntentData";
+import { UseScheduleDataProvider } from "hooks/useContextScheduleData";
 import Socket from "api/socket";
 
 function App({ Component, pageProps }: AppProps) {
@@ -19,19 +20,21 @@ function App({ Component, pageProps }: AppProps) {
           <UserDataProvider>
             <IntentsDataProvider>
               <UseCrudContextProvider>
-                <Socket />
-                <Head>
-                  <title>SoilTech</title>
-                  <link rel="shortcut icon" href="/logos/logo.png" />
-                  <link rel="apple-touch-icon" href="/logos/logo.png" />
-                  <link rel="manifest" href="/manifest.json" />
-                  <meta
-                    name="description"
-                    content="Soil tech Tecnologias de Irrigação"
-                  />
-                </Head>
-                <Component {...pageProps} />
-                <GlobalStyles />
+                <UseScheduleDataProvider>
+                  <Socket />
+                  <Head>
+                    <title>SoilTech</title>
+                    <link rel="shortcut icon" href="/logos/logo.png" />
+                    <link rel="apple-touch-icon" href="/logos/logo.png" />
+                    <link rel="manifest" href="/manifest.json" />
+                    <meta
+                      name="description"
+                      content="Soil tech Tecnologias de Irrigação"
+                    />
+                  </Head>
+                  <Component {...pageProps} />
+                  <GlobalStyles />
+                </UseScheduleDataProvider>
               </UseCrudContextProvider>
             </IntentsDataProvider>
           </UserDataProvider>

@@ -1,20 +1,34 @@
 import { useState } from "react";
 import { useContextIntentsData } from "hooks/useContextIntentData";
 import * as S from "./styles";
+import { useContextScheduleData } from "hooks/useContextScheduleData";
 
 const PercentComponent = () => {
-  const { intents, setIntents } = useContextIntentsData()
+  const { scheduleType, setNewAngleSchedule, setNewDateSchedule } = useContextScheduleData()
   const [percentimeter, setPercentimeter] = useState(0)
 
 
   const onChangeHandler = async (value: number) => {
-    if (intents) {
+    if (scheduleType) {
       if (value > 0 && value < 100) {
-        setPercentimeter(value),
-          setIntents(prevState => ({ ...prevState, ['percentimeter']: value }))
+        setPercentimeter(value)
+        if (scheduleType == 'StopAngle' || scheduleType == 'AutoReturn') {
+          setNewAngleSchedule(prevState => ({ ...prevState, ['percentimeter']: value }))
+
+        }
+        else if (scheduleType == 'Complete' || scheduleType == 'EasyStop') {
+          setNewDateSchedule(prevState => ({ ...prevState, ['percentimeter']: value }))
+        }
+
       } else {
-        setPercentimeter(0),
-          setIntents(prevState => ({ ...prevState, ['percentimeter']: 0 }))
+        setPercentimeter(0)
+        if (scheduleType == 'StopAngle' || scheduleType == 'AutoReturn') {
+          setNewAngleSchedule(prevState => ({ ...prevState, ['percentimeter']: 0 }))
+
+        }
+        else if (scheduleType == 'Complete' || scheduleType == 'EasyStop') {
+          setNewDateSchedule(prevState => ({ ...prevState, ['percentimeter']: 0 }))
+        }
       }
     }
   };

@@ -54,7 +54,11 @@ const MainHistoric = () => {
 
   const useStyles = createTheme({
     overrides: {
+
       MuiInput: {
+        input:{
+          textAlign: 'center'
+        },
         root: {
           fontSize: 20,
         },

@@ -27,6 +27,10 @@ import {
   requestGetAllPivotsForMapWithFarmId,
   requestPivotHistoric,
   requestGetByPivotId,
+  requestCreateNewAngleSchedule,
+  requestGetAngleSchedulings,
+  requestCreateNewDateSchedule,
+  requestGetDateSchedulings
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
@@ -38,6 +42,7 @@ import User, { requestUser, UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 import { useContextAuth } from "./useLoginAuth";
 import { useContextUserData } from "./useContextUserData";
+import Schedule from "utils/models/schedulings";
 interface UserProviderProps {
   children: React.ReactNode;
 }
@@ -75,6 +80,10 @@ interface actionCrudProps {
     start_date: string,
     end_date: string
   ) => Promise<void>;
+  createNewAngleSchedule: (schedule: Schedule) => Promise<void>;
+  getAngleSchedulings: (pivot_id: string) => Promise<void>;
+  createNewDateSchedule: (schedule: Schedule) => Promise<void>;
+  getDateSchedulings: (pivot_id: string) => Promise<void>;
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -259,6 +268,24 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     result && setPivotMapList(result);
   };
 
+  //Schedulings
+  const createNewAngleSchedule = async (schedule: Schedule) => {
+    const result = await requestCreateNewAngleSchedule(schedule, user?.token)
+  }
+  const getAngleSchedulings = async (pivot_id: string) => {
+    const result = await requestGetAngleSchedulings(pivot_id, user?.token)
+    console.log("Angle:",result)
+  }
+
+  const createNewDateSchedule = async (schedule: Schedule) => {
+    const result = await requestCreateNewDateSchedule(schedule, user?.token)
+  }
+  const getDateSchedulings = async (pivot_id: string) => {
+    const result = await requestGetDateSchedulings(pivot_id, user?.token)
+    console.log("Data:", result)
+  }
+
+
   return (
     <ActionCrudContext.Provider
       value={{
@@ -290,6 +317,10 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         getPivotState,
         getGetPivotsListForMapWithFarmId,
         getPivotHistoric,
+        createNewAngleSchedule,
+        getAngleSchedulings,
+        createNewDateSchedule,
+        getDateSchedulings,
       }}
     >
       {children}

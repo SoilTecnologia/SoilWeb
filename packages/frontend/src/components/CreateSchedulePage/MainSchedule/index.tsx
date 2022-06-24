@@ -1,24 +1,29 @@
 import * as S from "./styles";
 import { useContextUserData } from "hooks/useContextUserData";
 import Header from "components/globalComponents/Header";
-import React, { useState } from "react";
-
-
+import React, { useEffect, useState } from "react";
 
 import { useContextData } from "hooks/useContextData";
-import IntentManager from "../IntentManager";
-import SendAndCancelButton from "../SendAndCancelButton";
 import IntentBlock from "../IntentBlock";
+import { useContextScheduleData } from "hooks/useContextScheduleData";
+import { useContextAuth } from "hooks/useLoginAuth";
 
 type iconProps = {
   children: React.ReactNode;
 };
 
-const Icon = ({ children }: iconProps) => <S.Icon>{children}</S.Icon>;
 
 const MainCreateSchedule = () => {
   const { pivot } = useContextUserData();
-  const { pivotList } = useContextData();
+  const { user } = useContextAuth()
+  const { scheduleType,setNewAngleSchedule, setNewDateSchedule } = useContextScheduleData()
+  useEffect(() => {
+    if (user && pivot) {
+      setNewAngleSchedule(prevState => ({ ...prevState, [`pivot_id`]: pivot.pivot_id, [`author`]: user.user_id }))
+      setNewDateSchedule(prevState => ({ ...prevState, [`pivot_id`]: pivot.pivot_id, [`author`]: user.user_id }))
+    }
+
+  },[scheduleType])
 
   return (
     <S.Container>
@@ -47,7 +52,7 @@ const MainCreateSchedule = () => {
         </S.ButtonsView>
 
         <S.HeaderText>
-        Selecione o tipo do agendamento:
+          Selecione o tipo do agendamento:
         </S.HeaderText>
         <IntentBlock />
 
