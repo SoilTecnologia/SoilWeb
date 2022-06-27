@@ -10,7 +10,7 @@ import { useContextScheduleData } from "hooks/useContextScheduleData";
 const IntentManager = () => {
   const { scheduleType } = useContextScheduleData()
   return (
-    scheduleType !== '' ?
+    scheduleType !== '' && scheduleType !== 'EasyStop' && scheduleType !== 'AutoReturn' ?
       < S.Container >
         <S.IntentWrapper>
 

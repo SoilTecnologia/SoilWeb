@@ -3,8 +3,15 @@ import styled, {css} from "styled-components";
 
 export const Container =styled.div`
   display: flex;
+  flex-direction:column;
+  justify-content:center;
+
+`;
+export const MainRowAlign =styled.div`
+  display: flex;
   flex-direction:row;
   justify-content:center;
+
 `;
 ///left side
 export const ScheduleTypeContainer = styled.div`

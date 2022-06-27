@@ -81,9 +81,9 @@ interface actionCrudProps {
     end_date: string
   ) => Promise<void>;
   createNewAngleSchedule: (schedule: Schedule) => Promise<void>;
-  getAngleSchedulings: (pivot_id: string) => Promise<void>;
+  getAngleSchedulings: (pivot_id: string) => Promise<any>;
   createNewDateSchedule: (schedule: Schedule) => Promise<void>;
-  getDateSchedulings: (pivot_id: string) => Promise<void>;
+  getDateSchedulings: (pivot_id: string) => Promise<any>;
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -270,19 +270,19 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
 
   //Schedulings
   const createNewAngleSchedule = async (schedule: Schedule) => {
-    const result = await requestCreateNewAngleSchedule(schedule, user?.token)
+    const result = await requestCreateNewAngleSchedule(schedule, user?.token);
   }
   const getAngleSchedulings = async (pivot_id: string) => {
-    const result = await requestGetAngleSchedulings(pivot_id, user?.token)
-    console.log("Angle:",result)
+    const result = await requestGetAngleSchedulings(pivot_id, user?.token);
+    return result;
   }
 
   const createNewDateSchedule = async (schedule: Schedule) => {
-    const result = await requestCreateNewDateSchedule(schedule, user?.token)
+    const result = await requestCreateNewDateSchedule(schedule, user?.token);
   }
   const getDateSchedulings = async (pivot_id: string) => {
-    const result = await requestGetDateSchedulings(pivot_id, user?.token)
-    console.log("Data:", result)
+    const result = await requestGetDateSchedulings(pivot_id, user?.token);
+    return result;
   }
 
 

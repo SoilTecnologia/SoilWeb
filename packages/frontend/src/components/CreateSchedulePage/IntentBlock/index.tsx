@@ -43,75 +43,76 @@ const IntentBlock = () => {
   }
   return (
     <S.Container>
-      <S.ScheduleTypeContainer >
+      <S.MainRowAlign>
+        <S.ScheduleTypeContainer >
 
-        <S.HeaderText>
-          Por Ângulo:
-        </S.HeaderText>
-        <S.RowAlign>
+          <S.HeaderText>
+            Por Ângulo:
+          </S.HeaderText>
+          <S.RowAlign>
 
-          <S.ScheduleTypeButton onClick={() => { toggleState('StopAngle') }}
-            isSelected={scheduleType == '' ? true : scheduleType === 'StopAngle' ? true : false}>
-            <S.ButtonText>
-              Posição de Parada
-            </S.ButtonText>
-          </S.ScheduleTypeButton>
-
-
-          <S.ScheduleTypeButton onClick={() => { toggleState('AutoReturn') }}
-            isSelected={scheduleType == '' ? true : scheduleType === 'AutoReturn' ? true : false}>
-            <S.ButtonText>
-              Retorno Automático
-            </S.ButtonText>
-
-          </S.ScheduleTypeButton>
-
-        </S.RowAlign>
+            <S.ScheduleTypeButton onClick={() => { toggleState('StopAngle') }}
+              isSelected={scheduleType == '' ? true : scheduleType === 'StopAngle' ? true : false}>
+              <S.ButtonText>
+                Posição de Parada
+              </S.ButtonText>
+            </S.ScheduleTypeButton>
 
 
+            <S.ScheduleTypeButton onClick={() => { toggleState('AutoReturn') }}
+              isSelected={scheduleType == '' ? true : scheduleType === 'AutoReturn' ? true : false}>
+              <S.ButtonText>
+                Retorno Automático
+              </S.ButtonText>
 
-        <ScheduleFormComponent />
-      </S.ScheduleTypeContainer>
+            </S.ScheduleTypeButton>
 
-
-      <S.IntentContainer>
-        <S.HeaderText>
-          Por Data:
-        </S.HeaderText>
-
-        <S.RowAlign>
-
-          <S.ScheduleTypeButton onClick={() => { toggleState('Complete') }}
-            isSelected={scheduleType == '' ? true : scheduleType === 'Complete' ? true : false}>
-            <S.ButtonText>
-              Início e Fim
-            </S.ButtonText>
-          </S.ScheduleTypeButton>
+          </S.RowAlign>
 
 
 
+          <ScheduleFormComponent />
+        </S.ScheduleTypeContainer>
 
-          <S.ScheduleTypeButton onClick={() => { toggleState('EasyStop') }}
-            isSelected={scheduleType == '' ? true : scheduleType === 'EasyStop' ? true : false}>
-            <S.ButtonText>
-              Desligamento Automático
-            </S.ButtonText>
-          </S.ScheduleTypeButton>
 
-        </S.RowAlign>
+        <S.IntentContainer>
+          <S.HeaderText>
+            Por Data:
+          </S.HeaderText>
+
+          <S.RowAlign>
+
+            <S.ScheduleTypeButton onClick={() => { toggleState('Complete') }}
+              isSelected={scheduleType == '' ? true : scheduleType === 'Complete' ? true : false}>
+              <S.ButtonText>
+                Início e Fim
+              </S.ButtonText>
+            </S.ScheduleTypeButton>
 
 
 
 
-        <IntentManager />
+            <S.ScheduleTypeButton onClick={() => { toggleState('EasyStop') }}
+              isSelected={scheduleType == '' ? true : scheduleType === 'EasyStop' ? true : false}>
+              <S.ButtonText>
+                Desligamento Automático
+              </S.ButtonText>
+            </S.ScheduleTypeButton>
+
+          </S.RowAlign>
+
+
+
+
+          <IntentManager />
+
+
+
+        </S.IntentContainer>
+
+
+      </S.MainRowAlign>
         <SendAndCancelButton />
-
-
-
-      </S.IntentContainer>
-
-
-
     </S.Container>
   );
 };

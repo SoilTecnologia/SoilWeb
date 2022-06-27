@@ -16,14 +16,14 @@ type iconProps = {
 const MainCreateSchedule = () => {
   const { pivot } = useContextUserData();
   const { user } = useContextAuth()
-  const { scheduleType,setNewAngleSchedule, setNewDateSchedule } = useContextScheduleData()
+  const { scheduleType, setNewAngleSchedule, setNewDateSchedule } = useContextScheduleData()
   useEffect(() => {
     if (user && pivot) {
       setNewAngleSchedule(prevState => ({ ...prevState, [`pivot_id`]: pivot.pivot_id, [`author`]: user.user_id }))
       setNewDateSchedule(prevState => ({ ...prevState, [`pivot_id`]: pivot.pivot_id, [`author`]: user.user_id }))
     }
 
-  },[scheduleType])
+  }, [scheduleType])
 
   return (
     <S.Container>
@@ -36,7 +36,7 @@ const MainCreateSchedule = () => {
         <S.ButtonsView>
           <S.Button href="/intent">
             <S.AnchorButton>
-              <S.MapIcon />
+              <S.BackIcon />
 
               <S.Text>Intenções</S.Text>
             </S.AnchorButton>

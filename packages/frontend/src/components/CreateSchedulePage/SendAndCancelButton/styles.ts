@@ -5,6 +5,9 @@ export const Container =styled.div`
     width:85%;
     align-items:center;
     justify-content:space-evenly;
+    align-self:center;
+    margin:25px 0px;
+
   `}
 `;
 export const ConfirmButton=styled.button`

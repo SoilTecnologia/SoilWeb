@@ -4,6 +4,7 @@ import styled, {css} from "styled-components";
 export const Container=styled.div`
   flex-direction:row;
   display:flex;
+  align-self:center;
 `;
 
 export const InicialState =styled.button`

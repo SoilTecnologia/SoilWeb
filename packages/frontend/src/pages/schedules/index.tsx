@@ -1,8 +1,9 @@
+import MainScheduleList from "components/SchedulePage/MainScheduleList";
 
 
 const Schedules = () => {
 
-  return <></>
+  return (<MainScheduleList />)
 
 }
 export default Schedules;

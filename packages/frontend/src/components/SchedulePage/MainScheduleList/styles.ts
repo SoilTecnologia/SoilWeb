@@ -1,6 +1,9 @@
 import styled, { css } from "styled-components";
 import { FaHistory } from "react-icons/fa";
+import { GrMap } from "react-icons/gr";
+import { RiRoadMapLine } from "react-icons/ri";
 import { ImArrowLeft2 } from "react-icons/im";
+import { ImCalendar } from "react-icons/im";
 import Link from "next/link";
 
 export const Container = styled.div`
@@ -122,7 +125,7 @@ export const BackIcon = styled(ImArrowLeft2)`
   color: ${({ theme }) => theme.colors.secondary};
   font-family: ${({ theme }) => theme.font.family.Montserrat_bold};
 `;
-export const ClockIcon = styled(FaHistory)`
+export const ClockIcon = styled(ImCalendar)`
   font-size: ${({ theme }) => theme.font.sizes.xxlarge};
   color: ${({ theme }) => theme.colors.secondary};
   font-family: ${({ theme }) => theme.font.family.Montserrat_bold};
