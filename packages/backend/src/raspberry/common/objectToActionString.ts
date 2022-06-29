@@ -28,7 +28,7 @@ export const objectToActionString = (
   else actionString += '5';
   actionString += '1';
   actionString += '-';
-  actionString += percent.toString().padStart(3,0)
+  actionString += percent.toString().padStart(3, '0');
   if (newAngle) {
     const angle = responseAngle(newAngle);
     actionString += '-';

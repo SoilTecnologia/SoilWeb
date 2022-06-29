@@ -6,9 +6,9 @@ import { io } from "socket.io-client";
 
 const urlIo = {
   newDev: "https://be.soiltech.com.br",
-  local: "https://localhost:3308",
-  newProd: "http://api.soiltech.com.br"
-}
+  local: "http://localhost:3308",
+  newProd: "http://api.soiltech.com.br",
+};
 
 const Socket = () => {
   const { user } = useContextAuth();

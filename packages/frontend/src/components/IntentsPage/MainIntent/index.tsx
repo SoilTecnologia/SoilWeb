@@ -11,6 +11,8 @@ import Intent from "utils/models/intent";
 import StatusComponent from "../StatusComponent";
 import IntentBlock from "../IntentBlock";
 import { useContextData } from "hooks/useContextData";
+import { api } from "api/api";
+import { parseCookies } from "nookies";
 
 type iconProps = {
   children: React.ReactNode;
@@ -21,6 +23,19 @@ const Icon = ({ children }: iconProps) => <S.Icon>{children}</S.Icon>;
 const MainIntent = () => {
   const { pivot } = useContextUserData();
   const { pivotList } = useContextData();
+
+  const getRefresh = async () => {
+    const { "soilauth-token": token } = parseCookies();
+    const response = await api.post(
+      `/actions/readState`,
+      {
+        pivot_id: pivot.pivot_id,
+      },
+      { headers: { Authorization: token } }
+    );
+
+    console.log(response);
+  };
 
   return (
     <S.Container>
@@ -67,6 +82,10 @@ const MainIntent = () => {
 
         <IntentBlock />
       </S.Body>
+
+      <S.RefreshButton onClick={getRefresh}>
+        <S.IconRefresh />
+      </S.RefreshButton>
     </S.Container>
   );
 };

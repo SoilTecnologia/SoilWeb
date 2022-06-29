@@ -132,6 +132,9 @@ class CheckGprsInterval {
           );
           console.log(`Tentativas excedidas no pivo ${pivot_id}`);
           console.log('....');
+          emitter.emit('action-ack-not-received', {
+            id: pivot_id
+          });
         } else {
           console.log(`Tentativa de conexão n° ${existsNotActive.attempts}`);
           const responseWithoutThis = resNotActive.filter(
@@ -156,7 +159,7 @@ class CheckGprsInterval {
       // await this.getStatePivot(pivot_id, false)
     }
   }
-  
+
   public async checkPivots() {
     this.getDate();
     // 10 minutos = 10000 * 6 * 10

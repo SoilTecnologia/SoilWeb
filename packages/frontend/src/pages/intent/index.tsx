@@ -3,6 +3,7 @@ import MainIntent from "components/IntentsPage/MainIntent";
 import { useContextUserData } from "hooks/useContextUserData";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { parseCookies } from "nookies";
+import { api } from "api/api";
 
 const PivotIntent = () => {
   const { pivot, setFarm, farm } = useContextUserData();
@@ -23,10 +24,9 @@ const PivotIntent = () => {
     if (!pivot.pivot_id) {
       getPivotIfNotExists(pivot_id);
       !farm && getOneFarm(farm_id);
-      getPivotState(pivot_id);
-    } else {
-      getPivotState(pivot.pivot_id);
     }
+
+    getPivotState(pivot_id);
   }, []);
 
   return <MainIntent />;

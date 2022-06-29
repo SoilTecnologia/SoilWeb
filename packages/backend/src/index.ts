@@ -130,7 +130,7 @@ try {
         pivot_num,
         farm_name
       });
-      
+
       emitter.off('action-ack-not-received', () => {});
     });
   });
