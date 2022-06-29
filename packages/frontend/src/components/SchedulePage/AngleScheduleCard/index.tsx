@@ -11,6 +11,8 @@ import AntiClockwiseIcon from "../../../../public/icons/Sentido_antihorario.png"
 import { useState } from "react";
 import { addHours, format } from "date-fns";
 import Image from "next/image";
+import { useContextActionCrud } from "hooks/useActionsCrud";
+import { useContextScheduleData } from "hooks/useContextScheduleData";
 
 
 type PropsProvider = {
@@ -19,12 +21,25 @@ type PropsProvider = {
 
 const AngleScheduleCard = (props: PropsProvider) => {
   const { schedule } = props;
+  const { angleScheduleList, setAngleScheduleList } = useContextScheduleData()
+  const { deleteAngleSchedule, getAngleSchedulings } = useContextActionCrud()
 
-  console.log(schedule)
   const formatDate = (date: String | Date) => {
     const dateString = format(addHours(new Date(date as Date), 3), 'dd/MM/yyyy  HH:mm');
     return dateString;
   };
+
+  const handleDeleteSchedule = async () => {
+    await deleteAngleSchedule(schedule.scheduling_angle_id)
+      .then((response) => {
+        if (response) {
+          getAngleSchedulings(schedule.pivot_id).then(() => {
+            const newSchedulesList = angleScheduleList.filter(schedules => schedules.scheduling_angle_id != schedule.scheduling_angle_id)
+            setAngleScheduleList(newSchedulesList)
+          })
+        }
+      })
+  }
 
   return (
     <S.Card>
@@ -87,7 +102,7 @@ const AngleScheduleCard = (props: PropsProvider) => {
 
         <S.StatusWrapper>
           <S.DeleteButton
-          //onClick={() => setIsCollapsed(oldState => !oldState)}
+            onClick={() => handleDeleteSchedule()}
           >
             <S.DeleteIcon />
             <S.ButtonText>

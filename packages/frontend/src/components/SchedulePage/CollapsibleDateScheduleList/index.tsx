@@ -1,5 +1,6 @@
 
 import { useContextActionCrud } from "hooks/useActionsCrud";
+import { useContextScheduleData } from "hooks/useContextScheduleData";
 import { useContextUserData } from "hooks/useContextUserData";
 import { useEffect, useState } from "react";
 import { DateSchedule } from "utils/models/schedulings";
@@ -10,9 +11,9 @@ import * as S from "./styles";
 
 const CollapsibleDateScheduleList = () => {
   const { pivot } = useContextUserData()
+  const { dateScheduleList, setDateScheduleList } = useContextScheduleData()
   const { getDateSchedulings } = useContextActionCrud()
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [scheduleList, setScheduleList] = useState([])
 
 
   const loadSchedules = () => {
@@ -21,8 +22,7 @@ const CollapsibleDateScheduleList = () => {
     } else {
       getDateSchedulings(pivot.pivot_id)
         .then((response) => {
-          setScheduleList(response)
-          console.log(response)
+          setDateScheduleList(response)
           setIsCollapsed(true)
         })
     }
@@ -37,7 +37,7 @@ const CollapsibleDateScheduleList = () => {
       </S.ScheduleListButton>
       {isCollapsed && (
         <S.ScheduleListWrapper>
-          {scheduleList.map((schedule: DateSchedule) => (<DateScheduleCard schedule={schedule} />))}
+          {dateScheduleList.map((schedule: DateSchedule) => (<DateScheduleCard schedule={schedule} />))}
         </S.ScheduleListWrapper>
       )
       }

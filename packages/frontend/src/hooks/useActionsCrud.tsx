@@ -29,8 +29,10 @@ import {
   requestGetByPivotId,
   requestCreateNewAngleSchedule,
   requestGetAngleSchedulings,
+  requestDeleteAngleSchedule,
   requestCreateNewDateSchedule,
-  requestGetDateSchedulings
+  requestGetDateSchedulings,
+  requestDeleteDateSchedule,
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
@@ -43,6 +45,7 @@ import { useContextData } from "./useContextData";
 import { useContextAuth } from "./useLoginAuth";
 import { useContextUserData } from "./useContextUserData";
 import Schedule from "utils/models/schedulings";
+import { useContextScheduleData } from "./useContextScheduleData";
 interface UserProviderProps {
   children: React.ReactNode;
 }
@@ -84,6 +87,8 @@ interface actionCrudProps {
   getAngleSchedulings: (pivot_id: string) => Promise<any>;
   createNewDateSchedule: (schedule: Schedule) => Promise<void>;
   getDateSchedulings: (pivot_id: string) => Promise<any>;
+  deleteAngleSchedule: (schedule_id: string) => Promise<any>;
+  deleteDateSchedule: (schedule_id: string) => Promise<any>
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -102,6 +107,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   } = useContextData();
   const { user } = useContextAuth();
   const { setPivot, setHistoric } = useContextUserData();
+  const { dateScheduleList, setDateScheduleList, angleScheduleList, setAngleScheduleList } = useContextScheduleData()
   //CRUD USER
   const getAllUser = async (
     tokenState?: string
@@ -247,7 +253,6 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
       end_date,
       user?.token
     );
-    console.log(result);
     result && setHistoric(result);
   };
   //Rota page user
@@ -270,19 +275,38 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
 
   //Schedulings
   const createNewAngleSchedule = async (schedule: Schedule) => {
-    const result = await requestCreateNewAngleSchedule(schedule, user?.token);
+    await requestCreateNewAngleSchedule(schedule, user?.token);
   }
   const getAngleSchedulings = async (pivot_id: string) => {
-    const result = await requestGetAngleSchedulings(pivot_id, user?.token);
-    return result;
+    const result = await requestGetAngleSchedulings(pivot_id, user?.token)
+    if (result) {
+      return result
+    };
+  }
+  const deleteAngleSchedule = async (schedule_id: string) => {
+    const result = await requestDeleteAngleSchedule(schedule_id, user?.token);
+    if (result) {
+      return result
+    }
   }
 
+
+
+
   const createNewDateSchedule = async (schedule: Schedule) => {
-    const result = await requestCreateNewDateSchedule(schedule, user?.token);
+    await requestCreateNewDateSchedule(schedule, user?.token);
   }
   const getDateSchedulings = async (pivot_id: string) => {
     const result = await requestGetDateSchedulings(pivot_id, user?.token);
-    return result;
+    if (result) {
+      return result
+    };
+  }
+  const deleteDateSchedule = async (schedule_id: string) => {
+    const result = await requestDeleteDateSchedule(schedule_id, user?.token);
+    if (result) {
+      return result
+    }
   }
 
 
@@ -321,6 +345,8 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         getAngleSchedulings,
         createNewDateSchedule,
         getDateSchedulings,
+        deleteAngleSchedule,
+        deleteDateSchedule
       }}
     >
       {children}

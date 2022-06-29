@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import Schedule from "utils/models/schedulings";
+import Schedule, { AngleSchedule, DateSchedule } from "utils/models/schedulings";
 
 
 interface ScheduleProviderProps {
@@ -7,14 +7,26 @@ interface ScheduleProviderProps {
 }
 type ScheduleType = Schedule;
 
-
 type ScheduleDataContexProps = {
   scheduleType: String;
   setScheduleType: React.Dispatch<React.SetStateAction<String>>;
-  newAngleSchedule: ScheduleType,
-  setNewAngleSchedule: React.Dispatch<React.SetStateAction<Schedule>>,
-  newDateSchedule: ScheduleType,
-  setNewDateSchedule: React.Dispatch<React.SetStateAction<Schedule>>
+  //creating new Schedule
+  newAngleSchedule: ScheduleType;
+  setNewAngleSchedule: React.Dispatch<React.SetStateAction<Schedule>>;
+  newDateSchedule: ScheduleType;
+  setNewDateSchedule: React.Dispatch<React.SetStateAction<Schedule>>;
+  //List
+  angleScheduleList: AngleSchedule[];
+  setAngleScheduleList: React.Dispatch<React.SetStateAction<AngleSchedule[]>>;
+  dateScheduleList: DateSchedule[];
+  setDateScheduleList: React.Dispatch<React.SetStateAction<DateSchedule[]>>;
+  //Editing
+  editingScheduleType: String;
+  setEditingScheduleType: React.Dispatch<React.SetStateAction<String>>;
+  editingAngleSchedule: AngleSchedule
+  setEditingAngleSchedule: React.Dispatch<React.SetStateAction<AngleSchedule>>
+  editingDateSchedule: DateSchedule
+  setEditingDateSchedule: React.Dispatch<React.SetStateAction<DateSchedule>>
 };
 
 const ScheduleDataContext = createContext({} as ScheduleDataContexProps);
@@ -47,6 +59,11 @@ function UseScheduleDataProvider({ children }: ScheduleProviderProps) {
     end_timestamp: new Date(),
     timestamp: new Date().getTime()
   })
+  const [angleScheduleList, setAngleScheduleList] = useState<AngleSchedule[]>([] as AngleSchedule[])
+  const [dateScheduleList, setDateScheduleList] = useState<DateSchedule[]>([] as DateSchedule[])
+  const [editingScheduleType, setEditingScheduleType] = useState<String>('')
+  const [editingAngleSchedule, setEditingAngleSchedule] = useState<AngleSchedule>({} as AngleSchedule)
+  const [editingDateSchedule, setEditingDateSchedule] = useState<DateSchedule>({} as DateSchedule)
 
   return (
     <ScheduleDataContext.Provider
@@ -56,8 +73,17 @@ function UseScheduleDataProvider({ children }: ScheduleProviderProps) {
         newAngleSchedule: newAngleSchedule,
         setNewAngleSchedule,
         newDateSchedule: newDateSchedule,
-        setNewDateSchedule
-
+        setNewDateSchedule,
+        angleScheduleList: angleScheduleList,
+        setAngleScheduleList,
+        dateScheduleList: dateScheduleList,
+        setDateScheduleList,
+        editingScheduleType: editingScheduleType,
+        setEditingScheduleType,
+        editingAngleSchedule: editingAngleSchedule,
+        setEditingAngleSchedule,
+        editingDateSchedule: editingDateSchedule,
+        setEditingDateSchedule,
       }}
     >
       {children}

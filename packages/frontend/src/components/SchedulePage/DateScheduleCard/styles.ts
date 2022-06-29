@@ -36,10 +36,8 @@ export const EditButton = styled.button`
   ${({ theme }) => css`
     display: flex;
     padding: ${theme.spacings.xxsmall} ${theme.spacings.small};
-    background: linear-gradient(
-      ${theme.colors.primary} 80%,
-      ${theme.colors.primary_gradient} 100%
-    );
+    background: ${theme.colors.secondary};
+
     transition: all 0.3s linear;
     border-radius: 1.5rem;
     &:hover {
@@ -52,6 +50,13 @@ export const ButtonText = styled.div`
   ${({ theme }) => css`
     font-size: ${theme.font.sizes.medium};
     color: ${theme.colors.secondary};
+    font-family: ${theme.font.family.Montserrat_bold};
+  `}
+`;
+export const EditButtonText = styled.div`
+  ${({ theme }) => css`
+    font-size: ${theme.font.sizes.medium};
+    color: ${theme.colors.primary};
     font-family: ${theme.font.family.Montserrat_bold};
   `}
 `;
@@ -115,6 +120,6 @@ export const DeleteIcon = styled(RiDeleteBin5Line)`
 `;
 export const EditIcon = styled(RiEdit2Fill)`
   font-size: ${({ theme }) => theme.font.sizes.medium};
-  color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.primary};
   font-family: ${({ theme }) => theme.font.family.Montserrat_bold};
 `;

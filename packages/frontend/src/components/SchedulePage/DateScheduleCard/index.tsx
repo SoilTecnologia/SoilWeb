@@ -11,6 +11,8 @@ import ClockwiseIcon from "../../../../public/icons/Sentido_horario.png";
 import AntiClockwiseIcon from "../../../../public/icons/Sentido_antihorario.png";
 import { useState } from "react";
 import { addHours, format } from "date-fns";
+import { useContextScheduleData } from "hooks/useContextScheduleData";
+import { useContextActionCrud } from "hooks/useActionsCrud";
 
 type PropsProvider = {
   schedule: DateSchedule
@@ -18,11 +20,24 @@ type PropsProvider = {
 
 const DateScheduleCard = (props: PropsProvider) => {
   const { schedule } = props
+  const { dateScheduleList, setDateScheduleList } = useContextScheduleData()
+  const { deleteDateSchedule, getDateSchedulings } = useContextActionCrud()
 
   const formatDate = (date: string | Date) => {
     const dateString = format(addHours(new Date(date as Date), 3), 'dd/MM/yyyy  HH:mm');
     return dateString;
   };
+  const handleDeleteSchedule = async () => {
+    await deleteDateSchedule(schedule.scheduling_id)
+      .then((response) => {
+        if (response) {
+          getDateSchedulings(schedule.pivot_id).then(() => {
+            const newSchedulesList = dateScheduleList.filter(schedules => schedules.scheduling_id != schedule.scheduling_id)
+            setDateScheduleList(newSchedulesList)
+          })
+        }
+      })
+  }
 
   return (
     <S.Card>
@@ -80,7 +95,7 @@ const DateScheduleCard = (props: PropsProvider) => {
 
         <S.StatusWrapper>
           <S.DeleteButton
-          //onClick={() => setIsCollapsed(oldState => !oldState)}
+            onClick={() => handleDeleteSchedule()}
           >
             <S.DeleteIcon />
             <S.ButtonText>
@@ -91,9 +106,9 @@ const DateScheduleCard = (props: PropsProvider) => {
           //onClick={() => setIsCollapsed(oldState => !oldState)}
           >
             <S.EditIcon />
-            <S.ButtonText>
+            <S.EditButtonText>
               Editar
-            </S.ButtonText>
+            </S.EditButtonText>
           </S.EditButton>
 
         </S.StatusWrapper>
