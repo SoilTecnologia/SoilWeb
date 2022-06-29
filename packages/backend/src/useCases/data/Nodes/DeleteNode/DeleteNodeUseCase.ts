@@ -1,40 +1,41 @@
 import { inject, injectable } from 'tsyringe';
-import { INodesRepository } from '../../../../database/repositories/Nodes/INodesRepository';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { IDeleteBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
+import { checkUndefinedNull } from '@root/utils/decorators/check-types';
+import { IDeleteNodeService } from '@root/useCases/contracts/nodes/delete';
 
 @injectable()
-class DeleteNodeUseCase {
+class DeleteNodeUseCase implements IDeleteNodeService {
   constructor(
-    @inject('NodesRepository') private nodeRepository: INodesRepository
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
+    @inject('DeleteBase') private deleteNode: IDeleteBaseRepo
   ) {}
 
-  private async applyQueryFindByNodes(node_id: string) {
-    try {
-      return await this.nodeRepository.findById(node_id);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        DeleteNodeUseCase.name,
-        'Find Node By Node Id'
-      );
-    }
-  }
+  @checkUndefinedNull()
+  async execute({
+    node_id
+  }: IDeleteNodeService.Params): IDeleteNodeService.Response {
+    const nodeFind = await this.getById.get({
+      table: 'nodes',
+      column: 'node_id',
+      id: node_id
+    });
 
-  private async applyQueryDeleteNodes(node_id: string) {
-    try {
-      return await this.nodeRepository.delete(node_id);
-    } catch (err) {
-      messageErrorTryAction(err, true, DeleteNodeUseCase.name, 'Create Node');
-    }
-  }
+    if (nodeFind === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!nodeFind) throw new DataNotFound('Node');
 
-  async execute(node_id: string) {
-    const nodeAlreadyexists = await this.applyQueryFindByNodes(node_id);
+    const del = await this.deleteNode.del({
+      table: 'nodes',
+      column: 'node_id',
+      data: node_id
+    });
 
-    if (!nodeAlreadyexists) throw new Error('Does not find Node');
-
-    return await this.applyQueryDeleteNodes(node_id!!);
+    if (del === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else return { status: del ? 'OK' : 'FAIL' };
   }
 }
 
