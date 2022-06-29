@@ -1,16 +1,23 @@
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { messageErrorTryAction } from '@utils/types';
 import { GetOneNodeUseCase } from './GetOneNodeUseCase';
+import { ParamsNotExpected } from '@root/protocols/errors';
 
 class GetOneNodeController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const { node_id } = req.params;
 
+    if (Object.keys(req.body).length > 0) {
+      throw new ParamsNotExpected();
+    }
+
     const getOnenodeUseCase = container.resolve(GetOneNodeUseCase);
 
     try {
-      const allNodesFromFarm = await getOnenodeUseCase.execute(node_id);
+      const allNodesFromFarm = await getOnenodeUseCase.execute({
+        node_id: node_id
+      });
 
       res.status(200).send(allNodesFromFarm);
     } catch (err) {

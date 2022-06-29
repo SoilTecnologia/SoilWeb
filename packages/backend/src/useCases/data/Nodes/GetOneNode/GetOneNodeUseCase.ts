@@ -1,28 +1,30 @@
+import { IGetByIdBaseRepo } from '@root/database/protocols';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
+import { IGetOneNodeService } from '@root/useCases/contracts/nodes/get-one';
+import { checkUndefinedNull } from '@root/utils/decorators/check-types';
 import { inject, injectable } from 'tsyringe';
-import { INodesRepository } from '../../../../database/repositories/Nodes/INodesRepository';
-import { messageErrorTryAction } from '../../../../utils/types';
 
 @injectable()
-class GetOneNodeUseCase {
-  constructor(
-    @inject('NodesRepository') private nodeRepository: INodesRepository
-  ) {}
+class GetOneNodeUseCase implements IGetOneNodeService {
+  constructor(@inject('GetByIdBase') private getById: IGetByIdBaseRepo) {}
 
-  private async applyQueryGetNode(node_id: string) {
-    try {
-      return await this.nodeRepository.findById(node_id);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        GetOneNodeUseCase.name,
-        'Get Node By Id'
-      );
-    }
-  }
+  @checkUndefinedNull()
+  async execute({
+    node_id
+  }: IGetOneNodeService.Params): IGetOneNodeService.Response {
+    const node = await this.getById.get({
+      table: 'nodes',
+      column: 'node_id',
+      id: node_id
+    });
 
-  async execute(node_id: string) {
-    return await this.applyQueryGetNode(node_id);
+    if (node === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!node) throw new DataNotFound('Node');
+    else return node;
   }
 }
 
