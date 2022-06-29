@@ -61,7 +61,9 @@ class SendSchedulingAngle {
     // console.log(this.scheduleJob);
     try {
       const stateRepository = container.resolve(GetStateVariableUseCase);
-      const actualState = await stateRepository.execute(job.pivot_id);
+      const actualState = await stateRepository.execute({
+        pivot_id: job.pivot_id
+      });
       console.log(
         `Iniciando ação agendada as: ${dateSaoPaulo(job.start_timestamp!)}`
       );

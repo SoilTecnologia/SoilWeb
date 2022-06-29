@@ -12,6 +12,7 @@ import { ReadMapController } from '@useCases/data/Pivots/ReadMap/ReadMapControll
 import { ReadPivotStateController } from '@useCases/data/Pivots/ReadPivotState/ReadPivotController';
 import { UpdatePivotController } from '@useCases/data/Pivots/UpdatePivot/UpdatePivotController';
 import { UpdateStatePivotController } from '@useCases/data/Pivots/UpdatePivotState/UpdatePivotStateController';
+import { GetPivotStateAndVariablesRepo } from '@root/database/repositories/States/get-variables-by-state';
 
 const router = express.Router();
 
@@ -65,5 +66,19 @@ router.delete(
 );
 
 router.put('/putPivot', authMiddleware(), updatePivotController.handle);
+
+router.get('/full/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const repo = new GetPivotStateAndVariablesRepo();
+    const result = await repo.get({ pivot_id: id });
+
+    console.log(result);
+    return res.status(200).send(result);
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+});
 
 export default router;

@@ -1,8 +1,6 @@
 import { container, delay } from 'tsyringe';
 import { ActionRepository } from '@database/repositories/Action/ActionRepository';
 import { IActionRepository } from '@database/repositories/Action/IActionRepository';
-import { FarmsRepository } from '@database/repositories/Farms/FarmsRepository';
-import { IFarmsRepository } from '@database/repositories/Farms/IFarmsRepository';
 import { INodesRepository } from '@database/repositories/Nodes/INodesRepository';
 import { NodesRepository } from '@database/repositories/Nodes/NodesRepository';
 import { IPivotsRepository } from '@database/repositories/Pivots/IPivotsRepository';
@@ -36,47 +34,42 @@ import {
 
 // Implementations Repositories
 import {
-  AddNewUserRepo,
-  FindUserByIdRepo,
-  FindUserByLoginRepo,
-  DeleteUserRepo,
-  UpdateUserRepo,
-  GetAllUserRepo,
-  FindFarmByIdRepo,
-  CreateFarmRepo,
-  UpdateFarmRepo,
-  DeleteFarmRepo,
-  GetAllFarmsRepo,
   GetFarmByUserIdRepo,
-  GetMapFarmRepo
+  GetPivotByIdRepo,
+  GetAllBaseRepo,
+  GetByIdBaseRepo,
+  CreateBaseRepo,
+  DeleteBaseRepo,
+  GetByDataRepo,
+  UpdateBaseRepo,
+  GetByfarmAndNodeNumRepo,
+  GetAllByDataBaseRepo
 } from '@database/repositories/';
 
 // Protocols Repositories
 import {
-  ICreateUserRepository,
-  IFindUserByIdRepo,
-  IFindUserByLoginRepo,
-  IDeleteUserRepo,
-  IGetAllUserRepo,
-  IUpdateUserRepo,
-  IFindFarmByIdRepo,
-  ICreateFarmRepo,
-  IUpdateFarmRepo,
-  IDeleteFarmRepo,
-  IGetAllFarmsRepo,
   IGetFarmByUserIdRepo,
-  IGetMapFarmRepo
+  IGetPivotByIdRepo,
+  IGetAllBaseRepo,
+  IGetByIdBaseRepo,
+  ICreateBaseRepo,
+  IDeleteBaseRepo,
+  IUpdateBaseRepo,
+  IGetByDataRepo,
+  IGetByFarmAndNodeNumRepo,
+  IGetAllByDataBaseRepo
 } from '@database/protocols/';
 
-//Users
-container.register<ICreateUserRepository>('AddUser', AddNewUserRepo);
-container.register<IFindUserByIdRepo>('FindUserById', FindUserByIdRepo);
-container.register<IDeleteUserRepo>('DeleteUser', DeleteUserRepo);
-container.register<IGetAllUserRepo>('GetAllUsers', GetAllUserRepo);
-container.register<IUpdateUserRepo>('UpdateUser', UpdateUserRepo);
-container.register<IFindUserByLoginRepo>(
-  'FindUserByLogin',
-  FindUserByLoginRepo
+// Base
+container.register<IGetAllBaseRepo>('GetAllBase', GetAllBaseRepo);
+container.register<IGetByIdBaseRepo>('GetByIdBase', GetByIdBaseRepo);
+container.register<ICreateBaseRepo>('CreateBaseRepo', CreateBaseRepo);
+container.register<IGetByDataRepo>('GetByData', GetByDataRepo);
+container.register<IDeleteBaseRepo>('DeleteBase', DeleteBaseRepo);
+container.register<IUpdateBaseRepo>('UpdateBase', UpdateBaseRepo);
+container.register<IGetAllByDataBaseRepo>(
+  'GetAllByDataBase',
+  GetAllByDataBaseRepo
 );
 
 //Encrypter
@@ -87,18 +80,16 @@ container.register<ICompareEncrypt>('CompareEncrypt', BCryptCompare);
 container.register<ITokenJwt>('TokenJwt', CreateJwt);
 
 // Farms
-container.register<ICreateFarmRepo>('CreateFarms', CreateFarmRepo);
-container.register<IFindFarmByIdRepo>('FindFarmById', FindFarmByIdRepo);
-container.register<IUpdateFarmRepo>('UpdateFarm', UpdateFarmRepo);
-container.register<IDeleteFarmRepo>('DeleteFarm', DeleteFarmRepo);
-container.register<IGetAllFarmsRepo>('GetAllFarms', GetAllFarmsRepo);
 container.register<IGetFarmByUserIdRepo>('GetFarmByUser', GetFarmByUserIdRepo);
-container.register<IGetMapFarmRepo>('GetMapFarm', GetMapFarmRepo);
 
-container.registerSingleton<IFarmsRepository>(
-  'FarmsRepository',
-  delay(() => FarmsRepository)
+//Nodes
+container.register<IGetByFarmAndNodeNumRepo>(
+  'GetByFarmAndNodeNum',
+  GetByfarmAndNodeNumRepo
 );
+
+// Pivots
+container.register<IGetPivotByIdRepo>('GetPivotById', GetPivotByIdRepo);
 
 container.registerSingleton<IPivotsRepository>(
   'PivotsRepository',
