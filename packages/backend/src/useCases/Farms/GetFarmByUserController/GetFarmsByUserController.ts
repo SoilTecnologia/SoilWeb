@@ -11,7 +11,7 @@ class GetFarmsByUserController {
     try {
       const allFarmsFromUser = await getFarmByUserUseCase.execute(id);
 
-      res.status(201).send(allFarmsFromUser);
+      res.status(200).send(allFarmsFromUser);
     } catch (err) {
       console.log(`[ERROR] Server 500 on /farms/readAll`);
       console.log(err);

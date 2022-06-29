@@ -9,7 +9,7 @@ class GetAllFarmsController {
     try {
       const allFarmsFromUser = await getAllFarmsUseCase.execute();
 
-      res.status(201).send(allFarmsFromUser);
+      res.status(200).send(allFarmsFromUser);
     } catch (err) {
       messageErrorTryAction(
         err,

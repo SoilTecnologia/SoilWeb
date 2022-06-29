@@ -13,7 +13,7 @@ class GetAllPivotsController {
 
         res.send(allPivotsFromNode);
       } else {
-        res.status(201).send('Id not identifier');
+        res.status(200).send('Id not identifier');
       }
     } catch (err) {
       messageErrorTryAction(

@@ -20,7 +20,7 @@ class UpdateUserController {
         user_id
       });
 
-      return response.status(201).send(result);
+      return response.status(200).send(result);
     } catch (err) {
       messageErrorTryAction(
         err,

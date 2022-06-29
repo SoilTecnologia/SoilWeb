@@ -9,7 +9,7 @@ class GetAllPumpController {
         try {
             const allPumpController = await getAllPumpController.execute();
 
-            res.status(201).send(allPumpController);
+            res.status(200).send(allPumpController);
 
         }catch (err){
             messageErrorTryAction(

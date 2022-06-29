@@ -8,7 +8,7 @@ class GetAllSchedulingController {
       try {
         const allScheduling = await getAllSchedulingsUseCase.execute();
   
-        res.status(201).send(allScheduling);
+        res.status(200).send(allScheduling);
       } catch (err) {
         console.log(`[ERROR] Server 500 on /scheduling/GetAllSchedule`);
         console.log(err);

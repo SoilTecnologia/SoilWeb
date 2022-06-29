@@ -19,7 +19,7 @@ class CreatePumpUseCase {
   }
 
   async execute(pump: Omit<PumpModel, 'pump_id'>) {
-    const { pivot_id, author, pump_power, start_pump_angle, end_pump_angle } =
+    const { pivot_id, author, pump_power, start_pump_angle, end_pump_angle, timestamp } =
       pump;
 
     const pumpModel = new PumpModel();
@@ -29,7 +29,8 @@ class CreatePumpUseCase {
       author,
       pump_power,
       start_pump_angle,
-      end_pump_angle
+      end_pump_angle,
+      timestamp
     });
 
     return await this.applyQueryCreate(pumpModel);

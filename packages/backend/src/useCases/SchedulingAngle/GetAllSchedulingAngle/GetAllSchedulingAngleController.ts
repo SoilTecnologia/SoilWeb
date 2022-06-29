@@ -8,7 +8,7 @@ class GetAllSchedulingAngleController {
       try {
         const allSchedulingAngle = await getAllSchedulingsAngleUseCase.execute();
   
-        res.status(201).send(allSchedulingAngle);
+        res.status(200).send(allSchedulingAngle);
       } catch (err) {
         console.log(`[ERROR] Server 500 on /scheduling/GetAllSchedule`);
         console.log(err);
