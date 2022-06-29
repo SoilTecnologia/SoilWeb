@@ -11,11 +11,13 @@ class UpdateNodeController {
 
     try {
       const newNode = await updateNodeUseCase.execute({
-        node_id,
-        node_num,
-        farm_id,
-        is_gprs,
-        gateway
+        node: {
+          node_id,
+          node_num,
+          farm_id,
+          is_gprs,
+          gateway
+        }
       });
 
       res.send(newNode);

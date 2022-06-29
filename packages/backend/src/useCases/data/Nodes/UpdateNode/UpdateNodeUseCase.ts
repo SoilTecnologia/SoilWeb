@@ -1,45 +1,72 @@
+import { IGetByIdBaseRepo, IUpdateBaseRepo } from '@root/database/protocols';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound,
+  NotUpdateError,
+  ParamsEquals
+} from '@root/protocols/errors';
+import {
+  checkBooleans,
+  checkNumbers,
+  checkStrings
+} from '@root/utils/decorators/check-types';
 import { inject, injectable } from 'tsyringe';
-import { NodeModel } from '../../../../database/model/Node';
-import { INodesRepository } from '../../../../database/repositories/Nodes/INodesRepository';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { NodeModel } from '@database/model/Node';
+import { IUpdateNodeService } from '@root/useCases/contracts';
 
 @injectable()
-class UpdateNodeUseCase {
+class UpdateNodeUseCase implements IUpdateNodeService {
   constructor(
-    @inject('NodesRepository') private nodeRepository: INodesRepository
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo<NodeModel>,
+    @inject('UpdateBase') private update: IUpdateBaseRepo<NodeModel>
   ) {}
 
-  private async applyQueryFindByNodes(node_id: string) {
-    try {
-      return await this.nodeRepository.findById(node_id);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        UpdateNodeUseCase.name,
-        'Find Node By Node Id'
-      );
-    }
+  private checkObjectIsEquals(oldNode: NodeModel, newNode: NodeModel) {
+    if (
+      oldNode.farm_id === newNode.farm_id &&
+      oldNode.node_id === newNode.node_id &&
+      oldNode.node_num === newNode.node_num &&
+      oldNode.gateway === newNode.gateway &&
+      oldNode.is_gprs === newNode.is_gprs
+    ) {
+      return true;
+    } else false;
   }
 
-  private async applyQueryUpdateNodes(node: NodeModel) {
-    try {
-      return await this.nodeRepository.update(node);
-    } catch (err) {
-      messageErrorTryAction(err, true, UpdateNodeUseCase.name, 'Update Node');
-    }
-  }
-
-  async execute(node: NodeModel) {
+  @checkStrings(['farm_id', 'node_id'])
+  @checkNumbers(['node_num'])
+  @checkBooleans(['is_gprs'])
+  async execute({
+    node: { node_num, node_id, farm_id, is_gprs, gateway }
+  }: IUpdateNodeService.Params): IUpdateNodeService.Response {
     const nodeModel = new NodeModel();
 
-    const nodeAlreadyExists = await this.applyQueryFindByNodes(node.node_id!!);
+    const nodeAlreadyExists = await this.getById.get({
+      table: 'nodes',
+      column: 'node_id',
+      id: node_id!!
+    });
 
-    if (!nodeAlreadyExists) throw new Error('Does not Find Node');
+    if (nodeAlreadyExists === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!nodeAlreadyExists) throw new DataNotFound('Node');
 
-    Object.assign(nodeModel, node);
+    Object.assign(nodeModel, { node_num, node_id, farm_id, is_gprs, gateway });
 
-    return await this.applyQueryUpdateNodes(nodeModel);
+    if (this.checkObjectIsEquals(nodeAlreadyExists, nodeModel)) {
+      throw new ParamsEquals();
+    }
+
+    const putNode = await this.update.put({
+      table: 'nodes',
+      column: 'node_id',
+      where: node_id!!,
+      data: nodeModel
+    });
+
+    if (putNode === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!putNode) throw new NotUpdateError('Node');
+    else return putNode;
   }
 }
 
