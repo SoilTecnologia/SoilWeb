@@ -1,25 +1,31 @@
 import { container, inject, injectable } from 'tsyringe';
 import { PivotModel } from '@database/model/Pivot';
 import { PartialMapResponse } from '@database/model/types/pivot';
-import { IFarmsRepository } from '@database/repositories/Farms/IFarmsRepository';
 import { INodesRepository } from '@database/repositories/Nodes/INodesRepository';
 import { IPivotsRepository } from '@database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '@database/repositories/States/IState';
 import { messageErrorTryAction } from '@utils/types';
 import { GetLastCycleUseCase } from '../../Cycles/GetLastCycles/GetLastCycleUseCase';
+import { IGetByIdBaseRepo } from '@root/database/protocols';
+import { FarmModel } from '@root/database/model/Farm';
+import { DatabaseErrorReturn, DATABASE_ERROR } from '@root/protocols/errors';
 
 @injectable()
 class ReadMapUseCase {
   constructor(
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository,
-    @inject('FarmsRepository') private farmRepository: IFarmsRepository,
+    @inject('GetByIdBase') private farmRepository: IGetByIdBaseRepo<FarmModel>,
     @inject('NodesRepository') private nodeRepository: INodesRepository,
     @inject('StatesRepository') private stateRepository: IStateRepository
   ) {}
 
   private async applyQueryGetFarmById(farm_id: string) {
     try {
-      return this.farmRepository.findById(farm_id);
+      return this.farmRepository.get({
+        table: 'farms',
+        column: 'farm_id',
+        id: farm_id
+      });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -27,6 +33,7 @@ class ReadMapUseCase {
         ReadMapUseCase.name,
         'Get Farm By Farm Id'
       );
+      return DATABASE_ERROR;
     }
   }
 
@@ -40,6 +47,7 @@ class ReadMapUseCase {
         ReadMapUseCase.name,
         'Get Pivots By Farm Id'
       );
+      return DATABASE_ERROR;
     }
   }
 
@@ -53,6 +61,7 @@ class ReadMapUseCase {
         ReadMapUseCase.name,
         'Get State By States'
       );
+      return DATABASE_ERROR;
     }
   }
 
@@ -62,6 +71,8 @@ class ReadMapUseCase {
 
     for (let pivot of pivots) {
       const state = await this.applyQueryGetStateByPivot(pivot.pivot_id);
+      if (state === DATABASE_ERROR) throw new DatabaseErrorReturn();
+
       const variables = await getLastCycleUseCase.execute(pivot.pivot_id);
 
       const isTrue = state && variables && variables.length > 0;
@@ -91,9 +102,11 @@ class ReadMapUseCase {
 
   async execute(farm_id: PivotModel['farm_id']) {
     const farm = await this.applyQueryGetFarmById(farm_id);
-    const pivots = await this.applyQueryGetAllPivotsByFarms(farm_id);
-
+    if (farm === DATABASE_ERROR) throw new DatabaseErrorReturn();
     if (!farm) throw new Error('Farm does not find');
+
+    const pivots = await this.applyQueryGetAllPivotsByFarms(farm_id);
+    if (pivots === DATABASE_ERROR) throw new DatabaseErrorReturn();
     if (!pivots) throw new Error('Pivots does not find');
 
     const pivotArray = await this.handlePivotsResult(pivots);

@@ -6,15 +6,18 @@ import {
   DATABASE_ERROR,
   DataNotFound
 } from '@root/protocols/errors';
-import { IGetAllUserRepo } from '@root/database/protocols';
+import { IGetAllBaseRepo } from '@root/database/protocols/base/getAll';
+import { UserModel } from '@root/database/model/User';
 
 @injectable()
 class GetAllUserUseCase implements IGetAllUserService {
-  constructor(@inject('GetAllUsers') private getUsers: IGetAllUserRepo) {}
+  constructor(
+    @inject('GetAllBase') private getUsers: IGetAllBaseRepo<UserModel>
+  ) {}
 
   private async applyQueryGetUsers() {
     try {
-      return await this.getUsers.getAll();
+      return await this.getUsers.get({ table: 'users' });
     } catch (err) {
       messageErrorTryAction(err, true, GetAllUserUseCase.name, 'Get All Users');
       return DATABASE_ERROR;

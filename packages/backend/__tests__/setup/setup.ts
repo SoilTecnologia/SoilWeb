@@ -1,3 +1,4 @@
+import { mockDecorators } from '@tests/mocks/data/global/decorators';
 import 'reflect-metadata';
 
 describe('Jest Config', () => {

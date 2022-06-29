@@ -6,75 +6,59 @@ import {
   DatabaseError,
   DatabaseErrorReturn,
   DATABASE_ERROR,
-  FailedCreateDataError,
-  ParamsInvalid,
-  TypeParamError
+  FailedCreateDataError
 } from '@protocols/errors';
 import { IEncrypter, ITokenJwt } from '@useCases/data/User';
 import { ICreateUserUseCase } from '@useCases/contracts/users/';
-import {
-  ICreateUserRepository,
-  IFindUserByLoginRepo
-} from '@root/database/protocols';
+import { ICreateBaseRepo, IGetByDataRepo } from '@root/database/protocols';
+import { checkStrings } from '@root/utils/decorators/check-types';
 
 @injectable()
 class CreateUserUseCase implements ICreateUserUseCase {
   constructor(
     @inject('TokenJwt') private tokenJwt: ITokenJwt,
     @inject('Encrypter') private encrypter: IEncrypter,
-    @inject('AddUser') private addUserRepo: ICreateUserRepository,
-    @inject('FindUserByLogin') private findUserRepo: IFindUserByLoginRepo
+    @inject('CreateBaseRepo') private addUserRepo: ICreateBaseRepo<UserModel>,
+    @inject('GetByData') private findUserRepo: IGetByDataRepo<UserModel>
   ) {}
 
   private async apllyQueryFindUser(
     login: UserModel['login']
-  ): Promise<IFindUserByLoginRepo.Response | DatabaseError> {
+  ): Promise<IGetByDataRepo.Response<UserModel> | DatabaseError> {
     try {
-      return await this.findUserRepo.findUserByLogin(login);
+      return await this.findUserRepo.get({
+        table: 'users',
+        column: 'login',
+        data: login
+      });
     } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        CreateUserUseCase.name,
-        'FindUser By Login'
-      );
+      messageErrorTryAction(err, true, CreateUserUseCase.name, 'Find User');
       return DATABASE_ERROR;
     }
   }
 
   private async apllyQueryCreateUser(
     user: ICreateUserUseCase.Params
-  ): Promise<ICreateUserRepository.Response | DatabaseError> {
+  ): Promise<ICreateBaseRepo.Response<UserModel> | DatabaseError> {
     try {
-      return await this.addUserRepo.create(user);
+      return await this.addUserRepo.create({ table: 'users', data: user });
     } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        CreateUserUseCase.name,
-        'CREATE NEW USER'
-      );
+      messageErrorTryAction(err, true, CreateUserUseCase.name, 'Create User');
       return DATABASE_ERROR;
     }
   }
 
+  @checkStrings()
   async execute(
     user: ICreateUserUseCase.Params
   ): Promise<ICreateUserUseCase.Response> {
     const { password, login, user_type } = user;
 
-    if (!password || !login || !user_type) throw new ParamsInvalid();
-    if (typeof password !== 'string') throw new TypeParamError('password');
-    if (typeof login !== 'string') throw new TypeParamError('login');
-    if (typeof user_type !== 'string') throw new TypeParamError('user_type');
-
     const encryptedPassword = await this.encrypter.encrypt({ value: password });
 
     if (encryptedPassword === 'ENCRYPT ERROR') throw new Error('ENCRYPT ERROR');
 
-    const userALreadyExists = await this.apllyQueryFindUser(
-      login.toLowerCase()
-    );
+    const userALreadyExists = await this.apllyQueryFindUser(login);
 
     if (userALreadyExists === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (userALreadyExists) throw new AlreadyExistsError('User');
@@ -88,6 +72,7 @@ class CreateUserUseCase implements ICreateUserUseCase {
       });
 
       const newUser = await this.apllyQueryCreateUser(userModel);
+
       if (newUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
       else if (!newUser) throw new FailedCreateDataError('User');
       else {

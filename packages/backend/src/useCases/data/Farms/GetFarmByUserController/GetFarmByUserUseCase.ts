@@ -1,5 +1,5 @@
 import {
-  IFindUserByIdRepo,
+  IGetByIdBaseRepo,
   IGetFarmByUserIdRepo
 } from '@root/database/protocols';
 import {
@@ -11,12 +11,14 @@ import {
 import { inject, injectable } from 'tsyringe';
 import { messageErrorTryAction } from '@utils/types';
 import { IGetFarmByUserService } from '@root/useCases/contracts';
+import { UserModel } from '@root/database/model/User';
+import { checkUndefinedNull } from '@root/utils/decorators/check-types';
 
 @injectable()
 class GetFarmByUserUseCase implements IGetFarmByUserService {
   constructor(
     @inject('GetFarmByUser') private findFarms: IGetFarmByUserIdRepo,
-    @inject('FindUserById') private findUser: IFindUserByIdRepo
+    @inject('GetByIdBase') private findUser: IGetByIdBaseRepo<UserModel>
   ) {}
 
   private async applyQueryGetByUser(user_id: string) {
@@ -34,7 +36,11 @@ class GetFarmByUserUseCase implements IGetFarmByUserService {
   }
   private async applyQueryGetUser(user_id: string) {
     try {
-      return await this.findUser.findById({ id: user_id });
+      return await this.findUser.get({
+        table: 'users',
+        column: 'user_id',
+        id: user_id
+      });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -46,16 +52,10 @@ class GetFarmByUserUseCase implements IGetFarmByUserService {
     }
   }
 
+  @checkUndefinedNull()
   async execute({
     user_id
   }: IGetFarmByUserService.Params): IGetFarmByUserService.Response {
-    /*
-      Check types params and values not nullables
-    */
-    if (user_id === 'undefined' || user_id === 'null') {
-      throw new ParamsInvalid();
-    }
-
     const user = await this.applyQueryGetUser(user_id);
     /*
       Check user exist in database

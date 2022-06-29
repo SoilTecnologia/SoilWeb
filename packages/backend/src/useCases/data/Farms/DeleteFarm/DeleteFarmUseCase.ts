@@ -1,9 +1,8 @@
 import { IDeleteFarmService } from '@root/useCases/contracts';
 import { inject, injectable } from 'tsyringe';
 import { FarmModel } from '@database/model/Farm';
-import { IFarmsRepository } from '@database/repositories/Farms/IFarmsRepository';
 import { messageErrorTryAction } from '@utils/types';
-import { IDeleteFarmRepo, IFindFarmByIdRepo } from '@root/database/protocols';
+import { IDeleteBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
@@ -14,13 +13,17 @@ import {
 @injectable()
 class DeleteFarmUseCase implements IDeleteFarmService {
   constructor(
-    @inject('FindFarmById') private findFarm: IFindFarmByIdRepo,
-    @inject('DeleteFarm') private delFarm: IDeleteFarmRepo
+    @inject('GetByIdBase') private findFarm: IGetByIdBaseRepo<FarmModel>,
+    @inject('DeleteBase') private delFarm: IDeleteBaseRepo<FarmModel>
   ) {}
 
   private async applyQueryFindById(farm_id: string) {
     try {
-      return await this.findFarm.find({ farm_id });
+      return await this.findFarm.get({
+        table: 'farms',
+        column: 'farm_id',
+        id: farm_id
+      });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -34,7 +37,11 @@ class DeleteFarmUseCase implements IDeleteFarmService {
 
   private async applyQueryDeleteFarm(farm_id: string) {
     try {
-      return await this.delFarm.delete({ farm_id });
+      return await this.delFarm.del({
+        table: 'farms',
+        column: 'farm_id',
+        data: farm_id
+      });
     } catch (err) {
       messageErrorTryAction(err, true, DeleteFarmUseCase.name, 'Delete Farm');
       return DATABASE_ERROR;

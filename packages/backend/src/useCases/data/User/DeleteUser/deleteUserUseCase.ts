@@ -6,19 +6,24 @@ import {
 } from '@root/protocols/errors';
 import { inject, injectable } from 'tsyringe';
 import { messageErrorTryAction } from '@utils/types';
-import { IDeleteUserRepo, IFindUserByIdRepo } from '@root/database/protocols';
+import { IDeleteBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
 import { IDeleteUserService } from '@root/useCases/contracts';
+import { UserModel } from '@root/database/model/User';
 
 @injectable()
 class DeleteUserUseCase implements IDeleteUserService {
   constructor(
-    @inject('FindUserById') private findById: IFindUserByIdRepo,
-    @inject('DeleteUser') private deleteUser: IDeleteUserRepo
+    @inject('GetByIdBase') private findById: IGetByIdBaseRepo<UserModel>,
+    @inject('DeleteBase') private deleteUser: IDeleteBaseRepo<UserModel>
   ) {}
 
   private async apllyQueryFindUser(user_id: string) {
     try {
-      return await this.findById.findById({ id: user_id });
+      return await this.findById.get({
+        table: 'users',
+        column: 'user_id',
+        id: user_id
+      });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -32,7 +37,11 @@ class DeleteUserUseCase implements IDeleteUserService {
 
   private async applyQueryDeleteUser(user_id: string) {
     try {
-      return await this.deleteUser.deleteUser({ user_id });
+      return await this.deleteUser.del({
+        table: 'users',
+        data: user_id,
+        column: 'user_id'
+      });
     } catch (err) {
       messageErrorTryAction(err, true, DeleteUserUseCase.name, 'DELETE USER');
       return DATABASE_ERROR;

@@ -6,15 +6,18 @@ import {
 import { inject, injectable } from 'tsyringe';
 import { messageErrorTryAction } from '@utils/types';
 import { IGetAllFarmsService } from '@root/useCases/contracts';
-import { IGetAllFarmsRepo } from '@root/database/protocols';
+import { IGetAllBaseRepo } from '@root/database/protocols';
+import { FarmModel } from '@root/database/model/Farm';
 
 @injectable()
 class GetAllFarmsUseCase implements IGetAllFarmsService {
-  constructor(@inject('GetAllFarms') private findFarms: IGetAllFarmsRepo) {}
+  constructor(
+    @inject('GetAllBase') private findFarms: IGetAllBaseRepo<FarmModel>
+  ) {}
 
   private async applyQueryGetAll() {
     try {
-      return await this.findFarms.getAll();
+      return await this.findFarms.get({ table: 'farms' });
     } catch (err) {
       messageErrorTryAction(
         err,

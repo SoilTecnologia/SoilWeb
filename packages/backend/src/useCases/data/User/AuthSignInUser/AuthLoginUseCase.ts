@@ -1,43 +1,43 @@
-import { IFindUserByLoginRepo } from '@root/database/protocols';
+import { IGetByDataRepo } from '@root/database/protocols';
 import {
   DatabaseError,
   DatabaseErrorReturn,
   DATABASE_ERROR,
   FailedCreateDataError,
-  InvalidCredentials,
-  ParamsInvalid,
-  TypeParamError
+  InvalidCredentials
 } from '@root/protocols/errors';
 import { inject, injectable } from 'tsyringe';
 import { UserModel } from '@database/model/User';
 import { messageErrorTryAction } from '@utils/types';
 import { ICompareEncrypt, ITokenJwt } from '@useCases/data/User';
 import { ILoginAuth } from '@root/useCases/contracts/users/';
+import { checkStrings } from '@root/utils/decorators/check-types';
 
 @injectable()
 class AuthSignInUseCase implements ILoginAuth {
   constructor(
     @inject('TokenJwt') private tokenJwt: ITokenJwt,
     @inject('CompareEncrypt') private bcryptCompare: ICompareEncrypt,
-    @inject('FindUserByLogin') private findUserByLogin: IFindUserByLoginRepo
+    @inject('GetByData') private findUserByLogin: IGetByDataRepo<UserModel>
   ) {}
 
   private async applyQuerie(
     login: UserModel['login']
-  ): Promise<IFindUserByLoginRepo.Response | DatabaseError> {
+  ): Promise<IGetByDataRepo.Response<UserModel> | DatabaseError> {
     try {
-      return await this.findUserByLogin.findUserByLogin(login);
+      return await this.findUserByLogin.get({
+        table: 'users',
+        column: 'login',
+        data: login
+      });
     } catch (err) {
       messageErrorTryAction(err, true, AuthSignInUseCase.name, 'LOGIN USER');
       return DATABASE_ERROR;
     }
   }
 
+  @checkStrings()
   async execute({ login, password }: ILoginAuth.Params): ILoginAuth.Response {
-    if (!password || !login) throw new ParamsInvalid();
-    if (typeof password !== 'string') throw new TypeParamError('password');
-    if (typeof login !== 'string') throw new TypeParamError('login');
-
     const user = await this.applyQuerie(login.toLowerCase());
 
     if (user === DATABASE_ERROR) throw new DatabaseErrorReturn();

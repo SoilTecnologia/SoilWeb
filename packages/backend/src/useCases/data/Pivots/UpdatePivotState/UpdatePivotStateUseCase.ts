@@ -1,3 +1,4 @@
+import { IGetByIdBaseRepo } from '@root/database/protocols';
 import { timeStamp } from 'console';
 import { container, inject, injectable } from 'tsyringe';
 import { PivotModel } from '../../../../database/model/Pivot';
@@ -5,7 +6,6 @@ import { RadioVariableModel } from '../../../../database/model/RadioVariable';
 import { StateModel } from '../../../../database/model/State';
 import { StateVariableModel } from '../../../../database/model/StateVariables';
 import { HandleState } from '../../../../database/model/types/state';
-import { IFarmsRepository } from '../../../../database/repositories/Farms/IFarmsRepository';
 import { INodesRepository } from '../../../../database/repositories/Nodes/INodesRepository';
 import { IPivotsRepository } from '../../../../database/repositories/Pivots/IPivotsRepository';
 import { IRadioVariableRepository } from '../../../../database/repositories/RadioVariables/IRadioVariableRepository';
@@ -20,7 +20,7 @@ import {
   isStateVariableDifferent
 } from '../../../../utils/isDifferent';
 import { messageErrorTryAction } from '../../../../utils/types';
-import { CreateStateUseCase } from '../../States/CreateStateUseCase';
+import { CreateStateUseCase } from '../../States/Create/CreateStateUseCase';
 
 @injectable()
 class UpdatePivotStateUseCase {
@@ -32,7 +32,7 @@ class UpdatePivotStateUseCase {
 
   constructor(
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository,
-    @inject('FarmsRepository') private farmRepository: IFarmsRepository,
+    @inject('GetByIdBase') private farmRepository: IGetByIdBaseRepo,
     @inject('NodesRepository') private nodesRepository: INodesRepository,
     @inject('StatesRepository') private stateRepository: IStateRepository,
     @inject('StatesVariablesRepository')
@@ -74,7 +74,11 @@ class UpdatePivotStateUseCase {
 
   private async applyQueryGetFarmByFarm(farm_id: string) {
     try {
-      return await this.farmRepository.findById(farm_id);
+      return await this.farmRepository.get({
+        table: 'farms',
+        column: 'farm_id',
+        id: farm_id
+      });
     } catch (err) {
       messageErrorTryAction(
         err,

@@ -1,18 +1,17 @@
 import { inject, injectable } from 'tsyringe';
 import { UserModel } from '@database/model/User';
 import { messageErrorTryAction } from '@utils/types';
-import { IUpdateUserRepo, IFindUserByIdRepo } from '@root/database/protocols';
+import { IGetByIdBaseRepo, IUpdateBaseRepo } from '@root/database/protocols';
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
   DataNotFound,
   NotUpdateError,
-  ParamsEquals,
-  ParamsInvalid,
-  TypeParamError
+  ParamsEquals
 } from '@root/protocols/errors';
 import { IEncrypter, ICompareEncrypt } from '@useCases/data';
 import { IUpdateUserService } from '@root/useCases/contracts';
+import { checkStrings } from '@root/utils/decorators/check-types';
 
 @injectable()
 class UpdateUserUseCase implements IUpdateUserService {
@@ -20,8 +19,8 @@ class UpdateUserUseCase implements IUpdateUserService {
   private newPassword: string;
 
   constructor(
-    @inject('FindUserById') private findUser: IFindUserByIdRepo,
-    @inject('UpdateUser') private updateUser: IUpdateUserRepo,
+    @inject('GetByIdBase') private findUser: IGetByIdBaseRepo<UserModel>,
+    @inject('UpdateBase') private updateUser: IUpdateBaseRepo<UserModel>,
     @inject('Encrypter') private encrypter: IEncrypter,
     @inject('CompareEncrypt') private compareEncrypter: ICompareEncrypt
   ) {
@@ -30,7 +29,11 @@ class UpdateUserUseCase implements IUpdateUserService {
 
   private async apllyQueryGetUserById(user_id: string) {
     try {
-      return await this.findUser.findById({ id: user_id });
+      return await this.findUser.get({
+        table: 'users',
+        column: 'user_id',
+        id: user_id
+      });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -45,7 +48,12 @@ class UpdateUserUseCase implements IUpdateUserService {
 
   private async apllyQueryUpdateUser(userModel: UserModel) {
     try {
-      return await this.updateUser.update(userModel);
+      return await this.updateUser.put({
+        table: 'users',
+        column: 'user_id',
+        where: userModel.user_id!,
+        data: userModel
+      });
     } catch (err) {
       messageErrorTryAction(err, true, UpdateUserUseCase.name, 'Update User');
       return DATABASE_ERROR;
@@ -88,6 +96,7 @@ class UpdateUserUseCase implements IUpdateUserService {
     }
   }
 
+  @checkStrings()
   async execute({
     login,
     password,
@@ -95,22 +104,10 @@ class UpdateUserUseCase implements IUpdateUserService {
     user_id
   }: IUpdateUserService.Params): IUpdateUserService.Response {
     /*
-      Check Type and values not nullable
-    */
-
-    if (!password || !login || !user_type || !user_id)
-      throw new ParamsInvalid();
-
-    if (typeof password !== 'string') throw new TypeParamError('password');
-    if (typeof login !== 'string') throw new TypeParamError('login');
-    if (typeof user_type !== 'string') throw new TypeParamError('user_type');
-    if (typeof user_id !== 'string') throw new TypeParamError('user_id');
-
-    /*
       Check User by Id And checking error database
     */
 
-    const selectUser = await this.apllyQueryGetUserById(user_id);
+    const selectUser = await this.apllyQueryGetUserById(user_id!);
 
     if (selectUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (!selectUser) throw new DataNotFound('User');

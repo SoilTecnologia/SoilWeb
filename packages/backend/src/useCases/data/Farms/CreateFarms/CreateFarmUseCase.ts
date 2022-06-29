@@ -2,6 +2,8 @@ import { inject, injectable } from 'tsyringe';
 import { FarmModel } from '@database/model/Farm';
 import { messageErrorTryAction } from '@utils/types';
 import { ICreateFarmUseCase } from '@root/useCases/contracts';
+import { ICreateBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
+import { UserModel } from '@root/database/model/User';
 import {
   AlreadyExistsError,
   DatabaseErrorReturn,
@@ -11,35 +13,24 @@ import {
   ParamsInvalid,
   TypeParamError
 } from '@root/protocols/errors';
-import { IFindUserByIdRepo } from '@root/database/protocols';
-import { ICreateFarmRepo, IFindFarmByIdRepo } from '@root/database/protocols';
+import { checkNumbers, checkStrings } from '@root/utils/decorators/check-types';
 
 @injectable()
 class CreateFarmUseCase implements ICreateFarmUseCase {
   constructor(
-    @inject('CreateFarms') private createFarm: ICreateFarmRepo,
-    @inject('FindFarmById') private findFarm: IFindFarmByIdRepo,
-    @inject('FindUserById') private findUser: IFindUserByIdRepo
+    @inject('CreateBaseRepo') private createFarm: ICreateBaseRepo<FarmModel>,
+    @inject('GetByIdBase')
+    private getById: IGetByIdBaseRepo<FarmModel | UserModel>
   ) {}
 
-  private async findUserById(user_id: string) {
+  private async applyQueryGetById(table: 'users' | 'farms', id: string) {
     try {
-      return await this.findUser.findById({ id: user_id });
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        CreateFarmUseCase.name,
-        'Find Farm By Id'
-      );
-
-      return DATABASE_ERROR;
-    }
-  }
-
-  private async findFarmById(farm_id: string) {
-    try {
-      return await this.findFarm.find({ farm_id });
+      const column = table === 'users' ? 'user_id' : 'farm_id';
+      return await this.getById.get({
+        table,
+        column,
+        id
+      });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -54,13 +45,15 @@ class CreateFarmUseCase implements ICreateFarmUseCase {
 
   private async applyQueryCreateFarm(farm: FarmModel) {
     try {
-      return await this.createFarm.create(farm);
+      return await this.createFarm.create({ table: 'farms', data: farm });
     } catch (err) {
       messageErrorTryAction(err, true, CreateFarmUseCase.name, 'Create Farm');
       return DATABASE_ERROR;
     }
   }
 
+  @checkStrings(['farm_id', 'user_id', 'farm_name', 'farm_city'])
+  @checkNumbers(['farm_lng', 'farm_lat'])
   async execute({
     farm_id,
     farm_city,
@@ -69,28 +62,7 @@ class CreateFarmUseCase implements ICreateFarmUseCase {
     user_id,
     farm_name
   }: ICreateFarmUseCase.Params): Promise<ICreateFarmUseCase.Response> {
-    /*
-    Check types params and values not nullable
-    */
-    if (
-      !farm_id ||
-      !user_id ||
-      !farm_name ||
-      !farm_lat ||
-      !farm_lng ||
-      !farm_city
-    ) {
-      throw new ParamsInvalid();
-    }
-
-    if (typeof farm_id !== 'string') throw new TypeParamError('farm_id');
-    if (typeof user_id !== 'string') throw new TypeParamError('user_id');
-    if (typeof farm_name !== 'string') throw new TypeParamError('farm_name');
-    if (typeof farm_city !== 'string') throw new TypeParamError('farm_city');
-    if (typeof farm_lat !== 'number') throw new TypeParamError('farm_lat');
-    if (typeof farm_lng !== 'number') throw new TypeParamError('farm_lng');
-
-    const farmAlreadExisty = await this.findFarmById(farm_id);
+    const farmAlreadExisty = await this.applyQueryGetById('farms', farm_id);
 
     /*
       Check farm exist and response database
@@ -98,7 +70,7 @@ class CreateFarmUseCase implements ICreateFarmUseCase {
     if (farmAlreadExisty === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (farmAlreadExisty) throw new AlreadyExistsError('Farm');
     else {
-      const userExists = await this.findUserById(user_id);
+      const userExists = await this.applyQueryGetById('users', user_id);
       /*
         Check user exist and response databse
       */

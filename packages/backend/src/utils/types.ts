@@ -4,6 +4,8 @@ import { UserModel } from '../database/model/User';
 
 // target_types: tipos que retornarão true
 
+export type typeIsCheck = 'string' | 'number' | 'boolean';
+
 export const messageErrorTryAction = (
   err: any,
   isDatabase: boolean,

@@ -1,8 +1,6 @@
 /* eslint-disable no-unneeded-ternary */
-import {
-  ICreateUserRepository,
-  IFindUserByIdRepo
-} from '@root/database/protocols/users';
+
+import { ICreateBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
 import { inject, injectable } from 'tsyringe';
 import { StateVariableModel } from '../../../../database/model/StateVariables';
 import { CreateAction } from '../../../../database/model/types/action';
@@ -17,8 +15,8 @@ import { messageErrorTryAction } from '../../../../utils/types';
 @injectable()
 class CreateActionUseCase {
   constructor(
-    @inject('AddUser') private createUser: ICreateUserRepository,
-    @inject('FindUserById') private findUser: IFindUserByIdRepo,
+    @inject('CreateBaseRepo') private createUser: ICreateBaseRepo<UserModel>,
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
     @inject('ActionsRepository') private actionRepository: IActionRepository,
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository,
     @inject('NodesRepository') private nodeRepository: INodesRepository
@@ -52,7 +50,11 @@ class CreateActionUseCase {
 
   private async applyQueryGetUserById(user_id: string) {
     try {
-      return await this.findUser.findById({ id: user_id });
+      return await this.getById.get({
+        table: 'users',
+        column: 'user_id',
+        id: user_id
+      });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -78,7 +80,7 @@ class CreateActionUseCase {
 
   private async applyQueryCreateUser(user: UserModel) {
     try {
-      return await this.createUser.create(user);
+      return await this.createUser.create({ table: 'users', data: user });
     } catch (err) {
       messageErrorTryAction(
         err,

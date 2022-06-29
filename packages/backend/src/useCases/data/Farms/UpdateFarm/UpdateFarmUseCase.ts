@@ -10,36 +10,20 @@ import {
   TypeParamError
 } from '@root/protocols/errors';
 import { IUpdateFarmService } from '@root/useCases/contracts';
-import {
-  IFindFarmByIdRepo,
-  IFindUserByIdRepo,
-  IUpdateFarmRepo
-} from '@root/database/protocols';
+import { IGetByIdBaseRepo, IUpdateBaseRepo } from '@root/database/protocols';
+import { checkNumbers, checkStrings } from '@root/utils/decorators/check-types';
 
 @injectable()
 class UpdateFarmUseCase implements IUpdateFarmService {
   constructor(
-    @inject('FindFarmById') private findFarm: IFindFarmByIdRepo,
-    @inject('UpdateFarm') private updateFarm: IUpdateFarmRepo,
-    @inject('FindUserById') private findUser: IFindUserByIdRepo
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo<FarmModel>,
+    @inject('UpdateBase') private updateFarm: IUpdateBaseRepo<FarmModel>
   ) {}
 
-  private async applyQueryUserById(user_id: string) {
+  private async applyQueryFindById(table: 'users' | 'farms', farm_id: string) {
     try {
-      return await this.findUser.findById({ id: user_id });
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        UpdateFarmUseCase.name,
-        'Find User By Id'
-      );
-      return DATABASE_ERROR;
-    }
-  }
-  private async applyQueryFindById(farm_id: string) {
-    try {
-      return await this.findFarm.find({ farm_id });
+      const column = table === 'users' ? 'user_id' : 'farm_id';
+      return await this.getById.get({ table, column, id: farm_id });
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -53,7 +37,12 @@ class UpdateFarmUseCase implements IUpdateFarmService {
 
   private async applyQueryUpdateFarm(farm: FarmModel) {
     try {
-      return await this.updateFarm.update(farm);
+      return await this.updateFarm.put({
+        table: 'farms',
+        column: 'farm_id',
+        where: farm.farm_id,
+        data: farm
+      });
     } catch (err) {
       messageErrorTryAction(err, true, UpdateFarmUseCase.name, 'Update Farm');
       return DATABASE_ERROR;
@@ -73,6 +62,8 @@ class UpdateFarmUseCase implements IUpdateFarmService {
     } else false;
   }
 
+  @checkStrings(['farm_id', 'user_id', 'farm_name', 'farm_city'])
+  @checkNumbers(['farm_lng', 'farm_lat'])
   async execute({
     farm_id,
     farm_city,
@@ -81,31 +72,7 @@ class UpdateFarmUseCase implements IUpdateFarmService {
     farm_name,
     user_id
   }: FarmModel) {
-    /*
-     Check values null
-     */
-    if (
-      !farm_id ||
-      !user_id ||
-      !farm_name ||
-      !farm_lat ||
-      !farm_lng ||
-      !farm_city
-    ) {
-      throw new ParamsInvalid();
-    }
-
-    /*
-      Check Types of the values
-    */
-    if (typeof farm_id !== 'string') throw new TypeParamError('farm_id');
-    if (typeof user_id !== 'string') throw new TypeParamError('user_id');
-    if (typeof farm_name !== 'string') throw new TypeParamError('farm_name');
-    if (typeof farm_city !== 'string') throw new TypeParamError('farm_city');
-    if (typeof farm_lat !== 'number') throw new TypeParamError('farm_lat');
-    if (typeof farm_lng !== 'number') throw new TypeParamError('farm_lng');
-
-    const farmExists = await this.applyQueryFindById(farm_id);
+    const farmExists = await this.applyQueryFindById('farms', farm_id);
 
     /*
      Checks Farm Exists and response Database Find Farm
@@ -133,7 +100,7 @@ class UpdateFarmUseCase implements IUpdateFarmService {
         /*
          Check user exist and reponse error database query find user
         */
-        const user = await this.applyQueryUserById(user_id);
+        const user = await this.applyQueryFindById('users', user_id);
         if (user === DATABASE_ERROR) throw new DatabaseErrorReturn();
         else if (!user) throw new DataNotFound('User');
         else {
