@@ -19,6 +19,7 @@ class IoConnect {
     >
   ) {
     this.io = io;
+    IoConnect.io = io;
   }
 
   start() {
@@ -59,7 +60,6 @@ class IoConnect {
             connection,
             percentimeter
           });
-          emitter.off('connection', () => {});
 
           // console.log(`socket de state: `, status);
         });
@@ -72,7 +72,6 @@ class IoConnect {
             angle,
             percentimeter
           });
-          emitter.off('variable-change', () => {});
 
           // console.log(`socket de variavel: `, status);
         });
@@ -89,8 +88,6 @@ class IoConnect {
             pivot_num,
             farm_name
           });
-
-          emitter.off('action-received-ack', () => {});
         });
 
         emitter.on('action-ack-not-received', async (action) => {
@@ -105,8 +102,6 @@ class IoConnect {
             pivot_num,
             farm_name
           });
-
-          emitter.off('action-ack-not-received', () => {});
         });
       });
     } catch (err) {

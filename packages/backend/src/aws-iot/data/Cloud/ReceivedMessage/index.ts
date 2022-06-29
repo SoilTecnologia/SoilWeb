@@ -1,6 +1,5 @@
 import { container } from 'tsyringe';
 import { GetPivotByIdUseCase } from '@useCases/data/Pivots/GetById/GetByIdUseCase';
-import { handleResultString } from '@utils/handleFarmIdWithUndescores';
 import MessageQueue from '@utils/message_queue';
 import { messageErrorTryAction } from '@utils/types';
 import { socketIo } from '@utils/socketIo';
@@ -28,6 +27,7 @@ class HandleCloudMessageTypeCloud {
         if (node_num === '0') await handleGateway(payload, pivot_id);
         else await handleGprs(payload, pivot_id);
       }
+      socketIo('ackReceived', payload);
     } catch (err) {
       messageErrorTryAction(
         err,

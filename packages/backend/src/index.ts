@@ -26,7 +26,7 @@ httpServer.listen(PORT, async () => {
 });
 
 export const io = new Server(httpServer);
-new IoConnect(io).start();
+export const ioSocket = new IoConnect(io).start();
 // raspberry.start();
 // export const iotDevice = new IoTDevice('Raspberry', 0, 'agrishow_0');
 export const iotDevice = new IoTDevice('Cloud', 0);

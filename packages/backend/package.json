@@ -16,7 +16,7 @@
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
     "@typescript-eslint/parser": "^4.29.0",
-    "babel-jest": "^27.2.1",
+    "babel-jest": "^28.1.1",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
@@ -29,7 +29,8 @@
     "ts-jest": "^28.0.5",
     "ts-node": "^10.2.1",
     "tsconfig-paths": "^4.0.0",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "webpack-babel-jest": "^1.0.4"
   },
   "scripts": {
     "play:dev": "NODE_ENV=prod_dev node -r tsconfig-paths/register dist/src/index.js",
@@ -37,7 +38,8 @@
     "dev:docker": "NODE_ENV=dev_docker nodemon -r tsconfig-paths/register src/index.ts",
     "clear": "NODE_ENV=test jest --clearCache",
     "test": "NODE_ENV=test jest --passWithNoTests --silent --noStackTrace --runInBand --detectOpenHandles --forceExit",
-    "test:full": "NODE_ENV=test jest   --passWithNoTests --noStackTrace --runInBand",
+    "test:unit:log": "NODE_ENV=test jest  --noStackTrace --runInBand --watch -c jest-unit-config.js",
+    "test:integration:log": "NODE_ENV=test jest  --noStackTrace --runInBand  --watch -c jest-integration-config.js",
     "test:unit": "NODE_ENV=test npm test -- --watch -c jest-unit-config.js ",
     "test:integration": "NODE_ENV=test npm test -- --watch -c jest-integration-config.js ",
     "test:staged": "NODE_ENV=test npm test --findRelatedTests",

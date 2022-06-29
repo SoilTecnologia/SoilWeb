@@ -53,7 +53,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = 'clientIdCloud.pcLocal';
+      this.clientId = userLocal;
     }
   }
   /*
@@ -200,6 +200,7 @@ class IoTDevice {
           await HandleCloudMessageTypeRaspberry.receivedAction(json);
       }
     } catch (err) {
+      console.log(err);
       messageErrorTryAction(err, false, IoTDevice.name, 'Process Message');
     }
   };

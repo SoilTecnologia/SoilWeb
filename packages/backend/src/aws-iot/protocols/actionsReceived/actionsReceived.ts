@@ -1,7 +1,7 @@
-import { ActionModel } from '../../../database/model/Action';
-import { FarmModel } from '../../../database/model/Farm';
-import { NodeModel } from '../../../database/model/Node';
-import { PivotModel } from '../../../database/model/Pivot';
+import { ActionModel } from '@database/model/Action';
+import { FarmModel } from '@database/model/Farm';
+import { NodeModel } from '@database/model/Node';
+import { PivotModel } from '@database/model/Pivot';
 
 interface ActionReceived {
   farm_id: FarmModel['farm_id'];
