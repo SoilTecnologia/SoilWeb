@@ -40,12 +40,12 @@ class IoTDevice {
     this.qos = qos;
     this.queue = new MessageQueue();
 
-    // const userLocal = 'Henriques123';
-    // const clientIdCloud = {
-    //   newDev: 'cloudNewDev2022',
-    //   newProd: 'cloudNewProd2022',
-    //   pcLocal: `cloudLocal${userLocal}2022`
-    // };
+    const userLocal = 'Henriques123';
+    const clientIdCloud = {
+      newDev: 'cloudNewDev2022',
+      newProd: 'cloudNewProd2022',
+      pcLocal: `cloudLocal${userLocal}2022`
+    };
 
     if (type === 'Raspberry' && topic) {
       this.subTopic = topic;
@@ -53,7 +53,7 @@ class IoTDevice {
       this.clientId = topic;
     } else {
       this.subTopic = 'cloudHenrique';
-      this.clientId = 'xxt';
+      this.clientId = clientIdCloud.newDev;
     }
   }
   /*
@@ -67,21 +67,21 @@ class IoTDevice {
     try {
       let configBuilder: iot.AwsIotMqttConnectionConfigBuilder;
       configBuilder =
-         iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(
+        iot.AwsIotMqttConnectionConfigBuilder.new_mtls_builder_from_path(
           certPath,
           keyPath
         );
 
-       configBuilder.with_clean_session(false);
-       configBuilder.with_client_id(this.clientId);
-       configBuilder.with_endpoint(endpoint);
+      configBuilder.with_clean_session(false);
+      configBuilder.with_client_id(this.clientId);
+      configBuilder.with_endpoint(endpoint);
       // configBuilder.with_keep_alive_seconds(10);
       // configBuilder.with_ping_timeout_ms(1000);
 
       const config = configBuilder.build();
       const client = new mqtt.MqttClient();
 
-      this.connection =  client.new_connection(config);
+      this.connection = client.new_connection(config);
 
       /*
       Aqui fazemos a conexão com o broker e o subscribe de um tópico dependendo do tipo de dispositivo.
@@ -156,21 +156,20 @@ class IoTDevice {
         payload: any;
       } = json;
 
-      console.log(json)
+      console.log(json);
       console.log(`Recebido ack ${JSON.stringify(json, null, 2)}`);
-      
-      const pivotId = payload.pivot_id || id
+
+      const pivotId = payload.pivot_id || id;
 
       if (type === 'status' && this.type === 'Cloud') {
         checkGprsInterval.addResponseStatus(pivotId);
       } else if (type === 'action') {
         emitterResponse.addActionStatus(pivotId);
       }
-      
-      const {node_num} = handleResultString(id)
+
+      const { node_num } = handleResultString(id);
       if (this.type === 'Cloud') {
         if (json.type === 'status') {
-          
           const result = await HandleCloudMessageTypeCloud.receivedStatus({
             pivot_id: pivotId,
             payload,
