@@ -4,10 +4,11 @@ import knex from '@root/database';
 import { app } from '@root/app';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
-import { addNode, arrayNode } from '@tests/mocks/data/node';
+import { addNode } from '@tests/mocks/data/node';
 import {
   AlreadyExistsError,
   DataNotFound,
+  ParamsInvalid,
   ParamsNotExpected,
   TypeParamError
 } from '@root/protocols/errors';
@@ -48,7 +49,7 @@ describe('Create Nodes Integration', () => {
       .set('Authorization', token);
 
     expect(status).toBe(400);
-    expect(body).toHaveProperty('error', 'Params inválids');
+    expect(body).toHaveProperty('error', new ParamsInvalid().message);
   });
 
   it('should be return 400 and error if to have received params not expected', async () => {

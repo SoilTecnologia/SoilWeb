@@ -40,8 +40,6 @@ class UpdateNodeUseCase implements IUpdateNodeService {
   async execute({
     node: { node_num, node_id, farm_id, is_gprs, gateway }
   }: IUpdateNodeService.Params): IUpdateNodeService.Response {
-    const nodeModel = new NodeModel();
-
     const nodeAlreadyExists = await this.getById.get({
       table: 'nodes',
       column: 'node_id',
@@ -50,6 +48,8 @@ class UpdateNodeUseCase implements IUpdateNodeService {
 
     if (nodeAlreadyExists === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (!nodeAlreadyExists) throw new DataNotFound('Node');
+
+    const nodeModel = new NodeModel();
 
     Object.assign(nodeModel, { node_num, node_id, farm_id, is_gprs, gateway });
 

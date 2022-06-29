@@ -1,11 +1,16 @@
+import { ParamsNotExpected } from '@root/protocols/errors';
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { messageErrorTryAction } from '@utils/types';
 import { UpdateNodeUseCase } from './UpdateNodeUseCase';
 
 class UpdateNodeController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const { node_id, node_num, farm_id, is_gprs, gateway } = req.body;
+
+    if (Object.keys(req.body).length > (gateway ? 5 : 4)) {
+      res.status(400).send({ error: new ParamsNotExpected().message });
+    }
 
     const updateNodeUseCase = container.resolve(UpdateNodeUseCase);
 
@@ -13,14 +18,14 @@ class UpdateNodeController {
       const newNode = await updateNodeUseCase.execute({
         node: {
           node_id,
-          node_num,
+          node_num: Number(node_num),
           farm_id,
           is_gprs,
           gateway
         }
       });
 
-      res.send(newNode);
+      return res.status(201).send(newNode);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -28,7 +33,7 @@ class UpdateNodeController {
         UpdateNodeController.name,
         'Update Node '
       );
-      next();
+      res.status(400).send({ error: err.message });
     }
   }
 }
