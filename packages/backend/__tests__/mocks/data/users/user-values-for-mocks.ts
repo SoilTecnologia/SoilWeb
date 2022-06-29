@@ -1,5 +1,4 @@
 import { UserModel } from '@root/database/model/User';
-import { ICreateUserRepository } from '@root/database/protocols';
 import { ICreateUserUseCase } from '@root/useCases/contracts';
 
 export const addUser: ICreateUserUseCase.Params = {
@@ -8,7 +7,7 @@ export const addUser: ICreateUserUseCase.Params = {
   user_type: 'SUDO'
 };
 
-export const userCreated: ICreateUserRepository.Response = {
+export const userCreated: UserModel = {
   user_id: 'soiltech',
   login: 'soil',
   password: '123456',

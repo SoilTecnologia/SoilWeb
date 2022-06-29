@@ -3,7 +3,11 @@ import '@root/shared/container/index';
 import knex from '@root/database';
 import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
-import { ParamsInvalid, ParamsNotExpected } from '@root/protocols/errors';
+import {
+  DataNotFound,
+  ParamsInvalid,
+  ParamsNotExpected
+} from '@root/protocols/errors';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 
 describe('Find Farm By Id Integration', () => {
@@ -92,14 +96,8 @@ describe('Find Farm By Id Integration', () => {
       .get(`/farms/getOneFarm/${farm_id}`)
       .set('Authorization', token);
 
-    expect(status).toBe(200);
-    expect(body).toMatchObject({});
-    expect(body).not.toHaveProperty('farm_id', farm_id);
-    expect(body).not.toHaveProperty('user_id', user_id);
-    expect(body).not.toHaveProperty('farm_name', addFarms.farm_name);
-    expect(body).not.toHaveProperty('farm_city', addFarms.farm_city);
-    expect(body).not.toHaveProperty('farm_lng', addFarms.farm_lng);
-    expect(body).not.toHaveProperty('farm_lat', addFarms.farm_lat);
+    expect(status).toBe(400);
+    expect(body).toHaveProperty('error', new DataNotFound('Farm').message);
   });
 
   it('should to have return farm if farm exists', async () => {

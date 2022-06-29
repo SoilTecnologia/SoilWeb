@@ -1,10 +1,8 @@
+import 'reflect-metadata';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { CreateUserUseCase, ITokenJwt, IEncrypter } from '@root/useCases/data';
 import { ICreateUserUseCase } from '@root/useCases/contracts';
-import {
-  ICreateUserRepository,
-  IFindUserByLoginRepo
-} from '@database/protocols';
+import { ICreateBaseRepo, IGetByDataRepo } from '@database/protocols';
 import {
   AlreadyExistsError,
   DatabaseErrorReturn,
@@ -12,18 +10,18 @@ import {
 } from '@protocols/errors';
 import {
   addUser,
-  userCreated,
-  userResponse
+  userCreated
 } from '@tests/mocks/data/users/user-values-for-mocks';
+import { UserModel } from '@root/database/model/User';
 
 describe('Create User Use Case', () => {
-  let addUserRepo: MockProxy<ICreateUserRepository>;
-  let findUserRepo: MockProxy<IFindUserByLoginRepo>;
+  let addUserRepo: MockProxy<ICreateBaseRepo<UserModel>>;
+  let findUserRepo: MockProxy<IGetByDataRepo<UserModel>>;
 
   let encrypter: MockProxy<IEncrypter>;
   let token: MockProxy<ITokenJwt>;
   let createUserService: ICreateUserUseCase;
-  let addUserEncrypted: ICreateUserRepository.Params;
+  let addUserEncrypted: ICreateUserUseCase.Params;
 
   beforeEach(() => {
     addUserRepo = mock();
@@ -40,7 +38,7 @@ describe('Create User Use Case', () => {
 
     addUserEncrypted = { ...addUser, password: 'password_encrypted' };
 
-    findUserRepo.findUserByLogin.mockResolvedValue(undefined);
+    findUserRepo.get.mockResolvedValue(undefined);
     addUserRepo.create.mockResolvedValue(userCreated);
     encrypter.encrypt.mockResolvedValue('password_encrypted');
     token.create.mockResolvedValue('token_valid');
@@ -66,13 +64,10 @@ describe('Create User Use Case', () => {
   });
 
   it('should encrypted password return password encrypted ', async () => {
-    const callUserCreated = jest.spyOn(addUserRepo, 'create');
+    const callUserCreated = jest.spyOn(encrypter, 'encrypt');
     await createUserService.execute(addUser);
 
-    expect(callUserCreated).toHaveBeenCalledWith({
-      ...addUser,
-      password: 'password_encrypted'
-    });
+    expect(callUserCreated).toHaveBeenCalledWith({ value: addUser.password });
   });
 
   it('Should received an error if encrypted throw a error', () => {
@@ -88,25 +83,24 @@ describe('Create User Use Case', () => {
 
     await createUserService.execute(addUser);
 
-    expect(fnEncrypted).toHaveBeenCalledWith(addUserEncrypted);
+    expect(fnEncrypted).toHaveBeenCalledWith({
+      table: 'users',
+      data: addUserEncrypted
+    });
     expect(fnEncrypted).toBeCalledTimes(1);
   });
 
   it('should find user repository to have been called with data valids to have called once time', async () => {
-    const fnEncrypted = jest.spyOn(findUserRepo, 'findUserByLogin');
+    const fnEncrypted = jest.spyOn(findUserRepo, 'get');
 
     await createUserService.execute(addUser);
 
-    expect(fnEncrypted).toHaveBeenCalledWith('soil');
+    expect(fnEncrypted).toHaveBeenCalledWith({
+      table: 'users',
+      data: 'soil',
+      column: 'login'
+    });
     expect(fnEncrypted).toBeCalledTimes(1);
-  });
-
-  it('should to throw error if user is not created in database', async () => {
-    addUserRepo.create.mockResolvedValueOnce(undefined);
-
-    const err = createUserService.execute(addUser);
-
-    expect(err).rejects.toThrow(new FailedCreateDataError('User'));
   });
 
   it('should throw create user database error, when repository create return error', () => {
@@ -116,21 +110,27 @@ describe('Create User Use Case', () => {
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
 
-  it('should throw database error, when repository findUserByLogin return error', async () => {
-    jest
-      .spyOn(findUserRepo, 'findUserByLogin')
-      .mockRejectedValueOnce(new Error());
+  it('should throw database error, when repository findUserByLogin return error', () => {
+    jest.spyOn(findUserRepo, 'get').mockRejectedValueOnce(new Error());
     const promise = createUserService.execute(addUser);
 
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
 
-  it('should to throw error if user received already exists in database', async () => {
-    findUserRepo.findUserByLogin.mockResolvedValueOnce(userCreated);
+  it('should to throw error if user received already exists in database', () => {
+    findUserRepo.get.mockResolvedValueOnce(userCreated);
 
     const err = createUserService.execute(addUser);
 
     expect(err).rejects.toThrow(new AlreadyExistsError('User'));
+  });
+
+  it('should to throw error if create user return undefined', () => {
+    addUserRepo.create.mockResolvedValueOnce(undefined);
+
+    const err = createUserService.execute(addUser);
+
+    expect(err).rejects.toThrow(new FailedCreateDataError('User'));
   });
 
   //Tests Jwt Token response

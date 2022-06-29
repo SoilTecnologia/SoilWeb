@@ -1,6 +1,6 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 
-import { IFindUserByLoginRepo } from '@root/database/protocols';
+import { IGetByDataRepo } from '@root/database/protocols';
 import { ILoginAuth } from '@root/useCases/contracts';
 import {
   DatabaseErrorReturn,
@@ -16,9 +16,10 @@ import {
   addUser,
   userCreated
 } from '@tests/mocks/data/users/user-values-for-mocks';
+import { UserModel } from '@root/database/model/User';
 
 describe('Auth Login', () => {
-  let findUserRepo: MockProxy<IFindUserByLoginRepo>;
+  let findUserRepo: MockProxy<IGetByDataRepo<UserModel>>;
   let encrypter: MockProxy<ICompareEncrypt>;
   let token: MockProxy<ITokenJwt>;
 
@@ -33,7 +34,7 @@ describe('Auth Login', () => {
     authLogin = new AuthSignInUseCase(token, encrypter, findUserRepo);
     dataLogin = { login: 'soil', password: 'soiltech' };
 
-    findUserRepo.findUserByLogin.mockResolvedValue(userCreated);
+    findUserRepo.get.mockResolvedValue(userCreated);
     encrypter.compare.mockResolvedValue(true);
     token.create.mockResolvedValue('token_valid');
   });
@@ -58,7 +59,7 @@ describe('Auth Login', () => {
   });
 
   it('should to throw err Invalid Credentials if user not exists in database', () => {
-    findUserRepo.findUserByLogin.mockResolvedValueOnce(undefined);
+    findUserRepo.get.mockResolvedValueOnce(undefined);
 
     const promise = authLogin.execute(dataLogin);
 
@@ -67,18 +68,20 @@ describe('Auth Login', () => {
   // Tests Database
 
   it('should findUserRepo to have been called with data valids to have called once time', async () => {
-    const fnFindUser = jest.spyOn(findUserRepo, 'findUserByLogin');
+    const fnFindUser = jest.spyOn(findUserRepo, 'get');
 
     await authLogin.execute(dataLogin);
 
-    expect(fnFindUser).toHaveBeenCalledWith('soil');
+    expect(fnFindUser).toHaveBeenCalledWith({
+      table: 'users',
+      column: 'login',
+      data: 'soil'
+    });
     expect(fnFindUser).toBeCalledTimes(1);
   });
 
   it('should throw database error, when repository findUserByLogin return error', () => {
-    jest
-      .spyOn(findUserRepo, 'findUserByLogin')
-      .mockRejectedValueOnce(new Error());
+    jest.spyOn(findUserRepo, 'get').mockRejectedValueOnce(new Error());
     const promise = authLogin.execute(dataLogin);
 
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
@@ -86,7 +89,7 @@ describe('Auth Login', () => {
 
   //Tests Encrypter
   it('should encrypted password to have been called with data valids to have called once time', async () => {
-    findUserRepo.findUserByLogin.mockResolvedValueOnce(userCreated);
+    findUserRepo.get.mockResolvedValueOnce(userCreated);
     const fnEncrypted = jest.spyOn(encrypter, 'compare');
 
     await authLogin.execute(dataLogin);

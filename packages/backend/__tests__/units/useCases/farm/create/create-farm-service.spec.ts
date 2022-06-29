@@ -9,37 +9,30 @@ import {
   DataNotFound,
   FailedCreateDataError
 } from '@root/protocols/errors';
-import {
-  ICreateFarmRepo,
-  IFindFarmByIdRepo,
-  IFindUserByIdRepo
-} from '@root/database/protocols';
+import { ICreateBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
+import { FarmModel } from '@root/database/model/Farm';
 
 describe('Create User Use Case', () => {
-  let addfarmRepo: MockProxy<ICreateFarmRepo>;
-  let findFarmRepo: MockProxy<IFindFarmByIdRepo>;
-  let findUserRepo: MockProxy<IFindUserByIdRepo>;
+  let addfarmRepo: MockProxy<ICreateBaseRepo<FarmModel>>;
+  let getById: MockProxy<IGetByIdBaseRepo>;
 
   let createService: ICreateFarmUseCase;
 
   beforeAll(() => {
     addfarmRepo = mock();
-    findFarmRepo = mock();
-    findUserRepo = mock();
+    getById = mock();
 
-    createService = new CreateFarmUseCase(
-      addfarmRepo,
-      findFarmRepo,
-      findUserRepo
-    );
+    createService = new CreateFarmUseCase(addfarmRepo, getById);
 
-    findUserRepo.findById.mockResolvedValue(userCreated);
-    findFarmRepo.find.mockResolvedValue(undefined);
     addfarmRepo.create.mockResolvedValue(addFarms);
   });
 
   // Test received data corrects
   it('should to have been called with params válids and called once time', async () => {
+    getById.get
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(userCreated);
+
     const callUser = jest.spyOn(createService, 'execute');
     createService.execute(addFarms);
 
@@ -47,20 +40,30 @@ describe('Create User Use Case', () => {
     expect(callUser).toBeCalledTimes(1);
   });
 
-  // Tests find farm by id
+  // // Tests find farm by id
   it('should find farm repo to have been called with farm_id received', async () => {
-    const fnFarm = jest.spyOn(findFarmRepo, 'find');
+    getById.get
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(userCreated);
+    const fnFarm = jest.spyOn(getById, 'get');
 
     await createService.execute(addFarms);
 
-    expect(fnFarm).toHaveBeenCalledWith({ farm_id: addFarms.farm_id });
-    expect(fnFarm).toHaveBeenCalledTimes(1);
+    expect(fnFarm).toHaveBeenCalledWith({
+      table: 'farms',
+      column: 'farm_id',
+      id: addFarms.farm_id
+    });
+    expect(fnFarm).toHaveBeenLastCalledWith({
+      table: 'users',
+      column: 'user_id',
+      id: addFarms.user_id
+    });
+    expect(fnFarm).toHaveBeenCalledTimes(2);
   });
 
   it('should to throw database error if find farm repo return error', () => {
-    jest
-      .spyOn(findFarmRepo, 'find')
-      .mockRejectedValueOnce(new DatabaseErrorReturn());
+    getById.get.mockRejectedValueOnce(new Error());
 
     const promise = createService.execute(addFarms);
 
@@ -68,35 +71,29 @@ describe('Create User Use Case', () => {
   });
 
   it('should to throw farm already existse error if find farm repo return farm', () => {
-    jest.spyOn(findFarmRepo, 'find').mockResolvedValueOnce(addFarms);
+    getById.get.mockResolvedValueOnce(addFarms);
 
     const promise = createService.execute(addFarms);
 
     expect(promise).rejects.toThrow(new AlreadyExistsError('Farm'));
   });
 
-  //Tests find user by id
-  it('should find user repo to have been called with user_id received', async () => {
-    const fnUser = jest.spyOn(findUserRepo, 'findById');
-
-    await createService.execute(addFarms);
-
-    expect(fnUser).toHaveBeenCalledWith({ id: addFarms.user_id });
-    expect(fnUser).toHaveBeenCalledTimes(1);
-  });
+  //Tests Users
 
   it('should to throw database error if find user repo return error', () => {
-    jest
-      .spyOn(findUserRepo, 'findById')
-      .mockRejectedValueOnce(new DatabaseErrorReturn());
+    getById.get
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error());
 
     const promise = createService.execute(addFarms);
 
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
 
-  it('should to throw user not exists error if find user repo return undefined', () => {
-    jest.spyOn(findUserRepo, 'findById').mockResolvedValueOnce(undefined);
+  it('should to throw farm already existse error if find farm repo return farm', () => {
+    getById.get
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined);
 
     const promise = createService.execute(addFarms);
 
@@ -106,15 +103,22 @@ describe('Create User Use Case', () => {
   // Tests create farm
 
   it('should create farm repo to have been called with farm data received', async () => {
+    getById.get
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(userCreated);
+
     const fnUser = jest.spyOn(addfarmRepo, 'create');
 
     await createService.execute(addFarms);
 
-    expect(fnUser).toHaveBeenCalledWith(addFarms);
+    expect(fnUser).toHaveBeenCalledWith({ table: 'farms', data: addFarms });
     expect(fnUser).toHaveBeenCalledTimes(1);
   });
 
   it('should to throw database error if create farm repo return error', () => {
+    getById.get
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(userCreated);
     jest
       .spyOn(addfarmRepo, 'create')
       .mockRejectedValueOnce(new DatabaseErrorReturn());
@@ -125,6 +129,9 @@ describe('Create User Use Case', () => {
   });
 
   it('should to throw farm not created if create farm repo return undefined', () => {
+    getById.get
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(userCreated);
     jest.spyOn(addfarmRepo, 'create').mockResolvedValueOnce(undefined);
 
     const promise = createService.execute(addFarms);
@@ -132,8 +139,12 @@ describe('Create User Use Case', () => {
     expect(promise).rejects.toThrow(new FailedCreateDataError('Farm').message);
   });
 
-  // Test response useCase
+  // // Test response useCase
   it('should to received a new farm with the data send', async () => {
+    getById.get
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(userCreated);
+
     const promise = await createService.execute(addFarms);
 
     expect(promise).toHaveProperty('user_id', addFarms?.user_id);

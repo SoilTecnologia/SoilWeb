@@ -1,14 +1,15 @@
 import '@root/shared/container/index';
-import { IDeleteUserRepo, IFindUserByIdRepo } from '@root/database/protocols';
+import { IDeleteBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
 import { IDeleteUserService } from '@root/useCases/contracts';
 import { DeleteUserUseCase } from '@root/useCases/data';
 import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
+import { UserModel } from '@root/database/model/User';
 
 describe('Delete User Service', () => {
-  let findUser: MockProxy<IFindUserByIdRepo>;
-  let delUser: MockProxy<IDeleteUserRepo>;
+  let findUser: MockProxy<IGetByIdBaseRepo<UserModel>>;
+  let delUser: MockProxy<IDeleteBaseRepo<UserModel>>;
   let deleteUserService: IDeleteUserService;
   const user_id = 'soiltech';
 
@@ -18,8 +19,8 @@ describe('Delete User Service', () => {
 
     deleteUserService = new DeleteUserUseCase(findUser, delUser);
 
-    findUser.findById.mockResolvedValue(userCreated);
-    delUser.deleteUser.mockResolvedValue(1);
+    findUser.get.mockResolvedValue(userCreated);
+    delUser.del.mockResolvedValue(1);
   });
 
   // Teste params received
@@ -33,15 +34,19 @@ describe('Delete User Service', () => {
   // Tests return databse
 
   it('should findUser to have been called with params correctly ', async () => {
-    const fnFindUser = jest.spyOn(findUser, 'findById');
+    const fnFindUser = jest.spyOn(findUser, 'get');
 
     await deleteUserService.execute({ user_id });
 
-    expect(fnFindUser).toHaveBeenCalledWith({ id: 'soiltech' });
+    expect(fnFindUser).toHaveBeenCalledWith({
+      table: 'users',
+      column: 'user_id',
+      id: 'soiltech'
+    });
   });
 
   it('should return error if not exists user in database ', () => {
-    jest.spyOn(findUser, 'findById').mockResolvedValueOnce(undefined);
+    jest.spyOn(findUser, 'get').mockResolvedValueOnce(undefined);
 
     const promise = deleteUserService.execute({ user_id });
 
@@ -49,7 +54,7 @@ describe('Delete User Service', () => {
   });
 
   it('should return error if database return a error ', () => {
-    jest.spyOn(findUser, 'findById').mockRejectedValueOnce(new Error(''));
+    jest.spyOn(findUser, 'get').mockRejectedValueOnce(new Error(''));
 
     const promise = deleteUserService.execute({ user_id });
 
@@ -59,15 +64,19 @@ describe('Delete User Service', () => {
   //Tests return Database DeleteUser
 
   it('should findUser to have been called with params correctly ', async () => {
-    const fnDelUser = jest.spyOn(delUser, 'deleteUser');
+    const fnDelUser = jest.spyOn(delUser, 'del');
 
     await deleteUserService.execute({ user_id });
 
-    expect(fnDelUser).toHaveBeenCalledWith({ user_id: 'soiltech' });
+    expect(fnDelUser).toHaveBeenCalledWith({
+      table: 'users',
+      column: 'user_id',
+      data: 'soiltech'
+    });
   });
 
   it('should return error if delete user database return a error ', () => {
-    jest.spyOn(delUser, 'deleteUser').mockRejectedValueOnce(new Error(''));
+    jest.spyOn(delUser, 'del').mockRejectedValueOnce(new Error(''));
 
     const promise = deleteUserService.execute({ user_id });
 
@@ -77,7 +86,7 @@ describe('Delete User Service', () => {
   // Return final
 
   it('should return error if not response delete user ', async () => {
-    jest.spyOn(delUser, 'deleteUser').mockResolvedValueOnce(undefined);
+    jest.spyOn(delUser, 'del').mockResolvedValueOnce(undefined);
 
     const promise = await deleteUserService.execute({ user_id });
 

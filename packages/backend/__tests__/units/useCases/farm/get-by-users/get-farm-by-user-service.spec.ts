@@ -1,5 +1,6 @@
+import { UserModel } from '@root/database/model/User';
 import {
-  IFindUserByIdRepo,
+  IGetByIdBaseRepo,
   IGetFarmByUserIdRepo
 } from '@root/database/protocols';
 import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
@@ -13,7 +14,7 @@ import mock from 'jest-mock-extended/lib/Mock';
 
 describe('Get All Users', () => {
   let getAllFarmsRepo: MockProxy<IGetFarmByUserIdRepo>;
-  let getUser: MockProxy<IFindUserByIdRepo>;
+  let getUser: MockProxy<IGetByIdBaseRepo<UserModel>>;
   let getAllFarmsService: IGetFarmByUserService;
   const user_id = uuidGlobal;
 
@@ -23,7 +24,7 @@ describe('Get All Users', () => {
 
     getAllFarmsService = new GetFarmByUserUseCase(getAllFarmsRepo, getUser);
 
-    getUser.findById.mockResolvedValue(userCreated);
+    getUser.get.mockResolvedValue(userCreated);
     getAllFarmsRepo.getAll.mockResolvedValue(farmsArray);
   });
 
@@ -39,16 +40,20 @@ describe('Get All Users', () => {
   //Tests Get all database repo
   //Find User
   it('should get user repo to have been called with params correctly', () => {
-    const fnGetAll = jest.spyOn(getUser, 'findById');
+    const fnGetAll = jest.spyOn(getUser, 'get');
 
     getAllFarmsService.execute({ user_id });
 
     expect(fnGetAll).toHaveBeenCalledTimes(1);
-    expect(fnGetAll).toHaveBeenCalledWith({ id: user_id });
+    expect(fnGetAll).toHaveBeenCalledWith({
+      table: 'users',
+      column: 'user_id',
+      id: user_id
+    });
   });
 
   it('should to have database error if repo return error', () => {
-    jest.spyOn(getUser, 'findById').mockRejectedValueOnce(new Error());
+    jest.spyOn(getUser, 'get').mockRejectedValueOnce(new Error());
 
     const promise = getAllFarmsService.execute({ user_id });
 
@@ -56,7 +61,7 @@ describe('Get All Users', () => {
   });
 
   it('should to received users not found if repo return undefined', () => {
-    jest.spyOn(getUser, 'findById').mockResolvedValueOnce(undefined);
+    jest.spyOn(getUser, 'get').mockResolvedValueOnce(undefined);
 
     const promise = getAllFarmsService.execute({ user_id });
 

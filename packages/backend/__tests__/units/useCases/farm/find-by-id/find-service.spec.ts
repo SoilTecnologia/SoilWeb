@@ -1,13 +1,14 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 
-import { IFindFarmByIdRepo } from '@root/database/protocols';
+import { IGetByIdBaseRepo } from '@root/database/protocols';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import { GetOneFarmUseCase } from '@root/useCases/data';
-import { DatabaseErrorReturn } from '@root/protocols/errors';
+import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
 import { IGetOneFarmService } from '@root/useCases/contracts';
+import { FarmModel } from '@root/database/model/Farm';
 
 describe('Find Farm By Id Use Case', () => {
-  let findFarmRepo: MockProxy<IFindFarmByIdRepo>;
+  let findFarmRepo: MockProxy<IGetByIdBaseRepo<FarmModel>>;
   const { farm_id } = addFarms;
 
   let findService: IGetOneFarmService;
@@ -17,7 +18,7 @@ describe('Find Farm By Id Use Case', () => {
 
     findService = new GetOneFarmUseCase(findFarmRepo);
 
-    findFarmRepo.find.mockResolvedValue(addFarms);
+    findFarmRepo.get.mockResolvedValue(addFarms);
   });
 
   // Test received data corrects
@@ -31,17 +32,21 @@ describe('Find Farm By Id Use Case', () => {
 
   // Tests find farm by id
   it('should find farm repo to have been called with farm_id received', async () => {
-    const fnFarm = jest.spyOn(findFarmRepo, 'find');
+    const fnFarm = jest.spyOn(findFarmRepo, 'get');
 
     await findService.execute({ farm_id });
 
-    expect(fnFarm).toHaveBeenCalledWith({ farm_id: addFarms.farm_id });
+    expect(fnFarm).toHaveBeenCalledWith({
+      table: 'farms',
+      column: 'farm_id',
+      id: addFarms.farm_id
+    });
     expect(fnFarm).toHaveBeenCalledTimes(1);
   });
 
   it('should to throw database error if find farm repo return error', () => {
     jest
-      .spyOn(findFarmRepo, 'find')
+      .spyOn(findFarmRepo, 'get')
       .mockRejectedValueOnce(new DatabaseErrorReturn());
 
     const promise = findService.execute({ farm_id });
@@ -49,12 +54,12 @@ describe('Find Farm By Id Use Case', () => {
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
 
-  it('should to return undefined if find farm repo return undefined', async () => {
-    jest.spyOn(findFarmRepo, 'find').mockResolvedValueOnce(undefined);
+  it('should to return undefined if find farm repo return undefined', () => {
+    jest.spyOn(findFarmRepo, 'get').mockResolvedValueOnce(undefined);
 
-    const promise = await findService.execute({ farm_id });
+    const promise = findService.execute({ farm_id });
 
-    expect(promise).toBeUndefined();
+    expect(promise).rejects.toThrow(new DataNotFound('Farm'));
   });
 
   // Test response useCase

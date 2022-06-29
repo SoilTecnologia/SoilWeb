@@ -1,4 +1,5 @@
-import { IGetAllUserRepo } from '@root/database/protocols';
+import { UserModel } from '@root/database/model/User';
+import { IGetAllBaseRepo } from '@root/database/protocols';
 import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
 import { IGetAllUserService } from '@root/useCases/contracts';
 import { GetAllUserUseCase } from '@root/useCases/data';
@@ -7,15 +8,15 @@ import { MockProxy } from 'jest-mock-extended';
 import mock from 'jest-mock-extended/lib/Mock';
 
 describe('Get All Users', () => {
-  let getAllUserRepo: MockProxy<IGetAllUserRepo>;
+  let getAll: MockProxy<IGetAllBaseRepo<UserModel>>;
   let getAllUserService: IGetAllUserService;
 
   beforeAll(() => {
-    getAllUserRepo = mock();
+    getAll = mock();
 
-    getAllUserService = new GetAllUserUseCase(getAllUserRepo);
+    getAllUserService = new GetAllUserUseCase(getAll);
 
-    getAllUserRepo.getAll.mockResolvedValue(usersArray);
+    getAll.get.mockResolvedValue(usersArray);
   });
 
   it('should execute to have been called a once time and not received params', () => {
@@ -30,16 +31,16 @@ describe('Get All Users', () => {
   //Tests Get all database repo
 
   it('should get all users repo to have been called with params correctly', () => {
-    const fnGetAll = jest.spyOn(getAllUserRepo, 'getAll');
+    const fnGetAll = jest.spyOn(getAll, 'get');
 
     getAllUserService.execute();
 
     expect(fnGetAll).toHaveBeenCalledTimes(1);
-    expect(fnGetAll).toHaveBeenCalledWith();
+    expect(fnGetAll).toHaveBeenCalledWith({ table: 'users' });
   });
 
   it('should to have database error if repo return error', () => {
-    jest.spyOn(getAllUserRepo, 'getAll').mockRejectedValueOnce(new Error());
+    jest.spyOn(getAll, 'get').mockRejectedValueOnce(new Error());
 
     const promise = getAllUserService.execute();
 
@@ -47,7 +48,7 @@ describe('Get All Users', () => {
   });
 
   it('should to received users not found if repo return undefined', () => {
-    jest.spyOn(getAllUserRepo, 'getAll').mockResolvedValueOnce(undefined);
+    jest.spyOn(getAll, 'get').mockResolvedValueOnce(undefined);
 
     const promise = getAllUserService.execute();
 

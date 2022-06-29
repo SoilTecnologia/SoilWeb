@@ -1,17 +1,14 @@
-import { IGetAllFarmsRepo, IGetAllUserRepo } from '@root/database/protocols';
+import { FarmModel } from '@root/database/model/Farm';
+import { IGetAllBaseRepo } from '@root/database/protocols';
 import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
-import {
-  IGetAllFarmsService,
-  IGetAllUserService
-} from '@root/useCases/contracts';
-import { GetAllFarmsUseCase, GetAllUserUseCase } from '@root/useCases/data';
+import { IGetAllFarmsService } from '@root/useCases/contracts';
+import { GetAllFarmsUseCase } from '@root/useCases/data';
 import { farmsArray } from '@tests/mocks/data/farms/farms-values-mock';
-import { usersArray } from '@tests/mocks/data/users/user-values-for-mocks';
 import { MockProxy } from 'jest-mock-extended';
 import mock from 'jest-mock-extended/lib/Mock';
 
 describe('Get All Users', () => {
-  let getAllFarmsRepo: MockProxy<IGetAllFarmsRepo>;
+  let getAllFarmsRepo: MockProxy<IGetAllBaseRepo<FarmModel>>;
   let getAllFarmsService: IGetAllFarmsService;
 
   beforeAll(() => {
@@ -19,7 +16,7 @@ describe('Get All Users', () => {
 
     getAllFarmsService = new GetAllFarmsUseCase(getAllFarmsRepo);
 
-    getAllFarmsRepo.getAll.mockResolvedValue(farmsArray);
+    getAllFarmsRepo.get.mockResolvedValue(farmsArray);
   });
 
   it('should execute to have been called a once time and not received params', () => {
@@ -32,7 +29,7 @@ describe('Get All Users', () => {
   });
 
   //Tests Get all database repo
-  it('should get all users service to have been called with params correctly', () => {
+  it('should get all farms service to have been called with params correctly', () => {
     const fnGetAll = jest.spyOn(getAllFarmsService, 'execute');
 
     getAllFarmsService.execute();
@@ -41,33 +38,33 @@ describe('Get All Users', () => {
     expect(fnGetAll).toHaveBeenCalledWith();
   });
 
-  it('should get all users repo to have been called with params correctly', () => {
-    const fnGetAll = jest.spyOn(getAllFarmsRepo, 'getAll');
+  it('should get all farms repo to have been called with params correctly', () => {
+    const fnGetAll = jest.spyOn(getAllFarmsRepo, 'get');
 
     getAllFarmsService.execute();
 
     expect(fnGetAll).toHaveBeenCalledTimes(1);
-    expect(fnGetAll).toHaveBeenCalledWith();
+    expect(fnGetAll).toHaveBeenCalledWith({ table: 'farms' });
   });
 
   it('should to have database error if repo return error', () => {
-    jest.spyOn(getAllFarmsRepo, 'getAll').mockRejectedValueOnce(new Error());
+    jest.spyOn(getAllFarmsRepo, 'get').mockRejectedValueOnce(new Error());
 
     const promise = getAllFarmsService.execute();
 
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
 
-  it('should to received users not found if repo return undefined', () => {
-    jest.spyOn(getAllFarmsRepo, 'getAll').mockResolvedValueOnce(undefined);
+  it('should to received farms not found if repo return undefined', () => {
+    jest.spyOn(getAllFarmsRepo, 'get').mockResolvedValueOnce(undefined);
 
     const promise = getAllFarmsService.execute();
 
     expect(promise).rejects.toThrow(new DataNotFound('Farm'));
   });
 
-  it('should to received users not found if repo return undefined', async () => {
-    jest.spyOn(getAllFarmsRepo, 'getAll').mockResolvedValueOnce([]);
+  it('should to received farms not found if repo return undefined', async () => {
+    jest.spyOn(getAllFarmsRepo, 'get').mockResolvedValueOnce([]);
 
     const promise = await getAllFarmsService.execute();
 
@@ -76,7 +73,7 @@ describe('Get All Users', () => {
 
   // tests return
 
-  it('should to received all users with all data valids', async () => {
+  it('should to received all farms with all data valids', async () => {
     const promise = await getAllFarmsService.execute();
 
     expect(promise).toBe(farmsArray);
