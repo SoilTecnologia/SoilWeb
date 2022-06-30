@@ -3,7 +3,6 @@ import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useContextUserData } from "hooks/useContextUserData";
 import Header from "components/globalComponents/Header";
 import React, { useState } from "react";
-import Intent from "utils/models/intent";
 
 //Icons
 // import { ImCalendar } from "react-icons/im";

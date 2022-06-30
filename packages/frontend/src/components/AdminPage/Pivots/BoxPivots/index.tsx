@@ -14,7 +14,7 @@ type boxPivotProps = {
 
 const BoxPivots = ({ pivotData }: boxPivotProps) => {
   //Contexts
-  const { deleteNode } = useContextActionCrud();
+  const { deleteNode, getOneNode, deletePivot } = useContextActionCrud();
 
   //States
   const [modalOption, setModalOption] = useState(false);
@@ -35,10 +35,16 @@ const BoxPivots = ({ pivotData }: boxPivotProps) => {
     setIsDeletePivot(true);
   };
 
-  const okDeletePivot = () => {
+  const okDeletePivot = async () => {
     setIsDeletePivot(false);
-    deleteNode(pivotData.node_id, pivotData.farm_id);
+    const node = await getOneNode(pivotData.node_id);
+    if (node && node.node_num !== 0) {
+      deleteNode(pivotData.node_id, pivotData.farm_id);
+    } else {
+      await deletePivot(pivotData);
+    }
   };
+
   const notDeletePivot = () => {
     setIsDeletePivot(false);
   };

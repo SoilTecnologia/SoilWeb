@@ -8,6 +8,7 @@ const urlIo = {
   newDev: "https://be.soiltech.com.br",
   local: "http://localhost:3308",
   newProd: "http://api.soiltech.com.br",
+  gateway: "192.168.100.104",
 };
 
 const Socket = () => {
@@ -25,7 +26,7 @@ const Socket = () => {
     VariableSocket: false,
   });
 
-  const socket = io(urlIo.newDev, { transports: ["websocket"] });
+  const socket = io(urlIo.gateway, { transports: ["websocket"] });
 
   useEffect(() => {
     if (user?.user_id && farm?.farm_id) {

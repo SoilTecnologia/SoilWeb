@@ -67,8 +67,6 @@ class AuthSignInUseCase {
     const user = await this.applyQuerie(login.toLowerCase());
     if (!user) throw new Error('Invalid Credentials');
 
-    console.log(login, password);
-
     const comparePassword = await this.comparePassword(password, user.password);
 
     if (!comparePassword) throw new Error('Invalid Credentials');

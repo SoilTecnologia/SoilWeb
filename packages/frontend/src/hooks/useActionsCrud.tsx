@@ -164,21 +164,25 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const response = await requestGetAllNodes(farm_id, user?.token);
     response && setNodeList(response);
   };
+
   const getOneNode = async (node_id: Node["node_id"]) => {
     const node = await requestGetOneNode(node_id, user?.token);
     return node;
   };
+
   const createNode = async (node: NodeCreate) => {
     const nodeCreated = await requestCreateNode(node, user?.token);
 
     return nodeCreated;
   };
+
   const updateNode = async (node: Node) => {
     const newNode = await requestUpdateNode(node, user?.token);
     return newNode;
     // setData(stateAdmin);
     // newNode && (await getAllNodes(node.farm_id));
   };
+
   const deleteNode = async (id: string, farm_id: string) => {
     await requestDeleteNode(id, user?.token);
     await getAllPivots(farm_id);
