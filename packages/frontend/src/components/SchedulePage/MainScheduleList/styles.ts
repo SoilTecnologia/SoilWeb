@@ -1,7 +1,9 @@
 import styled, { css } from "styled-components";
 import { FaHistory } from "react-icons/fa";
+import { GrMap } from "react-icons/gr";
 import { RiRoadMapLine } from "react-icons/ri";
-
+import { ImArrowLeft2 } from "react-icons/im";
+import { ImCalendar } from "react-icons/im";
 import Link from "next/link";
 
 export const Container = styled.div`
@@ -118,19 +120,23 @@ export const Text = styled.h1`
   margin: 0 1rem;
 `;
 
-export const MapIcon = styled(RiRoadMapLine)`
+export const BackIcon = styled(ImArrowLeft2)`
   font-size: ${({ theme }) => theme.font.sizes.xxlarge};
   color: ${({ theme }) => theme.colors.secondary};
   font-family: ${({ theme }) => theme.font.family.Montserrat_bold};
 `;
-export const ClockIcon = styled(FaHistory)`
+export const ClockIcon = styled(ImCalendar)`
   font-size: ${({ theme }) => theme.font.sizes.xxlarge};
   color: ${({ theme }) => theme.colors.secondary};
   font-family: ${({ theme }) => theme.font.family.Montserrat_bold};
 `;
 
-// export const Button = styled.button`
-//   height:300px;
-//   width:400px;
-//   background:black;
-// `
+export const HeaderText = styled.h1`
+  ${({ theme }) => css`
+    font-size: ${theme.font.sizes.xxlarge};
+    color: ${theme.colors.primary};
+    font-family: ${theme.font.family.Montserrat_bold};
+    padding: 0 ${theme.spacings.xxsmall};
+    align-self:center;
+  `}
+`;

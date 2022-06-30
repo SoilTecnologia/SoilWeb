@@ -8,7 +8,8 @@ const urlIo = {
   newDev: "https://be.soiltech.com.br",
   local: "http://localhost:3308",
   newProd: "http://api.soiltech.com.br",
-  gateway: "192.168.100.104",
+  gateway: "http://192.168.100.104:3308/",
+  gatewayVpn: "http://10.8.0.6:3308/",
 };
 
 const Socket = () => {

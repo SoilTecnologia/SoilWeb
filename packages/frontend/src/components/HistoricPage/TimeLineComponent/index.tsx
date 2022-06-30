@@ -61,13 +61,15 @@ const TimeLineComponent = ({ historic }: PropsProvider) => {
           secondary: theme.colors.secondary,
           cardBgColor: theme.colors.secondary,
           cardForeColor: theme.colors.primary,
-          titleColor: theme.colors.primary,
-          textColor:theme.colors.primary,
+          textColor: theme.colors.primary,
+          titleColor: theme.colors.secondary,
+          titleColorActive: theme.colors.primary,
         }}
         fontSizes={{
           cardSubtitle: "1rem",
           cardText: "1rem",
           cardTitle: "1.5rem",
+
         }}
 
 

@@ -5,10 +5,10 @@ import Header from "components/globalComponents/Header";
 import React, { useState } from "react";
 
 //Icons
-// import { ImCalendar } from "react-icons/im";
+import { ImCalendar } from "react-icons/im";
 
-import StatusComponent from "../StatusComponent";
-import IntentBlock from "../IntentBlock";
+import StatusComponent from "../../IntentsPage/StatusComponent";
+import IntentBlock from "../../IntentsPage/IntentBlock";
 import { useContextData } from "hooks/useContextData";
 import ButtonRefresh from "components/globalComponents/ButtonRefresh";
 
@@ -33,15 +33,15 @@ const MainIntent = () => {
         }
       />
       <S.Body>
-        {/* <S.ScheduleButton>
-          <Icon>
-            <ImCalendar />
-          </Icon>
+        <S.ScheduleButton href="/create_schedule">
+          <S.AnchorScheduleButton>
+            <Icon>
+              <ImCalendar />
+            </Icon>
 
-          <S.ButtonText>
-            Realizar agendamento
-          </S.ButtonText>
-        </S.ScheduleButton> */}
+            <S.ButtonText>Realizar agendamento</S.ButtonText>
+          </S.AnchorScheduleButton>
+        </S.ScheduleButton>
 
         <S.CurrentStateContainer>
           <S.StateText>ESTADO ATUAL:</S.StateText>

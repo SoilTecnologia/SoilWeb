@@ -3,6 +3,7 @@ import Farm, { FarmCreate } from "utils/models/farm";
 import Intent from "utils/models/intent";
 import Node, { NodeCreate } from "utils/models/node";
 import Pivot, { PivotCreate } from "utils/models/pivot";
+import Schedule, { AngleSchedule, DateSchedule } from "utils/models/schedulings";
 import State from "utils/models/state";
 import User, { UserCreate } from "utils/models/user";
 import { api } from "./api";
@@ -402,7 +403,6 @@ export const requestPivotHistoric = async (
   end_date: string,
   tokenId: tokenState
 ) => {
-  console.log(pivot_id, start_date, end_date);
   return await api
     .get(`cycles/${pivot_id}/${start_date}/${end_date}`, tokenHeader(tokenId))
     .then((response) => response.data)
@@ -411,6 +411,97 @@ export const requestPivotHistoric = async (
       console.log(err);
     });
 };
+
+//Schedules
+
+export const requestCreateNewAngleSchedule = async (
+  schedule: Schedule,
+  tokenId: tokenState
+) => {
+  return await api
+    .post(`scheduling-angles/addSchedulingAngle`, schedule, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao criar agendamento por angulo");
+      console.log(err);
+    });
+};
+export const requestGetAngleSchedulings = async (
+  pivot_id: Pivot["pivot_id"],
+  tokenId: tokenState
+  ) => {
+    return await api
+    .get(`scheduling-angles/getSchedulingAngle/${pivot_id}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao buscar agendamento por angulo");
+      console.log(err);
+    });
+  };
+  export const requestDeleteAngleSchedule  = async (
+    schedule_id: AngleSchedule["scheduling_angle_id"],
+    tokenId: tokenState
+  ) => {
+    return await api
+      .delete(`scheduling-angles/deleteSchedulingAngle/${schedule_id}/`, {
+        headers: { Authorization: tokenId ? tokenId : token },
+      })
+      .then((response) => response.data)
+      .catch((err) => {
+        console.log("[ERROR] Falha ao deletar agendamento por angulo");
+        console.log(err);
+      });
+  };
+
+export const requestCreateNewDateSchedule = async (
+  schedule: Schedule,
+  tokenId: tokenState
+) => {
+  return await api
+    .post(`schedulings/addScheduling`, schedule, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao criar agendamento por data");
+      console.log(err);
+    });
+};
+export const requestGetDateSchedulings = async (
+  pivot_id: Pivot["pivot_id"],
+  tokenId: tokenState
+) => {
+  return await api
+    .get(`schedulings/getScheduling/${pivot_id}`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao buscar agendamento por data");
+      console.log(err);
+    });
+};
+
+export const requestDeleteDateSchedule  = async (
+  schedule_id: DateSchedule["scheduling_id"],
+  tokenId: tokenState
+) => {
+  return await api
+    .delete(`schedulings/deleteScheduling/${schedule_id}/`, {
+      headers: { Authorization: tokenId ? tokenId : token },
+    })
+    .then((response) => response.data)
+    .catch((err) => {
+      console.log("[ERROR] Falha ao deletar agendamento por data");
+      console.log(err);
+    });
+};
+
+
 
 /// WEB CRUD
 //  export const requestPivotStatus = async (pivo_id:string) => {
