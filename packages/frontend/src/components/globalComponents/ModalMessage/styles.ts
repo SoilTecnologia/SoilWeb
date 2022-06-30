@@ -1,7 +1,8 @@
 import styled, { css } from "styled-components";
 
 export const Container = styled.div`
-  height: 100%;
+  height: inherit;
+  width: max-content;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,6 +12,7 @@ export const Container = styled.div`
   padding: 4rem 8rem;
   border-radius: 1rem;
 `;
+
 export const IconContent = styled.div``;
 
 export const ContentTextModalInfo = styled.div`
@@ -19,12 +21,15 @@ export const ContentTextModalInfo = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
 export const AlertMessage = styled.p`
   ${({ theme }) => css`
     color: ${theme.colors.primary};
   `}
 `;
+
 export const SubAlert = styled(AlertMessage)``;
+
 export const Button = styled.button`
   margin: 0 1rem;
 `;

@@ -19,12 +19,13 @@ const Socket = () => {
     getGetPivotsListWithFarmId,
     getGetPivotsListForMapWithFarmId,
   } = useContextActionCrud();
+
   const [socketIsOpen, setSocketIsOpen] = useState({
     StatusSocket: false,
     VariableSocket: false,
   });
 
-  const socket = io(urlIo.local, { transports: ["websocket"] });
+  const socket = io(urlIo.newDev, { transports: ["websocket"] });
 
   useEffect(() => {
     if (user?.user_id && farm?.farm_id) {

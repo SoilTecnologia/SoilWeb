@@ -14,12 +14,14 @@ import 'reflect-metadata';
 import { Server, Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import IoTDevice from './aws-iot';
+import knex from './database';
 import * as raspberry from './raspberry/tests';
 import router from './routes';
 import { InitScheduleData } from './schedule';
 import './shared/container';
 import emitter from './utils/eventBus';
 import { handleResultAction } from './utils/handleFarmIdWithUndescores';
+import { messageErrorTryAction } from './utils/types';
 
 require('dotenv').config();
 
@@ -33,7 +35,12 @@ app.use(cors());
 app.use(express.json());
 app.use(router);
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, async () => {
+  try {
+    await knex.migrate.latest();
+  } catch (error) {
+    messageErrorTryAction(error, false, 'Index', 'Generate Migration Latest');
+  }
   console.info(`Server Listening on PORT ${PORT}, \n Welcome to the soil`);
 });
 

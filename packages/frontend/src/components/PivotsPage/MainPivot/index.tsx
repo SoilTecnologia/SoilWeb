@@ -1,8 +1,8 @@
 import Header from "components/globalComponents/Header";
 import Pivot from "utils/models/pivot";
 import PivotsContainer from "../PivotContainer";
-import Router from "next/router";
 import * as S from "./styles";
+import ButtonRefresh from "components/globalComponents/ButtonRefresh";
 
 type PivotListProps = {
   pivotList: Pivot[];
@@ -34,6 +34,8 @@ const MainPivot = ({ pivotList }: PivotListProps) => {
             <PivotsContainer key={pivot.pivot_id} pivot={pivot} />
           ))}
         </S.Grid>
+
+        <ButtonRefresh pivotList={pivotList} />
       </S.Container>
     </>
   );

@@ -35,6 +35,7 @@ class ProcessQueueMessages {
               this.type === 'Raspberry' && this.pubTopic
                 ? this.pubTopic
                 : queue.id;
+
             queueMessage.remove(queue);
 
             iotDevice.publish(queue, raspOrCloud);

@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components";
 import { FaHistory } from "react-icons/fa";
 import { RiRoadMapLine } from "react-icons/ri";
-import { BiRefresh } from "react-icons/bi";
+
 import Link from "next/link";
 
 export const Container = styled.div`
@@ -14,40 +14,11 @@ export const Container = styled.div`
   `}
 `;
 
-export const RefreshButton = styled.button`
-  ${({ theme }) => css`
-    width: 50px;
-    height: 50px;
-    position: fixed;
-    bottom: 50px;
-    right: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: linear-gradient(
-      ${theme.colors.primary} 90%,
-      ${theme.colors.primary_gradient} 100%
-    );
-    box-shadow: 5px 5px 15px gray;
-    transition: all 0.3s linear;
-    border-radius: 25px;
-
-    &:hover {
-      cursor: pointer;
-      opacity: 0.85;
-    }
-  `}
-`;
-
 export const Body = styled.div`
   display: flex;
   flex-direction: column;
 `;
-export const IconRefresh = styled(BiRefresh)`
-  font-size: ${({ theme }) => theme.font.sizes.xxlarge};
-  color: ${({ theme }) => theme.colors.secondary};
-`;
+
 export const ScheduleButton = styled.button`
   ${({ theme }) => css`
     display: flex;

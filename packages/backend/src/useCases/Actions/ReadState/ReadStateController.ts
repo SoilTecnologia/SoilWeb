@@ -1,16 +1,15 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { iotDevice } from '../../..';
 import { messageErrorTryAction } from '../../../utils/types';
 import { ReadStateUseCase } from './ReadStateUseCase';
 class ReadStateController {
   async handle(req: Request, res: Response) {
-    const { pivot_id } = req.body;
+    const { pivots } = req.body;
 
     try {
       const readState = container.resolve(ReadStateUseCase);
 
-      const response = await readState.execute({ pivot_id });
+      const response = await readState.execute({ pivots });
 
       res.status(201).send({ response });
     } catch (err) {

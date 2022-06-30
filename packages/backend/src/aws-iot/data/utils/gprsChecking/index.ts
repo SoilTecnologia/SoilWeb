@@ -125,16 +125,12 @@ class CheckGprsInterval {
         }, 2000);
       } else {
         if (existsNotActive.attempts > 3) {
-          await this.getStatePivot(pivot_id, false);
-
           this.responseNotActives = resNotActive.filter(
             (res) => res.id !== pivot_id
           );
           console.log(`Tentativas excedidas no pivo ${pivot_id}`);
           console.log('....');
-          emitter.emit('action-ack-not-received', {
-            id: pivot_id
-          });
+          await this.getStatePivot(pivot_id, false);
         } else {
           console.log(`Tentativa de conexão n° ${existsNotActive.attempts}`);
           const responseWithoutThis = resNotActive.filter(

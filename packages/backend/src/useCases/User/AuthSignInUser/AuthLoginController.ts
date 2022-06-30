@@ -6,6 +6,7 @@ import { AuthSignInUseCase } from './AuthLoginUseCase';
 class AuthSignInController {
   async handle(req: Request, res: Response, next: NextFunction) {
     const { login, password } = req.body;
+
     const authSignInUseCase = container.resolve(AuthSignInUseCase);
 
     try {
