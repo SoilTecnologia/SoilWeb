@@ -1,6 +1,12 @@
-import { ParamsInvalid, TypeParamError } from '@root/protocols/errors';
+import {
+  ParamsInvalid,
+  ParamsNotExpected,
+  TypeParamError
+} from '@root/protocols/errors';
 import { dateJs } from '@root/utils/handleDates/dateFactory';
+import dayjs from 'dayjs';
 import 'reflect-metadata';
+import instance from 'tsyringe/dist/typings/dependency-container';
 const requiredMetadataKey = Symbol('required');
 
 export function checkBooleans(values?: string[]) {
@@ -114,6 +120,44 @@ export function checkStrings(values?: string[]) {
                 `Expected type string, received type ${typeof value}`
               );
               throw new TypeParamError(key);
+            }
+          }
+        }
+      }
+
+      return method.apply(this, args);
+    };
+  };
+}
+
+export function checkDate(values?: string[]) {
+  return (
+    target: any,
+    propertyName: string,
+    descriptor: PropertyDescriptor
+  ) => {
+    let method = descriptor.value!;
+
+    descriptor.value = function (...args: any[]) {
+      for (let arg of args) {
+        const array = Object.entries(arg);
+
+        for (let [key, value] of array) {
+          if (values && values.length > 0) {
+            const item = values.find((item) => item === key);
+
+            if (item && !value) throw new ParamsInvalid();
+            if (item) {
+              try {
+                const date = dayjs(value as any).isValid();
+                if (!date || typeof value !== 'string')
+                  throw new TypeParamError(key);
+              } catch (err) {
+                console.log(
+                  `Erro convert value: ${value} of type ${typeof value} in date`
+                );
+                throw new TypeParamError(key);
+              }
             }
           }
         }
