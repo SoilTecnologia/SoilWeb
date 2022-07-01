@@ -9,25 +9,25 @@ class GetOneNodeController {
     const { node_id } = req.params;
 
     if (Object.keys(req.body).length > 0) {
-      throw new ParamsNotExpected();
-    }
+      res.status(400).send({ error: new ParamsNotExpected().message });
+    } else {
+      const getOnenodeUseCase = container.resolve(GetOneNodeUseCase);
 
-    const getOnenodeUseCase = container.resolve(GetOneNodeUseCase);
+      try {
+        const allNodesFromFarm = await getOnenodeUseCase.execute({
+          node_id: node_id
+        });
 
-    try {
-      const allNodesFromFarm = await getOnenodeUseCase.execute({
-        node_id: node_id
-      });
-
-      res.status(200).send(allNodesFromFarm);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        false,
-        GetOneNodeController.name,
-        'Get Node By Id'
-      );
-      next();
+        return res.status(201).send(allNodesFromFarm);
+      } catch (err) {
+        messageErrorTryAction(
+          err,
+          false,
+          GetOneNodeController.name,
+          'Get Node By Id'
+        );
+        res.status(400).send({ error: err.message });
+      }
     }
   }
 }
