@@ -49,7 +49,12 @@ class CreateSchedulingAngleUseCase {
     schedulingangle: Omit<SchedulingAngleModel, 'scheduling_angle_id'>
   ) {
     const {
+      pivot_id,
+      author,
+      start_angle,
+      end_angle,
       is_return,
+      direction,
       power,
       water,
       percentimeter,
@@ -58,7 +63,7 @@ class CreateSchedulingAngleUseCase {
     } = schedulingangle;
 
     const schedulingAngleModel = new SchedulingAngleModel();
-    
+
     Object.assign(schedulingAngleModel, {
       ...schedulingangle,
       power: is_return ? true : power,
@@ -73,9 +78,8 @@ class CreateSchedulingAngleUseCase {
     );
 
     if (newSchedulingAngleData) {
-
-      type omitId = Omit<SchedulingAngleHistModel,'scheduling_angle_hist_id'>
-      const schedule: omitId  = newSchedulingAngleData;
+      type omitId = Omit<SchedulingAngleHistModel, 'scheduling_angle_hist_id'>;
+      const schedule: omitId = newSchedulingAngleData;
       delete schedule.scheduling_angle_id;
 
       await this.applyQueryCreateHistory(schedule);
