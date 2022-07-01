@@ -9,23 +9,23 @@ class DeleteNodeController {
     const { id } = req.params;
 
     if (Object.keys(req.body).length > 0) {
-      throw new ParamsNotExpected();
-    }
+      res.status(400).send({ error: new ParamsNotExpected().message });
+    } else {
+      const deleteNodeUseCase = container.resolve(DeleteNodeUseCase);
 
-    const deleteNodeUseCase = container.resolve(DeleteNodeUseCase);
+      try {
+        const response = await deleteNodeUseCase.execute({ node_id: id });
 
-    try {
-      await deleteNodeUseCase.execute({ node_id: id });
-
-      res.sendStatus(200).send();
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        false,
-        DeleteNodeController.name,
-        'Delete Node '
-      );
-      next();
+        return res.status(201).send(response);
+      } catch (err) {
+        messageErrorTryAction(
+          err,
+          false,
+          DeleteNodeController.name,
+          'Delete Node '
+        );
+        res.status(400).send({ error: err.message });
+      }
     }
   }
 }
