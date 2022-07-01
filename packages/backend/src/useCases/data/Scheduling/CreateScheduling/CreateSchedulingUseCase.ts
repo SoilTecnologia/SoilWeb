@@ -1,55 +1,41 @@
 import { inject, injectable } from 'tsyringe';
-import { SchedulingModel } from '../../../../database/model/Scheduling';
-import { SchedulingHistoryModel } from '../../../../database/model/SchedulingHistory';
-import { ISchedulingRepository } from '../../../../database/repositories/Scheduling/ISchedulingRepository';
-import { ISchedulingHistoryRepository } from '../../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
-import { dateSaoPaulo } from '../../../../utils/convertTimeZoneDate';
-import emitter from '../../../../utils/eventBus';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { SchedulingModel } from '@database/model/Scheduling';
+import { dateSaoPaulo } from '@utils/convertTimeZoneDate';
+import emitter from '@utils/eventBus';
+import { ICreateBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound,
+  FailedCreateDataError
+} from '@root/protocols/errors';
+import { SchedulingHistoryModel } from '@root/database/model/SchedulingHistory';
+import {
+  checkBooleans,
+  checkDate,
+  checkNumbers,
+  checkStrings
+} from '@root/utils/decorators/check-types';
+import { PivotModel } from '@root/database/model/Pivot';
 @injectable()
 class CreateSchedulingUseCase {
   constructor(
-    @inject('SchedulingRepository')
-    private schedulingRepository: ISchedulingRepository,
-    @inject('SchedulingHistoryRepository')
-    private schedulingHistoryRepository: ISchedulingHistoryRepository
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo<PivotModel>,
+    @inject('CreateBaseRepo')
+    private createRepo: ICreateBaseRepo<
+      | Omit<SchedulingModel, 'scheduling_id'>
+      | Omit<SchedulingHistoryModel, 'scheduling_history_id'>
+    >
   ) {}
 
-  private async applyQueryCreate(scheduling: SchedulingModel) {
-    try {
-      return await this.schedulingRepository.create(scheduling);
-    } catch (err) {
-      console.log(err);
-
-      messageErrorTryAction(
-        err,
-        true,
-        CreateSchedulingUseCase.name,
-        'CreateSchedulling'
-      );
-    }
-  }
-
-  private async applyQueryCreateHistory(
-    scheduling: Omit<SchedulingHistoryModel, 'scheduling_history_id'>
-  ) {
-    try {
-      return await this.schedulingHistoryRepository.create(scheduling);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        CreateSchedulingUseCase.name,
-        'Create History'
-      );
-    }
-  }
-
+  @checkBooleans(['is_stop', 'power', 'water'])
+  @checkStrings(['pivot_id', 'author', 'direction'])
+  @checkDate(['start_timestamp', 'end_timestamp', 'timestamp'])
+  @checkNumbers(['percentimeter'])
   async execute(scheduling: Omit<SchedulingModel, 'scheduling_id'>) {
     const {
       is_stop,
       pivot_id,
-      author,
       power,
       water,
       direction,
@@ -58,12 +44,18 @@ class CreateSchedulingUseCase {
       end_timestamp,
       timestamp
     } = scheduling;
-    const schedulingModel = new SchedulingModel();
 
-    Object.assign(schedulingModel, {
-      pivot_id,
-      author,
-      is_stop,
+    const havePivot = await this.getById.get({
+      table: 'pivots',
+      column: 'pivot_id',
+      id: pivot_id
+    });
+
+    if (havePivot === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!havePivot) throw new DataNotFound('Pivot');
+
+    const schedulingModel = {
+      ...scheduling,
       power: is_stop ? false : power,
       water: is_stop ? false : water,
       direction: is_stop ? 'CLOCKWISE' : direction,
@@ -71,16 +63,28 @@ class CreateSchedulingUseCase {
       start_timestamp: dateSaoPaulo(start_timestamp!),
       end_timestamp: dateSaoPaulo(end_timestamp!),
       timestamp: dateSaoPaulo(timestamp!)
+    };
+
+    const newScheduling = await this.createRepo.create({
+      table: 'schedulings',
+      data: schedulingModel
     });
 
-    const newScheduling = await this.applyQueryCreate(schedulingModel);
+    if (newScheduling === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!newScheduling) throw new FailedCreateDataError('Scheduling');
 
-    if (newScheduling) {
-      await this.applyQueryCreateHistory(schedulingModel);
+    const createHistory = await this.createRepo.create({
+      table: 'scheduling_historys',
+      data: schedulingModel
+    });
+
+    if (createHistory === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!createHistory) throw new FailedCreateDataError('Scheduling');
+    else {
       emitter.emit('scheduling', { scheduling: newScheduling, isPut: false });
-    }
 
-    return newScheduling;
+      return newScheduling;
+    }
   }
 }
 

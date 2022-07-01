@@ -1,3 +1,4 @@
+import { ParamsNotExpected } from '@root/protocols/errors';
 import { timeStamp } from 'console';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
@@ -29,37 +30,37 @@ class CreateSchedulingController {
       timestamp
     } = req.body;
 
-    console.log(`
-      Data de inicion: ${dateSaoPaulo(start_timestamp)},
-      Data de termino: ${dateSaoPaulo(end_timestamp)},
-      Data de criação: ${dateSaoPaulo(timestamp)},
-      Date String: ${dateString(dateSaoPaulo(timestamp))}
-    `);
-    const createSchedulingUseCase = container.resolve(CreateSchedulingUseCase);
-
-    try {
-      const allScheduling = await createSchedulingUseCase.execute({
-        pivot_id,
-        author,
-        is_stop,
-        power,
-        water,
-        direction,
-        percentimeter,
-        start_timestamp,
-        end_timestamp,
-        timestamp
-      });
-
-      res.send(allScheduling);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        false,
-        CreateSchedulingController.name,
-        'CreateScheduling'
+    if (Object.keys(req.body).length > 10) {
+      res.status(400).send({ error: new ParamsNotExpected().message });
+    } else {
+      const createSchedulingUseCase = container.resolve(
+        CreateSchedulingUseCase
       );
-      next(err);
+
+      try {
+        const allScheduling = await createSchedulingUseCase.execute({
+          pivot_id,
+          author,
+          is_stop,
+          power,
+          water,
+          direction,
+          percentimeter,
+          start_timestamp,
+          end_timestamp,
+          timestamp
+        });
+
+        return res.status(201).send(allScheduling);
+      } catch (err) {
+        messageErrorTryAction(
+          err,
+          false,
+          CreateSchedulingController.name,
+          'CreateScheduling'
+        );
+        res.status(400).send({ error: err.message });
+      }
     }
   }
 }
