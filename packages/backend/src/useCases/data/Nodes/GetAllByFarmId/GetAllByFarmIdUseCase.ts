@@ -11,6 +11,7 @@ import { inject, injectable } from 'tsyringe';
 import { IGetAllByFarmService } from '@root/useCases/contracts';
 import { NodeModel } from '@root/database/model/Node';
 import { FarmModel } from '@root/database/model/Farm';
+import { checkUndefinedNull } from '@root/utils/decorators/check-types';
 
 @injectable()
 class GetAllByFarmIdUseCase implements IGetAllByFarmService {
@@ -20,6 +21,7 @@ class GetAllByFarmIdUseCase implements IGetAllByFarmService {
     @inject('GetByIdBase') private getById: IGetByIdBaseRepo<FarmModel>
   ) {}
 
+  @checkUndefinedNull()
   async execute({
     farm_id
   }: IGetAllByFarmService.Params): IGetAllByFarmService.Response {
