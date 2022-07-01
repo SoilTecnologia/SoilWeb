@@ -10,6 +10,8 @@ class GetAllByDataBaseRepo<T> implements IGetAllByDataBaseRepo<T> {
     where
   }: IGetAllByDataBaseRepo.Params): IGetAllByDataBaseRepo.Response<T> {
     try {
+      const response: T[] = await knex(table).select('*').where(column, where);
+      return response;
     } catch (error) {
       messageErrorTryAction(
         error,
@@ -19,8 +21,6 @@ class GetAllByDataBaseRepo<T> implements IGetAllByDataBaseRepo<T> {
       );
       return DATABASE_ERROR;
     }
-    const response: T[] = await knex(table).select('*').where(column, where);
-    return response;
   }
 }
 

@@ -2,7 +2,8 @@ import { IGetByFarmAndNodeNumRepo } from '@root/database/protocols';
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
-  DataNotFound
+  DataNotFound,
+  TypeParamError
 } from '@root/protocols/errors';
 import { IGetByFarmAndNodeNumService } from '@root/useCases/contracts/nodes/getByFarmAndNodeNum';
 import { checkUndefinedNull } from '@root/utils/decorators/check-types';
@@ -19,11 +20,14 @@ class GetByNumByFarmUseCase implements IGetByFarmAndNodeNumService {
     farm_id,
     node_num
   }: IGetByFarmAndNodeNumService.Params): IGetByFarmAndNodeNumService.Response {
-    const response = await this.getNode.get({ farm_id, node_num });
+    if (isNaN(node_num)) throw new TypeParamError('node_num');
+    else {
+      const response = await this.getNode.get({ farm_id, node_num });
 
-    if (response === DATABASE_ERROR) throw new DatabaseErrorReturn();
-    else if (!response) throw new DataNotFound('Node');
-    else return response;
+      if (response === DATABASE_ERROR) throw new DatabaseErrorReturn();
+      else if (!response) throw new DataNotFound('Node');
+      else return response;
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import { ParamsNotExpected } from '@root/protocols/errors';
+import { ParamsNotExpected, TypeParamError } from '@root/protocols/errors';
 import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { messageErrorTryAction } from '@utils/types';
@@ -9,26 +9,25 @@ class GetByNumByFarmController {
     const { farm_id, node_num } = req.params;
 
     if (Object.keys(req.body).length > 0) {
-      throw new ParamsNotExpected();
-    }
+      res.status(400).send({ error: new ParamsNotExpected().message });
+    } else {
+      const getByNumByFarmUseCase = container.resolve(GetByNumByFarmUseCase);
+      try {
+        const allNodesFromFarm = await getByNumByFarmUseCase.execute({
+          farm_id,
+          node_num: Number(node_num)
+        });
 
-    const getByNumByFarmUseCase = container.resolve(GetByNumByFarmUseCase);
-
-    try {
-      const allNodesFromFarm = await getByNumByFarmUseCase.execute({
-        farm_id,
-        node_num: Number(node_num)
-      });
-
-      res.send(allNodesFromFarm);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        false,
-        GetByNumByFarmController.name,
-        'Get Node By Farm and Node Num'
-      );
-      next();
+        return res.status(201).send(allNodesFromFarm);
+      } catch (err) {
+        messageErrorTryAction(
+          err,
+          false,
+          GetByNumByFarmController.name,
+          'Get Node By Farm and Node Num'
+        );
+        res.status(400).send({ error: err.message });
+      }
     }
   }
 }
