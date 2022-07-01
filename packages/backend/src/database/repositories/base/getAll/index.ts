@@ -3,10 +3,12 @@ import { IGetAllBaseRepo } from '@root/database/protocols';
 import { DATABASE_ERROR } from '@root/protocols/errors';
 import { messageErrorTryAction } from '@root/utils/types';
 
-class GetAllBaseRepo<T> implements IGetAllBaseRepo<T> {
-  async get({ table }: IGetAllBaseRepo.Params): IGetAllBaseRepo.Response<T> {
+class GetAllBaseRepo implements IGetAllBaseRepo {
+  async get<R = any>({
+    table
+  }: IGetAllBaseRepo.Params): IGetAllBaseRepo.Response<R> {
     try {
-      const value: T[] = await knex(table).select('*');
+      const value: R[] = await knex(table).select('*');
       return value;
     } catch (error) {
       messageErrorTryAction(

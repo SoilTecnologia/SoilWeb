@@ -19,45 +19,12 @@ class UpdateUserUseCase implements IUpdateUserService {
   private newPassword: string;
 
   constructor(
-    @inject('GetByIdBase') private findUser: IGetByIdBaseRepo<UserModel>,
-    @inject('UpdateBase') private updateUser: IUpdateBaseRepo<UserModel>,
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
+    @inject('UpdateBase') private updateUser: IUpdateBaseRepo,
     @inject('Encrypter') private encrypter: IEncrypter,
     @inject('CompareEncrypt') private compareEncrypter: ICompareEncrypt
   ) {
     this.passwordEqual = false;
-  }
-
-  private async apllyQueryGetUserById(user_id: string) {
-    try {
-      return await this.findUser.get({
-        table: 'users',
-        column: 'user_id',
-        id: user_id
-      });
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        UpdateUserUseCase.name,
-        'Find User By Id'
-      );
-
-      return DATABASE_ERROR;
-    }
-  }
-
-  private async apllyQueryUpdateUser(userModel: UserModel) {
-    try {
-      return await this.updateUser.put({
-        table: 'users',
-        column: 'user_id',
-        where: userModel.user_id!,
-        data: userModel
-      });
-    } catch (err) {
-      messageErrorTryAction(err, true, UpdateUserUseCase.name, 'Update User');
-      return DATABASE_ERROR;
-    }
   }
 
   private async checkObjectIsEquals(
@@ -107,7 +74,11 @@ class UpdateUserUseCase implements IUpdateUserService {
       Check User by Id And checking error database
     */
 
-    const selectUser = await this.apllyQueryGetUserById(user_id!);
+    const selectUser = await this.getById.get<UserModel>({
+      table: 'users',
+      column: 'user_id',
+      id: user_id!
+    });
 
     if (selectUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (!selectUser) throw new DataNotFound('User');
@@ -149,7 +120,12 @@ class UpdateUserUseCase implements IUpdateUserService {
           Check if update user with sucessfully and return a new user
         */
 
-        const newUser = await this.apllyQueryUpdateUser(user);
+        const newUser = await this.updateUser.put<UserModel>({
+          table: 'users',
+          column: 'user_id',
+          where: user.user_id!,
+          data: user
+        });
 
         if (newUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
         else if (!newUser) throw new NotUpdateError('User');

@@ -3,12 +3,12 @@ import { IDeleteBaseRepo } from '@root/database/protocols';
 import { DATABASE_ERROR } from '@root/protocols/errors';
 import { messageErrorTryAction } from '@root/utils/types';
 
-class DeleteBaseRepo<T> implements IDeleteBaseRepo<T> {
+class DeleteBaseRepo implements IDeleteBaseRepo {
   async del({
     table,
     column,
     data
-  }: IDeleteBaseRepo.Params): IDeleteBaseRepo.Response<T> {
+  }: IDeleteBaseRepo.Params): IDeleteBaseRepo.Response {
     try {
       const response = await knex(table).select().where(column, data).del();
 

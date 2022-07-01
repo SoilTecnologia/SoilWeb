@@ -1,6 +1,7 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import {
   DatabaseErrorReturn,
+  DATABASE_ERROR,
   DataNotFound,
   NotUpdateError,
   ParamsEquals
@@ -16,8 +17,8 @@ import {
 import { UserModel } from '@root/database/model/User';
 
 describe('Update User Use Case', () => {
-  let putUserRepo: MockProxy<IUpdateBaseRepo<UserModel>>;
-  let findUserRepo: MockProxy<IGetByIdBaseRepo<UserModel>>;
+  let putUserRepo: MockProxy<IUpdateBaseRepo>;
+  let findUserRepo: MockProxy<IGetByIdBaseRepo>;
   let encrypter: MockProxy<IEncrypter>;
   let CompareEncrypter: MockProxy<ICompareEncrypt>;
 
@@ -70,7 +71,7 @@ describe('Update User Use Case', () => {
   });
 
   it('should throw find user database error, when repository find user return error', () => {
-    jest.spyOn(findUserRepo, 'get').mockRejectedValueOnce(new Error());
+    jest.spyOn(findUserRepo, 'get').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = putUserService.execute(userCreated!);
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
@@ -155,7 +156,7 @@ describe('Update User Use Case', () => {
   });
 
   it('should throw database error, when repository update user return error', () => {
-    jest.spyOn(putUserRepo, 'put').mockRejectedValueOnce(new Error());
+    jest.spyOn(putUserRepo, 'put').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = putUserService.execute(userCreated!);
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());

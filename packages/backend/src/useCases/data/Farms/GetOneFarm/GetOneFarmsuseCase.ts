@@ -12,22 +12,7 @@ import { FarmModel } from '@root/database/model/Farm';
 
 @injectable()
 class GetOneFarmUseCase implements IGetOneFarmService {
-  constructor(
-    @inject('GetByIdBase') private findFarm: IGetByIdBaseRepo<FarmModel>
-  ) {}
-
-  private async applyQueryFindById(farm_id: string) {
-    try {
-      return await this.findFarm.get({
-        table: 'farms',
-        column: 'farm_id',
-        id: farm_id
-      });
-    } catch (err) {
-      messageErrorTryAction(err, true, GetOneFarmUseCase.name, 'Get One Farm');
-      return DATABASE_ERROR;
-    }
-  }
+  constructor(@inject('GetByIdBase') private getById: IGetByIdBaseRepo) {}
 
   async execute({
     farm_id
@@ -35,7 +20,11 @@ class GetOneFarmUseCase implements IGetOneFarmService {
     if (farm_id === 'undefined' || farm_id === 'null')
       throw new ParamsInvalid();
     else {
-      const farm = await this.applyQueryFindById(farm_id);
+      const farm = await this.getById.get<FarmModel>({
+        table: 'farms',
+        column: 'farm_id',
+        id: farm_id
+      });
       if (farm === DATABASE_ERROR) throw new DatabaseErrorReturn();
       else if (farm === undefined) throw new DataNotFound('Farm');
       else return farm;

@@ -1,28 +1,19 @@
 import 'reflect-metadata';
 import { mock, MockProxy } from 'jest-mock-extended';
-import {
-  IGetAllByDataBaseRepo,
-  IGetByDataRepo,
-  IGetByFarmAndNodeNumRepo,
-  IGetByIdBaseRepo
-} from '@database/protocols';
+import { IGetAllByDataBaseRepo, IGetByIdBaseRepo } from '@database/protocols';
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
   DataNotFound
 } from '@protocols/errors';
-import { arrayNode, nodeCreated } from '@tests/mocks/data/node';
-import { GetByNumByFarmUseCase } from '@root/useCases/data/Nodes/GetByNumByFarm/GetByNumByFarmUseCase';
-import { IGetByFarmAndNodeNumService } from '@root/useCases/contracts/nodes/getByFarmAndNodeNum';
-import { FarmModel } from '@root/database/model/Farm';
+import { arrayNode } from '@tests/mocks/data/node';
 import { IGetAllByFarmService } from '@root/useCases/contracts';
 import { GetAllByFarmIdUseCase } from '@root/useCases/data';
-import { NodeModel } from '@root/database/model/Node';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 
 describe('Update Node Service', () => {
-  let findAllNode: MockProxy<IGetAllByDataBaseRepo<NodeModel>>;
-  let findNode: MockProxy<IGetByIdBaseRepo<FarmModel>>;
+  let findAllNode: MockProxy<IGetAllByDataBaseRepo>;
+  let findNode: MockProxy<IGetByIdBaseRepo>;
   const farm_id = 'soiltech';
 
   let getService: IGetAllByFarmService;

@@ -1,5 +1,7 @@
 import { SchedulingModel } from '@root/database/model/Scheduling';
+import { uuidGlobal } from '../global';
 import { addPivot } from '../pivots';
+import { addUser, userCreated } from '../users/user-values-for-mocks';
 
 export const addScheduling: Omit<SchedulingModel, 'scheduling_id' | 'author'> =
   {
@@ -13,3 +15,9 @@ export const addScheduling: Omit<SchedulingModel, 'scheduling_id' | 'author'> =
     end_timestamp: new Date(),
     timestamp: new Date()
   };
+
+export const newScheduling = {
+  ...addScheduling,
+  author: userCreated.user_id,
+  scheduling_id: uuidGlobal
+};

@@ -4,12 +4,16 @@ import { mock, MockProxy } from 'jest-mock-extended';
 import { IDeleteFarmService } from '@root/useCases/contracts';
 import { DeleteFarmUseCase } from '@root/useCases/data';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
-import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
 import { FarmModel } from '@root/database/model/Farm';
 
 describe('Delete Farm Service', () => {
-  let findFarm: MockProxy<IGetByIdBaseRepo<FarmModel>>;
-  let delFarm: MockProxy<IDeleteBaseRepo<FarmModel>>;
+  let findFarm: MockProxy<IGetByIdBaseRepo>;
+  let delFarm: MockProxy<IDeleteBaseRepo>;
   let deleteFarmService: IDeleteFarmService;
   const farm_id = 'soil_farm';
 
@@ -55,7 +59,7 @@ describe('Delete Farm Service', () => {
   });
 
   it('should return error if database return a error ', () => {
-    jest.spyOn(findFarm, 'get').mockRejectedValueOnce(new Error(''));
+    jest.spyOn(findFarm, 'get').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = deleteFarmService.execute({ farm_id });
 
@@ -77,7 +81,7 @@ describe('Delete Farm Service', () => {
   });
 
   it('should return error if delete user database return a error ', () => {
-    jest.spyOn(delFarm, 'del').mockRejectedValueOnce(new Error(''));
+    jest.spyOn(delFarm, 'del').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = deleteFarmService.execute({ farm_id });
 

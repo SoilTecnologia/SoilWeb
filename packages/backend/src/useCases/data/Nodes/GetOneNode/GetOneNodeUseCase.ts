@@ -1,3 +1,4 @@
+import { NodeModel } from '@root/database/model/Node';
 import { IGetByIdBaseRepo } from '@root/database/protocols';
 import {
   DatabaseErrorReturn,
@@ -16,7 +17,7 @@ class GetOneNodeUseCase implements IGetOneNodeService {
   async execute({
     node_id
   }: IGetOneNodeService.Params): IGetOneNodeService.Response {
-    const node = await this.getById.get({
+    const node = await this.getById.get<NodeModel>({
       table: 'nodes',
       column: 'node_id',
       id: node_id

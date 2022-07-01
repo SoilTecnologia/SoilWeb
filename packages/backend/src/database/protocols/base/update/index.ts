@@ -1,12 +1,12 @@
 import { DatabaseError } from '@root/protocols/errors';
 
-interface IUpdateBaseRepo<T = any> {
-  put({
+interface IUpdateBaseRepo {
+  put<P = any, R = P>({
     table,
     column,
     where,
     data
-  }: IUpdateBaseRepo.Params<T>): IUpdateBaseRepo.Response<T>;
+  }: IUpdateBaseRepo.Params<P>): IUpdateBaseRepo.Response<R>;
 }
 
 namespace IUpdateBaseRepo {

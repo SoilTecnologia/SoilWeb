@@ -17,15 +17,15 @@ import { checkUndefinedNull } from '@root/utils/decorators/check-types';
 class GetAllByFarmIdUseCase implements IGetAllByFarmService {
   constructor(
     @inject('GetAllByDataBase')
-    private getAll: IGetAllByDataBaseRepo<NodeModel>,
-    @inject('GetByIdBase') private getById: IGetByIdBaseRepo<FarmModel>
+    private getAll: IGetAllByDataBaseRepo,
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo
   ) {}
 
   @checkUndefinedNull()
   async execute({
     farm_id
   }: IGetAllByFarmService.Params): IGetAllByFarmService.Response {
-    const farm = await this.getById.get({
+    const farm = await this.getById.get<FarmModel>({
       table: 'farms',
       column: 'farm_id',
       id: farm_id
@@ -34,7 +34,7 @@ class GetAllByFarmIdUseCase implements IGetAllByFarmService {
     if (farm === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (!farm) throw new DataNotFound('Farm');
 
-    const nodes = await this.getAll.get({
+    const nodes = await this.getAll.get<NodeModel>({
       table: 'nodes',
       column: 'farm_id',
       where: farm_id

@@ -8,7 +8,6 @@ import {
 } from '@root/protocols/errors';
 import { inject, injectable } from 'tsyringe';
 import { UserModel } from '@database/model/User';
-import { messageErrorTryAction } from '@utils/types';
 import { ICompareEncrypt, ITokenJwt } from '@useCases/data/User';
 import { ILoginAuth } from '@root/useCases/contracts/users/';
 import { checkStrings } from '@root/utils/decorators/check-types';
@@ -18,27 +17,16 @@ class AuthSignInUseCase implements ILoginAuth {
   constructor(
     @inject('TokenJwt') private tokenJwt: ITokenJwt,
     @inject('CompareEncrypt') private bcryptCompare: ICompareEncrypt,
-    @inject('GetByData') private findUserByLogin: IGetByDataRepo<UserModel>
+    @inject('GetByData') private getByData: IGetByDataRepo
   ) {}
-
-  private async applyQuerie(
-    login: UserModel['login']
-  ): Promise<IGetByDataRepo.Response<UserModel> | DatabaseError> {
-    try {
-      return await this.findUserByLogin.get({
-        table: 'users',
-        column: 'login',
-        data: login
-      });
-    } catch (err) {
-      messageErrorTryAction(err, true, AuthSignInUseCase.name, 'LOGIN USER');
-      return DATABASE_ERROR;
-    }
-  }
 
   @checkStrings()
   async execute({ login, password }: ILoginAuth.Params): ILoginAuth.Response {
-    const user = await this.applyQuerie(login.toLowerCase());
+    const user = await this.getByData.get<UserModel>({
+      table: 'users',
+      column: 'login',
+      data: login.toLowerCase()
+    });
 
     if (user === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (!user) throw new InvalidCredentials();

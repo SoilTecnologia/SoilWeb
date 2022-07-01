@@ -5,6 +5,7 @@ import { UpdateFarmUseCase } from '@root/useCases/data';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import {
   DatabaseErrorReturn,
+  DATABASE_ERROR,
   DataNotFound,
   NotUpdateError
 } from '@root/protocols/errors';
@@ -12,7 +13,7 @@ import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
 import { FarmModel } from '@root/database/model/Farm';
 
 describe('Update Farm Use Case', () => {
-  let putFarmRepo: MockProxy<IUpdateBaseRepo<FarmModel>>;
+  let putFarmRepo: MockProxy<IUpdateBaseRepo>;
   let findFarmRepo: MockProxy<IGetByIdBaseRepo>;
 
   let putFarmService: IUpdateFarmService;
@@ -64,7 +65,7 @@ describe('Update Farm Use Case', () => {
   });
 
   it('should throw database error, when repository find farm return error', () => {
-    jest.spyOn(findFarmRepo, 'get').mockRejectedValueOnce(new Error());
+    jest.spyOn(findFarmRepo, 'get').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = putFarmService.execute(addFarms!);
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
@@ -92,7 +93,7 @@ describe('Update Farm Use Case', () => {
   it('should throw database error, when repository find user return error', () => {
     findFarmRepo.get
       .mockResolvedValueOnce({ ...addFarms, farm_name: 'new_soil' })
-      .mockRejectedValueOnce(new Error());
+      .mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = putFarmService.execute(addFarms!);
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
@@ -130,7 +131,7 @@ describe('Update Farm Use Case', () => {
     findFarmRepo.get
       .mockResolvedValueOnce({ ...addFarms, farm_name: 'new_soil' })
       .mockResolvedValueOnce(userCreated);
-    jest.spyOn(putFarmRepo, 'put').mockRejectedValueOnce(new Error());
+    jest.spyOn(putFarmRepo, 'put').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = putFarmService.execute(addFarms!);
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());

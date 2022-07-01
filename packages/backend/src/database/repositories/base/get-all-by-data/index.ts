@@ -3,14 +3,14 @@ import { IGetAllByDataBaseRepo } from '@root/database/protocols';
 import { DATABASE_ERROR } from '@root/protocols/errors';
 import { messageErrorTryAction } from '@root/utils/types';
 
-class GetAllByDataBaseRepo<T> implements IGetAllByDataBaseRepo<T> {
-  async get({
+class GetAllByDataBaseRepo implements IGetAllByDataBaseRepo {
+  async get<R = any>({
     table,
     column,
     where
-  }: IGetAllByDataBaseRepo.Params): IGetAllByDataBaseRepo.Response<T> {
+  }: IGetAllByDataBaseRepo.Params): IGetAllByDataBaseRepo.Response<R> {
     try {
-      const response: T[] = await knex(table).select('*').where(column, where);
+      const response: R[] = await knex(table).select('*').where(column, where);
       return response;
     } catch (error) {
       messageErrorTryAction(

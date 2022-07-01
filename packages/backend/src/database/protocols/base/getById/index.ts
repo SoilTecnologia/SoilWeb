@@ -1,11 +1,11 @@
 import { DatabaseError } from '@root/protocols/errors';
 
-interface IGetByIdBaseRepo<T = any> {
-  get({
+interface IGetByIdBaseRepo {
+  get<R = any>({
     table,
     column,
     id
-  }: IGetByIdBaseRepo.Params): IGetByIdBaseRepo.Response<T>;
+  }: IGetByIdBaseRepo.Params): IGetByIdBaseRepo.Response<R>;
 }
 
 namespace IGetByIdBaseRepo {

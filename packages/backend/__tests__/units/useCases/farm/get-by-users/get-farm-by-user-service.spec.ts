@@ -3,7 +3,11 @@ import {
   IGetByIdBaseRepo,
   IGetFarmByUserIdRepo
 } from '@root/database/protocols';
-import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
 import { IGetFarmByUserService } from '@root/useCases/contracts/farms/get-by-user';
 import { GetFarmByUserUseCase } from '@root/useCases/data';
 import { farmsArray } from '@tests/mocks/data/farms/farms-values-mock';
@@ -14,7 +18,7 @@ import mock from 'jest-mock-extended/lib/Mock';
 
 describe('Get All Users', () => {
   let getAllFarmsRepo: MockProxy<IGetFarmByUserIdRepo>;
-  let getUser: MockProxy<IGetByIdBaseRepo<UserModel>>;
+  let getUser: MockProxy<IGetByIdBaseRepo>;
   let getAllFarmsService: IGetFarmByUserService;
   const user_id = uuidGlobal;
 
@@ -53,7 +57,7 @@ describe('Get All Users', () => {
   });
 
   it('should to have database error if repo return error', () => {
-    jest.spyOn(getUser, 'get').mockRejectedValueOnce(new Error());
+    jest.spyOn(getUser, 'get').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = getAllFarmsService.execute({ user_id });
 
@@ -79,7 +83,7 @@ describe('Get All Users', () => {
   });
 
   it('should to have database error if repo return error', () => {
-    jest.spyOn(getAllFarmsRepo, 'getAll').mockRejectedValueOnce(new Error());
+    jest.spyOn(getAllFarmsRepo, 'getAll').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = getAllFarmsService.execute({ user_id });
 

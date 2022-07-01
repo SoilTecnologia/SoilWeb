@@ -15,8 +15,8 @@ import { nodeCreated } from '@tests/mocks/data/node';
 import { DeleteNodeUseCase } from '@root/useCases/data/Nodes/DeleteNode/DeleteNodeUseCase';
 
 describe('Delete Farm Service', () => {
-  let findNode: MockProxy<IGetByIdBaseRepo<NodeModel>>;
-  let delNode: MockProxy<IDeleteBaseRepo<NodeModel>>;
+  let findNode: MockProxy<IGetByIdBaseRepo>;
+  let delNode: MockProxy<IDeleteBaseRepo>;
   let deleteNodeService: IDeleteNodeService;
   const node_id = nodeCreated.node_id!!;
 

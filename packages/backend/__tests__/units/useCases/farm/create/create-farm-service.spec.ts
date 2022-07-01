@@ -6,6 +6,7 @@ import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import {
   AlreadyExistsError,
   DatabaseErrorReturn,
+  DATABASE_ERROR,
   DataNotFound,
   FailedCreateDataError
 } from '@root/protocols/errors';
@@ -13,7 +14,7 @@ import { ICreateBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
 import { FarmModel } from '@root/database/model/Farm';
 
 describe('Create User Use Case', () => {
-  let addfarmRepo: MockProxy<ICreateBaseRepo<FarmModel>>;
+  let addfarmRepo: MockProxy<ICreateBaseRepo>;
   let getById: MockProxy<IGetByIdBaseRepo>;
 
   let createService: ICreateFarmUseCase;
@@ -63,7 +64,7 @@ describe('Create User Use Case', () => {
   });
 
   it('should to throw database error if find farm repo return error', () => {
-    getById.get.mockRejectedValueOnce(new Error());
+    getById.get.mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = createService.execute(addFarms);
 
@@ -83,7 +84,7 @@ describe('Create User Use Case', () => {
   it('should to throw database error if find user repo return error', () => {
     getById.get
       .mockResolvedValueOnce(undefined)
-      .mockRejectedValueOnce(new Error());
+      .mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = createService.execute(addFarms);
 
@@ -119,9 +120,7 @@ describe('Create User Use Case', () => {
     getById.get
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(userCreated);
-    jest
-      .spyOn(addfarmRepo, 'create')
-      .mockRejectedValueOnce(new DatabaseErrorReturn());
+    jest.spyOn(addfarmRepo, 'create').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = createService.execute(addFarms);
 

@@ -1,10 +1,10 @@
 import { DatabaseError } from '@root/protocols/errors';
 
-interface ICreateBaseRepo<T = any> {
-  create({
+interface ICreateBaseRepo {
+  create<P = any, R = P>({
     table,
     data
-  }: ICreateBaseRepo.Params<T>): ICreateBaseRepo.Response<T>;
+  }: ICreateBaseRepo.Params<P>): ICreateBaseRepo.Response<R>;
 }
 
 namespace ICreateBaseRepo {

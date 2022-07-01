@@ -15,7 +15,7 @@ import { messageErrorTryAction } from '../../../../utils/types';
 @injectable()
 class CreateActionUseCase {
   constructor(
-    @inject('CreateBaseRepo') private createUser: ICreateBaseRepo<UserModel>,
+    @inject('CreateBaseRepo') private createUser: ICreateBaseRepo,
     @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
     @inject('ActionsRepository') private actionRepository: IActionRepository,
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository,

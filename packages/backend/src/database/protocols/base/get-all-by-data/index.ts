@@ -1,11 +1,11 @@
 import { DatabaseError } from '@root/protocols/errors';
 
-interface IGetAllByDataBaseRepo<T = any> {
-  get({
+interface IGetAllByDataBaseRepo {
+  get<R = any>({
     table,
     column,
     where
-  }: IGetAllByDataBaseRepo.Params): IGetAllByDataBaseRepo.Response<T>;
+  }: IGetAllByDataBaseRepo.Params): IGetAllByDataBaseRepo.Response<R>;
 }
 
 namespace IGetAllByDataBaseRepo {

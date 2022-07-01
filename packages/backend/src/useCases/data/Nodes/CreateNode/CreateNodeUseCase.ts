@@ -24,8 +24,8 @@ import { FarmModel } from '@root/database/model/Farm';
 class CreateNodeUseCase implements ICreateNodeService {
   constructor(
     @inject('GetByFarmAndNodeNum') private getNode: IGetByFarmAndNodeNumRepo,
-    @inject('GetByIdBase') private getById: IGetByIdBaseRepo<FarmModel>,
-    @inject('CreateBaseRepo') private createNode: ICreateBaseRepo<NodeModel>
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
+    @inject('CreateBaseRepo') private createNode: ICreateBaseRepo
   ) {}
 
   @checkStrings(['farm_id'])
@@ -40,7 +40,7 @@ class CreateNodeUseCase implements ICreateNodeService {
       throw new Error('Node Gprs not accept ip gateway');
     }
 
-    const farm = await this.getById.get({
+    const farm = await this.getById.get<FarmModel>({
       table: 'farms',
       column: 'farm_id',
       id: farm_id
@@ -63,7 +63,10 @@ class CreateNodeUseCase implements ICreateNodeService {
         gateway: is_gprs ? null : gateway
       });
 
-      const response = await this.createNode.create({
+      const response = await this.createNode.create<
+        Omit<NodeModel, 'node_id'>,
+        NodeModel
+      >({
         table: 'nodes',
         data: nodeModel
       });

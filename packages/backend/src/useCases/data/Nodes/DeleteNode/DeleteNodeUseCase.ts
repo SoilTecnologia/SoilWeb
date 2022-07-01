@@ -7,6 +7,7 @@ import {
 } from '@root/protocols/errors';
 import { checkUndefinedNull } from '@root/utils/decorators/check-types';
 import { IDeleteNodeService } from '@root/useCases/contracts/nodes/delete';
+import { NodeModel } from '@root/database/model/Node';
 
 @injectable()
 class DeleteNodeUseCase implements IDeleteNodeService {
@@ -19,7 +20,7 @@ class DeleteNodeUseCase implements IDeleteNodeService {
   async execute({
     node_id
   }: IDeleteNodeService.Params): IDeleteNodeService.Response {
-    const nodeFind = await this.getById.get({
+    const nodeFind = await this.getById.get<NodeModel>({
       table: 'nodes',
       column: 'node_id',
       id: node_id

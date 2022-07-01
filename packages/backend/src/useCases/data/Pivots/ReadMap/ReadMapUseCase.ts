@@ -14,7 +14,7 @@ import { DatabaseErrorReturn, DATABASE_ERROR } from '@root/protocols/errors';
 class ReadMapUseCase {
   constructor(
     @inject('PivotsRepository') private pivotRepository: IPivotsRepository,
-    @inject('GetByIdBase') private farmRepository: IGetByIdBaseRepo<FarmModel>,
+    @inject('GetByIdBase') private farmRepository: IGetByIdBaseRepo,
     @inject('NodesRepository') private nodeRepository: INodesRepository,
     @inject('StatesRepository') private stateRepository: IStateRepository
   ) {}

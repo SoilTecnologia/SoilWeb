@@ -1,4 +1,5 @@
 import { FarmModel } from '@root/database/model/Farm';
+import { DatabaseError } from '@root/protocols/errors';
 
 interface IGetFarmByUserIdRepo {
   getAll({
@@ -8,7 +9,7 @@ interface IGetFarmByUserIdRepo {
 
 namespace IGetFarmByUserIdRepo {
   export type Params = { user_id: string };
-  export type Response = Promise<FarmModel[] | undefined>;
+  export type Response = Promise<FarmModel[] | undefined | DatabaseError>;
 }
 
 export { IGetFarmByUserIdRepo };

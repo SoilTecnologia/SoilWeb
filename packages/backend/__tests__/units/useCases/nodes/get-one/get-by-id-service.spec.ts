@@ -16,7 +16,7 @@ import { IGetOneNodeService } from '@root/useCases/contracts/nodes/get-one';
 import { GetOneNodeUseCase } from '@root/useCases/data/Nodes/GetOneNode/GetOneNodeUseCase';
 
 describe('Update Node Service', () => {
-  let findNode: MockProxy<IGetByIdBaseRepo<NodeModel>>;
+  let findNode: MockProxy<IGetByIdBaseRepo>;
   const node_id = nodeCreated.node_id!!;
 
   let getService: IGetOneNodeService;

@@ -3,14 +3,14 @@ import { IGetByIdBaseRepo } from '@root/database/protocols/base/getById';
 import { DATABASE_ERROR } from '@root/protocols/errors';
 import { messageErrorTryAction } from '@root/utils/types';
 
-class GetByIdBaseRepo<T = any> implements IGetByIdBaseRepo {
-  async get({
+class GetByIdBaseRepo implements IGetByIdBaseRepo {
+  async get<R = any>({
     table,
     column,
     id
-  }: IGetByIdBaseRepo.Params): IGetByIdBaseRepo.Response<T> {
+  }: IGetByIdBaseRepo.Params): IGetByIdBaseRepo.Response<R> {
     try {
-      const data: T = await knex(table).select('*').where(column, id).first();
+      const data: R = await knex(table).select('*').where(column, id).first();
 
       return data;
     } catch (error) {

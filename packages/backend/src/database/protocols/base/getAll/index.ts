@@ -1,7 +1,7 @@
 import { DatabaseError } from '@root/protocols/errors';
 
-interface IGetAllBaseRepo<T = any> {
-  get({ table }: IGetAllBaseRepo.Params): IGetAllBaseRepo.Response<T>;
+interface IGetAllBaseRepo {
+  get<R = any>({ table }: IGetAllBaseRepo.Params): IGetAllBaseRepo.Response<R>;
 }
 
 namespace IGetAllBaseRepo {

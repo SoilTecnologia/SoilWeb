@@ -3,13 +3,13 @@ import { ICreateBaseRepo } from '@root/database/protocols';
 import { DATABASE_ERROR } from '@root/protocols/errors';
 import { messageErrorTryAction } from '@root/utils/types';
 
-class CreateBaseRepo<T> implements ICreateBaseRepo<T> {
-  async create({
+class CreateBaseRepo implements ICreateBaseRepo {
+  async create<P = any, R = P>({
     table,
     data
-  }: ICreateBaseRepo.Params<T>): ICreateBaseRepo.Response<T> {
+  }: ICreateBaseRepo.Params<P>): ICreateBaseRepo.Response<R> {
     try {
-      const response: T[] = await knex(table).insert(data).returning('*');
+      const response: R[] = await knex(table).insert(data).returning('*');
       return response[0];
     } catch (error) {
       messageErrorTryAction(

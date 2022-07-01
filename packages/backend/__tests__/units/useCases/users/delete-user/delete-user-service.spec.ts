@@ -1,15 +1,19 @@
 import '@root/shared/container/index';
 import { IDeleteBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
 import { IDeleteUserService } from '@root/useCases/contracts';
 import { DeleteUserUseCase } from '@root/useCases/data';
 import { userCreated } from '@tests/mocks/data/users/user-values-for-mocks';
 import { UserModel } from '@root/database/model/User';
 
 describe('Delete User Service', () => {
-  let findUser: MockProxy<IGetByIdBaseRepo<UserModel>>;
-  let delUser: MockProxy<IDeleteBaseRepo<UserModel>>;
+  let findUser: MockProxy<IGetByIdBaseRepo>;
+  let delUser: MockProxy<IDeleteBaseRepo>;
   let deleteUserService: IDeleteUserService;
   const user_id = 'soiltech';
 
@@ -54,7 +58,7 @@ describe('Delete User Service', () => {
   });
 
   it('should return error if database return a error ', () => {
-    jest.spyOn(findUser, 'get').mockRejectedValueOnce(new Error(''));
+    jest.spyOn(findUser, 'get').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = deleteUserService.execute({ user_id });
 
@@ -76,7 +80,7 @@ describe('Delete User Service', () => {
   });
 
   it('should return error if delete user database return a error ', () => {
-    jest.spyOn(delUser, 'del').mockRejectedValueOnce(new Error(''));
+    jest.spyOn(delUser, 'del').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = deleteUserService.execute({ user_id });
 

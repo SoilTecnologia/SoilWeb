@@ -1,6 +1,10 @@
 import { FarmModel } from '@root/database/model/Farm';
 import { IGetAllBaseRepo } from '@root/database/protocols';
-import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
 import { IGetAllFarmsService } from '@root/useCases/contracts';
 import { GetAllFarmsUseCase } from '@root/useCases/data';
 import { farmsArray } from '@tests/mocks/data/farms/farms-values-mock';
@@ -8,7 +12,7 @@ import { MockProxy } from 'jest-mock-extended';
 import mock from 'jest-mock-extended/lib/Mock';
 
 describe('Get All Users', () => {
-  let getAllFarmsRepo: MockProxy<IGetAllBaseRepo<FarmModel>>;
+  let getAllFarmsRepo: MockProxy<IGetAllBaseRepo>;
   let getAllFarmsService: IGetAllFarmsService;
 
   beforeAll(() => {
@@ -48,7 +52,7 @@ describe('Get All Users', () => {
   });
 
   it('should to have database error if repo return error', () => {
-    jest.spyOn(getAllFarmsRepo, 'get').mockRejectedValueOnce(new Error());
+    jest.spyOn(getAllFarmsRepo, 'get').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = getAllFarmsService.execute();
 

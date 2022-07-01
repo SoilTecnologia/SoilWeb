@@ -4,6 +4,7 @@ import { IGetByDataRepo } from '@root/database/protocols';
 import { ILoginAuth } from '@root/useCases/contracts';
 import {
   DatabaseErrorReturn,
+  DATABASE_ERROR,
   FailedCreateDataError,
   InvalidCredentials
 } from '@root/protocols/errors';
@@ -19,7 +20,7 @@ import {
 import { UserModel } from '@root/database/model/User';
 
 describe('Auth Login', () => {
-  let findUserRepo: MockProxy<IGetByDataRepo<UserModel>>;
+  let findUserRepo: MockProxy<IGetByDataRepo>;
   let encrypter: MockProxy<ICompareEncrypt>;
   let token: MockProxy<ITokenJwt>;
 
@@ -81,7 +82,7 @@ describe('Auth Login', () => {
   });
 
   it('should throw database error, when repository findUserByLogin return error', () => {
-    jest.spyOn(findUserRepo, 'get').mockRejectedValueOnce(new Error());
+    jest.spyOn(findUserRepo, 'get').mockResolvedValueOnce(DATABASE_ERROR);
     const promise = authLogin.execute(dataLogin);
 
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());

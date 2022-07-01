@@ -20,9 +20,9 @@ import { FarmModel } from '@root/database/model/Farm';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 
 describe('Create User Use Case', () => {
-  let addRepo: MockProxy<ICreateBaseRepo<NodeModel>>;
+  let addRepo: MockProxy<ICreateBaseRepo>;
   let findNode: MockProxy<IGetByFarmAndNodeNumRepo>;
-  let findFarm: MockProxy<IGetByIdBaseRepo<FarmModel>>;
+  let findFarm: MockProxy<IGetByIdBaseRepo>;
 
   let createNode: ICreateNodeService;
 

@@ -6,17 +6,17 @@ import { ICreateBaseRepo, IGetByDataRepo } from '@database/protocols';
 import {
   AlreadyExistsError,
   DatabaseErrorReturn,
+  DATABASE_ERROR,
   FailedCreateDataError
 } from '@protocols/errors';
 import {
   addUser,
   userCreated
 } from '@tests/mocks/data/users/user-values-for-mocks';
-import { UserModel } from '@root/database/model/User';
 
 describe('Create User Use Case', () => {
-  let addUserRepo: MockProxy<ICreateBaseRepo<UserModel>>;
-  let findUserRepo: MockProxy<IGetByDataRepo<UserModel>>;
+  let addUserRepo: MockProxy<ICreateBaseRepo>;
+  let findUserRepo: MockProxy<IGetByDataRepo>;
 
   let encrypter: MockProxy<IEncrypter>;
   let token: MockProxy<ITokenJwt>;
@@ -104,14 +104,14 @@ describe('Create User Use Case', () => {
   });
 
   it('should throw create user database error, when repository create return error', () => {
-    jest.spyOn(addUserRepo, 'create').mockRejectedValueOnce(new Error());
+    jest.spyOn(addUserRepo, 'create').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = createUserService.execute(addUser);
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
 
   it('should throw database error, when repository findUserByLogin return error', () => {
-    jest.spyOn(findUserRepo, 'get').mockRejectedValueOnce(new Error());
+    jest.spyOn(findUserRepo, 'get').mockResolvedValueOnce(DATABASE_ERROR);
     const promise = createUserService.execute(addUser);
 
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());

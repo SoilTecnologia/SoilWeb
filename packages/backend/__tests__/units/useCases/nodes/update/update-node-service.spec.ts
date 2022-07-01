@@ -8,14 +8,13 @@ import {
   NotUpdateError,
   ParamsEquals
 } from '@protocols/errors';
-import { NodeModel } from '@root/database/model/Node';
 import { nodeCreated } from '@tests/mocks/data/node';
 import { UpdateNodeUseCase } from '@root/useCases/data/Nodes/UpdateNode/UpdateNodeUseCase';
 import { IUpdateNodeService } from '@root/useCases/contracts';
 
 describe('Update Node Service', () => {
-  let putNode: MockProxy<IUpdateBaseRepo<NodeModel>>;
-  let findNode: MockProxy<IGetByIdBaseRepo<NodeModel>>;
+  let putNode: MockProxy<IUpdateBaseRepo>;
+  let findNode: MockProxy<IGetByIdBaseRepo>;
 
   let createNode: IUpdateNodeService;
 

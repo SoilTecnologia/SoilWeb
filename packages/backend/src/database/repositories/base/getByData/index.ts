@@ -3,14 +3,14 @@ import { IGetByDataRepo } from '@root/database/protocols/base/getByData';
 import { DATABASE_ERROR } from '@root/protocols/errors';
 import { messageErrorTryAction } from '@root/utils/types';
 
-class GetByDataRepo<T> implements IGetByDataRepo<T> {
-  async get({
+class GetByDataRepo<T> implements IGetByDataRepo {
+  async get<R = any>({
     table,
     column,
     data
-  }: IGetByDataRepo.Params): IGetByDataRepo.Response<T> {
+  }: IGetByDataRepo.Params): IGetByDataRepo.Response<R> {
     try {
-      const response = await knex(table)
+      const response: R = await knex(table)
         .select('*')
         .where(column, data)
         .first();

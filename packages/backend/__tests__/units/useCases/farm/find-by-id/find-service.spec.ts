@@ -8,7 +8,7 @@ import { IGetOneFarmService } from '@root/useCases/contracts';
 import { FarmModel } from '@root/database/model/Farm';
 
 describe('Find Farm By Id Use Case', () => {
-  let findFarmRepo: MockProxy<IGetByIdBaseRepo<FarmModel>>;
+  let findFarmRepo: MockProxy<IGetByIdBaseRepo>;
   const { farm_id } = addFarms;
 
   let findService: IGetOneFarmService;

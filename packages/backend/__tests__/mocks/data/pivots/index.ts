@@ -1,5 +1,6 @@
 import { PivotModel } from '@root/database/model/Pivot';
 import { addFarms } from '../farms/farms-values-mock';
+import { uuidGlobal } from '../global';
 
 export const addPivot: Omit<PivotModel, 'node_id'> = {
   pivot_id: `${addFarms.farm_id}_1`,
@@ -11,4 +12,9 @@ export const addPivot: Omit<PivotModel, 'node_id'> = {
   pivot_radius: 360,
   radio_id: 1,
   farm_id: addFarms.farm_id
+};
+
+export const newPivot = {
+  ...addPivot,
+  node_id: uuidGlobal
 };

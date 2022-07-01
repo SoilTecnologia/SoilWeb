@@ -1,6 +1,10 @@
 import { UserModel } from '@root/database/model/User';
 import { IGetAllBaseRepo } from '@root/database/protocols';
-import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
 import { IGetAllUserService } from '@root/useCases/contracts';
 import { GetAllUserUseCase } from '@root/useCases/data';
 import { usersArray } from '@tests/mocks/data/users/user-values-for-mocks';
@@ -8,7 +12,7 @@ import { MockProxy } from 'jest-mock-extended';
 import mock from 'jest-mock-extended/lib/Mock';
 
 describe('Get All Users', () => {
-  let getAll: MockProxy<IGetAllBaseRepo<UserModel>>;
+  let getAll: MockProxy<IGetAllBaseRepo>;
   let getAllUserService: IGetAllUserService;
 
   beforeAll(() => {
@@ -40,7 +44,7 @@ describe('Get All Users', () => {
   });
 
   it('should to have database error if repo return error', () => {
-    jest.spyOn(getAll, 'get').mockRejectedValueOnce(new Error());
+    jest.spyOn(getAll, 'get').mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = getAllUserService.execute();
 

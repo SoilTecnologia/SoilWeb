@@ -17,22 +17,23 @@ import {
   checkStrings
 } from '@root/utils/decorators/check-types';
 import { PivotModel } from '@root/database/model/Pivot';
+import { ICreateSchedulingService } from '@root/useCases/contracts/scheduling';
+
 @injectable()
-class CreateSchedulingUseCase {
+class CreateSchedulingUseCase implements ICreateSchedulingService {
   constructor(
-    @inject('GetByIdBase') private getById: IGetByIdBaseRepo<PivotModel>,
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
     @inject('CreateBaseRepo')
-    private createRepo: ICreateBaseRepo<
-      | Omit<SchedulingModel, 'scheduling_id'>
-      | Omit<SchedulingHistoryModel, 'scheduling_history_id'>
-    >
+    private createRepo: ICreateBaseRepo
   ) {}
 
   @checkBooleans(['is_stop', 'power', 'water'])
   @checkStrings(['pivot_id', 'author', 'direction'])
   @checkDate(['start_timestamp', 'end_timestamp', 'timestamp'])
   @checkNumbers(['percentimeter'])
-  async execute(scheduling: Omit<SchedulingModel, 'scheduling_id'>) {
+  async execute(
+    scheduling: ICreateSchedulingService.Params
+  ): ICreateSchedulingService.Response {
     const {
       is_stop,
       pivot_id,
@@ -45,7 +46,7 @@ class CreateSchedulingUseCase {
       timestamp
     } = scheduling;
 
-    const havePivot = await this.getById.get({
+    const havePivot = await this.getById.get<PivotModel>({
       table: 'pivots',
       column: 'pivot_id',
       id: pivot_id
@@ -65,7 +66,10 @@ class CreateSchedulingUseCase {
       timestamp: dateSaoPaulo(timestamp!)
     };
 
-    const newScheduling = await this.createRepo.create({
+    const newScheduling = await this.createRepo.create<
+      Omit<SchedulingModel, 'scheduling_id'>,
+      SchedulingModel
+    >({
       table: 'schedulings',
       data: schedulingModel
     });
@@ -73,7 +77,10 @@ class CreateSchedulingUseCase {
     if (newScheduling === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (!newScheduling) throw new FailedCreateDataError('Scheduling');
 
-    const createHistory = await this.createRepo.create({
+    const createHistory = await this.createRepo.create<
+      Omit<SchedulingHistoryModel, 'scheduling_history_id'>,
+      SchedulingHistoryModel
+    >({
       table: 'scheduling_historys',
       data: schedulingModel
     });

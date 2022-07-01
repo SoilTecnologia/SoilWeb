@@ -18,8 +18,8 @@ import { IUpdateNodeService } from '@root/useCases/contracts';
 @injectable()
 class UpdateNodeUseCase implements IUpdateNodeService {
   constructor(
-    @inject('GetByIdBase') private getById: IGetByIdBaseRepo<NodeModel>,
-    @inject('UpdateBase') private update: IUpdateBaseRepo<NodeModel>
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
+    @inject('UpdateBase') private update: IUpdateBaseRepo
   ) {}
 
   private checkObjectIsEquals(oldNode: NodeModel, newNode: NodeModel) {
@@ -46,7 +46,7 @@ class UpdateNodeUseCase implements IUpdateNodeService {
     is_gprs,
     gateway
   }: IUpdateNodeService.Params): IUpdateNodeService.Response {
-    const nodeAlreadyExists = await this.getById.get({
+    const nodeAlreadyExists = await this.getById.get<NodeModel>({
       table: 'nodes',
       column: 'node_id',
       id: node_id!!
@@ -69,7 +69,7 @@ class UpdateNodeUseCase implements IUpdateNodeService {
       throw new ParamsEquals();
     }
 
-    const putNode = await this.update.put({
+    const putNode = await this.update.put<NodeModel>({
       table: 'nodes',
       column: 'node_id',
       where: node_id!!,

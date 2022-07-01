@@ -18,35 +18,9 @@ class CreateUserUseCase implements ICreateUserUseCase {
   constructor(
     @inject('TokenJwt') private tokenJwt: ITokenJwt,
     @inject('Encrypter') private encrypter: IEncrypter,
-    @inject('CreateBaseRepo') private addUserRepo: ICreateBaseRepo<UserModel>,
-    @inject('GetByData') private findUserRepo: IGetByDataRepo<UserModel>
+    @inject('CreateBaseRepo') private addRepo: ICreateBaseRepo,
+    @inject('GetByData') private getByData: IGetByDataRepo
   ) {}
-
-  private async apllyQueryFindUser(
-    login: UserModel['login']
-  ): Promise<IGetByDataRepo.Response<UserModel> | DatabaseError> {
-    try {
-      return await this.findUserRepo.get({
-        table: 'users',
-        column: 'login',
-        data: login
-      });
-    } catch (err) {
-      messageErrorTryAction(err, true, CreateUserUseCase.name, 'Find User');
-      return DATABASE_ERROR;
-    }
-  }
-
-  private async apllyQueryCreateUser(
-    user: ICreateUserUseCase.Params
-  ): Promise<ICreateBaseRepo.Response<UserModel> | DatabaseError> {
-    try {
-      return await this.addUserRepo.create({ table: 'users', data: user });
-    } catch (err) {
-      messageErrorTryAction(err, true, CreateUserUseCase.name, 'Create User');
-      return DATABASE_ERROR;
-    }
-  }
 
   @checkStrings()
   async execute(
@@ -58,7 +32,11 @@ class CreateUserUseCase implements ICreateUserUseCase {
 
     if (encryptedPassword === 'ENCRYPT ERROR') throw new Error('ENCRYPT ERROR');
 
-    const userALreadyExists = await this.apllyQueryFindUser(login);
+    const userALreadyExists = await this.getByData.get<UserModel>({
+      table: 'users',
+      column: 'login',
+      data: login
+    });
 
     if (userALreadyExists === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (userALreadyExists) throw new AlreadyExistsError('User');
@@ -71,7 +49,10 @@ class CreateUserUseCase implements ICreateUserUseCase {
         user_type
       });
 
-      const newUser = await this.apllyQueryCreateUser(userModel);
+      const newUser = await this.addRepo.create<
+        Omit<UserModel, 'user_id'>,
+        UserModel
+      >({ table: 'users', data: userModel });
 
       if (newUser === DATABASE_ERROR) throw new DatabaseErrorReturn();
       else if (!newUser) throw new FailedCreateDataError('User');

@@ -3,15 +3,15 @@ import { IUpdateBaseRepo } from '@root/database/protocols';
 import { DATABASE_ERROR } from '@root/protocols/errors';
 import { messageErrorTryAction } from '@root/utils/types';
 
-class UpdateBaseRepo<T = any> implements IUpdateBaseRepo<T> {
-  async put({
+class UpdateBaseRepo implements IUpdateBaseRepo {
+  async put<P = any, R = P>({
     table,
     column,
     where,
     data
-  }: IUpdateBaseRepo.Params<T>): IUpdateBaseRepo.Response<T> {
+  }: IUpdateBaseRepo.Params<P>): IUpdateBaseRepo.Response<R> {
     try {
-      const result = await knex(table)
+      const result: R[] = await knex(table)
         .where(column, where)
         .update(data)
         .returning('*');
