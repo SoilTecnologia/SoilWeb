@@ -105,7 +105,6 @@ export function checkStrings(values?: string[]) {
               console.log(`Value is not defined: Key: ${key}, Value: ${value}`);
               throw new ParamsInvalid();
             }
-
             if (typeof value !== 'string') {
               console.log(`${dateJs()},Error in ${propertyName}`);
               console.log(

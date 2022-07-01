@@ -23,12 +23,14 @@ class UpdateNodeUseCase implements IUpdateNodeService {
   ) {}
 
   private checkObjectIsEquals(oldNode: NodeModel, newNode: NodeModel) {
+    const gateway = !newNode.is_gprs
+      ? newNode.gateway === oldNode.gateway
+      : !newNode.gateway;
     if (
       oldNode.farm_id === newNode.farm_id &&
-      oldNode.node_id === newNode.node_id &&
       oldNode.node_num === newNode.node_num &&
-      oldNode.gateway === newNode.gateway &&
-      oldNode.is_gprs === newNode.is_gprs
+      oldNode.is_gprs === newNode.is_gprs &&
+      gateway
     ) {
       return true;
     } else false;
@@ -38,7 +40,11 @@ class UpdateNodeUseCase implements IUpdateNodeService {
   @checkNumbers(['node_num'])
   @checkBooleans(['is_gprs'])
   async execute({
-    node: { node_num, node_id, farm_id, is_gprs, gateway }
+    node_num,
+    node_id,
+    farm_id,
+    is_gprs,
+    gateway
   }: IUpdateNodeService.Params): IUpdateNodeService.Response {
     const nodeAlreadyExists = await this.getById.get({
       table: 'nodes',
@@ -51,7 +57,13 @@ class UpdateNodeUseCase implements IUpdateNodeService {
 
     const nodeModel = new NodeModel();
 
-    Object.assign(nodeModel, { node_num, node_id, farm_id, is_gprs, gateway });
+    Object.assign(nodeModel, {
+      node_num,
+      node_id,
+      farm_id,
+      is_gprs,
+      gateway
+    });
 
     if (this.checkObjectIsEquals(nodeAlreadyExists, nodeModel)) {
       throw new ParamsEquals();

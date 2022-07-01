@@ -32,10 +32,11 @@ describe('Update Node Service', () => {
   // Test received data corrects
   it('should to have been called with params válids and called once time', async () => {
     const callUser = jest.spyOn(createNode, 'execute');
-    createNode.execute({ node: { ...nodeCreated, node_num: 5 } });
+    createNode.execute({ ...nodeCreated, node_num: 5 });
 
     expect(callUser).toHaveBeenCalledWith({
-      node: { ...nodeCreated, node_num: 5 }
+      ...nodeCreated,
+      node_num: 5
     });
     expect(callUser).toBeCalledTimes(1);
   });
@@ -44,7 +45,7 @@ describe('Update Node Service', () => {
   it('should find repository to have been called with data valids to have called once time', async () => {
     const fnEncrypted = jest.spyOn(findNode, 'get');
 
-    await createNode.execute({ node: { ...nodeCreated, node_num: 5 } });
+    await createNode.execute({ ...nodeCreated, node_num: 5 });
 
     expect(fnEncrypted).toHaveBeenCalledWith({
       table: 'nodes',
@@ -58,7 +59,8 @@ describe('Update Node Service', () => {
     findNode.get.mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = createNode.execute({
-      node: { ...nodeCreated, node_num: 5 }
+      ...nodeCreated,
+      node_num: 5
     });
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
@@ -67,7 +69,8 @@ describe('Update Node Service', () => {
     findNode.get.mockResolvedValueOnce(undefined);
 
     const promise = createNode.execute({
-      node: { ...nodeCreated, node_num: 5 }
+      ...nodeCreated,
+      node_num: 5
     });
 
     expect(promise).rejects.toThrow(new DataNotFound('Node'));
@@ -77,7 +80,7 @@ describe('Update Node Service', () => {
   it('should put repository to have been called with data valids to have called once time', async () => {
     const fnEncrypted = jest.spyOn(putNode, 'put');
 
-    await createNode.execute({ node: { ...nodeCreated, node_num: 5 } });
+    await createNode.execute({ ...nodeCreated, node_num: 5 });
 
     expect(fnEncrypted).toHaveBeenCalledWith({
       table: 'nodes',
@@ -92,7 +95,8 @@ describe('Update Node Service', () => {
     putNode.put.mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = createNode.execute({
-      node: { ...nodeCreated, node_num: 5 }
+      ...nodeCreated,
+      node_num: 5
     });
     expect(promise).rejects.toThrow(new DatabaseErrorReturn());
   });
@@ -101,21 +105,23 @@ describe('Update Node Service', () => {
     putNode.put.mockResolvedValueOnce(undefined);
 
     const promise = createNode.execute({
-      node: { ...nodeCreated, node_num: 5 }
+      ...nodeCreated,
+      node_num: 5
     });
     expect(promise).rejects.toThrow(new NotUpdateError('Node'));
   });
 
   // returns useCases
   it('should  to throw if values equals', () => {
-    const promise = createNode.execute({ node: nodeCreated });
+    const promise = createNode.execute(nodeCreated);
 
     expect(promise).rejects.toThrow(new ParamsEquals());
   });
 
   it('should  return a new node ', async () => {
     const promise = await createNode.execute({
-      node: { ...nodeCreated, node_num: 5 }
+      ...nodeCreated,
+      node_num: 5
     });
 
     expect(promise).toStrictEqual({ ...nodeCreated, node_num: 1 });

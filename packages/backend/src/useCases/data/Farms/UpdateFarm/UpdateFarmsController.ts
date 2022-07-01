@@ -30,7 +30,7 @@ class UpdateFarmController {
           farm_name
         });
 
-        res.status(200).send(putFarm);
+        return res.status(200).send(putFarm);
       } catch (err) {
         messageErrorTryAction(
           err,
