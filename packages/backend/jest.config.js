@@ -15,6 +15,7 @@ module.exports = {
     '.+\\.ts$': 'ts-jest'
   },
   clearMocks: true,
+
   setupFilesAfterEnv: ['<rootDir>/__tests__/setup/setup.ts'],
   setupFiles: ['dotenv/config'],
   moduleNameMapper: {

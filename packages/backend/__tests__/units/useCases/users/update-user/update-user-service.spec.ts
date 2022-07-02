@@ -1,4 +1,6 @@
 import { mock, MockProxy } from 'jest-mock-extended';
+import '@tests/setup/unit/setup';
+
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,

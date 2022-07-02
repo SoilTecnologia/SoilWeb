@@ -1,3 +1,4 @@
+import '@tests/setup/unit/setup';
 import '@root/shared/container/index';
 import { IDeleteBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
 import { mock, MockProxy } from 'jest-mock-extended';

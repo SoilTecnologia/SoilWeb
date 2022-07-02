@@ -1,17 +1,13 @@
 import 'reflect-metadata';
+import '@tests/setup/unit/setup';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { IGetByIdBaseRepo, IUpdateBaseRepo } from '@database/protocols';
+import { IGetByIdBaseRepo } from '@database/protocols';
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
-  DataNotFound,
-  NotUpdateError,
-  ParamsEquals
+  DataNotFound
 } from '@protocols/errors';
-import { NodeModel } from '@root/database/model/Node';
 import { nodeCreated } from '@tests/mocks/data/node';
-import { UpdateNodeUseCase } from '@root/useCases/data/Nodes/UpdateNode/UpdateNodeUseCase';
-import { IUpdateNodeService } from '@root/useCases/contracts';
 import { IGetOneNodeService } from '@root/useCases/contracts/nodes/get-one';
 import { GetOneNodeUseCase } from '@root/useCases/data/Nodes/GetOneNode/GetOneNodeUseCase';
 

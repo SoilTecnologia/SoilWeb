@@ -1,4 +1,4 @@
-import { FarmModel } from '@root/database/model/Farm';
+import '@tests/setup/unit/setup';
 import { IGetAllBaseRepo } from '@root/database/protocols';
 import {
   DatabaseErrorReturn,

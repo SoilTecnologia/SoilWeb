@@ -1,3 +1,4 @@
+import '@tests/setup/unit/setup';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { ICreateFarmUseCase } from '@root/useCases/contracts';
 import { CreateFarmUseCase } from '@root/useCases/data';

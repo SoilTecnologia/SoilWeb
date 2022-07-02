@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import '@tests/setup/unit/setup';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { IGetByFarmAndNodeNumRepo } from '@database/protocols';
 import {

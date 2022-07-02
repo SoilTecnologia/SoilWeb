@@ -1,4 +1,5 @@
-import { UserModel } from '@root/database/model/User';
+import '@tests/setup/unit/setup';
+
 import {
   IGetByIdBaseRepo,
   IGetFarmByUserIdRepo

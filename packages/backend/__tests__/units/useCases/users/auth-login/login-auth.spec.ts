@@ -1,3 +1,5 @@
+import '@tests/setup/unit/setup';
+
 import { mock, MockProxy } from 'jest-mock-extended';
 
 import { IGetByDataRepo } from '@root/database/protocols';

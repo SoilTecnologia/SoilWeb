@@ -1,9 +1,14 @@
+import '@tests/setup/unit/setup';
 import { mock, MockProxy } from 'jest-mock-extended';
 
 import { IGetByIdBaseRepo } from '@root/database/protocols';
 import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import { GetOneFarmUseCase } from '@root/useCases/data';
-import { DatabaseErrorReturn, DataNotFound } from '@root/protocols/errors';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
 import { IGetOneFarmService } from '@root/useCases/contracts';
 import { FarmModel } from '@root/database/model/Farm';
 
@@ -45,9 +50,7 @@ describe('Find Farm By Id Use Case', () => {
   });
 
   it('should to throw database error if find farm repo return error', () => {
-    jest
-      .spyOn(findFarmRepo, 'get')
-      .mockRejectedValueOnce(new DatabaseErrorReturn());
+    findFarmRepo.get.mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = findService.execute({ farm_id });
 

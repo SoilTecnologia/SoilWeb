@@ -1,15 +1,13 @@
 import '@root/shared/container/index';
+import '@tests/setup/unit/setup';
+
 import { IDeleteBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { DeleteFarmUseCase } from '@root/useCases/data';
-import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
 import {
   DatabaseErrorReturn,
   DATABASE_ERROR,
   DataNotFound
 } from '@root/protocols/errors';
-import { FarmModel } from '@root/database/model/Farm';
-import { NodeModel } from '@root/database/model/Node';
 import { IDeleteNodeService } from '@root/useCases/contracts/nodes/delete';
 import { nodeCreated } from '@tests/mocks/data/node';
 import { DeleteNodeUseCase } from '@root/useCases/data/Nodes/DeleteNode/DeleteNodeUseCase';
