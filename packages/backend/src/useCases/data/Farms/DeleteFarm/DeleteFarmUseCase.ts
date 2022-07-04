@@ -9,6 +9,7 @@ import {
   DataNotFound,
   ParamsInvalid
 } from '@root/protocols/errors';
+import { checkUndefinedNull } from '@root/utils/decorators/check-types';
 
 @injectable()
 class DeleteFarmUseCase implements IDeleteFarmService {
@@ -17,30 +18,27 @@ class DeleteFarmUseCase implements IDeleteFarmService {
     @inject('DeleteBase') private delFarm: IDeleteBaseRepo
   ) {}
 
+  @checkUndefinedNull(['farm_id'])
   async execute({
     farm_id
   }: IDeleteFarmService.Params): IDeleteFarmService.Response {
-    if (farm_id === 'undefined' || farm_id === 'null') {
-      throw new ParamsInvalid();
-    } else {
-      const farmExists = await this.getById.get({
-        table: 'farms',
-        column: 'farm_id',
-        id: farm_id
-      });
+    const farmExists = await this.getById.get({
+      table: 'farms',
+      column: 'farm_id',
+      id: farm_id
+    });
 
-      if (farmExists === DATABASE_ERROR) throw new DatabaseErrorReturn();
-      else if (!farmExists) throw new DataNotFound('Farm');
+    if (farmExists === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!farmExists) throw new DataNotFound('Farm');
 
-      const del = await this.delFarm.del({
-        table: 'farms',
-        column: 'farm_id',
-        data: farm_id
-      });
+    const del = await this.delFarm.del({
+      table: 'farms',
+      column: 'farm_id',
+      data: farm_id
+    });
 
-      if (del === DATABASE_ERROR) throw new DatabaseErrorReturn();
-      else return { status: del ? 'OK' : 'FAIL' };
-    }
+    if (del === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else return { status: del ? 'OK' : 'FAIL' };
   }
 }
 

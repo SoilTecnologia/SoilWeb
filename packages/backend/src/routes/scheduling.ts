@@ -24,6 +24,7 @@ router.delete(
   authMiddleware(),
   deleteSchedulingController.handle
 );
+
 router.put(
   '/updateScheduling/',
   authMiddleware(),

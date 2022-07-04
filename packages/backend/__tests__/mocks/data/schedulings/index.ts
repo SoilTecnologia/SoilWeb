@@ -18,6 +18,6 @@ export const addScheduling: Omit<SchedulingModel, 'scheduling_id' | 'author'> =
 
 export const newScheduling = {
   ...addScheduling,
-  author: userCreated.user_id,
-  scheduling_id: uuidGlobal
+  author: userCreated!!.user_id!!,
+  scheduling_id: uuidGlobal!!
 };

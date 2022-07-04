@@ -1,50 +1,40 @@
+import { IDeleteBaseRepo, IGetByIdBaseRepo } from '@root/database/protocols';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
+import { IDeleteSchedulingService } from '@root/useCases/contracts/scheduling';
+import { checkUndefinedNull } from '@root/utils/decorators/check-types';
 import { inject, injectable } from 'tsyringe';
-import { SchedulingModel } from '../../../../database/model/Scheduling';
-import { ISchedulingRepository } from '../../../../database/repositories/Scheduling/ISchedulingRepository';
-import { messageErrorTryAction } from '../../../../utils/types';
 
 @injectable()
-class DeleteSchedulingUseCase {
+class DeleteSchedulingUseCase implements IDeleteSchedulingService {
   constructor(
-    @inject('SchedulingRepository')
-    private schedulingRepository: ISchedulingRepository
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
+    @inject('DeleteBase') private delRepo: IDeleteBaseRepo
   ) {}
 
-  private async applyQueryFindById(scheduling_id: string) {
-    try {
-      return await this.schedulingRepository.findById(scheduling_id);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        DeleteSchedulingUseCase.name,
-        'Get Scheduling By Id'
-      );
-    }
-  }
+  @checkUndefinedNull(['scheduling_id'])
+  async execute({
+    scheduling_id
+  }: IDeleteSchedulingService.Params): IDeleteSchedulingService.Response {
+    const scheduling = await this.getById.get({
+      table: 'schedulings',
+      column: 'scheduling_id',
+      id: scheduling_id
+    });
 
-  private async applyQueryDelete(scheduling_id: string) {
-    try {
-      return await this.schedulingRepository.delete(scheduling_id);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        DeleteSchedulingUseCase.name,
-        'Delete Scheduling '
-      );
-    }
-  }
+    if (scheduling === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!scheduling) throw new DataNotFound('Scheduling');
 
-  async execute(scheduling_id: SchedulingModel['scheduling_id']) {
-    const scheduling = await this.applyQueryFindById(scheduling_id);
-
-    if (!scheduling) throw new Error('Scheduling does not exist');
-    const deletedSchedule = await this.applyQueryDelete(scheduling_id);
-    console.log(`Agendamento excluído com sucesso do banco de dados....`);
-    console.log('....');
-
-    return deletedSchedule;
+    const delSchedule = await this.delRepo.del({
+      table: 'schedulings',
+      column: 'scheduling_id',
+      data: scheduling_id
+    });
+    if (delSchedule === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else return { status: delSchedule ? 'OK' : 'FAIL' };
   }
 }
 

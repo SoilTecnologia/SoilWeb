@@ -1,44 +1,37 @@
+import { IGetAllBaseRepo } from '@root/database/protocols';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound
+} from '@root/protocols/errors';
+import { IGetAllSchedulingService } from '@root/useCases/contracts/scheduling';
 import { inject, injectable } from 'tsyringe';
-import { ISchedulingRepository } from '../../../../database/repositories/Scheduling/ISchedulingRepository';
-import { dateString } from '../../../../utils/convertTimeZoneDate';
-import { messageErrorTryAction } from '../../../../utils/types';
+import { dateString } from '@utils/convertTimeZoneDate';
 
 @injectable()
-class GetAllSchedulingUseCase {
-  constructor(
-    @inject('SchedulingRepository')
-    private schedulingRepository: ISchedulingRepository
-  ) {}
+class GetAllSchedulingUseCase implements IGetAllSchedulingService {
+  constructor(@inject('GetAllBase') private getAll: IGetAllBaseRepo) {}
 
-  private async applyQueryGetAllScheduling() {
-    try {
-      return await this.schedulingRepository.getAllSchedulings();
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        GetAllSchedulingUseCase.name,
-        'GetAll Scheduling'
-      );
+  async execute(): IGetAllSchedulingService.Response {
+    const allSchedulings = await this.getAll.get({ table: 'schedulings' });
+
+    if (allSchedulings === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    else if (!allSchedulings) throw new DataNotFound('Scheduling');
+
+    const schedulings = [];
+
+    for (let schedule of allSchedulings) {
+      Object.assign(schedule, {
+        ...schedule,
+        start_timestamp: dateString(schedule.start_timestamp!),
+        end_timestamp: dateString(schedule.end_timestamp!),
+        timestamp: dateString(schedule.timestamp!)
+      });
+
+      schedulings.push(schedule);
     }
-  }
-  async execute() {
-    const allSchedulings = await this.applyQueryGetAllScheduling();
-    if (allSchedulings && allSchedulings.length > 0) {
-      const schedulings = [];
-      for (let schedule of allSchedulings) {
-        Object.assign(schedule, {
-          ...schedule,
-          start_timestamp: dateString(schedule.start_timestamp!),
-          end_timestamp: dateString(schedule.end_timestamp!),
-          timestamp: dateString(schedule.timestamp!)
-        });
 
-        schedulings.push(schedule);
-      }
-
-      return schedulings;
-    } else return [];
+    return schedulings;
   }
 }
 

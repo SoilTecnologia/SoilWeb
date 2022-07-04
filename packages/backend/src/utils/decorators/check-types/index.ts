@@ -7,6 +7,7 @@ import { dateJs } from '@root/utils/handleDates/dateFactory';
 import dayjs from 'dayjs';
 import 'reflect-metadata';
 import instance from 'tsyringe/dist/typings/dependency-container';
+import { Request, Response } from 'express';
 const requiredMetadataKey = Symbol('required');
 
 export function checkBooleans(values?: string[]) {
@@ -199,6 +200,24 @@ export function checkUndefinedNull(values?: string[]) {
       }
 
       return method.apply(this, args);
+    };
+  };
+}
+
+export function checkReqData(lenght: number) {
+  return (
+    target: any,
+    propertyName: string,
+    descriptor: PropertyDescriptor
+  ) => {
+    let method = descriptor.value!;
+
+    descriptor.value = function (...args: any[]) {
+      const [req, res] = args;
+
+      if (Object.keys(req.body).length > lenght) {
+        res.status(400).send({ error: new ParamsNotExpected().message });
+      } else return method.apply(this, args);
     };
   };
 }

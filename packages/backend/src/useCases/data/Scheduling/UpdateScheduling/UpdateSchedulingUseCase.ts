@@ -1,82 +1,61 @@
-import dayjs from 'dayjs';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { inject, injectable } from 'tsyringe';
-import { SchedulingModel } from '../../../../database/model/Scheduling';
-import { SchedulingHistoryModel } from '../../../../database/model/SchedulingHistory';
-import { ISchedulingRepository } from '../../../../database/repositories/Scheduling/ISchedulingRepository';
-import { ISchedulingHistoryRepository } from '../../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
+import { SchedulingModel } from '@database/model/Scheduling';
+import { SchedulingHistoryModel } from '@database/model/SchedulingHistory';
+import { dateIsAter, dateSaoPaulo } from '@utils/convertTimeZoneDate';
+import emitter from '@utils/eventBus';
+import { IUpdateSchedulingService } from '@root/useCases/contracts/scheduling';
 import {
-  dateIsAter,
-  dateSaoPaulo
-} from '../../../../utils/convertTimeZoneDate';
-import emitter from '../../../../utils/eventBus';
-import { messageErrorTryAction } from '../../../../utils/types';
+  ICreateBaseRepo,
+  IGetByIdBaseRepo,
+  IUpdateBaseRepo
+} from '@root/database/protocols';
+import {
+  DatabaseErrorReturn,
+  DATABASE_ERROR,
+  DataNotFound,
+  FailedCreateDataError,
+  NotUpdateError
+} from '@root/protocols/errors';
+import {
+  checkBooleans,
+  checkDate,
+  checkNumbers,
+  checkStrings
+} from '@root/utils/decorators/check-types';
 
 @injectable()
-class UpdateSchedulingUseCase {
+class UpdateSchedulingUseCase implements IUpdateSchedulingService {
   constructor(
-    @inject('SchedulingRepository')
-    private schedulingRepository: ISchedulingRepository,
-    @inject('SchedulingHistoryRepository')
-    private schedulingHistory: ISchedulingHistoryRepository
+    @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
+    @inject('GetByIdBase') private update: IUpdateBaseRepo,
+    @inject('CreateBaseRepo') private create: ICreateBaseRepo
   ) {}
 
-  private async applyQueryFindById(scheduling_id: string) {
-    try {
-      return await this.schedulingRepository.findById(scheduling_id);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        UpdateSchedulingUseCase.name,
-        'Get Scheduling By Id'
-      );
-    }
-  }
+  @checkStrings(['author', 'pivot_id', 'scheduling_id', 'direction'])
+  @checkBooleans(['is_stop', 'power', 'water'])
+  @checkNumbers(['percentimeter'])
+  @checkDate(['start_timestamp', 'end_timestamp', 'update_timestamp'])
+  async execute({
+    author,
+    pivot_id,
+    scheduling_id,
+    is_stop,
+    power,
+    water,
+    direction,
+    percentimeter,
+    end_timestamp,
+    start_timestamp,
+    update_timestamp
+  }: IUpdateSchedulingService.Params): IUpdateSchedulingService.Response {
+    const getScheduling = await this.getById.get<SchedulingModel>({
+      table: 'schedulings',
+      column: 'scheduling_id',
+      id: scheduling_id
+    });
 
-  private async applyQueryUpdate(
-    scheduling: Omit<SchedulingModel, 'timestamp'>
-  ) {
-    try {
-      const schel = await this.schedulingRepository.update(scheduling);
-      return schel;
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        UpdateSchedulingUseCase.name,
-        'Update Scheduling '
-      );
-    }
-  }
-
-  private async applyQueryCreateHistory(
-    scheduling: Omit<SchedulingHistoryModel, 'scheduling_history_id'>
-  ) {
-    try {
-      return await this.schedulingHistory.create({
-        ...scheduling,
-        updated: scheduling.scheduling_id
-      });
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        true,
-        UpdateSchedulingUseCase.name,
-        'Create in History'
-      );
-    }
-  }
-
-  async execute(
-    scheduling: Omit<SchedulingModel, 'timestamp'>,
-    update_timestamp: Date
-  ) {
-    const getScheduling = await this.applyQueryFindById(
-      scheduling.scheduling_id
-    );
-
-    if (!getScheduling) throw new Error('Schedulings Does Not Exists');
+    if (getScheduling === DATABASE_ERROR) throw new DatabaseErrorReturn();
+    if (!getScheduling) throw new DataNotFound('Scheduling');
 
     const dateIsRuning = dateIsAter(
       getScheduling.start_timestamp!,
@@ -87,23 +66,41 @@ class UpdateSchedulingUseCase {
       console.log('Não é possivel atualizar, agendamento em execução...');
       return 'scheduling is running';
     } else {
-      const newScheduling = await this.applyQueryUpdate({
-        ...scheduling,
-        start_timestamp: dateSaoPaulo(scheduling.start_timestamp!),
-        end_timestamp: dateSaoPaulo(scheduling.end_timestamp!)
+      const newScheduling = await this.update.put<SchedulingModel>({
+        table: 'schedulings',
+        column: 'scheduling_id',
+        where: scheduling_id,
+        data: {
+          author,
+          pivot_id,
+          scheduling_id,
+          is_stop,
+          power,
+          water,
+          direction,
+          percentimeter,
+          end_timestamp: dateSaoPaulo(end_timestamp!),
+          start_timestamp: dateSaoPaulo(start_timestamp!),
+          timestamp: dateSaoPaulo(update_timestamp!)
+        }
       });
 
-      if (newScheduling) {
-        type omitId = Omit<SchedulingHistoryModel, 'scheduling_history_id'>;
-        const schedule: omitId = newScheduling;
-        delete schedule.scheduling_id;
+      if (newScheduling === DATABASE_ERROR) throw new DatabaseErrorReturn();
+      else if (!newScheduling) throw new NotUpdateError('Scheduling');
 
-        await this.applyQueryCreateHistory({
-          ...schedule,
-          updated: newScheduling.scheduling_id
-        });
-        emitter.emit('scheduling', { scheduling: newScheduling, isPut: true });
-      }
+      type omitId = Omit<SchedulingHistoryModel, 'scheduling_history_id'>;
+      const schedule: omitId = { ...newScheduling };
+      delete schedule.scheduling_id;
+
+      const history = await this.create.create<omitId, SchedulingHistoryModel>({
+        table: 'scheduling_historys',
+        data: schedule
+      });
+
+      if (history === DATABASE_ERROR) throw new DatabaseErrorReturn();
+      else if (!history) throw new FailedCreateDataError('SchedulingHistory');
+
+      emitter.emit('scheduling', { scheduling: newScheduling, isPut: true });
 
       return newScheduling;
     }

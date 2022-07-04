@@ -1,5 +1,7 @@
 import { SchedulingModel } from '@root/database/model/Scheduling';
 
+type timestampProps = { update_timestamp: Date };
+type OmitScheduling = Omit<SchedulingModel, 'timestamp'>;
 interface IUpdateSchedulingService {
   execute(
     scheduling: IUpdateSchedulingService.Params
@@ -7,8 +9,10 @@ interface IUpdateSchedulingService {
 }
 
 namespace IUpdateSchedulingService {
-  export type Params = SchedulingModel;
-  export type Response = Promise<SchedulingModel | undefined>;
+  export type Params = OmitScheduling & timestampProps;
+  export type Response = Promise<
+    SchedulingModel | undefined | 'scheduling is running'
+  >;
 }
 
 export { IUpdateSchedulingService };
