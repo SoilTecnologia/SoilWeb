@@ -23,10 +23,8 @@ type ScheduleDataContexProps = {
   //Editing
   editingScheduleType: String;
   setEditingScheduleType: React.Dispatch<React.SetStateAction<String>>;
-  editingAngleSchedule: AngleSchedule
-  setEditingAngleSchedule: React.Dispatch<React.SetStateAction<AngleSchedule>>
-  editingDateSchedule: DateSchedule
-  setEditingDateSchedule: React.Dispatch<React.SetStateAction<DateSchedule>>
+  editingSchedule: ScheduleType
+  setEditingSchedule: React.Dispatch<React.SetStateAction<ScheduleType>>
 };
 
 const ScheduleDataContext = createContext({} as ScheduleDataContexProps);
@@ -61,9 +59,9 @@ function UseScheduleDataProvider({ children }: ScheduleProviderProps) {
   })
   const [angleScheduleList, setAngleScheduleList] = useState<AngleSchedule[]>([])
   const [dateScheduleList, setDateScheduleList] = useState<DateSchedule[]>([])
+
   const [editingScheduleType, setEditingScheduleType] = useState<String>('')
-  const [editingAngleSchedule, setEditingAngleSchedule] = useState<AngleSchedule>({} as AngleSchedule)
-  const [editingDateSchedule, setEditingDateSchedule] = useState<DateSchedule>({} as DateSchedule)
+  const [editingSchedule, setEditingSchedule] = useState<ScheduleType>({} as ScheduleType)
 
   return (
     <ScheduleDataContext.Provider
@@ -80,10 +78,8 @@ function UseScheduleDataProvider({ children }: ScheduleProviderProps) {
         setDateScheduleList,
         editingScheduleType: editingScheduleType,
         setEditingScheduleType,
-        editingAngleSchedule: editingAngleSchedule,
-        setEditingAngleSchedule,
-        editingDateSchedule: editingDateSchedule,
-        setEditingDateSchedule,
+        editingSchedule: editingSchedule,
+        setEditingSchedule,
       }}
     >
       {children}

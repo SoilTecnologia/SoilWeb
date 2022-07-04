@@ -27,7 +27,7 @@ const CollapsibleDateScheduleList = () => {
         })
     }
   }
-  console.log(JSON.stringify(dateScheduleList) != JSON.stringify([]), JSON.stringify(dateScheduleList), JSON.stringify([]))
+
   return (
     <S.Container>
       <S.ScheduleListButton onClick={() => loadSchedules()}>

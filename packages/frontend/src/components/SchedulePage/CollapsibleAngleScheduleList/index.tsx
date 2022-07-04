@@ -24,7 +24,6 @@ const CollapsibleAngleScheduleList = () => {
         })
     }
   }
-  console.log(angleScheduleList)
 
   return (
     <S.Container>

@@ -13,6 +13,7 @@ import { addHours, format } from "date-fns";
 import Image from "next/image";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 import { useContextScheduleData } from "hooks/useContextScheduleData";
+import Router from "next/router";
 
 
 type PropsProvider = {
@@ -21,10 +22,10 @@ type PropsProvider = {
 
 const AngleScheduleCard = (props: PropsProvider) => {
   const { schedule } = props;
-  const { angleScheduleList, setAngleScheduleList } = useContextScheduleData()
+  const { angleScheduleList, setAngleScheduleList,setEditingSchedule,setEditingScheduleType } = useContextScheduleData()
   const { deleteAngleSchedule, getAngleSchedulings } = useContextActionCrud()
 
-  const formatDate = (date: String) => {
+  const formatDate = (date: string | any) => {
     const [dates, hours] = date.split(' ')
     const [hour, min, sec] = hours.split(':')
     return `${dates} as ${hour}:${min}`;
@@ -40,6 +41,16 @@ const AngleScheduleCard = (props: PropsProvider) => {
           })
         }
       })
+  }
+  const handleEditSchedule = () => {
+    setEditingSchedule(schedule)
+    if(schedule.is_return){
+      setEditingScheduleType('AutoReturn')
+    }else{
+      setEditingScheduleType('StopAngle')
+    }
+
+    Router.push(`edit_schedule`)
   }
 
   return (
@@ -111,7 +122,7 @@ const AngleScheduleCard = (props: PropsProvider) => {
             </S.ButtonText>
           </S.DeleteButton>
           <S.EditButton
-          //onClick={() => setIsCollapsed(oldState => !oldState)}
+            onClick={() => handleEditSchedule()}
           >
             <S.EditIcon />
             <S.EditButtonText>

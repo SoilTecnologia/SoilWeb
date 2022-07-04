@@ -6,7 +6,7 @@ interface Schedule {
   power?: boolean | null;
   water?: boolean | null;
   direction?: "CLOCKWISE" | "ANTI_CLOCKWISE" | null;
-  percentimeter?: number;
+  percentimeter: number;
   start_angle?: number;
   end_angle?: number;
   start_timestamp?: string | Date | number;

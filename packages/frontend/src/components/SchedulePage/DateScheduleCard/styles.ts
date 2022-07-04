@@ -1,4 +1,5 @@
 import styled, { css } from "styled-components";
+import Link from "next/link";
 
 import { RiDeleteBin5Line, RiEdit2Fill } from "react-icons/ri";
 export const Card = styled.div`
@@ -35,6 +36,20 @@ export const DeleteButton = styled.button`
 export const EditButton = styled.button`
   ${({ theme }) => css`
     display: flex;
+    padding: ${theme.spacings.xxsmall} ${theme.spacings.small};
+    background: ${theme.colors.secondary};
+
+    transition: all 0.3s linear;
+    border-radius: 1.5rem;
+    &:hover {
+      cursor: pointer;
+      opacity: 0.85;
+    }
+  `}
+`;
+export const AnchorButton = styled.a`
+  ${({ theme }) => css`
+  display: flex;
     padding: ${theme.spacings.xxsmall} ${theme.spacings.small};
     background: ${theme.colors.secondary};
 

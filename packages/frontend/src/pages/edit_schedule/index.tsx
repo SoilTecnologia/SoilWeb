@@ -1,8 +1,9 @@
+import MainEditSchedule from "components/EditSchedulePage/MainEditSchedule";
 
 
 const EditSchedule = () => {
 
-  return <></>
+  return <MainEditSchedule />
 
 }
 export default EditSchedule;

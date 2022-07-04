@@ -6,11 +6,11 @@ import OnIcon from "../../../../public/icons/Ligar.png";
 import OffIcon from "../../../../public/icons/Parar.png";
 import WaterOnIcon from "../../../../public/icons/Com_agua.png";
 import WaterOffIcon from "../../../../public/icons/Sem_agua.png";
-import ErrorIcon from "../../../../public/icons/Exclamação.png";
 import ClockwiseIcon from "../../../../public/icons/Sentido_horario.png";
 import AntiClockwiseIcon from "../../../../public/icons/Sentido_antihorario.png";
-import { useState } from "react";
-import { addHours, format } from "date-fns";
+
+import Router from "next/router";
+
 import { useContextScheduleData } from "hooks/useContextScheduleData";
 import { useContextActionCrud } from "hooks/useActionsCrud";
 
@@ -20,10 +20,10 @@ type PropsProvider = {
 
 const DateScheduleCard = (props: PropsProvider) => {
   const { schedule } = props
-  const { dateScheduleList, setDateScheduleList } = useContextScheduleData()
+  const { dateScheduleList, setDateScheduleList, setEditingSchedule,setEditingScheduleType } = useContextScheduleData()
   const { deleteDateSchedule, getDateSchedulings } = useContextActionCrud()
 
-  const formatDate = (date: String) => {
+  const formatDate = (date: string | any) => {
     const [dates, hours] = date.split(' ')
     const [hour, min, sec] = hours.split(':')
     return `${dates} as ${hour}:${min}`;
@@ -38,6 +38,15 @@ const DateScheduleCard = (props: PropsProvider) => {
           })
         }
       })
+  }
+  const handleEditSchedule = () => {
+    setEditingSchedule(schedule)
+    if(schedule.is_stop){
+      setEditingScheduleType('EasyStop')
+    }else{
+      setEditingScheduleType('Complete')
+    }
+    Router.push(`edit_schedule`)
   }
 
   return (
@@ -103,8 +112,9 @@ const DateScheduleCard = (props: PropsProvider) => {
               Excluir
             </S.ButtonText>
           </S.DeleteButton>
+
           <S.EditButton
-          //onClick={() => setIsCollapsed(oldState => !oldState)}
+            onClick={() => handleEditSchedule()}
           >
             <S.EditIcon />
             <S.EditButtonText>

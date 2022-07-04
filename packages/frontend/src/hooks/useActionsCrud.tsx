@@ -30,9 +30,11 @@ import {
   requestCreateNewAngleSchedule,
   requestGetAngleSchedulings,
   requestDeleteAngleSchedule,
+  requestEditAngleSchedule,
   requestCreateNewDateSchedule,
   requestGetDateSchedulings,
   requestDeleteDateSchedule,
+  requestEditDateSchedule
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
@@ -44,7 +46,7 @@ import User, { requestUser, UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 import { useContextAuth } from "./useLoginAuth";
 import { useContextUserData } from "./useContextUserData";
-import Schedule from "utils/models/schedulings";
+import Schedule, { AngleSchedule, DateSchedule } from "utils/models/schedulings";
 import { useContextScheduleData } from "./useContextScheduleData";
 interface UserProviderProps {
   children: React.ReactNode;
@@ -88,7 +90,9 @@ interface actionCrudProps {
   createNewDateSchedule: (schedule: Schedule) => Promise<void>;
   getDateSchedulings: (pivot_id: string) => Promise<any>;
   deleteAngleSchedule: (schedule_id: string) => Promise<any>;
-  deleteDateSchedule: (schedule_id: string) => Promise<any>
+  deleteDateSchedule: (schedule_id: string) => Promise<any>;
+  editAngleSchedule: (schedule: AngleSchedule) => Promise<void>;
+  editDateSchedule: (schedule: DateSchedule) => Promise<void>;
 }
 
 const ActionCrudContext = createContext({} as actionCrudProps);
@@ -292,8 +296,9 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
       return result
     }
   }
-
-
+  const editAngleSchedule = async (schedule: AngleSchedule) => {
+    const result = await requestEditAngleSchedule(schedule, user?.token);
+  }
 
 
   const createNewDateSchedule = async (schedule: Schedule) => {
@@ -310,6 +315,9 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     if (result) {
       return result
     }
+  }
+  const editDateSchedule = async (schedule: DateSchedule) => {
+    const result = await requestEditDateSchedule(schedule, user?.token);
   }
 
 
@@ -349,7 +357,9 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         createNewDateSchedule,
         getDateSchedulings,
         deleteAngleSchedule,
-        deleteDateSchedule
+        deleteDateSchedule,
+        editAngleSchedule,
+        editDateSchedule
       }}
     >
       {children}
