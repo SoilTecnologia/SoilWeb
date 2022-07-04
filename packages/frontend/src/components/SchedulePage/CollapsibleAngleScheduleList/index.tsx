@@ -24,6 +24,7 @@ const CollapsibleAngleScheduleList = () => {
         })
     }
   }
+  console.log(angleScheduleList)
 
   return (
     <S.Container>
@@ -33,9 +34,14 @@ const CollapsibleAngleScheduleList = () => {
         </S.Text>
       </S.ScheduleListButton>
       {isCollapsed && (
-        <S.ScheduleListWrapper>
-          {angleScheduleList.map((schedule: AngleSchedule) => (<AngleScheduleCard schedule={schedule} />))}
-        </S.ScheduleListWrapper>
+        JSON.stringify(angleScheduleList) != JSON.stringify([]) ? (
+          <S.ScheduleListWrapper>
+            {angleScheduleList.map((schedule: AngleSchedule) => (<AngleScheduleCard schedule={schedule} />))}
+          </S.ScheduleListWrapper>
+        ) :
+          <S.EmptyText>
+            Nenhum agendamento por ângulo foi encontrado!
+          </S.EmptyText>
       )
       }
     </S.Container>

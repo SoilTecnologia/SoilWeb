@@ -34,6 +34,13 @@ export const Text = styled.h1`
     color: ${theme.colors.secondary};
   `}
 `;
+export const EmptyText = styled.h1`
+  ${({ theme }) => css`
+    font-size: ${theme.font.sizes.xxlarge};
+    font-family: ${theme.font.family.Montserrat_bold};
+    color: ${theme.colors.primary};
+  `}
+`;
 export const ScheduleListWrapper = styled.h1`
   ${({ theme }) => css`
     display: flex;

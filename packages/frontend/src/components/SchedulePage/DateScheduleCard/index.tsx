@@ -23,9 +23,10 @@ const DateScheduleCard = (props: PropsProvider) => {
   const { dateScheduleList, setDateScheduleList } = useContextScheduleData()
   const { deleteDateSchedule, getDateSchedulings } = useContextActionCrud()
 
-  const formatDate = (date: string | Date) => {
-    const dateString = format(addHours(new Date(date as Date), 3), 'dd/MM/yyyy  HH:mm');
-    return dateString;
+  const formatDate = (date: String) => {
+    const [dates, hours] = date.split(' ')
+    const [hour, min, sec] = hours.split(':')
+    return `${dates} as ${hour}:${min}`;
   };
   const handleDeleteSchedule = async () => {
     await deleteDateSchedule(schedule.scheduling_id)
@@ -49,7 +50,7 @@ const DateScheduleCard = (props: PropsProvider) => {
         <S.StatusWrapper>
           {!schedule.is_stop && (
             <S.Wrapper>
-              <S.Text>Inicio: {formatDate(schedule.start_timestamp as Date)}</S.Text>
+              <S.Text>Inicio: {formatDate(schedule.start_timestamp)}</S.Text>
 
               <S.Status>
                 <S.ImageContainer>
@@ -82,7 +83,7 @@ const DateScheduleCard = (props: PropsProvider) => {
             </S.Wrapper>
           )}
           <S.Wrapper>
-            <S.Text>Término: {formatDate(schedule.end_timestamp as Date)}</S.Text>
+            <S.Text>Término: {formatDate(schedule.end_timestamp)}</S.Text>
             <S.Status>
               <S.ImageContainer>
                 <Image layout="responsive" src={OffIcon} alt={"Desligado"} />

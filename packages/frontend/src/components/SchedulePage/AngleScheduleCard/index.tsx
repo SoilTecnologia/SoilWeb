@@ -24,9 +24,10 @@ const AngleScheduleCard = (props: PropsProvider) => {
   const { angleScheduleList, setAngleScheduleList } = useContextScheduleData()
   const { deleteAngleSchedule, getAngleSchedulings } = useContextActionCrud()
 
-  const formatDate = (date: String | Date) => {
-    const dateString = format(addHours(new Date(date as Date), 3), 'dd/MM/yyyy  HH:mm');
-    return dateString;
+  const formatDate = (date: String) => {
+    const [dates, hours] = date.split(' ')
+    const [hour, min, sec] = hours.split(':')
+    return `${dates} as ${hour}:${min}`;
   };
 
   const handleDeleteSchedule = async () => {
@@ -51,7 +52,7 @@ const AngleScheduleCard = (props: PropsProvider) => {
         <S.StatusWrapper>
           {!schedule.is_return && (
             <S.Wrapper>
-              <S.Text>Inicio: {formatDate(schedule.start_timestamp as Date)}</S.Text>
+              <S.Text>Inicio: {formatDate(schedule.start_timestamp)}</S.Text>
 
               <S.Status>
                 <S.ImageContainer>
@@ -86,7 +87,7 @@ const AngleScheduleCard = (props: PropsProvider) => {
           )}
           <S.Wrapper>
             {schedule.is_return && (
-              <S.Text>Início: {formatDate(schedule.start_timestamp as Date)}</S.Text>
+              <S.Text>Início: {formatDate(schedule.start_timestamp)}</S.Text>
             )}
 
             <S.Text>Angulo Final: {schedule.end_angle}</S.Text>

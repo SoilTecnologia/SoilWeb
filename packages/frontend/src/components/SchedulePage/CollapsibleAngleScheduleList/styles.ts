@@ -3,18 +3,18 @@ export const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    align-items:center;
+    align-items: center;
     width: 100%;
     transition: all 0.3s linear;
     margin: 20px;
   `}
 `;
 export const ScheduleListButton = styled.button`
- ${({ theme }) => css`
+  ${({ theme }) => css`
     display: flex;
-    width:60%;
-    align-items:center;
-    justify-content:center;
+    width: 60%;
+    align-items: center;
+    justify-content: center;
     padding: ${theme.spacings.xxsmall} ${theme.spacings.small};
     background: linear-gradient(
       ${theme.colors.primary} 80%,
@@ -33,6 +33,13 @@ export const Text = styled.h1`
     font-size: ${theme.font.sizes.xxlarge};
     font-family: ${theme.font.family.Montserrat_bold};
     color: ${theme.colors.secondary};
+  `}
+`;
+export const EmptyText = styled.h1`
+  ${({ theme }) => css`
+    font-size: ${theme.font.sizes.xxlarge};
+    font-family: ${theme.font.family.Montserrat_bold};
+    color: ${theme.colors.primary};
   `}
 `;
 export const ScheduleListWrapper = styled.h1`

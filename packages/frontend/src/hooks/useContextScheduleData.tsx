@@ -43,7 +43,7 @@ function UseScheduleDataProvider({ children }: ScheduleProviderProps) {
     percentimeter: 0,
     start_angle: 0,
     end_angle: 0,
-    start_timestamp: new Date(),
+    start_timestamp: '',
     timestamp: new Date().getTime()
 
   })
@@ -55,12 +55,12 @@ function UseScheduleDataProvider({ children }: ScheduleProviderProps) {
     water: null,
     direction: null,
     percentimeter: 0,
-    start_timestamp: new Date(),
-    end_timestamp: new Date(),
+    start_timestamp: '',
+    end_timestamp: '',
     timestamp: new Date().getTime()
   })
-  const [angleScheduleList, setAngleScheduleList] = useState<AngleSchedule[]>([] as AngleSchedule[])
-  const [dateScheduleList, setDateScheduleList] = useState<DateSchedule[]>([] as DateSchedule[])
+  const [angleScheduleList, setAngleScheduleList] = useState<AngleSchedule[]>([])
+  const [dateScheduleList, setDateScheduleList] = useState<DateSchedule[]>([])
   const [editingScheduleType, setEditingScheduleType] = useState<String>('')
   const [editingAngleSchedule, setEditingAngleSchedule] = useState<AngleSchedule>({} as AngleSchedule)
   const [editingDateSchedule, setEditingDateSchedule] = useState<DateSchedule>({} as DateSchedule)
