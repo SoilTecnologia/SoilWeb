@@ -1,6 +1,7 @@
 import { RadioVariableModel } from '../database/model/RadioVariable';
 import { StateModel } from '../database/model/State';
 import { StateVariableModel } from '../database/model/StateVariables';
+import { dateString } from './convertTimeZoneDate';
 import emitter from './eventBus';
 
 export type CustomState = Pick<
@@ -27,10 +28,9 @@ export const isStateDifferent = (
 };
 
 export const isPercentDiferent = (oldPercent: number, newPercent: number) => {
-  const subtractPercent = oldPercent < newPercent ? newPercent - oldPercent : oldPercent - newPercent ;
-  const checkSubtract = subtractPercent > 0 && subtractPercent <= 5
-  console.log(`Checando subtração de ${oldPercent} - ${newPercent} = ${subtractPercent}`)
-  console.log("...")
+  const subtractPercent =
+    oldPercent < newPercent ? newPercent - oldPercent : oldPercent - newPercent;
+  const checkSubtract = subtractPercent > 0 && subtractPercent <= 5;
 
   return checkSubtract || oldPercent === newPercent;
 };
@@ -59,7 +59,9 @@ export const isStateVariableDifferent = (
     const oldPercent = oldStateVariable.percentimeter;
     const newPercent = oldStateVariable.angle;
     console.log(
-      `Estado de percentimetro alterado: antigo, ${oldPercent}, novo: ${newPercent}`
+      `${dateString(
+        new Date()
+      )} Estado de percentimetro alterado: antigo, ${oldPercent}, novo: ${newPercent}`
     );
     console.log('...');
   }

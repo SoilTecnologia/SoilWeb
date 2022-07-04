@@ -15,6 +15,7 @@ import {
 import { GetStateVariableUseCase } from '../../useCases/StateVariable/GetStateVariable/GetStateVariableUseCase';
 import { dateSaoPaulo } from '../../utils/convertTimeZoneDate';
 import { dateRuleSchedule } from '../utils/dateUtils';
+import { scheduleFactory } from '../protocols/scheduleFactory';
 
 class SendSchedulingAngle {
   private job: SchedulingAngleModel;
@@ -42,8 +43,9 @@ class SendSchedulingAngle {
   private configJob(date: Date, callback: CallbackProps) {
     try {
       const rule = dateRuleSchedule(date);
-      schedule.scheduleJob(
-        this.job.scheduling_angle_id,
+      const scheduleName = `${this.job.scheduling_angle_id}-${this.job.pivot_id}`;
+      scheduleFactory.scheduleJob(
+        scheduleName,
         rule,
         callback.bind(null, {
           job: this.job
@@ -167,7 +169,9 @@ class SendSchedulingAngle {
     try {
       const createAction = container.resolve(CreateActionUseCase);
 
-      SendSchedulingAngle.removeJob(job.scheduling_angle_id);
+      SendSchedulingAngle.removeJob(
+        `${job.scheduling_angle_id}-${job.pivot_id}`
+      );
 
       const action: Omit<CreateAction, 'timestamp_sent'> = {
         pivot_id: job.pivot_id,
