@@ -15,6 +15,7 @@ import {
 import { GetStateVariableUseCase } from '../../useCases/data/StateVariable/GetStateVariable/GetStateVariableUseCase';
 import { dateSaoPaulo } from '../../utils/convertTimeZoneDate';
 import { dateRuleSchedule } from '../utils/dateUtils';
+import { scheduleFactory } from '../protocols/scheduleFactory';
 
 class SendSchedulingAngle {
   private job: SchedulingAngleModel;
@@ -42,7 +43,10 @@ class SendSchedulingAngle {
   private configJob(date: Date, callback: CallbackProps) {
     try {
       const rule = dateRuleSchedule(date);
-      schedule.scheduleJob(
+      console.log(
+        `Configurando o agendamento de nome ${this.job.scheduling_angle_id}`
+      );
+      scheduleFactory.scheduleJob(
         this.job.scheduling_angle_id,
         rule,
         callback.bind(null, {

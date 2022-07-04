@@ -2,7 +2,7 @@ import { dateJs } from './handleDates/dateFactory';
 
 
 const dateString = (date?: Date) => {
-  const hour =  dateJs.tz(date).add(3, "hour").format('DD/MM/YYYY-HH:mm:ss')
+  const hour =  dateJs.tz(date).format('DD/MM/YYYY-HH:mm:ss')
   return hour.replace("-", " ")
 }
 
@@ -26,9 +26,9 @@ const dateIsBefore = (dateOne: Date, dateTwo: Date) => {
 };
 
 
-export { 
+export {
   dateIsAter,
-  dateIsBefore, 
-  dateSaoPaulo, 
+  dateIsBefore,
+  dateSaoPaulo,
   dateString,
   dateAddt3 };
