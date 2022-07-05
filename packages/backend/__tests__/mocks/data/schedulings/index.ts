@@ -21,3 +21,10 @@ export const newScheduling = {
   author: userCreated!!.user_id!!,
   scheduling_id: uuidGlobal!!
 };
+
+type newProps = { timestamp?: Date | null; update_timestamp: Date };
+export const putScheduling: Omit<SchedulingModel, 'timestamp'> & newProps = {
+  ...newScheduling,
+  update_timestamp: new Date()
+};
+delete putScheduling.timestamp;

@@ -2,8 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import { container } from 'tsyringe';
 import { messageErrorTryAction } from '@utils/types';
 import { UpdateSchedulingUseCase } from './UpdateSchedulingUseCase';
+import { checkReqData } from '@root/utils/decorators/check-types';
 
 class UpdateSchedulingController {
+  @checkReqData(11)
   async handle(req: Request, res: Response, next: NextFunction) {
     const {
       scheduling_id,
@@ -34,7 +36,7 @@ class UpdateSchedulingController {
         update_timestamp
       });
 
-      res.status(200).send(putScheduling);
+      return res.status(201).send(putScheduling);
     } catch (err) {
       messageErrorTryAction(
         err,
@@ -42,7 +44,7 @@ class UpdateSchedulingController {
         UpdateSchedulingController.name,
         'Update Scheduling'
       );
-      res.status(201).send({ error: err.message });
+      res.status(400).send({ error: err.message });
     }
   }
 }

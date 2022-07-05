@@ -11,7 +11,7 @@ interface IUpdateSchedulingService {
 namespace IUpdateSchedulingService {
   export type Params = OmitScheduling & timestampProps;
   export type Response = Promise<
-    SchedulingModel | undefined | 'scheduling is running'
+    SchedulingModel | undefined | { message: 'scheduling is running' }
   >;
 }
 

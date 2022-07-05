@@ -77,12 +77,12 @@ class CreateSchedulingUseCase implements ICreateSchedulingService {
     if (newScheduling === DATABASE_ERROR) throw new DatabaseErrorReturn();
     else if (!newScheduling) throw new FailedCreateDataError('Scheduling');
 
-    const createHistory = await this.createRepo.create<
-      Omit<SchedulingHistoryModel, 'scheduling_history_id'>,
-      SchedulingHistoryModel
-    >({
+    const createHistory = await this.createRepo.create<SchedulingHistoryModel>({
       table: 'scheduling_historys',
-      data: schedulingModel
+      data: {
+        ...schedulingModel,
+        scheduling_history_id: newScheduling.scheduling_id
+      }
     });
 
     if (createHistory === DATABASE_ERROR) throw new DatabaseErrorReturn();

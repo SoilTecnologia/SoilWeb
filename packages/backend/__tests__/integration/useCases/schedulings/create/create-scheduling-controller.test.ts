@@ -14,9 +14,12 @@ import {
 } from '@tests/mocks/data/global/createDatasDb';
 import { addScheduling } from '@tests/mocks/data/schedulings';
 import { addPivot } from '@tests/mocks/data/pivots';
-import { addFarms } from '@tests/mocks/data/farms/farms-values-mock';
+import { SchedulingHistoryModel } from '@root/database/model/SchedulingHistory';
+import { dateString } from '@root/utils/convertTimeZoneDate';
+import dayjs from 'dayjs';
+import { dateToFormat } from '@tests/mocks/data/global/date';
 
-describe('Create Farms Integration', () => {
+describe('Create Scheduling Integration', () => {
   let token: string;
   let user_id: string;
 
@@ -197,7 +200,48 @@ describe('Create Farms Integration', () => {
     expect(body).toHaveProperty('error', new DataNotFound('Pivot').message);
   });
 
-  it('should be return a status 201 and a new farm', async () => {
+  it('should be create schedule history with schedule id saved', async () => {
+    await createPivot();
+    const { body } = await supertest(app)
+      .post('/schedulings/addScheduling')
+      .send({
+        ...addScheduling,
+        author: user_id
+      })
+      .set('Authorization', token);
+
+    const shceduleHistory = await knex<SchedulingHistoryModel>(
+      'scheduling_historys'
+    )
+      .select('*')
+      .where({ scheduling_history_id: body.scheduling_id })
+      .first();
+
+    expect(shceduleHistory).toHaveProperty(
+      'scheduling_history_id',
+      body.scheduling_id
+    );
+    expect(shceduleHistory).toHaveProperty('power', body.power);
+    expect(shceduleHistory).toHaveProperty('water', body.water);
+    expect(shceduleHistory).toHaveProperty('is_stop', body.is_stop);
+    expect(shceduleHistory).toHaveProperty('direction', body.direction);
+    expect(shceduleHistory).toHaveProperty('author', body.author);
+    expect(shceduleHistory).toHaveProperty('pivot_id', body.pivot_id);
+    expect(shceduleHistory).toHaveProperty('percentimeter', body.percentimeter);
+    expect(dateToFormat(shceduleHistory?.start_timestamp!)).toBe(
+      dateToFormat(body.start_timestamp)
+    );
+    expect(dateToFormat(shceduleHistory?.end_timestamp!)).toBe(
+      dateToFormat(body.end_timestamp)
+    );
+    expect(dateToFormat(shceduleHistory?.timestamp!)).toBe(
+      dateToFormat(body.timestamp)
+    );
+
+    expect(shceduleHistory).toHaveProperty('updated', null);
+  });
+
+  it('should be return a status 201 and a new scheduling', async () => {
     await createPivot();
     const { status, body } = await supertest(app)
       .post('/schedulings/addScheduling')
@@ -215,8 +259,14 @@ describe('Create Farms Integration', () => {
     expect(body).toHaveProperty('power', addScheduling.power);
     expect(body).toHaveProperty('water', addScheduling.water);
     expect(body).toHaveProperty('is_stop', addScheduling.is_stop);
-    expect(body).toHaveProperty('start_timestamp');
-    expect(body).toHaveProperty('timestamp');
-    expect(body).toHaveProperty('end_timestamp');
+    expect(dateToFormat(body.start_timestamp!)).toBe(
+      dateToFormat(addScheduling.start_timestamp!)
+    );
+    expect(dateToFormat(body?.end_timestamp!)).toBe(
+      dateToFormat(addScheduling.end_timestamp!)
+    );
+    expect(dateToFormat(body?.timestamp!)).toBe(
+      dateToFormat(addScheduling.timestamp!)
+    );
   });
 });

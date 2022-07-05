@@ -97,7 +97,7 @@ describe('Update Scheduling Use Case', () => {
 
     const promise = await putScheduling.execute(data);
 
-    expect(promise).toBe('scheduling is running');
+    expect(promise).toHaveProperty('message', 'scheduling is running');
   });
 
   //Teste Put Scheduling
@@ -157,7 +157,7 @@ describe('Update Scheduling Use Case', () => {
       scheduling_id?: string;
     }
 
-    const newData: omit = data;
+    const newData: omit = { ...data };
     delete newData.update_timestamp;
     delete newData.scheduling_id;
 
@@ -166,7 +166,8 @@ describe('Update Scheduling Use Case', () => {
     expect(fnEncrypted).toHaveBeenCalledWith({
       table: 'scheduling_historys',
       data: {
-        ...newData
+        ...newData,
+        updated: data.scheduling_id
       }
     });
 

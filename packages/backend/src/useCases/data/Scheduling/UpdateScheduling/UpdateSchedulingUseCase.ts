@@ -27,14 +27,14 @@ import {
 class UpdateSchedulingUseCase implements IUpdateSchedulingService {
   constructor(
     @inject('GetByIdBase') private getById: IGetByIdBaseRepo,
-    @inject('GetByIdBase') private update: IUpdateBaseRepo,
+    @inject('UpdateBase') private update: IUpdateBaseRepo,
     @inject('CreateBaseRepo') private create: ICreateBaseRepo
   ) {}
 
-  @checkStrings(['author', 'pivot_id', 'scheduling_id', 'direction'])
   @checkBooleans(['is_stop', 'power', 'water'])
   @checkNumbers(['percentimeter'])
   @checkDate(['start_timestamp', 'end_timestamp', 'update_timestamp'])
+  @checkStrings(['author', 'pivot_id', 'scheduling_id', 'direction'])
   async execute({
     author,
     pivot_id,
@@ -64,7 +64,7 @@ class UpdateSchedulingUseCase implements IUpdateSchedulingService {
 
     if (dateIsRuning) {
       console.log('Não é possivel atualizar, agendamento em execução...');
-      return 'scheduling is running';
+      return { message: 'scheduling is running' };
     } else {
       const newScheduling = await this.update.put<SchedulingModel>({
         table: 'schedulings',
@@ -94,7 +94,7 @@ class UpdateSchedulingUseCase implements IUpdateSchedulingService {
 
       const history = await this.create.create<omitId, SchedulingHistoryModel>({
         table: 'scheduling_historys',
-        data: schedule
+        data: { ...schedule, updated: newScheduling.scheduling_id }
       });
 
       if (history === DATABASE_ERROR) throw new DatabaseErrorReturn();

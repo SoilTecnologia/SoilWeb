@@ -172,7 +172,7 @@ describe('Create User Use Case', () => {
   it('should to received a new farm with the data send', async () => {
     addRepo.create.mockResolvedValueOnce(newScheduling).mockResolvedValueOnce({
       ...addNewScheduling,
-      scheduling_history_id: uuidGlobal
+      scheduling_history_id: newScheduling.scheduling_id
     });
 
     const promise = await createService.execute(addNewScheduling);

@@ -4,9 +4,15 @@ import knex from '@root/database';
 import { app } from '@root/app';
 import { addUser } from '@tests/mocks/data/users/user-values-for-mocks';
 import { ParamsNotExpected } from '@root/protocols/errors';
-import { createNode } from '@tests/mocks/data/global/createDatasDb';
+import {
+  createNode,
+  createPivot
+} from '@tests/mocks/data/global/createDatasDb';
+import { FarmModel } from '@root/database/model/Farm';
+import { addScheduling, newScheduling } from '@tests/mocks/data/schedulings';
+import { addPivot } from '@tests/mocks/data/pivots';
 
-describe('Create Farms Integration', () => {
+describe('Create Scheduling Integration', () => {
   let token: string;
   let user_id: string;
 
@@ -29,7 +35,7 @@ describe('Create Farms Integration', () => {
     await knex.destroy();
   });
 
-  it('should be return 400 and error params inválid if to have param null', async () => {
+  it('should be return 400 and error params inválid if to have param in body', async () => {
     const { status, body } = await supertest(app)
       .get('/schedulings/getAllScheduling')
       .send({ name: 'soil' })
@@ -45,6 +51,41 @@ describe('Create Farms Integration', () => {
 
     expect(status).toBe(201);
     expect(body).toHaveLength(0);
+  });
+  it('should be return 401 and error token invalid if received token not expected', async () => {
+    const { status, text } = await supertest(app)
+      .get('/schedulings/getAllScheduling')
+      .set('Authorization', 'abc');
+
+    expect(status).toBe(401);
+    expect(text).toBe('Invalid Token!');
+  });
+
+  it('should to have array farms with database', async () => {
+    const { status, body } = await supertest(app)
+      .get('/schedulings/getAllScheduling')
+      .set('Authorization', token);
+
+    expect(status).toBe(201);
+    expect(body).toHaveLength(0);
+  });
+
+  it('should be return 400 if no farms found', async () => {
+    await createPivot();
+    for (let c = 0; c < 3; c++) {
+      await knex('schedulings').insert({
+        ...addScheduling,
+        pivot_id: addPivot.pivot_id,
+        author: user_id
+      });
+    }
+
+    const { status, body } = await supertest(app)
+      .get('/schedulings/getAllScheduling')
+      .set('Authorization', token);
+
+    expect(status).toBe(201);
+    expect(body).toHaveLength(3);
   });
 
   // it('should be return 400 and error if to have received params not expected', async () => {
