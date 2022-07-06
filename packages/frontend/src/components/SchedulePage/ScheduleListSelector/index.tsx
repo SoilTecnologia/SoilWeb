@@ -2,13 +2,17 @@
 import CollapsibleAngleScheduleList from "../CollapsibleAngleScheduleList";
 import CollapsibleDateScheduleList from "../CollapsibleDateScheduleList";
 import * as S from "./styles";
+type PropsProvider = {
+  pivotId: string
+}
 
-const ScheduleListSelector = () => {
+const ScheduleListSelector = (props: PropsProvider) => {
 
+  const { pivotId } = props
   return (
     <S.Container>
-      <CollapsibleDateScheduleList />
-      <CollapsibleAngleScheduleList />
+      <CollapsibleDateScheduleList pivotId={pivotId} />
+      <CollapsibleAngleScheduleList pivotId={pivotId} />
     </S.Container>
   )
 };

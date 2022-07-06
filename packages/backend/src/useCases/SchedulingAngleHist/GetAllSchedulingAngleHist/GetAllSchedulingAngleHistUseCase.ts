@@ -1,6 +1,10 @@
 import { inject, injectable } from 'tsyringe';
 import { ISchedulingAngleHistRepository } from '../../../database/repositories/SchedulingAngleHist/ISchedulingAngleHistRepository';
-import { dateString } from '../../../utils/convertTimeZoneDate';
+import {
+  dateString,
+  dateStringAdd,
+  dateStringAdd6
+} from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -25,21 +29,20 @@ class GetAllSchedulingAngleHistUseCase {
   async execute() {
     const AllSchedulingsAngleHist = await this.applyQueryGetSchedules();
 
-    if(AllSchedulingsAngleHist && AllSchedulingsAngleHist.length > 0){
-      const schedulings = []
-      for(let schedule of AllSchedulingsAngleHist){
+    if (AllSchedulingsAngleHist && AllSchedulingsAngleHist.length > 0) {
+      const schedulings = [];
+      for (let schedule of AllSchedulingsAngleHist) {
         Object.assign(schedule, {
           ...schedule,
-          start_timestamp: dateString(schedule.start_timestamp!),
-          timestamp: dateString(schedule.timestamp!)
-        })
+          start_timestamp: dateStringAdd(schedule.start_timestamp!),
+          timestamp: dateStringAdd6(schedule.timestamp!)
+        });
 
-        schedulings.push(schedule)
+        schedulings.push(schedule);
       }
 
       return schedulings;
-    }
-    else return []
+    } else return [];
   }
 }
 

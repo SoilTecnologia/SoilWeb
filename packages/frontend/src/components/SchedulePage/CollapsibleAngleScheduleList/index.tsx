@@ -6,8 +6,13 @@ import { AngleSchedule } from "utils/models/schedulings";
 import AngleScheduleCard from "../AngleScheduleCard";
 import * as S from "./styles";
 
-const CollapsibleAngleScheduleList = () => {
-  const { pivot } = useContextUserData()
+type PropsProvider = {
+  pivotId: string
+}
+
+
+const CollapsibleAngleScheduleList = (props:PropsProvider) => {
+  const { pivotId } = props
   const { angleScheduleList, setAngleScheduleList } = useContextScheduleData()
   const { getAngleSchedulings } = useContextActionCrud()
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -17,7 +22,7 @@ const CollapsibleAngleScheduleList = () => {
     if (isCollapsed) {
       setIsCollapsed(false)
     } else {
-      getAngleSchedulings(pivot?.pivot_id)
+      getAngleSchedulings(pivotId)
         .then((response) => {
           setAngleScheduleList(response)
           setIsCollapsed(true)
@@ -35,7 +40,7 @@ const CollapsibleAngleScheduleList = () => {
       {isCollapsed && (
         JSON.stringify(angleScheduleList) != JSON.stringify([]) ? (
           <S.ScheduleListWrapper>
-            {angleScheduleList.map((schedule: AngleSchedule) => (<AngleScheduleCard schedule={schedule} />))}
+            {angleScheduleList.map((schedule: AngleSchedule) => (<AngleScheduleCard key={schedule.scheduling_angle_id} schedule={schedule} />))}
           </S.ScheduleListWrapper>
         ) :
           <S.EmptyText>

@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { UserModel } from '../../../database/model/User';
 import { ISchedulingHistoryRepository } from '../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
-import { dateString } from '../../../utils/convertTimeZoneDate';
+import { dateString, dateStringAdd } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -27,22 +27,21 @@ class GetUserSchedulingHistoryUseCase {
   async execute(author: UserModel['password']) {
     const getUserSchedulingHistory = await this.applyQueryGetByUser(author);
 
-    if(getUserSchedulingHistory && getUserSchedulingHistory.length > 0){
-      const schedulings = []
-      for(let schedule of getUserSchedulingHistory){
+    if (getUserSchedulingHistory && getUserSchedulingHistory.length > 0) {
+      const schedulings = [];
+      for (let schedule of getUserSchedulingHistory) {
         Object.assign(schedule, {
           ...schedule,
-          start_timestamp: dateString(schedule.start_timestamp!),
-          end_timestamp: dateString(schedule.end_timestamp!),
-          timestamp: dateString(schedule.timestamp!)
-        })
+          start_timestamp: dateStringAdd(schedule.start_timestamp!),
+          end_timestamp: dateStringAdd(schedule.end_timestamp!),
+          timestamp: dateStringAdd(schedule.timestamp!)
+        });
 
-        schedulings.push(schedule)
+        schedulings.push(schedule);
       }
 
       return schedulings;
-    }
-    else return []
+    } else return [];
   }
 }
 

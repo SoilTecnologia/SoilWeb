@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { ISchedulingRepository } from '../../../database/repositories/Scheduling/ISchedulingRepository';
-import { dateString } from '../../../utils/convertTimeZoneDate';
+import { dateString, dateStringAdd } from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -24,22 +24,21 @@ class GetAllSchedulingUseCase {
   }
   async execute() {
     const allSchedulings = await this.applyQueryGetAllScheduling();
-    if(allSchedulings && allSchedulings.length > 0){
-      const schedulings = []
-      for(let schedule of allSchedulings){
+    if (allSchedulings && allSchedulings.length > 0) {
+      const schedulings = [];
+      for (let schedule of allSchedulings) {
         Object.assign(schedule, {
           ...schedule,
-          start_timestamp: dateString(schedule.start_timestamp!),
-          end_timestamp: dateString(schedule.end_timestamp!),
-          timestamp: dateString(schedule.timestamp!)
-        })
+          start_timestamp: dateStringAdd(schedule.start_timestamp!),
+          end_timestamp: dateStringAdd(schedule.end_timestamp!),
+          timestamp: dateStringAdd(schedule.timestamp!)
+        });
 
-        schedulings.push(schedule)
+        schedulings.push(schedule);
       }
 
       return schedulings;
-    }
-    else return []
+    } else return [];
   }
 }
 

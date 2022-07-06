@@ -7,8 +7,12 @@ import { DateSchedule } from "utils/models/schedulings";
 import DateScheduleCard from "../DateScheduleCard";
 import * as S from "./styles";
 
-const CollapsibleDateScheduleList = () => {
-  const { pivot } = useContextUserData();
+type PropsProvider = {
+  pivotId: string;
+};
+
+const CollapsibleDateScheduleList = (props: PropsProvider) => {
+  const { pivotId } = props;
   const { dateScheduleList, setDateScheduleList } = useContextScheduleData();
   const { getDateSchedulings } = useContextActionCrud();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -17,8 +21,7 @@ const CollapsibleDateScheduleList = () => {
     if (isCollapsed) {
       setIsCollapsed(false);
     } else {
-      getDateSchedulings(pivot.pivot_id).then((response) => {
-        console.log(response);
+      getDateSchedulings(pivotId).then((response) => {
         setDateScheduleList(response);
         setIsCollapsed(true);
       });
@@ -34,7 +37,10 @@ const CollapsibleDateScheduleList = () => {
         (JSON.stringify(dateScheduleList) != JSON.stringify([]) ? (
           <S.ScheduleListWrapper>
             {dateScheduleList.map((schedule: DateSchedule) => (
-              <DateScheduleCard schedule={schedule} />
+              <DateScheduleCard
+                key={schedule.scheduling_id}
+                schedule={schedule}
+              />
             ))}
           </S.ScheduleListWrapper>
         ) : (

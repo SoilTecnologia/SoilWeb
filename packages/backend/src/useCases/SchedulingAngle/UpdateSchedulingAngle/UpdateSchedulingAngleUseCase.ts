@@ -75,7 +75,9 @@ class UpdateSchedulingAngleUseCase {
         console.log('...');
         return 'scheduling is running';
       } else {
-        
+        console.log(
+          `Atualizando o Agendamento por angulo ${scheduling_angle.scheduling_angle_id} às ${update_timestamp} com \nInicio às ${scheduling_angle.start_timestamp} `
+        );
         const newSchedulingAngle = await this.applyQueryUpdateSchedule({
           ...scheduling_angle,
           start_timestamp: dateSaoPaulo(scheduling_angle.start_timestamp!),
@@ -83,9 +85,11 @@ class UpdateSchedulingAngleUseCase {
         });
 
         if (newSchedulingAngle) {
-
-          type omitId = Omit<SchedulingAngleHistModel,'scheduling_angle_hist_id'>
-          const schedule: omitId =  newSchedulingAngle;
+          type omitId = Omit<
+            SchedulingAngleHistModel,
+            'scheduling_angle_hist_id'
+          >;
+          const schedule: omitId = newSchedulingAngle;
           delete schedule.scheduling_angle_id;
 
           await this.applyQueryCreateHistory({

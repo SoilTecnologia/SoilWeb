@@ -27,7 +27,7 @@ const Socket = () => {
     VariableSocket: false,
   });
 
-  const socket = io(urlIo.gateway, { transports: ["websocket"] });
+  const socket = io(urlIo.newDev, { transports: ["websocket"] });
 
   useEffect(() => {
     if (user?.user_id && farm?.farm_id) {
@@ -48,7 +48,6 @@ const Socket = () => {
     }
     return () => {
       socket.close();
-      console.log("fechou");
     };
   }, [user, farm]);
 

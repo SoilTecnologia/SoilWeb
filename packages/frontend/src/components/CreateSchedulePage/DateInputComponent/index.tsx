@@ -56,17 +56,17 @@ const DateInputComponent = () => {
   const handleSetStartDate = (value: Date) => {
     setStartDate(value as Date)
     if (scheduleType == 'StopAngle' || scheduleType == 'AutoReturn') {
-      setNewAngleSchedule(prevState => ({ ...prevState, ['start_timestamp']: new Date(value).valueOf() }))
+      setNewAngleSchedule(prevState => ({ ...prevState, ['start_timestamp']: value.getTime() }))
 
     }
     else if (scheduleType == 'Complete' || scheduleType == 'EasyStop') {
-      setNewDateSchedule(prevState => ({ ...prevState, ['start_timestamp']: new Date(value).valueOf() }))
+      setNewDateSchedule(prevState => ({ ...prevState, ['start_timestamp']: value.getTime() }))
     }
   }
 
   const handleSetEndDate = (value: Date) => {
     setEndDate(value as Date)
-    setNewDateSchedule(prevState => ({ ...prevState, ['end_timestamp']: new Date(value).valueOf() }))
+    setNewDateSchedule(prevState => ({ ...prevState, ['end_timestamp']: value.getTime() }))
 
 
   }

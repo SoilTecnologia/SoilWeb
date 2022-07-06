@@ -78,6 +78,9 @@ class CreateSchedulingUseCase {
       timestamp: timestamp ? dateSaoPaulo(timestamp!) : dateSaoPaulo(new Date())
     });
 
+    console.log(
+      `Criando Novo agendamento por data às ${timestamp} com \nInicio às ${start_timestamp} \nTérmino ás ${end_timestamp} `
+    );
     const newScheduling = await this.applyQueryCreate(schedulingModel);
 
     if (newScheduling) {

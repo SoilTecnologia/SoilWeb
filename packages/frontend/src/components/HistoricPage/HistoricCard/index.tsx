@@ -80,20 +80,26 @@ const HistoricCard = ({ historic }: PropsProvider) => {
           )}
 
         </S.StatusWrapper>
-        <S.ExapandButton
-          onClick={() => setIsCollapsed(oldState => !oldState)}
-        >
-          <S.Text>
-            Expandir
-          </S.Text>
-        </S.ExapandButton>
+        {!historic.is_running && (
+
+          <S.ExapandButton
+            onClick={() => setIsCollapsed(oldState => !oldState)}
+          >
+            <S.Text>
+              {!isCollapsed ? 'Exibir' : 'Fechar'}
+            </S.Text>
+          </S.ExapandButton>
+        )}
+
       </S.StatusWrapper>
+
       {(isCollapsed && !historic.is_running) && (
         <S.StatusWrapper>
           <PercentChart historic={historic} />
-          <TimeLineComponent historic={historic}/>
+          <TimeLineComponent historic={historic} />
         </S.StatusWrapper>
       )}
+
     </S.Card >
   );
 };

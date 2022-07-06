@@ -57,9 +57,18 @@ class ManageSchedule {
     try {
       const schedulling = await getAllSchedullingUseCase.execute();
       if (schedulling && schedulling.length > 0) {
+        console.log(`Existem agendamentos por data pendentes, iniciando verificação... \nChecando se a data atual é maior que data dos agendamentos
+          `);
+
         for (const job of schedulling) {
-          const dateIsBefore = checkDateGranted(job.end_timestamp!!);
-          const startIsBefore = checkDateGranted(job.start_timestamp!);
+          const dateIsBefore = checkDateGranted(
+            job.end_timestamp!!,
+            job.scheduling_id
+          );
+          const startIsBefore = checkDateGranted(
+            job.start_timestamp!,
+            job.scheduling_id
+          );
           // Se a data atual for maior que a data de fim do agendamento,
           //pode excluir o agendamento do banco de dados
           // Se não verifica se a data atual for maior que a data de inicio,
@@ -75,8 +84,9 @@ class ManageSchedule {
                     .toDate()
                 : job.start_timestamp
             };
-            console.log('Adicionando novo agendamento ao listener....');
-            console.log('...');
+            console.log(
+              'Adicionando novo agendamento por data ao listener....'
+            );
             const listenerSchedule = new SendSchedulingListening();
             await listenerSchedule.addListening({
               scheduling: newJob,
@@ -84,6 +94,7 @@ class ManageSchedule {
             });
           }
         }
+        console.log('');
       }
     } catch (err) {
       messageErrorTryAction(err, false, ManageSchedule.name, 'GetSchedule');
@@ -102,13 +113,7 @@ class ManageSchedule {
   }
 
   private async enqueueOneJob(job: ScheduleEmitter) {
-    console.log(
-      `Adicionando no Send Action o agendamento... ${JSON.stringify(
-        job,
-        null,
-        2
-      )}`
-    );
+    console.log('Adicionando novo agendamento por data ao listener....');
     const listenerSchedule = new SendSchedulingListening();
     await listenerSchedule.addListening(job);
   }

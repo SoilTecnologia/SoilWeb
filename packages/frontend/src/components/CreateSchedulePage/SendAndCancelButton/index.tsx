@@ -11,6 +11,10 @@ const SendAndCancelButton = () => {
   const { createNewAngleSchedule, createNewDateSchedule, getDateSchedulings, getAngleSchedulings } = useContextActionCrud()
   const [inicialAngleIntentsState, setAngleInicialIntentsState] = useState({} as Schedule)
   const [inicialDateIntentsState, setDateInicialIntentsState] = useState({} as Schedule)
+  const [readyAngle, setReadyAngle] = useState(false)
+  const [readyDate, setReadyDate] = useState(false)
+
+
   useEffect(() => {
     setAngleInicialIntentsState({
       pivot_id: '',
@@ -43,28 +47,82 @@ const SendAndCancelButton = () => {
 
   }, [scheduleType])
 
+
+  useEffect(() => {
+    if (readyAngle) {
+      handleSendIntents()
+      setReadyAngle(false)
+    }
+  }, [readyAngle, setReadyAngle])
+
+  useEffect(() => {
+    if (readyDate) {
+      handleSendIntents()
+      setReadyDate(false)
+    }
+  }, [readyDate, setReadyDate])
+
   const resetSchedule = () => {
     setNewAngleSchedule(inicialAngleIntentsState)
     setNewDateSchedule(inicialDateIntentsState)
     setScheduleType('')
   }
 
-  const handleSendIntents = () => {
-    console.log('Angle:', newAngleSchedule, 'Date:', newDateSchedule)
+  const handleSendIntents = async () => {
     if (scheduleType === 'StopAngle' || scheduleType === 'AutoReturn') {
       createNewAngleSchedule(newAngleSchedule).then(() => {
-        getAngleSchedulings(pivot.pivot_id)
-
+        getAngleSchedulings(newAngleSchedule['pivot_id'])
         resetSchedule()
       })
     } else if (scheduleType === 'Complete' || scheduleType === 'EasyStop') {
       createNewDateSchedule(newDateSchedule).then(() => {
-        getDateSchedulings(pivot.pivot_id)
+        getDateSchedulings(newDateSchedule['pivot_id'])
         resetSchedule()
       })
     }
 
   }
+
+  const handleAngleButton = async () => {
+    await angleDataCheck()
+    setReadyAngle(true)
+  }
+  const handleDateButton = async () => {
+    await dateDataCheck()
+    setReadyDate(true)
+  }
+
+  const angleDataCheck = async () => {
+    console.log(newAngleSchedule)
+    for (const [key, value] of Object.entries(newAngleSchedule)) {
+      if (value == null && key != 'direction') {
+        setNewAngleSchedule(prevState => ({ ...prevState, [`${key}`]: false }))
+      }
+      else if (typeof value != 'number' && (key == 'start_timestamp' || key == 'end_timestamp')) {
+        setNewAngleSchedule(prevState => ({ ...prevState, [`${key}`]: value.getTime() }))
+      }
+      else if (value == null && key == 'direction') {
+        setNewAngleSchedule(prevState => ({ ...prevState, [`${key}`]: 'CLOCKWISE' }))
+      }
+    }
+  }
+
+  const dateDataCheck = async () => {
+    for (const [key, value] of Object.entries(newAngleSchedule)) {
+      if (value == null && key != 'direction') {
+        setNewDateSchedule(prevState => ({ ...prevState, [`${key}`]: false }))
+      }
+      else if (value == '' && (key == 'start_timestamp' || key == 'end_timestamp')) {
+        setNewDateSchedule(prevState => ({ ...prevState, [`${key}`]: new Date().getTime() }))
+      }
+      else if (value == null && key == 'direction') {
+        setNewDateSchedule(prevState => ({ ...prevState, [`${key}`]: 'CLOCKWISE' }))
+      }
+    }
+
+
+  }
+
 
   const renderCondition = () => {
     if ((scheduleType === 'StopAngle' || scheduleType === 'AutoReturn') && newAngleSchedule != inicialAngleIntentsState) {
@@ -77,7 +135,7 @@ const SendAndCancelButton = () => {
             </S.ButtonText>
 
           </S.ResetButton>
-          <S.ConfirmButton onClick={() => handleSendIntents()}>
+          <S.ConfirmButton onClick={() => handleAngleButton()}>
             <S.ButtonText>
               Confirmar
             </S.ButtonText>
@@ -95,7 +153,7 @@ const SendAndCancelButton = () => {
             </S.ButtonText>
 
           </S.ResetButton>
-          <S.ConfirmButton onClick={() => handleSendIntents()}>
+          <S.ConfirmButton onClick={() => handleDateButton()}>
             <S.ButtonText>
               Confirmar
             </S.ButtonText>

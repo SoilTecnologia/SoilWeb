@@ -72,7 +72,9 @@ class CreateSchedulingAngleUseCase {
       start_timestamp: dateSaoPaulo(start_timestamp!),
       timestamp: dateSaoPaulo(timestamp!)
     });
-
+    console.log(
+      `Criando Novo agendamento por angulo às ${timestamp} com \nInicio às ${start_timestamp}  `
+    );
     const newSchedulingAngleData = await this.applyQueryCreateAngle(
       schedulingAngleModel
     );

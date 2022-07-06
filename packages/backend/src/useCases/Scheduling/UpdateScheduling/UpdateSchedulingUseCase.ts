@@ -82,6 +82,9 @@ class UpdateSchedulingUseCase {
       console.log('Não é possivel atualizar, agendamento em execução...');
       return 'scheduling is running';
     } else {
+      console.log(
+        `Atualizando o Agendamento por data ${scheduling.scheduling_id} às ${update_timestamp} com \nInicio às ${scheduling.start_timestamp} \nTérmino ás ${scheduling.end_timestamp} `
+      );
       const newScheduling = await this.applyQueryUpdate({
         ...scheduling,
         start_timestamp: dateSaoPaulo(scheduling.start_timestamp!),

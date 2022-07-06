@@ -1,4 +1,3 @@
-
 import { container } from 'tsyringe';
 import { SchedulingAngleModel } from '../../database/model/SchedulingAngle';
 import { DeleteSchedulingAngleUseCase } from '../../useCases/SchedulingAngle/DeleteSchedulingAngle/DeleteSchedulingAngleUseCase';
@@ -58,8 +57,13 @@ class ManageScheduleAngle {
     try {
       const schedulling = await getAllSchedulingAngle.execute();
       if (schedulling && schedulling.length > 0) {
+        console.log(`Existem agendamentos por data pendentes, iniciando verificação... \nChecando se a data atual é maior que data dos agendamentos
+          `);
         for (const job of schedulling) {
-          const dateIsBefore = checkDateGranted(job.start_timestamp!);
+          const dateIsBefore = checkDateGranted(
+            job.start_timestamp!,
+            job.scheduling_angle_id
+          );
           if (dateIsBefore) {
             console.log('Data de inicio do agendamento expirada...');
             this.removeScheduleDb(job.scheduling_angle_id);
@@ -80,16 +84,16 @@ class ManageScheduleAngle {
     if (this.jobs && this.jobs.length > 0) {
       for (const job of this.jobs) {
         console.log('Adicionando novo agendamento ao listener....');
-        console.log('...');
         const listenerSchedule = new SendSchedulingAngle(job);
 
         await listenerSchedule.addListening();
       }
+      console.log('');
     }
   }
 
   private async enqueueOneJob({ scheduling, isPut }: ScheduleAngleEmitter) {
-    console.log('Adicionando novo agendamento ao listener....');
+    console.log('Adicionando novo agendamento por angulo ao listener....');
     console.log('...');
     const listenerSchedule = new SendSchedulingAngle({ scheduling, isPut });
 

@@ -4,6 +4,8 @@ import timezone from 'dayjs/plugin/timezone';
 import schedule from 'node-schedule';
 import { RecurrenceRule } from 'node-schedule';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { dateJs } from '../../utils/handleDates/dateFactory';
+import { dateSaoPaulo, dateString } from '../../utils/convertTimeZoneDate';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -24,12 +26,13 @@ const dateRuleSchedule = (date: Date): RecurrenceRule => {
   return rule;
 };
 
-const checkDateGranted = (date: Date) => {
-  const dateNow = dayjs().tz('America/Sao_Paulo').subtract(3, 'hour');
-  const dateReceived = dayjs(date).tz('America/Sao_Paulo');
-  const dateIsBefore = dayjs(dateReceived).isSameOrBefore(dateNow);
-  console.log(`Data agora: ${dateNow}`);
-  console.log(`Data recebida: ${dateReceived}`);
+const checkDateGranted = (date: Date, agendamento?: string) => {
+  const dateNow = dayjs().subtract(3, 'hour');
+  const dateReceived = dayjs(date).add(1, 'month').subtract(1, 'day');
+  const dateIsBefore = dateReceived.isSameOrBefore(dateNow);
+  console.log(
+    `Agendamento: ${agendamento}: \nHora Atual -> ${dateNow}, Hora Recebida: ${dateReceived}\n`
+  );
   return dateIsBefore;
 };
 

@@ -6,12 +6,27 @@ import { useEffect, useState } from "react";
 import { AngleSchedule, DateSchedule } from "utils/models/schedulings";
 import dayjs from "dayjs";
 import router from "next/router";
+import { parseCookies } from "nookies";
 
 const SendAndCancelButton = () => {
   const { pivot } = useContextUserData()
   const { editingScheduleType, setEditingScheduleType, editingSchedule, setEditingSchedule, } = useContextScheduleData()
   const { editAngleSchedule, editDateSchedule, getDateSchedulings, getAngleSchedulings } = useContextActionCrud()
   const [inicialState, setInicialState] = useState(editingSchedule)
+  const [Ids, setIds] = useState({
+    pivotId: '',
+    pivotNum: 0
+  })
+
+  useEffect(() => {
+    const { "user-pivot-id": pivot_id, "soilauth-userid": user_id, "user-pivot-num": pivot_num } =
+      parseCookies();
+    setIds({
+      pivotId: pivot.pivot_id || pivot_id,
+      pivotNum: pivot.pivot_num || Number(pivot_num)
+    })
+
+  }, []);
 
   useEffect(() => {
     setInicialState(editingSchedule)
@@ -24,7 +39,6 @@ const SendAndCancelButton = () => {
     setEditingScheduleType('')
   }
   function formatDate(date: any, control: string) {
-    console.log('ainda n editou', date, control)
     if ((typeof date == 'string')) {
       const [dates, hours] = date.split(" ")
       const [day, month, year] = dates.split('/')
@@ -32,7 +46,6 @@ const SendAndCancelButton = () => {
       const preFormat = `${year}-${month}-${day}T${hour}:${min}:00.000Z`
       const formated = dayjs(preFormat).format(`ddd MMM D YYYY ${hour}:${min}:00 [GMT]ZZ`)
       const timestamp = new Date(formated).getTime()
-      console.log('editou', date, control, timestamp)
       if (control == 'start') {
         setEditingSchedule(prevState => ({ ...prevState, [`start_timestamp`]: timestamp }))
       } else {
@@ -45,15 +58,16 @@ const SendAndCancelButton = () => {
   const handleSendIntents = () => {
     formatDate(editingSchedule.start_timestamp, 'start')
     formatDate(editingSchedule.end_timestamp, 'end')
+
     if (typeof editingSchedule.start_timestamp !== 'string' && typeof editingSchedule.start_timestamp !== 'string') {
       if (editingScheduleType === 'StopAngle' || editingScheduleType === 'AutoReturn') {
         editAngleSchedule(editingSchedule as AngleSchedule).then(() => {
-          getAngleSchedulings(pivot.pivot_id)
+          getAngleSchedulings(Ids.pivotId)
           router.push('schedules')
         })
       } else if (editingScheduleType === 'Complete' || editingScheduleType === 'EasyStop') {
         editDateSchedule(editingSchedule as DateSchedule).then(() => {
-          getDateSchedulings(pivot.pivot_id)
+          getDateSchedulings(Ids.pivotId)
           router.push('schedules')
         })
       }
