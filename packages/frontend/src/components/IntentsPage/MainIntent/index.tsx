@@ -21,7 +21,6 @@ const Icon = ({ children }: iconProps) => <S.Icon>{children}</S.Icon>;
 const MainIntent = () => {
   const { pivot } = useContextUserData();
   const { pivotList } = useContextData();
-
   /* libera e trava a requisição de refresh de estado do pivo, para não haver spawn */
 
   return (

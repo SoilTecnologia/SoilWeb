@@ -13,7 +13,6 @@ const SendAndCancelButton = () => {
 
   const handleSendIntents = () => {
     if (pivot) {
-      console.log(intents)
       sendPivotIntent(pivot.pivot_id, intents)
       setIntents(inicialIntentsState)
     }

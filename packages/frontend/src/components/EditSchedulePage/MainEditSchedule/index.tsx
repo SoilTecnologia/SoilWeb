@@ -1,22 +1,40 @@
 import * as S from "./styles";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { useContextUserData } from "hooks/useContextUserData";
 
 
 import Header from "components/globalComponents/Header";
 import IntentBlock from "../IntentBlock";
-import { useContextScheduleData } from "hooks/useContextScheduleData";
+import { parseCookies } from "nookies";
+
 
 
 
 const MainEditSchedule = () => {
   const { pivot } = useContextUserData();
-  const { editingSchedule } = useContextScheduleData()
+  const [Ids, setIds] = useState({
+    pivotNum: 0
+  })
+
+
+  useEffect(() => {
+    const { "user-pivot-num": pivot_num } =
+      parseCookies();
+    setIds({
+      pivotNum: pivot.pivot_num || Number(pivot_num)
+    })
+
+  }, []);
+
+
+
+
+
   return (
     <S.Container>
       <Header
-        text={`Editando agendamento do Pivô ${pivot?.pivot_num}`}
+        text={`Editando agendamento do Pivô ${Ids.pivotNum}`}
 
       />
       <S.Body>

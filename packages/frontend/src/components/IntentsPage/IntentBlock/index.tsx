@@ -9,9 +9,7 @@ import theme from "styles/theme";
 
 const IntentBlock = () => {
   const { farm, pivot } = useContextUserData();
-  console.log(`Farm : ${JSON.stringify(farm, null, 2)}`);
-  console.log(".....");
-  console.log(`Pivot : ${JSON.stringify(pivot, null, 2)}`);
+
 
   const createGeoJSONCircle = function () {
     const points = 64;
@@ -84,8 +82,8 @@ const IntentBlock = () => {
             mapStyle="mapbox://styles/mapbox/satellite-streets-v11"
             mapboxAccessToken="pk.eyJ1IjoiZWR1YXJkb3BtOTgiLCJhIjoiY2wxNnBmM2R4MDlwMTNibGxxcGk1ZmJ1NyJ9.32_foZvLX17jQIypXtYmCg"
           >
-            <Source id="polygon" type="geojson" data={createGeoJSONCircle()}>
-              <Layer {...layerStyle} />
+            <Source id="polygon" type="geojson" data={createGeoJSONCircle() as any}>
+              <Layer {...layerStyle as any} />
             </Source>
           </Map>
         </S.MapStyle>

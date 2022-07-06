@@ -10,7 +10,6 @@ const Admin = () => {
   const [isAdm, setIsAdm] = useState(false);
 
   useEffect(() => {
-    console.log("HAHasd");
     const {
       "soilauth-token": token,
       "soilauth-usertype": user_type,

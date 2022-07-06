@@ -24,6 +24,7 @@ const PivotsContainer = ({ pivot }: PivotProps) => {
   const handleIntent = () => {
     const propsCookie = { maxAge: 60 * 60 * 2 };
     setCookie(undefined, "user-pivot-id", pivot.pivot_id, propsCookie);
+    setCookie(undefined, "user-pivot-num", pivot.pivot_num.toString(), propsCookie);
     setPivot(pivot);
     Router.push("/intent");
   };

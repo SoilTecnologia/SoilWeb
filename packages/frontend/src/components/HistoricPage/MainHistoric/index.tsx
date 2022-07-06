@@ -17,10 +17,12 @@ import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 
 import theme from "styles/theme";
 import { useEffect } from "react";
+import { parseCookies } from "nookies";
 
 const MainHistoric = () => {
   const { pivot, historic, setHistoric } = useContextUserData();
   const { getPivotHistoric } = useContextActionCrud();
+  const [pivotId, setPivotId] = useState('')
 
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -39,6 +41,14 @@ const MainHistoric = () => {
     setCurrentPage(pageNumber);
   };
 
+
+  useEffect(() => {
+    const { "user-pivot-id": pivot_id, "user-farm-id": farm_id } =
+      parseCookies();
+    setPivotId(pivot.pivot_id || pivot_id)
+
+  }, []);
+
   useEffect(() => {
     return () => {
       setHistoric([]);
@@ -49,14 +59,14 @@ const MainHistoric = () => {
     const formatedStartDate = format(new Date(startDate), "dd-MM-yyyy");
     const formatedEndDate = format(new Date(endDate), "dd-MM-yyyy");
     paginate(1);
-    getPivotHistoric(pivot.pivot_id, formatedStartDate, formatedEndDate);
+    getPivotHistoric(pivotId, formatedStartDate, formatedEndDate);
   };
 
   const useStyles = createTheme({
     overrides: {
 
       MuiInput: {
-        input:{
+        input: {
           textAlign: 'center'
         },
         root: {
@@ -117,7 +127,7 @@ const MainHistoric = () => {
 
           <MuiPickersUtilsProvider utils={DateFnsUtils} locale={pt}>
             <ThemeProvider theme={useStyles}>
-               <DatePicker
+              <DatePicker
                 value={endDate}
                 minDate={startDate}
                 maxDate={new Date()}

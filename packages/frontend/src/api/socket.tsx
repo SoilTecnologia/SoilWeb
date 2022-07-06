@@ -48,7 +48,7 @@ const Socket = () => {
     }
     return () => {
       socket.close();
-      console.log("fechou");
+
     };
   }, [user, farm]);
 
