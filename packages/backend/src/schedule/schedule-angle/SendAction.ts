@@ -26,9 +26,9 @@ class SendSchedulingAngle {
     this.isPut = isPut;
   }
 
-  public static async removeJob(schedule_id: string) {
+  public static async removeJob(schedule_id: string, pivot_id: string) {
     try {
-      schedule.cancelJob(schedule_id);
+      schedule.cancelJob(`${schedule_id}-${pivot_id}`);
       const deleteScheduleAngle = container.resolve(
         DeleteSchedulingAngleUseCase
       );
@@ -169,9 +169,7 @@ class SendSchedulingAngle {
     try {
       const createAction = container.resolve(CreateActionUseCase);
 
-      SendSchedulingAngle.removeJob(
-        `${job.scheduling_angle_id}-${job.pivot_id}`
-      );
+      SendSchedulingAngle.removeJob(job.scheduling_angle_id, job.pivot_id);
 
       const action: Omit<CreateAction, 'timestamp_sent'> = {
         pivot_id: job.pivot_id,
