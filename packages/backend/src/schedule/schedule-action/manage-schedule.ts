@@ -25,9 +25,10 @@ class ManageSchedule {
     const { scheduling } = schedulling;
     this.jobs = this.jobs.filter(
       (job) =>
-        job.scheduling.scheduling_id === scheduling.scheduling_id &&
-        job.scheduling.timestamp === scheduling.timestamp
+        job.scheduling.scheduling_id !== scheduling.scheduling_id &&
+        job.scheduling.timestamp !== scheduling.timestamp
     );
+
     scheduleFactory.cancelJob(`${scheduling.scheduling_id}-start`);
     scheduleFactory.cancelJob(`${scheduling.scheduling_id}-stop`);
   }
@@ -76,11 +77,11 @@ class ManageSchedule {
             };
             console.log('Adicionando novo agendamento ao listener....');
             console.log('...');
-            const listenerSchedule = new SendSchedulingListening({
+            const listenerSchedule = new SendSchedulingListening();
+            await listenerSchedule.addListening({
               scheduling: newJob,
               isPut: false
             });
-            await listenerSchedule.addListening();
           }
         }
       }
@@ -94,15 +95,22 @@ class ManageSchedule {
       for (const job of this.jobs) {
         console.log('Adicionando novo agendamento ao listener....');
         console.log('...');
-        const listenerSchedule = new SendSchedulingListening(job);
-        await listenerSchedule.addListening();
+        const listenerSchedule = new SendSchedulingListening();
+        await listenerSchedule.addListening(job);
       }
     }
   }
 
   private async enqueueOneJob(job: ScheduleEmitter) {
-    const listenerSchedule = new SendSchedulingListening(job);
-    await listenerSchedule.addListening();
+    console.log(
+      `Adicionando no Send Action o agendamento... ${JSON.stringify(
+        job,
+        null,
+        2
+      )}`
+    );
+    const listenerSchedule = new SendSchedulingListening();
+    await listenerSchedule.addListening(job);
   }
 
   async start() {

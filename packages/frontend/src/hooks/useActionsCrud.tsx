@@ -34,7 +34,7 @@ import {
   requestCreateNewDateSchedule,
   requestGetDateSchedulings,
   requestDeleteDateSchedule,
-  requestEditDateSchedule
+  requestEditDateSchedule,
 } from "api/requestApi";
 import { parseCookies } from "nookies";
 import React, { createContext, useContext } from "react";
@@ -46,7 +46,10 @@ import User, { requestUser, UserCreate } from "utils/models/user";
 import { useContextData } from "./useContextData";
 import { useContextAuth } from "./useLoginAuth";
 import { useContextUserData } from "./useContextUserData";
-import Schedule, { AngleSchedule, DateSchedule } from "utils/models/schedulings";
+import Schedule, {
+  AngleSchedule,
+  DateSchedule,
+} from "utils/models/schedulings";
 import { useContextScheduleData } from "./useContextScheduleData";
 interface UserProviderProps {
   children: React.ReactNode;
@@ -111,7 +114,12 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   } = useContextData();
   const { user } = useContextAuth();
   const { setPivot, setHistoric } = useContextUserData();
-  const { dateScheduleList, setDateScheduleList, angleScheduleList, setAngleScheduleList } = useContextScheduleData()
+  const {
+    dateScheduleList,
+    setDateScheduleList,
+    angleScheduleList,
+    setAngleScheduleList,
+  } = useContextScheduleData();
   //CRUD USER
   const getAllUser = async (
     tokenState?: string
@@ -239,16 +247,19 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const newPivot = await requestUpdatePivot(pivot, user?.token);
     newPivot && (await getAllPivots(pivot.farm_id));
   };
+
   const sendPivotIntent = async (
     pivotId: Pivot["pivot_id"],
     intent: Intent
   ) => {
     await requestSendPivotIntent(pivotId, intent, user?.token);
   };
+
   const deletePivot = async (pivot: Pivot) => {
     await requestDeletePivot(pivot.pivot_id, user?.token);
     await getAllPivots(pivot.farm_id);
   };
+
   const getPivotHistoric = async (
     pivot_id: Pivot["pivot_id"],
     start_date: string,
@@ -272,6 +283,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
     const result = await requestGetPivotsListWithFarmId(farm_id, user?.token);
     result && setPivotList(result);
   };
+
   const getGetPivotsListForMapWithFarmId = async (farm_id: Farm["farm_id"]) => {
     const result = await requestGetAllPivotsForMapWithFarmId(
       farm_id,
@@ -283,43 +295,41 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
   //Schedulings
   const createNewAngleSchedule = async (schedule: Schedule) => {
     await requestCreateNewAngleSchedule(schedule, user?.token);
-  }
+  };
   const getAngleSchedulings = async (pivot_id: string) => {
-    const result = await requestGetAngleSchedulings(pivot_id, user?.token)
+    const result = await requestGetAngleSchedulings(pivot_id, user?.token);
     if (result) {
-      return result
-    };
-  }
+      return result;
+    }
+  };
   const deleteAngleSchedule = async (schedule_id: string) => {
     const result = await requestDeleteAngleSchedule(schedule_id, user?.token);
     if (result) {
-      return result
+      return result;
     }
-  }
+  };
   const editAngleSchedule = async (schedule: AngleSchedule) => {
     const result = await requestEditAngleSchedule(schedule, user?.token);
-  }
-
+  };
 
   const createNewDateSchedule = async (schedule: Schedule) => {
     await requestCreateNewDateSchedule(schedule, user?.token);
-  }
+  };
   const getDateSchedulings = async (pivot_id: string) => {
     const result = await requestGetDateSchedulings(pivot_id, user?.token);
     if (result) {
-      return result
-    };
-  }
+      return result;
+    }
+  };
   const deleteDateSchedule = async (schedule_id: string) => {
     const result = await requestDeleteDateSchedule(schedule_id, user?.token);
     if (result) {
-      return result
+      return result;
     }
-  }
+  };
   const editDateSchedule = async (schedule: DateSchedule) => {
     const result = await requestEditDateSchedule(schedule, user?.token);
-  }
-
+  };
 
   return (
     <ActionCrudContext.Provider
@@ -359,7 +369,7 @@ function UseCrudContextProvider({ children }: UserProviderProps) {
         deleteAngleSchedule,
         deleteDateSchedule,
         editAngleSchedule,
-        editDateSchedule
+        editDateSchedule,
       }}
     >
       {children}

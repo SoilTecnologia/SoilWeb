@@ -1,14 +1,9 @@
-import dayjs from 'dayjs';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingModel } from '../../../database/model/Scheduling';
 import { SchedulingHistoryModel } from '../../../database/model/SchedulingHistory';
 import { ISchedulingRepository } from '../../../database/repositories/Scheduling/ISchedulingRepository';
 import { ISchedulingHistoryRepository } from '../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
-import {
-  dateIsAter,
-  dateSaoPaulo
-} from '../../../utils/convertTimeZoneDate';
+import { dateIsAter, dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 
@@ -90,12 +85,12 @@ class UpdateSchedulingUseCase {
       const newScheduling = await this.applyQueryUpdate({
         ...scheduling,
         start_timestamp: dateSaoPaulo(scheduling.start_timestamp!),
-        end_timestamp: dateSaoPaulo(scheduling.end_timestamp!),     
+        end_timestamp: dateSaoPaulo(scheduling.end_timestamp!)
       });
 
       if (newScheduling) {
-        type omitId =  Omit<SchedulingHistoryModel, 'scheduling_history_id'>
-        const schedule: omitId = newScheduling 
+        type omitId = Omit<SchedulingHistoryModel, 'scheduling_history_id'>;
+        const schedule: omitId = { ...newScheduling };
         delete schedule.scheduling_id;
 
         await this.applyQueryCreateHistory({

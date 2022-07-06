@@ -37,6 +37,7 @@ class DeleteSchedulingUseCase {
   }
 
   async execute(scheduling_id: SchedulingModel['scheduling_id']) {
+    console.log(`Deletando agendamento... ${scheduling_id}`);
     const scheduling = await this.applyQueryFindById(scheduling_id);
 
     if (!scheduling) throw new Error('Scheduling does not exist');

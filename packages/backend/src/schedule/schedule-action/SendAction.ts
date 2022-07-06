@@ -17,10 +17,7 @@ class SendSchedulingListening {
   private job: SchedulingModel;
   private isPut: boolean;
 
-  constructor({ scheduling, isPut }: ScheduleEmitter) {
-    this.job = scheduling;
-    this.isPut = isPut;
-  }
+  constructor() {}
 
   private configJob(date: Date, callback: CallbackProps, id: string) {
     try {
@@ -68,17 +65,6 @@ class SendSchedulingListening {
 
   private async stopJob({ job }: JobSchedulingModel) {
     const deleteSchedule = container.resolve(DeleteSchedulingUseCase);
-    try {
-      scheduleFactory.cancelJob(`${job.scheduling_id}-start`);
-      scheduleFactory.cancelJob(`${job.scheduling_id}-stop`);
-    } catch (err) {
-      messageErrorTryAction(
-        err,
-        false,
-        SendSchedulingListening.name,
-        'Cancel Job'
-      );
-    }
 
     try {
       await deleteSchedule.execute(job.scheduling_id);
@@ -97,6 +83,9 @@ class SendSchedulingListening {
         job.timestamp,
         true
       );
+
+      scheduleFactory.cancelJob(`${job.scheduling_id}-start`);
+      scheduleFactory.cancelJob(`${job.scheduling_id}-stop`);
     } catch (err) {
       const error = err as Error;
       console.log(`Error in ${SendSchedulingListening.name} of stopJob`);
@@ -105,8 +94,11 @@ class SendSchedulingListening {
     }
   }
 
-  async addListening() {
-    const { start_timestamp, end_timestamp, is_stop } = this.job;
+  async addListening({ scheduling, isPut }: ScheduleEmitter) {
+    this.job = scheduling;
+    this.isPut = isPut;
+
+    const { start_timestamp, end_timestamp, is_stop } = scheduling;
 
     // Enviar para iniciar o agendamento
     if (is_stop) {

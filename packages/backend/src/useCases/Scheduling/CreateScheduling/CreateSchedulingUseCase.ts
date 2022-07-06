@@ -1,9 +1,10 @@
+import dayjs from 'dayjs';
 import { inject, injectable } from 'tsyringe';
 import { SchedulingModel } from '../../../database/model/Scheduling';
 import { SchedulingHistoryModel } from '../../../database/model/SchedulingHistory';
 import { ISchedulingRepository } from '../../../database/repositories/Scheduling/ISchedulingRepository';
 import { ISchedulingHistoryRepository } from '../../../database/repositories/SchedulingHistory/ISchedulingHistoryRepository';
-import {  dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
+import { dateSaoPaulo } from '../../../utils/convertTimeZoneDate';
 import emitter from '../../../utils/eventBus';
 import { messageErrorTryAction } from '../../../utils/types';
 @injectable()
@@ -68,9 +69,13 @@ class CreateSchedulingUseCase {
       water: is_stop ? false : water,
       direction: is_stop ? 'CLOCKWISE' : direction,
       percentimeter: is_stop ? 0 : percentimeter,
-      start_timestamp: dateSaoPaulo(start_timestamp!),
-      end_timestamp: dateSaoPaulo(end_timestamp!),
-      timestamp: dateSaoPaulo(timestamp!)
+      start_timestamp: is_stop
+        ? dateSaoPaulo(timestamp!)
+        : dateSaoPaulo(start_timestamp!),
+      end_timestamp: end_timestamp
+        ? dateSaoPaulo(end_timestamp!)
+        : dateSaoPaulo(new Date()),
+      timestamp: timestamp ? dateSaoPaulo(timestamp!) : dateSaoPaulo(new Date())
     });
 
     const newScheduling = await this.applyQueryCreate(schedulingModel);

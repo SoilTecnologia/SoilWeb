@@ -4,7 +4,11 @@ import { PartialListResponse } from '../../../database/model/types/pivot';
 import { IPivotsRepository } from '../../../database/repositories/Pivots/IPivotsRepository';
 import { IStateRepository } from '../../../database/repositories/States/IState';
 import { IStatesVariableRepository } from '../../../database/repositories/StatesVariables/IStatesVariablesRepository';
-import { dateString } from '../../../utils/convertTimeZoneDate';
+import {
+  dateString,
+  dateStringAdd,
+  dateStringAdd6
+} from '../../../utils/convertTimeZoneDate';
 import { messageErrorTryAction } from '../../../utils/types';
 
 @injectable()
@@ -66,7 +70,6 @@ class ReadListPivotUseCase {
         const variable =
           state &&
           (await this.applyQueryStateVariableByStateId(state.state_id));
-
         const result: PartialListResponse = {
           pivot_id: pivot.pivot_id,
           pivot_num: pivot.pivot_num,
@@ -77,7 +80,8 @@ class ReadListPivotUseCase {
           percentimeter: state && variable ? variable.percentimeter : null,
           rssi: null,
           father: null,
-          timestamp: state && variable ? dateString(variable.timestamp) : null
+          timestamp:
+            state && variable ? dateStringAdd6(variable.timestamp) : null
         };
 
         response.push(result);
