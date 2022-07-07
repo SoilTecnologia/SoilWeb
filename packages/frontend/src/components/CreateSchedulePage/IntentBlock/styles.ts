@@ -1,27 +1,27 @@
-import styled, {css} from "styled-components";
+import styled, { css } from "styled-components";
 
-
-export const Container =styled.div`
+export const Container = styled.div`
   display: flex;
-  flex-direction:column;
-  justify-content:center;
-
+  flex-direction: column;
+  justify-content: center;
 `;
-export const MainRowAlign =styled.div`
+export const MainRowAlign = styled.div`
   display: flex;
-  flex-direction:row;
-  justify-content:center;
-
+  flex-direction: row;
+  justify-content: center;
 `;
 ///left side
 export const ScheduleTypeContainer = styled.div`
-${({theme})=>css`
-  display: flex;
-  width:100%;
-  flex-direction:column;
-  align-items:center;
-`}
+  ${({ theme }) => css`
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding: ${theme.spacings.xsmall};
+  `}
 `;
+
+
 export const HeaderText = styled.h1`
   ${({ theme }) => css`
     font-size: ${theme.font.sizes.xxlarge};
@@ -30,26 +30,25 @@ export const HeaderText = styled.h1`
     padding: 0 ${theme.spacings.xxsmall};
   `}
 `;
-export const Wrapper=styled.div`
-  display:flex;
-  flex-direction:column;
-  margin-top:2rem;
-  align-items:center;
+export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+  align-items: center;
 `;
 
 export const RowAlign = styled.div`
-  display:flex;
-  flex-direction:row;
-  justify-content:space-around;
-  align-items:center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
 `;
 
-export const ScheduleTypeButton= styled.button<{isSelected:boolean}>`
-
+export const ScheduleTypeButton = styled.button<{ isSelected: boolean }>`
   ${({ theme }) => css`
     display: flex;
     width: 30%;
-    min-height:8rem;
+    min-height: 8rem;
     align-self: center;
     align-items: center;
     justify-content: center;
@@ -69,12 +68,13 @@ export const ScheduleTypeButton= styled.button<{isSelected:boolean}>`
       opacity: 0.85;
     }
   `}
-  ${({ theme,isSelected }) => !isSelected&&`
+  ${({ theme, isSelected }) =>
+    !isSelected &&
+    `
 
     background:${theme.colors.off};
 
   `}
-
 `;
 export const ButtonText = styled.h1`
   ${({ theme }) => css`
@@ -85,18 +85,13 @@ export const ButtonText = styled.h1`
   `}
 `;
 
-
-
 ///right side
 export const IntentContainer = styled.div`
-${({theme})=>css`
-  display: flex;
-  width:100%;
-  flex-direction:column;
-  align-items:center;
-  padding:${theme.spacings.xsmall};
+  ${({ theme }) => css`
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding: ${theme.spacings.xsmall};
   `}
 `;
-
-
-

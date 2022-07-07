@@ -14,11 +14,11 @@ const IntentManager = () => {
       < S.Container >
         <S.IntentWrapper>
 
-          <IntentsInlineContainer
+          {/* <IntentsInlineContainer
             intentName="LIGA/DESLIGA"
           >
             <ScheduleSelectionButtons type="power" />
-          </IntentsInlineContainer>
+          </IntentsInlineContainer> */}
 
           <IntentsInlineContainer
             intentName="SENTIDO"
@@ -43,6 +43,10 @@ const IntentManager = () => {
           </IntentsInlineContainer>
 
         </S.IntentWrapper>
+
+
+
+
       </ S.Container >
       : <></>
 

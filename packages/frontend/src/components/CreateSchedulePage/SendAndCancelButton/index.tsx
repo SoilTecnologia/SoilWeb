@@ -93,7 +93,6 @@ const SendAndCancelButton = () => {
   }
 
   const angleDataCheck = async () => {
-    console.log(newAngleSchedule)
     for (const [key, value] of Object.entries(newAngleSchedule)) {
       if (value == null && key != 'direction') {
         setNewAngleSchedule(prevState => ({ ...prevState, [`${key}`]: false }))
@@ -108,12 +107,12 @@ const SendAndCancelButton = () => {
   }
 
   const dateDataCheck = async () => {
-    for (const [key, value] of Object.entries(newAngleSchedule)) {
+    for (const [key, value] of Object.entries(newDateSchedule)) {
       if (value == null && key != 'direction') {
         setNewDateSchedule(prevState => ({ ...prevState, [`${key}`]: false }))
       }
-      else if (value == '' && (key == 'start_timestamp' || key == 'end_timestamp')) {
-        setNewDateSchedule(prevState => ({ ...prevState, [`${key}`]: new Date().getTime() }))
+      else if (typeof value != 'number' && (key == 'start_timestamp' || key == 'end_timestamp')) {
+        setNewDateSchedule(prevState => ({ ...prevState, [`${key}`]: value.getTime() }))
       }
       else if (value == null && key == 'direction') {
         setNewDateSchedule(prevState => ({ ...prevState, [`${key}`]: 'CLOCKWISE' }))
