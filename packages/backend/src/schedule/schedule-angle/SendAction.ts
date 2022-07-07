@@ -13,9 +13,9 @@ import {
   JobSchedulingAngleModel
 } from '../protocols';
 import { GetStateVariableUseCase } from '../../useCases/StateVariable/GetStateVariable/GetStateVariableUseCase';
-import { dateSaoPaulo } from '../../utils/convertTimeZoneDate';
 import { dateRuleSchedule } from '../utils/dateUtils';
 import { scheduleFactory } from '../protocols/scheduleFactory';
+import { dateSaoPaulo } from '../../utils/convertTimeZoneDate';
 
 class SendSchedulingAngle {
   private job: SchedulingAngleModel;
@@ -147,13 +147,13 @@ class SendSchedulingAngle {
       const oldAngleGrantedNewAngle = angle.oldAngle < angle.newAngle;
       const newAngleGrantedStartAngle = angle.newAngle >= job.start_angle!;
 
-      // Checa se o angulo antigo é maior que o novo angulo  quer dizer que o pivo
-      // está indo de 0 a 360 para chegar ao start angulo, então o novo angulo
-      // tem que maior ou igual ao start angulo para iniciar o agendamento.
-      // Se o angulo antigo for menor que o novo angulo quer dizer que
-      // o pivo está indo de 360 a 0 para chegar ao start angulo, então o novo
-      // angulo precisa ser menor ou igual ao start angulo para iniciar o agendamento
-
+      /* Checa se o angulo antigo é maior que o novo angulo  quer dizer que o pivo
+       está indo de 0 a 360 para chegar ao start angulo, então o novo angulo
+       tem que maior ou igual ao start angulo para iniciar o agendamento.
+       Se o angulo antigo for menor que o novo angulo quer dizer que
+       o pivo está indo de 360 a 0 para chegar ao start angulo, então o novo
+       angulo precisa ser menor ou igual ao start angulo para iniciar o agendamento
+      */
       const subtractAngle =
         !oldAngleGrantedNewAngle && newAngleGrantedStartAngle;
       const addAngle = oldAngleGrantedNewAngle && !newAngleGrantedStartAngle;

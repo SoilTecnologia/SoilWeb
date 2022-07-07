@@ -6,7 +6,7 @@ const devWeb = "https://be.soiltech.com.br/";
 const gateway = "192.168.100.104";
 
 export const api = axios.create({
-  baseURL: devLocal,
+  baseURL: prod,
 });
 
 // api.interceptors.request.use((config) => {

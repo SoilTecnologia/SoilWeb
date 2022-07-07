@@ -52,8 +52,8 @@ class IoTDevice {
       this.pubTopic = `cloudHenrique`;
       this.clientId = topic;
     } else {
-      this.subTopic = 'cloudHenrique';
-      this.clientId = clientIdCloud.pcLocal;
+      this.subTopic = 'cloud3';
+      this.clientId = clientIdCloud.newProd;
     }
   }
   /*
@@ -167,7 +167,7 @@ class IoTDevice {
         emitterResponse.addActionStatus(pivotId);
       }
 
-      const { node_num } = handleResultString(id);
+      const { node_num } = await handleResultString(id);
       if (this.type === 'Cloud') {
         if (json.type === 'status') {
           const result = await HandleCloudMessageTypeCloud.receivedStatus({
