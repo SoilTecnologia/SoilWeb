@@ -25,7 +25,7 @@ const IntentBlock = () => {
 
     if (type === 'StopAngle' || type === 'AutoReturn') {
       if (type === 'StopAngle') {
-        setNewAngleSchedule(prevState => ({ ...prevState, ['is_return']: false }))
+        setNewAngleSchedule(prevState => ({ ...prevState, ['is_return']: false, ['power']: true }))
       }
       else {
         setNewAngleSchedule(prevState => ({ ...prevState, ['is_return']: true }))
@@ -34,7 +34,7 @@ const IntentBlock = () => {
 
     else if (type === 'Complete' || type === 'EasyStop') {
       if (type === 'Complete') {
-        setNewDateSchedule(prevState => ({ ...prevState, ['is_stop']: false }))
+        setNewDateSchedule(prevState => ({ ...prevState, ['is_stop']: false, ['power']: true  }))
       } else {
         setNewDateSchedule(prevState => ({ ...prevState, ['is_stop']: true }))
       }
@@ -112,7 +112,7 @@ const IntentBlock = () => {
 
 
       </S.MainRowAlign>
-        <SendAndCancelButton />
+      <SendAndCancelButton />
     </S.Container>
   );
 };
