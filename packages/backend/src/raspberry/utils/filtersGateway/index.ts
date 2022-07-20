@@ -27,17 +27,21 @@ const filterActionGateway = async (actions: ActionsResult[]) => {
 const filterPivotsGateway = async (
   pivots: PivotModel[]
 ): Promise<PivotModel[]> => {
-  const getNode = container.resolve(GetOneNodeUseCase);
-  const allPivots: PivotModel[] = [];
-  for (const pivot of pivots) {
-    const node = await getNode.execute(pivot.node_id!!);
-    if (node?.node_num === 0) allPivots.push(pivot);
+  try {
+    const getNode = container.resolve(GetOneNodeUseCase);
+    const allPivots: PivotModel[] = [];
+    console.log(pivots);
+    if (pivots && pivots.length > 0) {
+      for (const pivot of pivots) {
+        const node = await getNode.execute(pivot.node_id!!);
+        if (node?.node_num === 0) allPivots.push(pivot);
+      }
+    }
+    return allPivots;
+  } catch (err) {
+    console.log(err.message);
+    return [];
   }
-
-  return allPivots;
 };
 
-export {
-  filterActionGateway,
-  filterPivotsGateway
-}
+export { filterActionGateway, filterPivotsGateway };

@@ -1,9 +1,8 @@
 import { StatusObject } from '../../utils/conversions';
 
-export const statusStringToObject = (status: string) => {
+export const statusStringToObject = (status: number[]) => {
   if (status) {
-    let [direction, water, power, percentimeter, angle, timestamp] =
-      status.split('-');
+    let [direction, water, power, percentimeter, angle, timestamp] = status;
 
     let response: StatusObject = {
       power: null,
@@ -14,37 +13,44 @@ export const statusStringToObject = (status: string) => {
       timestamp: new Date()
     };
 
-    if (direction === '3') {
+    if (direction === 3) {
       response.direction = 'CLOCKWISE';
-    } else if (direction === '4') {
+    } else if (direction === 4) {
       response.direction = 'ANTI_CLOCKWISE';
     }
 
-    if (water === '5') {
+    if (water === 5) {
       response.water = false;
-    } else if (water === '6') {
+    } else if (water === 6) {
       response.water = true;
     }
 
-    if (power == '1') {
+    if (power == 1) {
       response.power = true;
-    } else if (power == '2') {
+    } else if (power == 2) {
       response.power = false;
     }
 
-    response.percentimeter = Number(percentimeter);
-    response.angle = Number(angle);
-    response.timestamp = new Date(Number(timestamp));
+    response.percentimeter = percentimeter;
+    response.angle = angle;
+    response.timestamp = new Date(timestamp);
 
     return response;
   }
 };
 
-export const payloadToString = (response: number[]) => {
-  const conertToString = new TextDecoder().decode(new Uint8Array(response));
-  const payloadObject = statusStringToObject(
-    conertToString.substring(0, conertToString.indexOf('#'))
-  );
+// export const payloadToString = (response: number[]) => {
+//   let str = '';
+//   for (let item of response) {
+//     if (typeof item === 'number') {
+//       str += item;
+//     }
+//   }
 
-  return payloadObject;
-};
+//   // const conertToString = new TextDecoder().decode(new Uint8Array(response));
+//   // const payloadObject = statusStringToObject(
+//   //   conertToString.substring(0, conertToString.indexOf('#'))
+//   // );
+
+//   return statusStringToObject(str);
+// };

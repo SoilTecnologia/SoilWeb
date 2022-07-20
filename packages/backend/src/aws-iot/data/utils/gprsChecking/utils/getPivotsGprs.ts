@@ -6,14 +6,19 @@ import { FindAllUseCase } from '../../../../../useCases/Pivots/FindAll/FindAllUs
 const filterPivotsGateway = async (
   pivots: PivotModel[]
 ): Promise<PivotModel[]> => {
-  const getNode = container.resolve(GetOneNodeUseCase);
-  const allPivots: PivotModel[] = [];
-  for (const pivot of pivots) {
-    const node = await getNode.execute(pivot.node_id!!);
-    if (node?.node_num !== 0) allPivots.push(pivot);
-  }
+  try {
+    const getNode = container.resolve(GetOneNodeUseCase);
+    const allPivots: PivotModel[] = [];
+    for (const pivot of pivots) {
+      const node = await getNode.execute(pivot.node_id!!);
+      if (node?.node_num !== 0) allPivots.push(pivot);
+    }
 
-  return allPivots;
+    return allPivots;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
 };
 
 const loadPivots = async () => {

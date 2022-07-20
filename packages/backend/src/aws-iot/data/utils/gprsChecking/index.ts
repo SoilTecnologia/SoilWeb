@@ -35,7 +35,11 @@ class CheckGprsInterval {
   }
 
   public addResponseStatus(pivot_id: string) {
-    this.responseActives.push({ id: pivot_id });
+    const alreadyExists = this.responseActives.find(
+      (res) => res.id === pivot_id
+    );
+    if (alreadyExists) console.log('Pivot já está em checagem');
+    else this.responseActives.push({ id: pivot_id });
   }
 
   private async getStatePivot(pivot_id: string, connection: boolean) {
@@ -96,6 +100,58 @@ class CheckGprsInterval {
     }
   }
 
+  private actionNotIsActive(pivot_id: string) {
+    console.log('Tentativas 1...');
+    this.responseNotActives.push({ id: pivot_id, attempts: 2 });
+    const payload = {
+      payload: '000-000',
+      type: 'status',
+      id: pivot_id
+    };
+    iotDevice.publish(payload, pivot_id);
+
+    setTimeout(async () => {
+      await this.checkResponseActive(pivot_id);
+    }, 15000);
+  }
+
+  private async actionActive(
+    existsNotActive: responseNotActiveProps,
+    pivot_id: string
+  ) {
+    if (existsNotActive.attempts >= 3) {
+      this.responseNotActives = this.responseNotActives.filter(
+        (res) => res.id !== pivot_id
+      );
+
+      console.log(`Tentativas excedidas no pivo ${pivot_id}`);
+      console.log('....');
+      await this.getStatePivot(pivot_id, false);
+    } else {
+      console.log(`Tentativa de conexão n° ${existsNotActive.attempts}`);
+      this.responseNotActives = this.responseNotActives.filter(
+        (res) => res.id !== pivot_id
+      );
+
+      this.responseNotActives.push({
+        id: existsNotActive.id,
+        attempts: existsNotActive.attempts + 1
+      });
+
+      const payload = {
+        payload: '000-000',
+        type: 'status',
+        id: pivot_id
+      };
+
+      iotDevice.publish(payload, pivot_id);
+
+      setTimeout(async () => {
+        await this.checkResponseActive(pivot_id);
+      }, 15000);
+    }
+  }
+
   public async checkResponseActive(pivot_id: string) {
     const resActive = this.responseActives;
     const resNotActive = this.responseNotActives;
@@ -110,48 +166,9 @@ class CheckGprsInterval {
     } else {
       console.log(`Pivo fora do ar: ...${pivot_id}, `);
       const existsNotActive = resNotActive.find((res) => res.id === pivot_id);
-      if (!existsNotActive) {
-        console.log('Tentativas 1...');
-        resNotActive.push({ id: pivot_id, attempts: 2 });
-        const payload = {
-          payload: '000-000',
-          type: 'status',
-          id: pivot_id
-        };
-        iotDevice.publish(payload, pivot_id);
 
-        setTimeout(async () => {
-          await this.checkResponseActive(pivot_id);
-        }, 2000);
-      } else {
-        if (existsNotActive.attempts > 3) {
-          this.responseNotActives = resNotActive.filter(
-            (res) => res.id !== pivot_id
-          );
-          console.log(`Tentativas excedidas no pivo ${pivot_id}`);
-          console.log('....');
-          await this.getStatePivot(pivot_id, false);
-        } else {
-          console.log(`Tentativa de conexão n° ${existsNotActive.attempts}`);
-          const responseWithoutThis = resNotActive.filter(
-            (res) => res.id !== pivot_id
-          );
-          responseWithoutThis.push({
-            id: existsNotActive.id,
-            attempts: existsNotActive.attempts + 1
-          });
-          this.responseNotActives = responseWithoutThis;
-          const payload = {
-            payload: '000-000',
-            type: 'status',
-            id: pivot_id
-          };
-          iotDevice.publish(payload, pivot_id);
-          setTimeout(async () => {
-            await this.checkResponseActive(pivot_id);
-          }, 5000);
-        }
-      }
+      if (!existsNotActive) this.actionNotIsActive(pivot_id);
+      else this.actionActive(existsNotActive, pivot_id);
       // await this.getStatePivot(pivot_id, false)
     }
   }
@@ -178,7 +195,7 @@ class CheckGprsInterval {
 
           setTimeout(() => {
             this.checkResponseActive(pivot.pivot_id);
-          }, 2000);
+          }, 15000);
         }
       } else {
         console.log('Does Not Found Pivots GPRS');

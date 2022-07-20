@@ -57,7 +57,7 @@ export const isStateVariableDifferent = (
 
   if (oldStateVariable.percentimeter !== newStateVariable.percentimeter) {
     const oldPercent = oldStateVariable.percentimeter;
-    const newPercent = oldStateVariable.angle;
+    const newPercent = newStateVariable.percentimeter;
     console.log(
       `${dateString(
         new Date()

@@ -91,7 +91,6 @@ try {
         connection,
         percentimeter
       });
-      emitter.off('connection', () => {});
 
       // console.log(`socket de state: `, status);
     });
@@ -104,7 +103,6 @@ try {
         angle,
         percentimeter
       });
-      emitter.off('variable-change', () => {});
 
       // console.log(`socket de variavel: `, status);
     });
@@ -121,8 +119,6 @@ try {
         pivot_num,
         farm_name
       });
-
-      emitter.off('action-received-ack', () => {});
     });
 
     emitter.on('action-ack-not-received', async (action) => {
@@ -137,8 +133,6 @@ try {
         pivot_num,
         farm_name
       });
-
-      emitter.off('action-ack-not-received', () => {});
     });
   });
 } catch (err) {
@@ -146,8 +140,9 @@ try {
   console.log(err.message);
 }
 
-// raspberry.start();
-// export const iotDevice = new IoTDevice('Raspberry', 0, 'agrishow_0');
-export const iotDevice = new IoTDevice('Cloud', 0);
+export const NODE_ID_GATEWAY = 'agrishow_0';
+raspberry.start();
+export const iotDevice = new IoTDevice('Raspberry', 0, NODE_ID_GATEWAY);
+// export const iotDevice = new IoTDevice('Cloud', 0);
 iotDevice.start();
 InitScheduleData.start();

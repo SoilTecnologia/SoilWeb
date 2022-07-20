@@ -5,6 +5,7 @@ import { UserModel } from '../../model/User';
 
 interface IActionRepository {
   getNotSucess(): Promise<ActionsResult[]>;
+  getNotSucessByPivot(pivot_id: string): Promise<ActionsResult[]>;
   findById(
     action_id: ActionModel['action_id']
   ): Promise<ActionModel | undefined>;

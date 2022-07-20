@@ -26,6 +26,13 @@ class ActionRepository implements IActionRepository {
       .innerJoin('pivots', 'actions.pivot_id', '=', 'pivots.pivot_id');
   }
 
+  async getNotSucessByPivot(pivot_id: string): Promise<ActionsResult[]> {
+    return await knex<ActionModel>('actions')
+      .select('*')
+      .where({ pivot_id, success: null })
+      .join('pivots', 'actions.pivot_id', '=', 'pivots.pivot_id');
+  }
+
   async create(action: CreateAction): Promise<ActionModel[]> {
     const actionCreated = await knex<ActionModel>('actions')
       .insert(action)

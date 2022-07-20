@@ -1,14 +1,11 @@
 import Axios from 'axios';
 import 'reflect-metadata';
 import '../shared/container';
-import { FormDataEncoder } from 'form-data-encoder';
-import { FormData } from 'formdata-node';
-import { Readable } from 'stream';
 import emitter from '../utils/eventBus';
 import GenericQueue from '../utils/generic_queue';
 import { CheckStatusRadio } from './common/checkStatusRadio';
 import { HandleActionActive } from './common/handleActionActive';
-import { payloadToString } from './common/payloadToString';
+import { statusStringToObject } from './common/payloadToString';
 import { ActionData, IdleData, RadioResponse } from './protocols';
 import { loadActions, loadPivots } from './utils';
 
@@ -17,24 +14,23 @@ const TIMEOUT = 10000;
 const activeQueue: GenericQueue<ActionData> = new GenericQueue<ActionData>(); // Guarda as intenções 351..., vao participar da pool que atualiza mais rapido
 const idleQueue: GenericQueue<IdleData> = new GenericQueue<IdleData>(); // Guarda as intenções 00000, vao participar da pool que atualiza de forma mais devagar
 
-export const sendData = async (radio_id: number, data: string) => {
-  const bodyFormData = new FormData();
+export const sendData = async (radio_id: number, intention: string) => {
+  // const bodyFormData = new FormData();
 
-  bodyFormData.set('ID', radio_id);
-  // bodyFormData.set('CMD', '40');
-  bodyFormData.set('intencao', data);
-  const encoder = new FormDataEncoder(bodyFormData);
-  const dataSend = Readable.from(encoder);
+  // bodyFormData.set('ID', radio_id);
+  // // bodyFormData.set('CMD', '40');
+  // bodyFormData.set('intencao', data);
+  // const encoder = new FormDataEncoder(bodyFormData);
+  // const dataSend = Readable.from(encoder);
 
-  const response = await Axios.post<RadioResponse>(
-    `http://192.168.100.100:3031/comands`,
-    dataSend,
-    { headers: encoder.headers, timeout: TIMEOUT }
+  const { data } = await Axios.post<RadioResponse>(
+    `http://192.168.100.104:3031/comands`,
+    { radio_id, intention }
   );
 
-  const result = payloadToString(response.data.payload);
+  const result = statusStringToObject(data.payload);
 
-  return { result, data: response.data };
+  return { result, data };
 };
 
 export const checkPool = async () => {
@@ -51,8 +47,8 @@ export const checkPool = async () => {
 };
 
 export const start = async () => {
-  await loadActions(activeQueue);
   await loadPivots(idleQueue);
+  await loadActions(activeQueue);
 
   emitter.on('action', (action) => {
     activeQueue.enqueue({

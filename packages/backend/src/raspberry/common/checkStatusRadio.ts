@@ -115,13 +115,12 @@ class CheckStatusRadio {
       await this.getStatePivot(false);
 
       this.current.attempts = 1;
-      this.resetCurrent();
     }
-
     this.resetCurrent();
+
     setTimeout(async () => {
       await checkPool();
-    }, 5000);
+    }, 30000 * 2); // 30 segundos
     // this.intervalState(true);
 
     // this.resetCurrent();
@@ -139,6 +138,7 @@ class CheckStatusRadio {
       const { data, result } = await sendData(this.radio_id, '000-000');
 
       const radioDataIsEquals = this.radio_id == data.id;
+
       if (result && radioDataIsEquals && data.status === 'OK') {
         console.log(
           `RadioResponse: ${data.cmdResponse}, Status: ${data.status}`
