@@ -60,6 +60,9 @@ const StatusComponent = () => {
             <S.Percent>
               Percentímetro: {pivot.percentimeter}%
             </S.Percent>
+            <S.Percent>
+              Posição: {pivot.end_angle ? pivot.end_angle : 0}º
+            </S.Percent>
           </>
         )
         }

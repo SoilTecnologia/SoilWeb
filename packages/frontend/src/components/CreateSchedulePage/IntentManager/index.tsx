@@ -20,11 +20,11 @@ const IntentManager = () => {
             <ScheduleSelectionButtons type="power" />
           </IntentsInlineContainer> */}
 
-          <IntentsInlineContainer
+          {scheduleType !== 'StopAngle' && (<IntentsInlineContainer
             intentName="SENTIDO"
           >
             <ScheduleSelectionButtons type="direction" />
-          </IntentsInlineContainer>
+          </IntentsInlineContainer>)}
 
         </S.IntentWrapper>
 

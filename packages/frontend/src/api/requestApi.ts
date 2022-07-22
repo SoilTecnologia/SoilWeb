@@ -299,7 +299,7 @@ export const requestSendPivotIntent = async (
     })
     .then((response) => response.data)
     .catch((err) => {
-      console.log("[ERROR] Falha ao salvar fazenda");
+      console.log("[ERROR] Falha ao enviar ação.");
       console.log(err);
     });
 };

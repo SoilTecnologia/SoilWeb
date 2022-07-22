@@ -37,7 +37,6 @@ function UseScheduleDataProvider({ children }: ScheduleProviderProps) {
     is_return: null,
     power: null,
     water: null,
-    direction: null,
     percentimeter: 0,
     start_angle: 0,
     end_angle: 0,

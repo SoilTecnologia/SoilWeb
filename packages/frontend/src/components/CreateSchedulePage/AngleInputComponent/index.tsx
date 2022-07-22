@@ -3,7 +3,7 @@ import { useState } from "react";
 import * as S from "./styles";
 
 const AngleInputComponent = () => {
-  const { setNewAngleSchedule } = useContextScheduleData()
+  const { scheduleType, setNewAngleSchedule } = useContextScheduleData()
 
   const [startAngle, setStartAngle] = useState(0)
   const [endAngle, setEndAngle] = useState(0)
@@ -26,7 +26,7 @@ const AngleInputComponent = () => {
       </S.Header>
       <S.RowAlign>
 
-        <S.Wrapper>
+        {scheduleType !== 'AutoReturn' && (<S.Wrapper>
           <S.Text>Inicial: </S.Text>
           <S.AngleInput
             type={'number'}
@@ -38,7 +38,7 @@ const AngleInputComponent = () => {
             pattern="[0-9]"
           />
           <S.Text>°</S.Text>
-        </S.Wrapper>
+        </S.Wrapper>)}
 
         <S.Wrapper>
           <S.Text>Final: </S.Text>

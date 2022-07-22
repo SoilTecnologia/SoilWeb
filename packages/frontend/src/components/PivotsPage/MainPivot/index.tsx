@@ -10,34 +10,33 @@ type PivotListProps = {
 
 const MainPivot = ({ pivotList }: PivotListProps) => {
   return (
-    <>
+
+    <S.Container>
       <Header text={"Pivôs"} />
-      <S.Container>
-        <S.ButtonsView>
-          <S.Button href="/farms">
-            <S.AnchorButton>
-              <S.BackIcon />
-              <S.Text>Voltar</S.Text>
-            </S.AnchorButton>
-          </S.Button>
+      <S.ButtonsView>
+        <S.Button href="/farms">
+          <S.AnchorButton>
+            <S.BackIcon />
+            <S.Text>Voltar</S.Text>
+          </S.AnchorButton>
+        </S.Button>
 
-          <S.Button href="/map">
-            <S.AnchorButton>
-              <S.MapIcon />
-              <S.Text>Mapa</S.Text>
-            </S.AnchorButton>
-          </S.Button>
-        </S.ButtonsView>
+        <S.Button href="/map">
+          <S.AnchorButton>
+            <S.MapIcon />
+            <S.Text>Mapa</S.Text>
+          </S.AnchorButton>
+        </S.Button>
+      </S.ButtonsView>
 
-        <S.Grid>
-          {pivotList.map((pivot: Pivot) => (
-            <PivotsContainer key={pivot.pivot_id} pivot={pivot} />
-          ))}
-        </S.Grid>
+      <S.Grid>
+        {pivotList.map((pivot: Pivot) => (
+          <PivotsContainer key={pivot.pivot_id} pivot={pivot} />
+        ))}
+      </S.Grid>
+      <ButtonRefresh pivotList={pivotList} />
+    </S.Container>
 
-        <ButtonRefresh pivotList={pivotList} />
-      </S.Container>
-    </>
   );
 };
 

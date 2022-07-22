@@ -22,7 +22,6 @@ const SendAndCancelButton = () => {
       is_return: null,
       power: null,
       water: null,
-      direction: null,
       percentimeter: 0,
       start_angle: 0,
       end_angle: 0,
@@ -99,9 +98,6 @@ const SendAndCancelButton = () => {
       }
       else if (typeof value != 'number' && (key == 'start_timestamp' || key == 'end_timestamp')) {
         setNewAngleSchedule(prevState => ({ ...prevState, [`${key}`]: value.getTime() }))
-      }
-      else if (value == null && key == 'direction') {
-        setNewAngleSchedule(prevState => ({ ...prevState, [`${key}`]: 'CLOCKWISE' }))
       }
     }
   }

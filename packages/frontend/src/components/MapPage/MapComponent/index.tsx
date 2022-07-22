@@ -230,7 +230,6 @@ const MapComponent = () => {
           const findUpdatedPivot = pivotMapList.pivots?.find((pivot) =>
             pivot.pivot_id == payload.pivot_id ? pivot : null
           );
-          console.log(payload.type, socketPayload);
           if (payload.type == "status") {
             await map?.setPaintProperty(
               `${payload.pivot_id}`,

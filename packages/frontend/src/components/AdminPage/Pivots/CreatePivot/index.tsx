@@ -68,7 +68,6 @@ const CreatePivot = ({ setAddNode, farm }: createPivotProps) => {
   const verifyPivotAlreadyExists = async (pivot: PivotCreate) => {
     const pivotExists = await getOnePivot(pivot);
     if (pivotExists) {
-      console.log("Existe vou chamar o estado de waarning");
       setPivotAlreadyExists(true);
     } else {
       createPivot(pivot);

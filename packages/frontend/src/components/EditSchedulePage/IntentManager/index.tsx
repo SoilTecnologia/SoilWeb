@@ -14,17 +14,11 @@ const IntentManager = () => {
       < S.Container >
         <S.IntentWrapper>
 
-          <IntentsInlineContainer
-            intentName="LIGA/DESLIGA"
-          >
-            <ScheduleSelectionButtons type="power" />
-          </IntentsInlineContainer>
-
-          <IntentsInlineContainer
+          {editingScheduleType !== 'StopAngle' && (<IntentsInlineContainer
             intentName="SENTIDO"
           >
             <ScheduleSelectionButtons type="direction" />
-          </IntentsInlineContainer>
+          </IntentsInlineContainer>)}
 
         </S.IntentWrapper>
 

@@ -29,8 +29,8 @@ export const RefreshButton = styled.button`
     width: 50px;
     height: 50px;
     position: fixed;
-    bottom: 50px;
-    right: 50px;
+    bottom: 40px;
+    right: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
